@@ -51,6 +51,7 @@ import TableHeader from 'src/views/apps/documents/list/TableHeader'
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import formatDate from 'src/utils/formatDate'
 import formatCurrency from 'src/utils/formatCurrency'
+import Autocomplete from '@mui/material/Autocomplete'
 
 interface InvoiceStatusObj {
   [key: string]: {
@@ -319,8 +320,8 @@ console.log("storestorestore", store)
           <Card>
             <CardHeader title='Filters' />
             <CardContent>
-              <Grid container spacing={6}>
-                <Grid item xs={12} sm={6}>
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={4}>
                   <FormControl fullWidth>
                     <InputLabel id='invoice-status-select'>Estado de la orden</InputLabel>
 
@@ -339,7 +340,80 @@ console.log("storestorestore", store)
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={4}>
+                  <FormControl fullWidth>
+                    <InputLabel id='invoice-status-select'>Condición de Pago</InputLabel>
+
+                    <Select
+                      fullWidth
+                      value={statusValue}
+                      sx={{ mr: 4, mb: 2 }}
+                      label='Estado de la orden'
+                      onChange={handleStatusValue}
+                      labelId='invoice-status-select'
+                    >
+                      <MenuItem value=''>none</MenuItem>
+                      {Object.keys(orderStatusLabels).map( k  => {
+                         return <MenuItem value={k}>{orderStatusLabels[k]}</MenuItem>
+                      })}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <FormControl fullWidth>
+                    <InputLabel id='invoice-status-select'>Localidad</InputLabel>
+
+                    <Select
+                      fullWidth
+                      value={statusValue}
+                      sx={{ mr: 4, mb: 2 }}
+                      label='Estado de la orden'
+                      onChange={handleStatusValue}
+                      labelId='invoice-status-select'
+                    >
+                      <MenuItem value=''>none</MenuItem>
+                      {Object.keys(orderStatusLabels).map( k  => {
+                         return <MenuItem value={k}>{orderStatusLabels[k]}</MenuItem>
+                      })}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={12} sm={4}>
+                  <FormControl fullWidth>
+                    <InputLabel id='invoice-status-select'>Tipo Documento</InputLabel>
+
+                    <Select
+                      fullWidth
+                      value={statusValue}
+                      sx={{ mr: 4, mb: 2 }}
+                      label='Estado de la orden'
+                      onChange={handleStatusValue}
+                      labelId='invoice-status-select'
+                    >
+                      <MenuItem value=''>none</MenuItem>
+                      <MenuItem value='2'>Pedido</MenuItem>
+                      <MenuItem value='2'>Cotización</MenuItem>
+
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid  xs={12} sm={4} >
+            
+                <Autocomplete
+        multiple
+        options={[{title: "test"}]}
+        filterSelectedOptions
+        defaultValue={[{title: "test"}]}
+        id='autocomplete-multiple-outlined'
+        getOptionLabel={option => option.title || ''}
+        sx={{  mt: 3, ml: 3,  }}
+        renderInput={params => <TextField {...params} label='Vendedores' placeholder='Vendedores' />}
+      />
+    
+                </Grid>
+                <Grid item xs={12} sm={4}>
                   <DatePicker
                     isClearable
                     selectsRange
@@ -354,7 +428,7 @@ console.log("storestorestore", store)
                       <CustomInput
                         dates={dates}
                         setDates={setDates}
-                        label='Invoice Date'
+                        label='Fecha'
                         end={endDateRange as number | Date}
                         start={startDateRange as number | Date}
                       />
