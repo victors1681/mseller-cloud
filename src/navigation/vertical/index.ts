@@ -20,7 +20,7 @@ const navigation = (): VerticalNavItemsType => {
         {
           title: 'Transportes',
           icon: 'mdi:truck',
-          path: '/apps/transports/preview'
+          path: '/apps/transports/list'
         },
         {
           title: 'Cobranza',

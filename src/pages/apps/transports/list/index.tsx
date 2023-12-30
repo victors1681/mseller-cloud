@@ -30,12 +30,12 @@ import DatePicker from 'react-datepicker'
 
 // ** Store & Actions Imports
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchData, deleteInvoice } from 'src/store/apps/documents'
+import { fetchData, deleteInvoice } from 'src/store/apps/transports'
 
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
 import { ThemeColor } from 'src/@core/layouts/types'
-import { OrderType } from 'src/types/apps/invoiceTypes'
+import { TransporteType } from 'src/types/apps/transportType'
 import { DateType } from 'src/types/forms/reactDatepickerTypes'
 
 // ** Utils Import
@@ -43,7 +43,6 @@ import { getInitials } from 'src/@core/utils/get-initials'
 
 // ** Custom Components Imports
 import CustomChip from 'src/@core/components/mui/chip'
-import CustomAvatar from 'src/@core/components/mui/avatar'
 import OptionsMenu from 'src/@core/components/option-menu'
 import TableHeader from 'src/views/apps/documents/list/TableHeader'
 
@@ -52,6 +51,7 @@ import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import formatDate from 'src/utils/formatDate'
 import formatCurrency from 'src/utils/formatCurrency'
 import Autocomplete from '@mui/material/Autocomplete'
+import { transportStatusLabels, transportStatusObj } from '../utils/transportMappings'
 
 interface InvoiceStatusObj {
   [key: string]: {
@@ -69,7 +69,7 @@ interface CustomInputProps {
 }
 
 interface CellType {
-  row: OrderType
+  row: TransporteType
 }
 
 // ** Styled component for the link in the dataTable
@@ -88,109 +88,68 @@ const invoiceStatusObj: InvoiceStatusObj = {
   Downloaded: { color: 'info', icon: 'mdi:arrow-down' }
 }
 
-const orderStatusLabels = {
-  "0": "Pendiente",
-  "1": "Procesado",
-  "3": "Retenido",
-  "5": "Pendinete Imprimir",
-  "6": "Condicion Crédito",
-  "7": "Backorder",
-  "8": "Error Integración",
-  "9": "Listo Para Integrar",
-  "10": "Enviado al ERP",
-}
-
-const orderStatusObj: UserStatusType = {
-  
-  "1": 'success',
-  "10": 'success',
-  "0": 'warning',
-  "3": 'info',
-  "9": 'secondary',
-  "5": 'primary',
-  "8": 'error'
-}
-
 
 // ** renders client column
-const renderClient = (row: OrderType) => {
-  if (row.avatarUrl) {
-    return <CustomAvatar src={row.avatarUrl} sx={{ mr: 3, width: '1.875rem', height: '1.875rem' }} />
-  } else {
-    return (
-      <CustomAvatar
-        skin='light'
-        color={(row.avatarColor as ThemeColor) || ('primary' as ThemeColor)}
-        sx={{ mr: 3, fontSize: '.8rem', width: '1.875rem', height: '1.875rem' }}
-      >
-        {getInitials(row.nombreCliente || '')}
-      </CustomAvatar>
-    )
-  }
-}
 
 const defaultColumns: GridColDef[] = [
   {
-    flex: 0.2,
+    flex: 0.15,
     field: 'id',
-    minWidth: 120,
+    minWidth: 110,
     headerName: '#',
-    renderCell: ({ row }: CellType) => <LinkStyled href={`/apps/invoice/preview/${row.noPedidoStr}`}>{`#${row.noPedidoStr}`}</LinkStyled>
-  },
-  {
-    flex: 0.25,
-    field: 'seller',
-    minWidth: 250,
-    headerName: 'Vendedor',
-    renderCell: ({ row }: CellType) => { 
-
-      return (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          {renderClient(row)}
-          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 600 }}>
-              {row.vendedor.nombre}
-            </Typography>
-            <Typography noWrap variant='caption'>
-              {row.vendedor.codigo}
-            </Typography>
-          </Box>
-        </Box>
-      )
-    }
-  },
-  {
-    flex: 0.25,
-    field: 'client',
-    minWidth: 300,
-    headerName: 'Cliente',
-    renderCell: ({ row }: CellType) => { 
-
-      return (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}> 
-          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 600, textTransform: 'capitalize' }}>
-              {row.nombreCliente}
-            </Typography>
-            <Typography noWrap variant='caption'>
-              {row.codigoCliente} - {row.condicion.descripcion}
-            </Typography>
-          </Box>
-        </Box>
-      )
-    }
+    renderCell: ({ row }: CellType) => <LinkStyled href={`/apps/transports/docs/${row.noTransporte}`}>{`${row.noTransporte}`}</LinkStyled>
   },
   {
     flex: 0.1,
     minWidth: 90,
-    field: 'total',
-    headerName: 'Total',
-    renderCell: ({ row }: CellType) => <Typography variant='body2'>{`${formatCurrency(row.total) || 0}`}</Typography>
+    field: 'documents',
+    headerName: 'Entregas',
+    renderCell: ({ row }: CellType) => <Typography variant='body2'>{`${row.documentosEntrega.length}`}</Typography>
+  },
+  {
+    flex: 0.25,
+    field: 'driver',
+    minWidth: 250,
+    headerName: 'Distribuidor',
+    renderCell: ({ row }: CellType) => {
+
+      return (
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 600 }}>
+              {row.distribuidor.nombre}
+            </Typography>
+            <Typography noWrap variant='caption'>
+              {row.distribuidor.codigo}
+            </Typography>
+          </Box>
+        </Box>
+      )
+    }
   },
   {
     flex: 0.15,
-    minWidth: 130,
-    field: 'issuedDate',
+    field: 'location',
+    minWidth: 100,
+    headerName: 'Localidad',
+    renderCell: ({ row }: CellType) => {
+
+      return (
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Typography noWrap variant='body2' sx={{ color: 'text.primary', textTransform: 'capitalize' }}>
+              {row.localidad.descripcion}
+            </Typography>
+          </Box>
+        </Box>
+      )
+    }
+  },
+  {
+    flex: 0.18,
+    minWidth: 150,
+    field: 'date',
     headerName: 'Fecha',
     renderCell: ({ row }: CellType) => <Typography variant='body2'>{formatDate(row.fecha)}</Typography>
   },
@@ -204,8 +163,8 @@ const defaultColumns: GridColDef[] = [
         <CustomChip
           skin='light'
           size='small'
-          label={orderStatusLabels[row?.procesado] || ""}
-          color={orderStatusObj[row.procesado]}
+          label={transportStatusLabels[row?.status?.toString()] || ""}
+          color={transportStatusObj[row.status]}
           sx={{ textTransform: 'capitalize' }}
         />
       )
@@ -227,7 +186,7 @@ const CustomInput = forwardRef((props: CustomInputProps, ref) => {
 })
 /* eslint-enable */
 
-const InvoiceList = () => {
+const TransportList = () => {
   // ** State
   const [dates, setDates] = useState<Date[]>([])
   const [value, setValue] = useState<string>('')
@@ -239,14 +198,14 @@ const InvoiceList = () => {
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
-  const store = useSelector((state: RootState) => state.invoice)
-console.log("storestorestore", store)
+  const store = useSelector((state: RootState) => state.transports)
+  console.log("storestorestore", store)
   useEffect(() => {
     dispatch(
       fetchData({
         dates,
-        q: value,
-        procesado: statusValue
+        noTransporte: value,
+        status: statusValue
       })
     )
   }, [dispatch, statusValue, value, dates])
@@ -299,7 +258,7 @@ console.log("storestorestore", store)
               },
               {
                 text: 'Edit',
-                href: `/apps/invoice/edit/${row.noPedidoStr}`,
+                href: `/apps/invoice/edit/${row.noTransporte}`,
                 icon: <Icon icon='mdi:pencil-outline' fontSize={20} />
               },
               {
@@ -334,8 +293,8 @@ console.log("storestorestore", store)
                       labelId='invoice-status-select'
                     >
                       <MenuItem value=''>none</MenuItem>
-                      {Object.keys(orderStatusLabels).map( k  => {
-                         return <MenuItem value={k}>{orderStatusLabels[k]}</MenuItem>
+                      {Object.keys(transportStatusLabels).map(k => {
+                        return <MenuItem value={k}>{transportStatusLabels[k]}</MenuItem>
                       })}
                     </Select>
                   </FormControl>
@@ -353,8 +312,8 @@ console.log("storestorestore", store)
                       labelId='invoice-status-select'
                     >
                       <MenuItem value=''>none</MenuItem>
-                      {Object.keys(orderStatusLabels).map( k  => {
-                         return <MenuItem value={k}>{orderStatusLabels[k]}</MenuItem>
+                      {Object.keys(transportStatusLabels).map(k => {
+                        return <MenuItem value={k}>{transportStatusLabels[k]}</MenuItem>
                       })}
                     </Select>
                   </FormControl>
@@ -372,8 +331,8 @@ console.log("storestorestore", store)
                       labelId='invoice-status-select'
                     >
                       <MenuItem value=''>none</MenuItem>
-                      {Object.keys(orderStatusLabels).map( k  => {
-                         return <MenuItem value={k}>{orderStatusLabels[k]}</MenuItem>
+                      {Object.keys(transportStatusLabels).map(k => {
+                        return <MenuItem value={k}>{transportStatusLabels[k]}</MenuItem>
                       })}
                     </Select>
                   </FormControl>
@@ -399,41 +358,22 @@ console.log("storestorestore", store)
                   </FormControl>
                 </Grid>
 
-                <Grid  xs={12} sm={4} >
-            
-                <Autocomplete
-        multiple
-        options={[{title: "test"}]}
-        filterSelectedOptions
-        defaultValue={[{title: "test"}]}
-        id='autocomplete-multiple-outlined'
-        getOptionLabel={option => option.title || ''}
-        sx={{  mt: 3, ml: 3,  }}
-        renderInput={params => <TextField {...params} label='Vendedores' placeholder='Vendedores' />}
-      />
-    
+                <Grid xs={12} sm={4} >
+
+                  <Autocomplete
+                    multiple
+                    options={[{ title: "test" }]}
+                    filterSelectedOptions
+                    defaultValue={[{ title: "test" }]}
+                    id='autocomplete-multiple-outlined'
+                    getOptionLabel={option => option.title || ''}
+                    sx={{ mt: 3, ml: 3, }}
+                    renderInput={params => <TextField {...params} label='Distribuidores' placeholder='Distribuidores' />}
+                  />
+
                 </Grid>
                 <Grid item xs={12} sm={4}>
-                  <DatePicker
-                    isClearable
-                    selectsRange
-                    monthsShown={2}
-                    endDate={endDateRange}
-                    selected={startDateRange}
-                    startDate={startDateRange}
-                    shouldCloseOnSelect={false}
-                    id='date-range-picker-months'
-                    onChange={handleOnChangeRange}
-                    customInput={
-                      <CustomInput
-                        dates={dates}
-                        setDates={setDates}
-                        label='Fecha'
-                        end={endDateRange as number | Date}
-                        start={startDateRange as number | Date}
-                      />
-                    }
-                  />
+                  
                 </Grid>
               </Grid>
             </CardContent>
@@ -441,11 +381,11 @@ console.log("storestorestore", store)
         </Grid>
         <Grid item xs={12}>
           <Card>
-            <TableHeader value={value} selectedRows={selectedRows} handleFilter={handleFilter} placeholder='Cliente, NoPedido' />
+            <TableHeader value={value} selectedRows={selectedRows} handleFilter={handleFilter} placeholder='No.Transporte' />
             <DataGrid
               autoHeight
               pagination
-              rows={store.data}
+              rows={store.transportData}
               columns={columns}
               checkboxSelection
               disableRowSelectionOnClick
@@ -453,7 +393,7 @@ console.log("storestorestore", store)
               paginationModel={paginationModel}
               onPaginationModelChange={setPaginationModel}
               onRowSelectionModelChange={rows => setSelectedRows(rows)}
-              getRowId={row =>  row.noPedidoStr}
+              getRowId={row => row.noTransporte}
             />
           </Card>
         </Grid>
@@ -462,4 +402,4 @@ console.log("storestorestore", store)
   )
 }
 
-export default InvoiceList
+export default TransportList
