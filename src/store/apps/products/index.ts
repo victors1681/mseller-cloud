@@ -10,7 +10,7 @@ import { ProductType } from 'src/types/apps/productTypes'
 interface DataParams {
   query: string
   dates?: Date[]
-  procesado?: string
+  status?: string
   pageNumber: number
 }
 
@@ -28,8 +28,8 @@ export const fetchData = createAsyncThunk(
   'appProduct/fetchData',
   async (params: DataParams) => {
     console.log('params', params)
-    if (params.procesado === '') {
-      delete params.procesado
+    if (params.status === '') {
+      delete params.status
     }
     const response = await axios.get<
       any,
@@ -84,6 +84,11 @@ export const appProductSlice = createSlice({
     })
     builder.addCase(fetchData.rejected, (state, action) => {
       state.isLoading = false
+      state.data = []
+      state.total = 0
+      state.pageNumber = 0
+      state.pageSize = 0
+      state.totalPages = 0
     })
     builder.addCase(fetchData.fulfilled, (state, action) => {
       state.data = action.payload.data

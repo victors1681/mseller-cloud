@@ -214,11 +214,11 @@ const InvoiceList = () => {
       fetchData({
         dates,
         query: value,
-        procesado: statusValue,
+        status: statusValue,
         pageNumber: paginationModel.page,
       }),
     )
-  }, [])
+  }, [statusValue])
 
   const handlePagination = useCallback(
     (values: any) => {
@@ -227,7 +227,7 @@ const InvoiceList = () => {
         fetchData({
           dates,
           query: value,
-          procesado: statusValue,
+          status: statusValue,
           pageNumber: values.page,
         }),
       )
@@ -241,7 +241,7 @@ const InvoiceList = () => {
         fetchData({
           dates,
           query: value,
-          procesado: statusValue,
+          status: statusValue,
           pageNumber: paginationModel.page,
         }),
       )
@@ -314,22 +314,6 @@ const InvoiceList = () => {
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
                   <FormControl fullWidth>
-                    <InputLabel id="invoice-status-select">Vendedor</InputLabel>
-                    <Select
-                      fullWidth
-                      value={statusValue}
-                      sx={{ mr: 4, mb: 2 }}
-                      label="Vendedor"
-                      onChange={handleStatusValue}
-                      labelId="invoice-status-select"
-                    >
-                      <MenuItem value="">none</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <FormControl fullWidth>
                     <InputLabel id="invoice-status-select">Activo</InputLabel>
                     <Select
                       fullWidth
@@ -340,6 +324,8 @@ const InvoiceList = () => {
                       labelId="invoice-status-select"
                     >
                       <MenuItem value="">none</MenuItem>
+                      <MenuItem value="A">Activo</MenuItem>
+                      <MenuItem value="I">Inactivo</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>

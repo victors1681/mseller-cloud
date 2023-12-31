@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState, useEffect, forwardRef } from 'react'
+import { useState, useEffect, forwardRef, useCallback } from 'react'
 
 // ** Next Import
 import Link from 'next/link'
@@ -52,6 +52,7 @@ import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import formatDate from 'src/utils/formatDate'
 import formatCurrency from 'src/utils/formatCurrency'
 import Autocomplete from '@mui/material/Autocomplete'
+import { debounce } from '@mui/material'
 
 interface InvoiceStatusObj {
   [key: string]: {
@@ -100,7 +101,7 @@ const orderStatusLabels = {
   '10': 'Enviado al ERP',
 }
 
-const orderStatusObj: UserStatusType = {
+const orderStatusObj = {
   '1': 'success',
   '10': 'success',
   '0': 'warning',
@@ -123,7 +124,6 @@ const renderClient = (row: OrderType) => {
     return (
       <CustomAvatar
         skin="light"
-        color={(row.avatarColor as ThemeColor) || ('primary' as ThemeColor)}
         sx={{ mr: 3, fontSize: '.8rem', width: '1.875rem', height: '1.875rem' }}
       >
         {getInitials(row.nombreCliente || '')}
@@ -141,7 +141,7 @@ const defaultColumns: GridColDef[] = [
     renderCell: ({ row }: CellType) => (
       <LinkStyled
         href={`/apps/invoice/preview/${row.noPedidoStr}`}
-      >{`#${row.noPedidoStr}`}</LinkStyled>
+      >{`${row.noPedidoStr}`}</LinkStyled>
     ),
   },
   {
@@ -278,20 +278,63 @@ const InvoiceList = () => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
   const store = useSelector((state: RootState) => state.invoice)
-  console.log('storestorestore', store)
+
+  const handlePagination = useCallback(
+    (values: any) => {
+      setPaginationModel(values)
+      dispatch(
+        fetchData({
+          dates,
+          query: value,
+          procesado: statusValue,
+          pageNumber: values.page,
+        }),
+      )
+    },
+    [paginationModel, value, statusValue],
+  )
+
   useEffect(() => {
     dispatch(
       fetchData({
         dates,
-        q: value,
+        query: value,
         procesado: statusValue,
+        pageNumber: paginationModel.page,
       }),
     )
-  }, [dispatch, statusValue, value, dates])
+  }, [dispatch, statusValue, dates])
 
-  const handleFilter = (val: string) => {
-    setValue(val)
-  }
+  const performRequest = useCallback(
+    (value: string) => {
+      dispatch(
+        fetchData({
+          dates,
+          query: value,
+          procesado: statusValue,
+          pageNumber: paginationModel.page,
+        }),
+      )
+    },
+    [dispatch, statusValue, value, dates, paginationModel],
+  )
+
+  const fn = useCallback(
+    debounce((val: string) => {
+      setPaginationModel({ page: 1, pageSize: 20 })
+      performRequest(val)
+    }, 900),
+    [],
+  )
+
+  const handleFilter = useCallback(
+    (val: string) => {
+      fn.clear()
+      setValue(val)
+      fn(val)
+    },
+    [fn],
+  )
 
   const handleStatusValue = (e: SelectChangeEvent) => {
     setStatusValue(e.target.value)
@@ -512,15 +555,17 @@ const InvoiceList = () => {
             <DataGrid
               autoHeight
               pagination
+              checkboxSelection
               rows={store.data}
               columns={columns}
-              checkboxSelection
               disableRowSelectionOnClick
-              pageSizeOptions={[10, 25, 50]}
               paginationModel={paginationModel}
-              onPaginationModelChange={setPaginationModel}
+              onPaginationModelChange={handlePagination}
               onRowSelectionModelChange={(rows) => setSelectedRows(rows)}
               getRowId={(row) => row.noPedidoStr}
+              paginationMode="server"
+              loading={store.isLoading}
+              rowCount={store.totalResults} //
             />
           </Card>
         </Grid>

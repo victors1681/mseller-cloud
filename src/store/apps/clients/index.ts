@@ -84,6 +84,11 @@ export const appClientSlice = createSlice({
     })
     builder.addCase(fetchData.rejected, (state, action) => {
       state.isLoading = false
+      state.data = []
+      state.total = 0
+      state.pageNumber = 0
+      state.pageSize = 0
+      state.totalPages = 0
     })
     builder.addCase(fetchData.fulfilled, (state, action) => {
       state.data = action.payload.data

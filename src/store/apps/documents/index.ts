@@ -4,11 +4,13 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 // ** Axios Imports
 import axios from 'axios'
+import { PaginatedResponse } from 'src/types/apps/response'
 
 interface DataParams {
-  q: string
+  query: string
   dates?: Date[]
   procesado?: string
+  pageNumber?: number
 }
 
 interface Redux {
@@ -16,28 +18,39 @@ interface Redux {
   dispatch: Dispatch<any>
 }
 
+export interface AxiosResponse<T> {
+  data: T
+}
 // ** Fetch Invoices
 export const fetchData = createAsyncThunk(
-  'appInvoice/fetchData',
+  'appDocuments/fetchData',
   async (params: DataParams) => {
     if (params.procesado === '') {
       delete params.procesado
     }
-    const response = await axios.get('/api/document/orders', {
+    const response = await axios.get<
+      any,
+      AxiosResponse<PaginatedResponse<DocumentType>>
+    >('/api/document/orders', {
       params,
     })
 
     return {
-      invoices: response.data,
+      data: response.data.data,
       params,
       allData: [],
-      total: response.data.length,
+      total: response.data.data.length,
+      pageNumber: response.data.pageNumber,
+      pageSize: response.data.pageSize,
+      totalPages: response.data.totalPages,
+      totalResults: response.data.totalResults,
+      isLoading: false,
     }
   },
 )
 
 export const deleteInvoice = createAsyncThunk(
-  'appInvoice/deleteData',
+  'appDocuments/deleteData',
   async (id: number | string, { getState, dispatch }: Redux) => {
     const response = await axios.delete('/apps/invoice/delete', {
       data: id,
@@ -48,23 +61,44 @@ export const deleteInvoice = createAsyncThunk(
   },
 )
 
-export const appInvoiceSlice = createSlice({
-  name: 'appInvoice',
+export const appDocumentsSlice = createSlice({
+  name: 'appDocuments',
   initialState: {
-    data: [],
-    total: 1,
+    data: [] as any,
     params: {},
     allData: [],
+    pageNumber: 0,
+    pageSize: 0,
+    totalPages: 0,
+    totalResults: 0,
+    total: 0,
+    isLoading: true,
   },
   reducers: {},
   extraReducers: (builder) => {
+    builder.addCase(fetchData.pending, (state, action) => {
+      state.isLoading = true
+    })
+    builder.addCase(fetchData.rejected, (state, action) => {
+      state.isLoading = false
+      state.data = []
+      state.total = 0
+      state.pageNumber = 0
+      state.pageSize = 0
+      state.totalPages = 0
+    })
     builder.addCase(fetchData.fulfilled, (state, action) => {
-      state.data = action.payload.invoices
+      state.data = action.payload.data
       state.params = action.payload.params
       state.allData = action.payload.allData
       state.total = action.payload.total
+      state.pageNumber = action.payload.pageNumber
+      state.pageSize = action.payload.pageSize
+      state.totalPages = action.payload.totalPages
+      ;(state.totalResults = action.payload.totalResults),
+        (state.isLoading = false)
     })
   },
 })
 
-export default appInvoiceSlice.reducer
+export default appDocumentsSlice.reducer
