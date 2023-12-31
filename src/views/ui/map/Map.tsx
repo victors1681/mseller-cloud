@@ -173,7 +173,7 @@ export const Map = ({ orderDetails }: MapProps) => {
   }, [locations?.length]);
 
   return (
-    <Wrapper apiKey={process.env.GOOGLE_MAP || ""} render={render}>
+    <Wrapper apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAP || ""} render={render}>
       <MyMapComponent center={center} zoom={zoom}>
         {locations?.map((l) => (
           <Marker

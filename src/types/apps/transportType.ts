@@ -1,4 +1,5 @@
 import { TransportStatusEnum } from "src/pages/apps/transports/utils/transportMappings"
+import { ClienteType, VendedorType } from "./clientTypes"
 
 export interface TransportResponse {
   transportes: TransporteType[]
@@ -11,7 +12,7 @@ export interface TransporteType {
   distribuidor: Distribuidor
   procesado: boolean
   status: number
-  localidad: Localidad
+  localidad: LocalidadType
   noTransporte: string
   localidadId: number
   codigoDistribuidor: string
@@ -28,7 +29,7 @@ export interface Distribuidor {
   localidad: number
 }
 
-export interface Localidad {
+export interface LocalidadType {
   id: number
   codigo: any
   descripcion: string
@@ -79,7 +80,7 @@ export interface DocumentoEntregaType {
     fechaEntrega: string
     modificada: boolean
     recibida: boolean
-    vendedor: Vendedor
+    vendedor: VendedorType
     noDocEntrega: string
     codigoCliente: string
     fecha: string
@@ -98,21 +99,13 @@ export interface DocumentoEntregaType {
     permitirEditar: boolean
     secuenciaEntrega: number
     detalle: DocumentoEntregaDetalleType[]
-    cliente: Cliente
+    cliente: ClienteType
     codigoMotivoRechazo: string
     motivoRechazo: MotivoRechazo
     NcfAutoActualizado: boolean
     NcfFechaAutoActualizado: string
 }
 
-
-export interface Vendedor {
-  codigo: string
-  nombre: string
-  email: string
-  status: string
-  localidad: number
-}
 
 export interface DocumentoEntregaDetalleType {
   producto: Producto
@@ -163,45 +156,4 @@ export interface Producto {
   descuento: number
   tipoImpuesto: string
   apartado: number
-}
-
-export interface Cliente {
-  codigo: string
-  nombre: string
-  direccion: string
-  telefono1: string
-  ciudad: string
-  balance: number
-  limiteFacturas: number
-  limiteCredito: number
-  status: string
-  rnc: string
-  confirmado: boolean
-  email: string
-  condicionPrecio: number
-  codigoVendedor: string
-  rutaVenta: number
-  clasificacion: string
-  actualizar: boolean
-  descuento: number
-  impuesto: boolean
-  condicion: string
-  dia: number
-  frecuencia: number
-  secuencia: number
-  localidadId: number
-  bloqueoPorVencimiento: boolean
-  descuentoProntoPago: number
-  tipoCliente: string
-  contacto: any
-  localidad: any
-  geoLocalizacion?: GeoLocalizacion
-  vendedor: Vendedor
-  condicionPago: any
-}
-
-export interface GeoLocalizacion {
-  codigo_cliente: string
-  longitud: number
-  latitud: number
 }
