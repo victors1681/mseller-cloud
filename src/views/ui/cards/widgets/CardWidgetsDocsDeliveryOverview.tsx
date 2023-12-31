@@ -28,9 +28,11 @@ import {
 import { TransportStatusEnum } from 'src/pages/apps/transports/utils/transportMappings'
 import formatCurrency from 'src/utils/formatCurrency'
 import React from 'react'
+import LoadingWrapper from '../../LoadingWrapper'
 
 interface Props {
   docsData: DocumentoEntregaType[]
+  isLoading: boolean
 }
 
 const getStats = (docsData: DocumentoEntregaType[]) => {
@@ -47,7 +49,6 @@ const getStats = (docsData: DocumentoEntregaType[]) => {
       f.tipoPago === TypoPagoEnum.Check,
   )
   const check = checkArr.reduce((a, c) => (a += c.bruto_E), 0)
-  console.log('checkArr', checkArr)
 
   const creditArr = docsData.filter(
     (f) =>
@@ -157,127 +158,131 @@ const CardWidgetsDocsDeliveryOverview = (props: Props) => {
 
   return (
     <Card>
-      <CardHeader
-        title="Entregas"
-        titleTypographyProps={{
-          sx: {
-            lineHeight: '1.5rem !important',
-            letterSpacing: '0.15px !important',
-          },
-        }}
-      />
-      <CardContent>
-        <Grid container sx={{ my: [0, 4, 3] }}>
-          <Grid item xs={12} sm={6} sx={{ mb: [3, 0] }}>
-            <ReactApexcharts
-              type="donut"
-              height={200}
-              series={data.donut}
-              options={options()}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} sx={{ my: 'auto' }}>
-            <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
-              <CustomAvatar
-                skin="light"
-                variant="rounded"
-                sx={{ mr: 3, '& svg': { color: 'primary.main' } }}
-              >
-                <Icon icon="mdi:currency-usd" />
-              </CustomAvatar>
-              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                <Typography variant="body2">Total Entregas</Typography>
-                <Typography variant="h6">
-                  {formatCurrency(data.total)}
-                </Typography>
+      <LoadingWrapper isLoading={props.isLoading}>
+        <CardHeader
+          title="Entregas"
+          titleTypographyProps={{
+            sx: {
+              lineHeight: '1.5rem !important',
+              letterSpacing: '0.15px !important',
+            },
+          }}
+        />
+        <CardContent>
+          <Grid container sx={{ my: [0, 4, 3] }}>
+            <Grid item xs={12} sm={6} sx={{ mb: [3, 0] }}>
+              <ReactApexcharts
+                type="donut"
+                height={200}
+                series={data.donut}
+                options={options()}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} sx={{ my: 'auto' }}>
+              <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
+                <CustomAvatar
+                  skin="light"
+                  variant="rounded"
+                  sx={{ mr: 3, '& svg': { color: 'primary.main' } }}
+                >
+                  <Icon icon="mdi:currency-usd" />
+                </CustomAvatar>
+                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                  <Typography variant="body2">Total Entregas</Typography>
+                  <Typography variant="h6">
+                    {formatCurrency(data.total)}
+                  </Typography>
+                </Box>
               </Box>
-            </Box>
-            <Divider sx={{ my: (theme) => `${theme.spacing(4)} !important` }} />
-            <Grid container>
-              <Grid item xs={6} sx={{ mb: 4 }}>
-                <Box
-                  sx={{
-                    mb: 1.5,
-                    display: 'flex',
-                    alignItems: 'center',
-                    '& svg': {
-                      mr: 1.5,
-                      fontSize: '0.75rem',
-                      color: 'primary.main',
-                    },
-                  }}
-                >
-                  <Icon icon="mdi:circle" />
-                  <Typography variant="body2">Efectivo</Typography>
-                </Box>
-                <Typography sx={{ fontWeight: 600 }}>
-                  {formatCurrency(data.cash)}
-                </Typography>
-              </Grid>
-              <Grid item xs={6} sx={{ mb: 4 }}>
-                <Box
-                  sx={{
-                    mb: 1.5,
-                    display: 'flex',
-                    alignItems: 'center',
-                    '& svg': {
-                      mr: 1.5,
-                      fontSize: '0.75rem',
-                      color: hexToRGBA(theme.palette.primary.main, 0.7),
-                    },
-                  }}
-                >
-                  <Icon icon="mdi:circle" />
-                  <Typography variant="body2">Cheque</Typography>
-                </Box>
-                <Typography sx={{ fontWeight: 600 }}>
-                  {formatCurrency(data.check)}
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Box
-                  sx={{
-                    mb: 1.5,
-                    display: 'flex',
-                    alignItems: 'center',
-                    '& svg': {
-                      mr: 1.5,
-                      fontSize: '0.75rem',
-                      color: hexToRGBA(theme.palette.primary.main, 0.5),
-                    },
-                  }}
-                >
-                  <Icon icon="mdi:circle" />
-                  <Typography variant="body2">Transferencia</Typography>
-                </Box>
-                <Typography sx={{ fontWeight: 600 }}>
-                  {formatCurrency(data.transfer)}
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Box
-                  sx={{
-                    mb: 1.5,
-                    display: 'flex',
-                    alignItems: 'center',
-                    '& svg': {
-                      mr: 1.5,
-                      fontSize: '0.75rem',
-                      color: 'customColors.trackBg',
-                    },
-                  }}
-                >
-                  <Icon icon="mdi:circle" />
-                  <Typography variant="body2">Crédito</Typography>
-                </Box>
-                <Typography sx={{ fontWeight: 600 }}>
-                  {formatCurrency(data.credit)}
-                </Typography>
+              <Divider
+                sx={{ my: (theme) => `${theme.spacing(4)} !important` }}
+              />
+              <Grid container>
+                <Grid item xs={6} sx={{ mb: 4 }}>
+                  <Box
+                    sx={{
+                      mb: 1.5,
+                      display: 'flex',
+                      alignItems: 'center',
+                      '& svg': {
+                        mr: 1.5,
+                        fontSize: '0.75rem',
+                        color: 'primary.main',
+                      },
+                    }}
+                  >
+                    <Icon icon="mdi:circle" />
+                    <Typography variant="body2">Efectivo</Typography>
+                  </Box>
+                  <Typography sx={{ fontWeight: 600 }}>
+                    {formatCurrency(data.cash)}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6} sx={{ mb: 4 }}>
+                  <Box
+                    sx={{
+                      mb: 1.5,
+                      display: 'flex',
+                      alignItems: 'center',
+                      '& svg': {
+                        mr: 1.5,
+                        fontSize: '0.75rem',
+                        color: hexToRGBA(theme.palette.primary.main, 0.7),
+                      },
+                    }}
+                  >
+                    <Icon icon="mdi:circle" />
+                    <Typography variant="body2">Cheque</Typography>
+                  </Box>
+                  <Typography sx={{ fontWeight: 600 }}>
+                    {formatCurrency(data.check)}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Box
+                    sx={{
+                      mb: 1.5,
+                      display: 'flex',
+                      alignItems: 'center',
+                      '& svg': {
+                        mr: 1.5,
+                        fontSize: '0.75rem',
+                        color: hexToRGBA(theme.palette.primary.main, 0.5),
+                      },
+                    }}
+                  >
+                    <Icon icon="mdi:circle" />
+                    <Typography variant="body2">Transferencia</Typography>
+                  </Box>
+                  <Typography sx={{ fontWeight: 600 }}>
+                    {formatCurrency(data.transfer)}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Box
+                    sx={{
+                      mb: 1.5,
+                      display: 'flex',
+                      alignItems: 'center',
+                      '& svg': {
+                        mr: 1.5,
+                        fontSize: '0.75rem',
+                        color: 'customColors.trackBg',
+                      },
+                    }}
+                  >
+                    <Icon icon="mdi:circle" />
+                    <Typography variant="body2">Crédito</Typography>
+                  </Box>
+                  <Typography sx={{ fontWeight: 600 }}>
+                    {formatCurrency(data.credit)}
+                  </Typography>
+                </Grid>
               </Grid>
             </Grid>
           </Grid>
-        </Grid>
-      </CardContent>
+        </CardContent>
+      </LoadingWrapper>
     </Card>
   )
 }

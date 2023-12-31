@@ -272,7 +272,7 @@ const InvoiceList = () => {
   const [startDateRange, setStartDateRange] = useState<any>(null)
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
-    pageSize: 10,
+    pageSize: 20,
   })
 
   // ** Hooks

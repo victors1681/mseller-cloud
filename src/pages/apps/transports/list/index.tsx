@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState, useEffect, forwardRef } from 'react'
+import { useState, useEffect, forwardRef, useCallback } from 'react'
 
 // ** Next Import
 import Link from 'next/link'
@@ -35,7 +35,10 @@ import { fetchData, deleteInvoice } from 'src/store/apps/transports'
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
 import { ThemeColor } from 'src/@core/layouts/types'
-import { TransporteType } from 'src/types/apps/transportType'
+import {
+  TransporteListType,
+  TransporteType,
+} from 'src/types/apps/transportType'
 import { DateType } from 'src/types/forms/reactDatepickerTypes'
 
 // ** Utils Import
@@ -55,6 +58,7 @@ import {
   transportStatusLabels,
   transportStatusObj,
 } from '../utils/transportMappings'
+import { debounce } from '@mui/material'
 
 interface InvoiceStatusObj {
   [key: string]: {
@@ -72,7 +76,7 @@ interface CustomInputProps {
 }
 
 interface CellType {
-  row: TransporteType
+  row: TransporteListType
 }
 
 // ** Styled component for the link in the dataTable
@@ -111,7 +115,7 @@ const defaultColumns: GridColDef[] = [
     field: 'documents',
     headerName: 'Entregas',
     renderCell: ({ row }: CellType) => (
-      <Typography variant="body2">{`${row.documentosEntrega.length}`}</Typography>
+      <Typography variant="body2">{`${row.totalEntregas}`}</Typography>
     ),
   },
   {
@@ -223,7 +227,7 @@ const TransportList = () => {
   const [startDateRange, setStartDateRange] = useState<any>(null)
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
-    pageSize: 10,
+    pageSize: 20,
   })
 
   // ** Hooks
@@ -236,26 +240,58 @@ const TransportList = () => {
         dates,
         noTransporte: value,
         status: statusValue,
+        pageNumber: paginationModel.page,
       }),
     )
-  }, [dispatch, statusValue, value, dates])
+  }, [statusValue])
 
-  const handleFilter = (val: string) => {
-    setValue(val)
-  }
+  const performRequest = useCallback(
+    (value: string) => {
+      dispatch(
+        fetchData({
+          dates,
+          noTransporte: value,
+          status: statusValue,
+          pageNumber: paginationModel.page,
+        }),
+      )
+    },
+    [dispatch, statusValue, value, dates, paginationModel],
+  )
 
+  const fn = useCallback(
+    debounce((val: string) => {
+      setPaginationModel({ page: 1, pageSize: 20 })
+      performRequest(val)
+    }, 900),
+    [],
+  )
   const handleStatusValue = (e: SelectChangeEvent) => {
     setStatusValue(e.target.value)
   }
 
-  const handleOnChangeRange = (dates: any) => {
-    const [start, end] = dates
-    if (start !== null && end !== null) {
-      setDates(dates)
-    }
-    setStartDateRange(start)
-    setEndDateRange(end)
-  }
+  const handleFilter = useCallback(
+    (val: string) => {
+      fn.clear()
+      setValue(val)
+      fn(val)
+    },
+    [fn],
+  )
+  const handlePagination = useCallback(
+    (values: any) => {
+      setPaginationModel(values)
+      dispatch(
+        fetchData({
+          dates,
+          noTransporte: value,
+          status: statusValue,
+          pageNumber: values.page,
+        }),
+      )
+    },
+    [paginationModel, value, statusValue],
+  )
 
   const columns: GridColDef[] = [
     ...defaultColumns,
@@ -450,13 +486,14 @@ const TransportList = () => {
               pagination
               rows={store.transportData}
               columns={columns}
-              checkboxSelection
               disableRowSelectionOnClick
-              pageSizeOptions={[10, 25, 50]}
               paginationModel={paginationModel}
-              onPaginationModelChange={setPaginationModel}
+              onPaginationModelChange={handlePagination}
               onRowSelectionModelChange={(rows) => setSelectedRows(rows)}
               getRowId={(row) => row.noTransporte}
+              paginationMode="server"
+              loading={store.isLoading}
+              rowCount={store.totalResults} //
             />
           </Card>
         </Grid>

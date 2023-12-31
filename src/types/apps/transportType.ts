@@ -8,6 +8,19 @@ export interface TransportResponse {
   pageSize: number
 }
 
+export interface TransporteListType {
+  distribuidor: Distribuidor
+  procesado: boolean
+  status: number
+  localidad: LocalidadType
+  noTransporte: string
+  localidadId: number
+  codigoDistribuidor: string
+  fecha: string
+  observacion: string
+  totalEntregas: number
+}
+
 export interface TransporteType {
   distribuidor: Distribuidor
   procesado: boolean

@@ -31,10 +31,7 @@ import {
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
 import { ThemeColor } from 'src/@core/layouts/types'
-import {
-  DocumentoEntregaType,
-  TransporteType,
-} from 'src/types/apps/transportType'
+import { DocumentoEntregaType } from 'src/types/apps/transportType'
 
 // ** Custom Components Imports
 import CustomChip from 'src/@core/components/mui/chip'
@@ -241,7 +238,7 @@ const TransportDocs = (props: TransportDocsProps) => {
   const [startDateRange, setStartDateRange] = useState<any>(null)
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
-    pageSize: 10,
+    pageSize: 20,
   })
 
   // ** Hooks
@@ -286,11 +283,15 @@ const TransportDocs = (props: TransportDocsProps) => {
     <DatePickerWrapper>
       <Grid container spacing={6}>
         <Grid item xs={6}>
-          <CardStatisticsTransport docsData={store.docsData} />
+          <CardStatisticsTransport
+            docsData={store.docsData}
+            isLoading={store.isLoading}
+          />
         </Grid>
         <Grid item xs={6}>
           <CardWidgetsDocsDeliveryOverview
             docsData={store.docsData?.documentos || []}
+            isLoading={store.isLoading}
           />
         </Grid>
         <Grid item xs={12}>
@@ -301,11 +302,11 @@ const TransportDocs = (props: TransportDocsProps) => {
               rows={store.docsData?.documentos || []}
               columns={columns}
               disableRowSelectionOnClick
-              pageSizeOptions={[10, 25, 50]}
               paginationModel={paginationModel}
               onPaginationModelChange={setPaginationModel}
               onRowSelectionModelChange={(rows) => setSelectedRows(rows)}
               getRowId={(row) => row.noDocEntrega}
+              loading={store.isLoading}
             />
           </Card>
         </Grid>

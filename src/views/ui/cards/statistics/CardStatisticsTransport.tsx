@@ -24,6 +24,8 @@ import {
 } from 'src/pages/apps/transports/utils/transportMappings'
 import CustomChip from 'src/@core/components/mui/chip'
 import Link from 'next/link'
+import React from 'react'
+import LoadingWrapper from '../../LoadingWrapper'
 interface DataType {
   icon: string
   stats: string
@@ -74,84 +76,90 @@ const renderStats = (docsData: DocumentoEntregaResponse | null) => {
 
 interface Props {
   docsData: DocumentoEntregaResponse | null
+  isLoading: boolean
 }
+
 const CardStatisticsTransport = (props: Props) => {
   return (
     <Card>
-      <CardHeader
-        title={
-          <Button
-            sx={{ mb: 2 }}
-            component={Link}
-            startIcon={<Icon icon="ep:back" />}
-            variant="text"
-            href="/apps/transports/list"
-          >
-            Regresar Transporte
-          </Button>
-        }
-        titleTypographyProps={{
-          sx: {
-            lineHeight: '2rem !important',
-            letterSpacing: '0.15px !important',
-          },
-        }}
-      />
-      <CardContent>
-        <Grid container>
-          <Grid item xs={6} md={6}>
-            <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
-              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                <Typography variant="body2">No. Transporte</Typography>
-                <Typography variant="h6">
-                  {props.docsData?.noTransporte}
-                </Typography>
-              </Box>
-            </Box>
-          </Grid>
-          <Grid item xs={6} md={6}>
-            <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
-              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                <Typography variant="body2">Distribuidor</Typography>
-                <Typography variant="h6">
-                  {props.docsData?.distribuidor.nombre}
-                </Typography>
-              </Box>
-            </Box>
-          </Grid>
-          <Grid item xs={6} md={6}>
-            <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
-              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                <Typography variant="body2">Status</Typography>
+      <LoadingWrapper isLoading={props.isLoading}>
+        <>
+          <CardHeader
+            title={
+              <Button
+                sx={{ mb: 2 }}
+                component={Link}
+                startIcon={<Icon icon="ep:back" />}
+                variant="text"
+                href="/apps/transports/list"
+              >
+                Regresar Transporte
+              </Button>
+            }
+            titleTypographyProps={{
+              sx: {
+                lineHeight: '2rem !important',
+                letterSpacing: '0.15px !important',
+              },
+            }}
+          />
+          <CardContent>
+            <Grid container>
+              <Grid item xs={6} md={6}>
+                <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    <Typography variant="body2">No. Transporte</Typography>
+                    <Typography variant="h6">
+                      {props.docsData?.noTransporte}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Grid>
+              <Grid item xs={6} md={6}>
+                <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    <Typography variant="body2">Distribuidor</Typography>
+                    <Typography variant="h6">
+                      {props.docsData?.distribuidor.nombre}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Grid>
+              <Grid item xs={6} md={6}>
+                <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    <Typography variant="body2">Status</Typography>
 
-                <CustomChip
-                  skin="light"
-                  size="small"
-                  label={
-                    transportStatusLabels[props.docsData?.status || 0] || ''
-                  }
-                  color={transportStatusObj[props.docsData?.status || '']}
-                  sx={{ textTransform: 'capitalize' }}
-                />
-              </Box>
-            </Box>
-          </Grid>
-          <Grid item xs={6} md={6}>
-            <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
-              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                <Typography variant="body2">Fecha</Typography>
-                <Typography variant="h6">
-                  {formatDate(props.docsData?.fecha || '')}
-                </Typography>
-              </Box>
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={12}>
-            <Divider sx={{ mt: 5, mb: 5 }}></Divider>
-          </Grid>
-          {renderStats(props.docsData)}
-        </Grid>
-      </CardContent>
+                    <CustomChip
+                      skin="light"
+                      size="small"
+                      label={
+                        transportStatusLabels[props.docsData?.status || 0] || ''
+                      }
+                      color={transportStatusObj[props.docsData?.status || '']}
+                      sx={{ textTransform: 'capitalize' }}
+                    />
+                  </Box>
+                </Box>
+              </Grid>
+              <Grid item xs={6} md={6}>
+                <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    <Typography variant="body2">Fecha</Typography>
+                    <Typography variant="h6">
+                      {formatDate(props.docsData?.fecha || '')}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Divider sx={{ mt: 5, mb: 5 }}></Divider>
+              </Grid>
+              {renderStats(props.docsData)}
+            </Grid>
+          </CardContent>
+        </>
+      </LoadingWrapper>
     </Card>
   )
 }
