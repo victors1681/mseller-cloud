@@ -29,18 +29,17 @@ import format from 'date-fns/format'
 
 // ** Store & Actions Imports
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchData, deleteClient } from 'src/store/apps/clients'
+import { fetchData, deleteProduct } from 'src/store/apps/products'
 
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
-import { ThemeColor } from 'src/@core/layouts/types'
-import OptionsMenu from 'src/@core/components/option-menu'
 import TableHeader from 'src/views/apps/documents/list/TableHeader'
 
 // ** Styled Components
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import formatCurrency from 'src/utils/formatCurrency'
-import { ClienteType } from 'src/types/apps/clientTypes'
+import { ProductType } from 'src/types/apps/productTypes'
+import PriceDisplay from 'src/views/apps/products/list/PriceDisplay'
 
 interface CustomInputProps {
   dates: Date[]
@@ -51,7 +50,7 @@ interface CustomInputProps {
 }
 
 interface CellType {
-  row: ClienteType
+  row: ProductType
 }
 
 // ** Styled component for the link in the dataTable
@@ -74,9 +73,9 @@ const defaultColumns: GridColDef[] = [
   },
   {
     flex: 0.35,
-    field: 'client',
+    field: 'name',
     minWidth: 300,
-    headerName: 'Nombre/Dir',
+    headerName: 'Nombre',
     renderCell: ({ row }: CellType) => {
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -93,31 +92,7 @@ const defaultColumns: GridColDef[] = [
               {row.nombre}
             </Typography>
             <Typography noWrap variant="caption">
-              {row.direccion} - {row.ciudad}
-            </Typography>
-          </Box>
-        </Box>
-      )
-    },
-  },
-  {
-    flex: 0.2,
-    field: 'seller',
-    minWidth: 200,
-    headerName: 'Vendedor',
-    renderCell: ({ row }: CellType) => {
-      return (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography
-              noWrap
-              variant="body2"
-              sx={{ color: 'text.primary', fontWeight: 600 }}
-            >
-              {row.vendedor.nombre}
-            </Typography>
-            <Typography noWrap variant="caption">
-              {row.vendedor.codigo}
+              {row.area} - {row.iDArea}
             </Typography>
           </Box>
         </Box>
@@ -127,29 +102,56 @@ const defaultColumns: GridColDef[] = [
   {
     flex: 0.15,
     minWidth: 130,
-    field: 'rnc',
-    headerName: 'RNC',
+    field: 'unit',
+    headerName: 'Un',
     renderCell: ({ row }: CellType) => (
-      <Typography variant="body2">{row.rnc}</Typography>
+      <Typography variant="body2">{row.unidad}</Typography>
     ),
+  },
+  {
+    flex: 0.15,
+    minWidth: 130,
+    field: 'pack',
+    headerName: 'Empaque',
+    renderCell: ({ row }: CellType) => (
+      <Typography variant="body2">{row.empaque}</Typography>
+    ),
+  },
+  {
+    flex: 0.2,
+    field: 'price',
+    minWidth: 200,
+    headerName: 'Precios',
+    renderCell: ({ row }: CellType) => {
+      return (
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <PriceDisplay
+              defaultPrice={row.precio1}
+              prices={[row.precio2, row.precio3, row.precio4, row.precio5]}
+            />
+          </Box>
+        </Box>
+      )
+    },
   },
   {
     flex: 0.1,
     minWidth: 90,
-    field: 'total',
-    headerName: 'Tipo',
+    field: 'stock',
+    headerName: 'Impuesto',
     renderCell: ({ row }: CellType) => (
-      <Typography variant="body2">{row.tipoCliente}</Typography>
+      <Typography variant="body2">{row.impuesto}%</Typography>
     ),
   },
 
   {
     flex: 0.1,
-    minWidth: 120,
-    field: 'balance',
-    headerName: 'Balance',
+    minWidth: 80,
+    field: 'fact',
+    headerName: 'Factor',
     renderCell: ({ row }: CellType) => (
-      <Typography variant="body2">{formatCurrency(row.balance)}</Typography>
+      <Typography variant="body2">{row.factor}</Typography>
     ),
   },
   {
@@ -204,7 +206,7 @@ const InvoiceList = () => {
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
-  const store = useSelector((state: RootState) => state.clients)
+  const store = useSelector((state: RootState) => state.Products)
 
   //Initial Load
   useEffect(() => {
@@ -282,7 +284,7 @@ const InvoiceList = () => {
             <IconButton
               size="small"
               disabled
-              onClick={() => dispatch(deleteClient(row.codigo))}
+              onClick={() => dispatch(deleteProduct(row.codigo))}
             >
               <Icon icon="tabler:edit" fontSize={20} />
             </IconButton>
@@ -307,7 +309,7 @@ const InvoiceList = () => {
       <Grid container spacing={6}>
         <Grid item xs={12}>
           <Card>
-            <CardHeader title="Clientes" />
+            <CardHeader title="Productos" />
             <CardContent>
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>

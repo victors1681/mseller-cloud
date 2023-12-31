@@ -46,27 +46,27 @@ const navigation = (): VerticalNavItemsType => {
         {
           title: 'Productos',
           icon: 'fluent-mdl2:product',
-          path: '/apps/products/preview',
+          path: '/apps/products/list',
         },
         {
           title: 'Condiciones Pago',
           icon: 'mdi:account-payment',
-          path: '/apps/paymentType/edit',
+          path: '/apps/paymentType/list',
         },
         {
           title: 'Localidades',
           icon: 'mdi:location',
-          path: '/apps/locations/add',
+          path: '/apps/locations/list',
         },
         {
           title: 'Vendedores',
           icon: 'gis:map-users',
-          path: '/apps/sellers/add',
+          path: '/apps/sellers/list',
         },
         {
           title: 'Distribuidores',
           icon: 'healthicons:truck-driver',
-          path: '/apps/drivers/add',
+          path: '/apps/drivers/list',
         },
       ],
     },
