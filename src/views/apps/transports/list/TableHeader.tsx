@@ -32,21 +32,7 @@ const TableHeader = (props: TableHeaderProps) => {
         justifyContent: 'space-between',
       }}
     >
-      <Select
-        size="small"
-        displayEmpty
-        defaultValue=""
-        sx={{ mr: 4, mb: 2 }}
-        disabled={selectedRows && selectedRows.length === 0}
-        renderValue={(selected) =>
-          selected.length === 0 ? 'Acciones' : selected
-        }
-      >
-        <MenuItem disabled>Acciones</MenuItem>
-        <MenuItem value="1">Aprobar</MenuItem>
-        <MenuItem value="3">Retener</MenuItem>
-        <MenuItem value="delete">Eliminar</MenuItem>
-      </Select>
+      <div></div>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
         <TextField
           size="small"
@@ -55,14 +41,14 @@ const TableHeader = (props: TableHeaderProps) => {
           placeholder={props.placeholder}
           onChange={(e) => handleFilter(e.target.value)}
         />
-        <Button
+        {/* <Button
           sx={{ mb: 2 }}
           component={Link}
           variant="contained"
           href="/apps/invoice/add"
         >
-          Crear Pedido
-        </Button>
+          Crear Transporte
+        </Button> */}
       </Box>
     </Box>
   )

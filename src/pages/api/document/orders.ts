@@ -13,7 +13,9 @@ const handler = async (
 
     const response = await axios.get('http://localhost:5162/portal/Pedido', {
       params: req.query,
+      paramsSerializer: (params) => new URLSearchParams(params).toString(),
     })
+
     res.status(200).json(response.data)
   } catch (error: any) {
     if (error.code === 'ECONNRESET' || error.code === 'ECONNABORTED') {

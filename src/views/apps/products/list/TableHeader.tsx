@@ -32,21 +32,7 @@ const TableHeader = (props: TableHeaderProps) => {
         justifyContent: 'space-between',
       }}
     >
-      <Select
-        size="small"
-        displayEmpty
-        defaultValue=""
-        sx={{ mr: 4, mb: 2 }}
-        disabled={selectedRows && selectedRows.length === 0}
-        renderValue={(selected) =>
-          selected.length === 0 ? 'Acciones' : selected
-        }
-      >
-        <MenuItem disabled>Acciones</MenuItem>
-        <MenuItem value="1">Aprobar</MenuItem>
-        <MenuItem value="3">Retener</MenuItem>
-        <MenuItem value="delete">Eliminar</MenuItem>
-      </Select>
+      <div></div>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
         <TextField
           size="small"
@@ -57,11 +43,12 @@ const TableHeader = (props: TableHeaderProps) => {
         />
         <Button
           sx={{ mb: 2 }}
+          disabled
           component={Link}
           variant="contained"
           href="/apps/invoice/add"
         >
-          Crear Pedido
+          Crear Producto
         </Button>
       </Box>
     </Box>

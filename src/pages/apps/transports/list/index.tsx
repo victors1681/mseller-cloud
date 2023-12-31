@@ -47,7 +47,7 @@ import { getInitials } from 'src/@core/utils/get-initials'
 // ** Custom Components Imports
 import CustomChip from 'src/@core/components/mui/chip'
 import OptionsMenu from 'src/@core/components/option-menu'
-import TableHeader from 'src/views/apps/documents/list/TableHeader'
+import TableHeader from 'src/views/apps/transports/list/TableHeader'
 
 // ** Styled Components
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
@@ -303,43 +303,15 @@ const TransportList = () => {
       headerName: 'Actions',
       renderCell: ({ row }: CellType) => (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Tooltip title="Aprobar">
-            <IconButton
-              size="small"
-              onClick={() => dispatch(deleteInvoice(row.id))}
-            >
-              <Icon icon="material-symbols:order-approve" fontSize={20} />
-            </IconButton>
-          </Tooltip>
           <Tooltip title="View">
             <IconButton
               size="small"
               component={Link}
-              href={`/apps/invoice/preview/${row.id}`}
+              href={`/apps/transports/docs/${row.noTransporte}`}
             >
               <Icon icon="mdi:eye-outline" fontSize={20} />
             </IconButton>
           </Tooltip>
-          <OptionsMenu
-            iconProps={{ fontSize: 20 }}
-            iconButtonProps={{ size: 'small' }}
-            menuProps={{ sx: { '& .MuiMenuItem-root svg': { mr: 2 } } }}
-            options={[
-              {
-                text: 'Download',
-                icon: <Icon icon="mdi:download" fontSize={20} />,
-              },
-              {
-                text: 'Edit',
-                href: `/apps/invoice/edit/${row.noTransporte}`,
-                icon: <Icon icon="mdi:pencil-outline" fontSize={20} />,
-              },
-              {
-                text: 'Duplicate',
-                icon: <Icon icon="mdi:content-copy" fontSize={20} />,
-              },
-            ]}
-          />
         </Box>
       ),
     },

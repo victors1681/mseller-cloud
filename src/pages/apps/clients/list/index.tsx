@@ -35,7 +35,7 @@ import { fetchData, deleteClient } from 'src/store/apps/clients'
 import { RootState, AppDispatch } from 'src/store'
 import { ThemeColor } from 'src/@core/layouts/types'
 import OptionsMenu from 'src/@core/components/option-menu'
-import TableHeader from 'src/views/apps/documents/list/TableHeader'
+import TableHeader from 'src/views/apps/clients/list/TableHeader'
 
 // ** Styled Components
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
@@ -307,7 +307,27 @@ const InvoiceList = () => {
       <Grid container spacing={6}>
         <Grid item xs={12}>
           <Card>
-            <CardHeader title="Clientes" />
+            <CardHeader
+              title="Clientes"
+              action={
+                <OptionsMenu
+                  options={[
+                    {
+                      text: 'Importar',
+                      icon: <Icon icon="tabler:file-import" fontSize={20} />,
+                    },
+                    {
+                      text: 'Exportar',
+                      icon: <Icon icon="clarity:export-line" fontSize={20} />,
+                    },
+                  ]}
+                  iconButtonProps={{
+                    size: 'small',
+                    sx: { color: 'text.primary' },
+                  }}
+                />
+              }
+            />
             <CardContent>
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>

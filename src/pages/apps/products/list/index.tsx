@@ -33,13 +33,13 @@ import { fetchData, deleteProduct } from 'src/store/apps/products'
 
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
-import TableHeader from 'src/views/apps/documents/list/TableHeader'
+import TableHeader from 'src/views/apps/products/list/TableHeader'
 
 // ** Styled Components
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
-import formatCurrency from 'src/utils/formatCurrency'
 import { ProductType } from 'src/types/apps/productTypes'
 import PriceDisplay from 'src/views/apps/products/list/PriceDisplay'
+import OptionsMenu from 'src/@core/components/option-menu'
 
 interface CustomInputProps {
   dates: Date[]
@@ -309,7 +309,27 @@ const InvoiceList = () => {
       <Grid container spacing={6}>
         <Grid item xs={12}>
           <Card>
-            <CardHeader title="Productos" />
+            <CardHeader
+              title="Productos"
+              action={
+                <OptionsMenu
+                  options={[
+                    {
+                      text: 'Importar',
+                      icon: <Icon icon="tabler:file-import" fontSize={20} />,
+                    },
+                    {
+                      text: 'Exportar',
+                      icon: <Icon icon="clarity:export-line" fontSize={20} />,
+                    },
+                  ]}
+                  iconButtonProps={{
+                    size: 'small',
+                    sx: { color: 'text.primary' },
+                  }}
+                />
+              }
+            />
             <CardContent>
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>

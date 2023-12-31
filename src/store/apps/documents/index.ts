@@ -5,6 +5,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 // ** Axios Imports
 import axios from 'axios'
 import { PaginatedResponse } from 'src/types/apps/response'
+import { getDateParam } from 'src/utils/getDateParam'
 
 interface DataParams {
   query: string
@@ -21,18 +22,24 @@ interface Redux {
 export interface AxiosResponse<T> {
   data: T
 }
-// ** Fetch Invoices
+// ** Fetch Documents
 export const fetchData = createAsyncThunk(
   'appDocuments/fetchData',
   async (params: DataParams) => {
+    console.log('params', params)
+
     if (params.procesado === '') {
       delete params.procesado
     }
+
     const response = await axios.get<
       any,
       AxiosResponse<PaginatedResponse<DocumentType>>
     >('/api/document/orders', {
-      params,
+      params: {
+        ...params,
+        ...getDateParam(params.dates),
+      },
     })
 
     return {
