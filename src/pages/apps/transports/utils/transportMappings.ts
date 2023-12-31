@@ -15,39 +15,39 @@ export enum TransportStatusEnum {
   Parcial = 14,
 }
 
-export const transportStatusLabels: Record<TransportStatusEnum | number, string> = {
-  [TransportStatusEnum.Pendiente]: "Pendiente",
-  [TransportStatusEnum.Sincronizado]: "Sincronizado",
-  [TransportStatusEnum.Recibido]: "Recibido",
-  [TransportStatusEnum.Procesado]: "Procesado",
-  [TransportStatusEnum.Integrado]: "Integrado",
-  [TransportStatusEnum.Cancelado]: "Cancelado",
-  [TransportStatusEnum.Error]: "Error",
-  [TransportStatusEnum.Entregado]: "Entregado",
-  [TransportStatusEnum.NoEntregado]: "No Entregado",
-  [TransportStatusEnum.EntDespues]: "Ent.Después",
-  [TransportStatusEnum.Integrado2]: "Integrado",
-  [TransportStatusEnum.Elaborando]: "Elaborando",
-  [TransportStatusEnum.ERP]: "ERP",
-  [TransportStatusEnum.Parcial]: "Parcial",
-};
+export const transportStatusLabels: Record<
+  TransportStatusEnum | number,
+  string
+> = {
+  [TransportStatusEnum.Pendiente]: 'Pendiente',
+  [TransportStatusEnum.Sincronizado]: 'Sincronizado',
+  [TransportStatusEnum.Recibido]: 'Recibido',
+  [TransportStatusEnum.Procesado]: 'Procesado',
+  [TransportStatusEnum.Integrado]: 'Integrado',
+  [TransportStatusEnum.Cancelado]: 'Cancelado',
+  [TransportStatusEnum.Error]: 'Error',
+  [TransportStatusEnum.Entregado]: 'Entregado',
+  [TransportStatusEnum.NoEntregado]: 'No Entregado',
+  [TransportStatusEnum.EntDespues]: 'Ent.Después',
+  [TransportStatusEnum.Integrado2]: 'Integrado',
+  [TransportStatusEnum.Elaborando]: 'Elaborando',
+  [TransportStatusEnum.ERP]: 'ERP',
+  [TransportStatusEnum.Parcial]: 'Parcial',
+}
 
-  
-  export const transportStatusObj = {
-  
-    "1": 'warning',
-    "13": 'success',
-    "5": 'success',
-    "11": 'success',
-    "8": 'success',
-    "4": 'success',
-    "0": 'warning',
-    "3": 'primary',
-    "6": 'secondary',
-    "9": 'secondary',
-    "10": 'secondary',
-    "14": 'info',
-    "2": 'info',
-    "7": 'error'
-  } as any
-  
+export const transportStatusObj = {
+  '1': 'warning',
+  '13': 'success',
+  '5': 'success',
+  '11': 'success',
+  '8': 'success',
+  '4': 'success',
+  '0': 'warning',
+  '3': 'primary',
+  '6': 'secondary',
+  '9': 'secondary',
+  '10': 'secondary',
+  '14': 'info',
+  '2': 'info',
+  '7': 'error',
+} as any

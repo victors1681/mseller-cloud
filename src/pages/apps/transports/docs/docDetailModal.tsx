@@ -12,21 +12,39 @@ import { styled } from '@mui/material/styles'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 import Link from 'next/link'
-import { DocumentoEntregaDetalleType, DocumentoEntregaType } from 'src/types/apps/transportType'
-import { Box, BoxProps, Card, CardContent, Divider, Grid, Table, TableBody, TableCellBaseProps, TableCell, TableRow } from '@mui/material'
+import {
+  DocumentoEntregaDetalleType,
+  DocumentoEntregaType,
+} from 'src/types/apps/transportType'
+import {
+  Box,
+  BoxProps,
+  Card,
+  CardContent,
+  Divider,
+  Grid,
+  Table,
+  TableBody,
+  TableCellBaseProps,
+  TableCell,
+  TableRow,
+} from '@mui/material'
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid'
 import formatCurrency from 'src/utils/formatCurrency'
 import CustomChip from 'src/@core/components/mui/chip'
-import { transportStatusLabels, transportStatusObj } from '../utils/transportMappings'
+import {
+  transportStatusLabels,
+  transportStatusObj,
+} from '../utils/transportMappings'
 import formatDate from 'src/utils/formatDate'
 
 const LinkStyled = styled(Link)(({ theme }) => ({
   textDecoration: 'none',
-  color: theme.palette.primary.main
+  color: theme.palette.primary.main,
 }))
 
 interface Props {
-  title: string,
+  title: string
   data: DocumentoEntregaType
 }
 
@@ -45,23 +63,29 @@ const columns: GridColDef[] = [
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography noWrap variant='body2' sx={{ color: 'text.primary', textTransform: 'capitalize' }}>
+            <Typography
+              noWrap
+              variant="body2"
+              sx={{ color: 'text.primary', textTransform: 'capitalize' }}
+            >
               {row.cantidad_E}
             </Typography>
-            <Typography noWrap variant='caption'>
+            <Typography noWrap variant="caption">
               O:{row.cantidad_E}
             </Typography>
           </Box>
         </Box>
       )
-    }
+    },
   },
   {
     flex: 0.1,
     minWidth: 50,
     field: 'unit',
     headerName: 'Un',
-    renderCell: ({ row }: CellType) => <Typography variant='body2'>{row.unidad}</Typography>
+    renderCell: ({ row }: CellType) => (
+      <Typography variant="body2">{row.unidad}</Typography>
+    ),
   },
   {
     field: 'code',
@@ -73,16 +97,20 @@ const columns: GridColDef[] = [
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography noWrap variant='body2' sx={{ color: 'text.primary', textTransform: 'capitalize' }}>
+            <Typography
+              noWrap
+              variant="body2"
+              sx={{ color: 'text.primary', textTransform: 'capitalize' }}
+            >
               {row.producto.nombre}
             </Typography>
-            <Typography noWrap variant='caption'>
+            <Typography noWrap variant="caption">
               {row.producto.codigo}
             </Typography>
           </Box>
         </Box>
       )
-    }
+    },
   },
   {
     field: 'discount',
@@ -94,16 +122,20 @@ const columns: GridColDef[] = [
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography noWrap variant='body2' sx={{ color: 'text.primary', textTransform: 'capitalize' }}>
+            <Typography
+              noWrap
+              variant="body2"
+              sx={{ color: 'text.primary', textTransform: 'capitalize' }}
+            >
               {row.porcientoDescuento_E}%
             </Typography>
-            <Typography noWrap variant='caption'>
+            <Typography noWrap variant="caption">
               O:{row.porcientoDescuento}%
             </Typography>
           </Box>
         </Box>
       )
-    }
+    },
   },
   {
     field: 'price',
@@ -115,13 +147,17 @@ const columns: GridColDef[] = [
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography noWrap variant='body2' sx={{ color: 'text.primary', textTransform: 'capitalize' }}>
+            <Typography
+              noWrap
+              variant="body2"
+              sx={{ color: 'text.primary', textTransform: 'capitalize' }}
+            >
               {formatCurrency(row.precioUnitario)}
             </Typography>
           </Box>
         </Box>
       )
-    }
+    },
   },
   {
     field: 'total',
@@ -132,26 +168,30 @@ const columns: GridColDef[] = [
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography noWrap variant='body2' sx={{ color: 'text.primary', textTransform: 'capitalize' }}>
+            <Typography
+              noWrap
+              variant="body2"
+              sx={{ color: 'text.primary', textTransform: 'capitalize' }}
+            >
               {formatCurrency(row.subtotal_E)}
             </Typography>
-            <Typography noWrap variant='caption'>
+            <Typography noWrap variant="caption">
               O:{formatCurrency(row.subtotal)}
             </Typography>
           </Box>
         </Box>
       )
-    }
-  }
-];
+    },
+  },
+]
 
 const CalcWrapper = styled(Box)<BoxProps>(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
   '&:not(:last-of-type)': {
-    marginBottom: theme.spacing(2)
-  }
+    marginBottom: theme.spacing(2),
+  },
 }))
 
 interface HeaderProps {
@@ -163,146 +203,174 @@ const MUITableCell = styled(TableCell)<TableCellBaseProps>(({ theme }) => ({
   paddingLeft: '0 !important',
   paddingRight: '0 !important',
   paddingTop: `${theme.spacing(1)} !important`,
-  paddingBottom: `${theme.spacing(1)} !important`
+  paddingBottom: `${theme.spacing(1)} !important`,
 }))
 
 const Header = ({ data }: HeaderProps) => {
-  return (<Grid container>
-    <Grid item sm={6} xs={12} sx={{pb: 3}}>
-      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+  return (
+    <Grid container>
+      <Grid item sm={6} xs={12} sx={{ pb: 3 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+          <Box sx={{ mb: 0, display: 'flex', alignItems: 'center' }}>
+            <Typography variant="body2" sx={{ mr: 2, fontWeight: 600 }}>
+              {data.cliente.nombre}
+            </Typography>
+          </Box>
 
-        <Box sx={{ mb: 0, display: 'flex', alignItems: 'center' }}>
-          <Typography variant='body2' sx={{ mr: 2, fontWeight: 600 }}>
-            {data.cliente.nombre}
+          <Typography variant="body2" sx={{ mb: 1 }}>
+            {data.cliente.direccion}, {data.cliente.ciudad}
+          </Typography>
+
+          <Box sx={{ mb: 0, display: 'flex', alignItems: 'center' }}>
+            <Typography variant="body2" sx={{ mr: 2, fontWeight: 600 }}>
+              Tel.:
+            </Typography>
+            <Typography variant="body2">{data.cliente.telefono1}</Typography>
+          </Box>
+
+          <Box sx={{ mb: 0, display: 'flex', alignItems: 'center' }}>
+            <Typography variant="body2" sx={{ mr: 2, fontWeight: 600 }}>
+              RNC:
+            </Typography>
+            <Typography variant="body2">{data.cliente.rnc}</Typography>
+          </Box>
+        </Box>
+      </Grid>
+
+      <Grid item sm={6} xs={12}>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Typography variant="body2" sx={{ mr: 2, fontWeight: 600 }}>
+            NCF:
+          </Typography>
+          <Typography variant="body2">{data.ncf ? data.ncf : '-'}</Typography>
+        </Box>
+
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Typography variant="body2" sx={{ mr: 2, fontWeight: 600 }}>
+            NCF Auto Asignado:
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{ fontWeight: 600, color: 'text.primary' }}
+          >
+            {data.NcfAutoActualizado ? 'SI' : 'NO'}
           </Typography>
         </Box>
 
-        <Typography variant='body2' sx={{ mb: 1 }}>
-          {data.cliente.direccion}, {data.cliente.ciudad}
-        </Typography>
-
-        <Box sx={{ mb: 0, display: 'flex', alignItems: 'center' }}>
-          <Typography variant='body2' sx={{ mr: 2, fontWeight: 600 }}>
-            Tel.:
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Typography variant="body2" sx={{ mr: 2, fontWeight: 600 }}>
+            Permite Editar:
           </Typography>
-          <Typography variant='body2'>{data.cliente.telefono1}</Typography>
-        </Box>
-
-        <Box sx={{ mb: 0, display: 'flex', alignItems: 'center' }}>
-          <Typography variant='body2' sx={{ mr: 2, fontWeight: 600 }}>
-            RNC:
+          <Typography
+            variant="body2"
+            sx={{ fontWeight: 600, color: 'text.primary' }}
+          >
+            {data.permitirEditar ? 'SI' : 'NO'}
           </Typography>
-          <Typography variant='body2'>{data.cliente.rnc}</Typography>
         </Box>
-
-      </Box>
+      </Grid>
     </Grid>
-
-    <Grid item sm={6} xs={12}>
-
-      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <Typography variant='body2' sx={{ mr: 2, fontWeight: 600 }}>
-          NCF:
-        </Typography>
-        <Typography variant='body2'>{data.ncf ? data.ncf : '-'}</Typography>
-      </Box>
-
-      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <Typography variant='body2' sx={{ mr: 2, fontWeight: 600 }}>
-          NCF Auto Asignado:
-        </Typography>
-        <Typography variant='body2'  sx={{ fontWeight: 600, color: 'text.primary' }} >{data.NcfAutoActualizado ? 'SI' : 'NO'}</Typography>
-      </Box>
-
-
-      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <Typography variant='body2' sx={{ mr: 2, fontWeight: 600 }}>
-          Permite Editar:
-        </Typography>
-        <Typography variant='body2'  sx={{ fontWeight: 600, color: 'text.primary' }} >{data.permitirEditar ? 'SI' : 'NO'}</Typography>
-      </Box>
-
-
-    </Grid>
-
-  </Grid>)
+  )
 }
 interface FooterProps {
   data: DocumentoEntregaType
 }
 const Footer = ({ data }: FooterProps) => {
-
-  const total = data.detalle.reduce((acc, c) => acc += c.subtotal_E < 0 ? 0 : c.subtotal_E, 0);
-  const discount = data.detalle.reduce((acc, c) => acc += c.totalDescuento_E < 0 ? 0 : c.totalDescuento_E, 0);
-  const tax = data.detalle.reduce((acc, c) => acc += c.totalImpuesto_E < 0 ? 0 : c.totalImpuesto_E, 0);
+  const total = data.detalle.reduce(
+    (acc, c) => (acc += c.subtotal_E < 0 ? 0 : c.subtotal_E),
+    0,
+  )
+  const discount = data.detalle.reduce(
+    (acc, c) => (acc += c.totalDescuento_E < 0 ? 0 : c.totalDescuento_E),
+    0,
+  )
+  const tax = data.detalle.reduce(
+    (acc, c) => (acc += c.totalImpuesto_E < 0 ? 0 : c.totalImpuesto_E),
+    0,
+  )
 
   const subtotal = total - (discount + tax)
 
-  return (<CardContent>
-    <Grid container>
-      <Grid item xs={12} sm={7} lg={9} sx={{ order: { sm: 1, xs: 2 } }}>
-        <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
-          <Typography variant='body2' sx={{ mr: 2, fontWeight: 600 }}>
-            Vendedor:
-          </Typography>
-          <Typography variant='body2'>{data.vendedor.codigo} - {data.vendedor.nombre}</Typography>
-        </Box>
-        <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
-          <Typography variant='body2' sx={{ mr: 2, fontWeight: 600 }}>
-            Status:
-          </Typography>
-          <CustomChip
-            skin='light'
-            size='small'
-            label={transportStatusLabels[data.status] || ""}
-            color={transportStatusObj[data.status]}
-            sx={{ textTransform: 'capitalize' }}
-          />
-        </Box>
-        <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
-          <Typography variant='body2' sx={{ mr: 2, fontWeight: 600 }}>
-            Fecha entrega:
-          </Typography>
-          <Typography variant='body2'>{formatDate(data.fechaEntrega)}</Typography>
-        </Box>
+  return (
+    <CardContent>
+      <Grid container>
+        <Grid item xs={12} sm={7} lg={9} sx={{ order: { sm: 1, xs: 2 } }}>
+          <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
+            <Typography variant="body2" sx={{ mr: 2, fontWeight: 600 }}>
+              Vendedor:
+            </Typography>
+            <Typography variant="body2">
+              {data.vendedor.codigo} - {data.vendedor.nombre}
+            </Typography>
+          </Box>
+          <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
+            <Typography variant="body2" sx={{ mr: 2, fontWeight: 600 }}>
+              Status:
+            </Typography>
+            <CustomChip
+              skin="light"
+              size="small"
+              label={transportStatusLabels[data.status] || ''}
+              color={transportStatusObj[data.status]}
+              sx={{ textTransform: 'capitalize' }}
+            />
+          </Box>
+          <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
+            <Typography variant="body2" sx={{ mr: 2, fontWeight: 600 }}>
+              Fecha entrega:
+            </Typography>
+            <Typography variant="body2">
+              {formatDate(data.fechaEntrega)}
+            </Typography>
+          </Box>
 
-        {!!data.motivoRechazo?.motivo && ( 
-        <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
-          <Typography variant='body2' sx={{ mr: 2, fontWeight: 600 }}>
-            Rechazo:
-          </Typography>
-          <Typography variant='body2'>{data.motivoRechazo?.motivo}</Typography>
-        </Box>)}
+          {!!data.motivoRechazo?.motivo && (
+            <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ mr: 2, fontWeight: 600 }}>
+                Rechazo:
+              </Typography>
+              <Typography variant="body2">
+                {data.motivoRechazo?.motivo}
+              </Typography>
+            </Box>
+          )}
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          sm={5}
+          lg={3}
+          sx={{ mb: { sm: 0, xs: 4 }, order: { sm: 2, xs: 1 } }}
+        >
+          <CalcWrapper>
+            <Typography variant="body2">Subtotal:</Typography>
+            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+              {formatCurrency(subtotal)}
+            </Typography>
+          </CalcWrapper>
+          <CalcWrapper>
+            <Typography variant="body2">Descuento:</Typography>
+            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+              {formatCurrency(discount)}
+            </Typography>
+          </CalcWrapper>
+          <CalcWrapper>
+            <Typography variant="body2">Impuesto:</Typography>
+            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+              {formatCurrency(tax)}
+            </Typography>
+          </CalcWrapper>
+          <Divider />
+          <CalcWrapper>
+            <Typography variant="body2">Total:</Typography>
+            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+              {formatCurrency(total)}
+            </Typography>
+          </CalcWrapper>
+        </Grid>
       </Grid>
-      <Grid item xs={12} sm={5} lg={3} sx={{ mb: { sm: 0, xs: 4 }, order: { sm: 2, xs: 1 } }}>
-        <CalcWrapper>
-          <Typography variant='body2'>Subtotal:</Typography>
-          <Typography variant='body2' sx={{ fontWeight: 600 }}>
-            {formatCurrency(subtotal)}
-          </Typography>
-        </CalcWrapper>
-        <CalcWrapper>
-          <Typography variant='body2'>Descuento:</Typography>
-          <Typography variant='body2' sx={{ fontWeight: 600 }}>
-            {formatCurrency(discount)}
-          </Typography>
-        </CalcWrapper>
-        <CalcWrapper>
-          <Typography variant='body2'>Impuesto:</Typography>
-          <Typography variant='body2' sx={{ fontWeight: 600 }}>
-            {formatCurrency(tax)}
-          </Typography>
-        </CalcWrapper>
-        <Divider />
-        <CalcWrapper>
-          <Typography variant='body2'>Total:</Typography>
-          <Typography variant='body2' sx={{ fontWeight: 600 }}>
-            {formatCurrency(total)}
-          </Typography>
-        </CalcWrapper>
-      </Grid>
-    </Grid>
-  </CardContent>)
+    </CardContent>
+  )
 }
 
 const DocDetailModal = (props: Props) => {
@@ -315,23 +383,28 @@ const DocDetailModal = (props: Props) => {
 
   return (
     <div>
-      <LinkStyled href={`#`} onClick={handleClickOpen}>{props.title}</LinkStyled>
+      <LinkStyled href={`#`} onClick={handleClickOpen}>
+        {props.title}
+      </LinkStyled>
 
-      <Dialog onClose={handleClose} aria-labelledby='customized-dialog-title' open={open}>
-        <DialogTitle id='customized-dialog-title' sx={{ p: 4 }}>
-          <Typography variant='h6' component='span'>
+      <Dialog
+        onClose={handleClose}
+        aria-labelledby="customized-dialog-title"
+        open={open}
+      >
+        <DialogTitle id="customized-dialog-title" sx={{ p: 4 }}>
+          <Typography variant="h6" component="span">
             Entrega: {props.data.noDocEntrega}
           </Typography>
           <IconButton
-            aria-label='close'
+            aria-label="close"
             onClick={handleClose}
             sx={{ top: 10, right: 10, position: 'absolute', color: 'grey.500' }}
           >
-            <Icon icon='mdi:close' />
+            <Icon icon="mdi:close" />
           </IconButton>
         </DialogTitle>
         <DialogContent dividers sx={{ p: 4 }}>
-
           <Grid container spacing={0}>
             <Header data={props.data} />
 
@@ -343,9 +416,8 @@ const DocDetailModal = (props: Props) => {
                   columns={columns}
                   pageSizeOptions={[10]}
                   disableRowSelectionOnClick
-                  getRowId={row => row.posicionPartida}
+                  getRowId={(row) => row.posicionPartida}
                 />
-
               </Card>
             </Grid>
           </Grid>

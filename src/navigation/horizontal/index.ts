@@ -18,7 +18,7 @@ const navigation = (): HorizontalNavItemsType => [
     subject: 'acl-page',
     title: 'Access Control',
     icon: 'mdi:shield-outline',
-  }
+  },
 ]
 
 export default navigation

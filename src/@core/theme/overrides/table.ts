@@ -7,9 +7,9 @@ const Table = () => {
       styleOverrides: {
         root: ({ theme }: OwnerStateThemeType) => ({
           boxShadow: theme.shadows[0],
-          borderTopColor: theme.palette.divider
-        })
-      }
+          borderTopColor: theme.palette.divider,
+        }),
+      },
     },
     MuiTableHead: {
       styleOverrides: {
@@ -18,10 +18,10 @@ const Table = () => {
           '& .MuiTableCell-head': {
             fontSize: '0.75rem',
             fontWeight: 600,
-            letterSpacing: '0.13px'
-          }
-        }
-      }
+            letterSpacing: '0.13px',
+          },
+        },
+      },
     },
     MuiTableBody: {
       styleOverrides: {
@@ -29,40 +29,41 @@ const Table = () => {
           '& .MuiTableCell-body': {
             letterSpacing: '0.25px',
             color: theme.palette.text.secondary,
-            '&:not(.MuiTableCell-sizeSmall):not(.MuiTableCell-paddingCheckbox):not(.MuiTableCell-paddingNone)': {
-              paddingTop: theme.spacing(3.5),
-              paddingBottom: theme.spacing(3.5)
-            }
-          }
-        })
-      }
+            '&:not(.MuiTableCell-sizeSmall):not(.MuiTableCell-paddingCheckbox):not(.MuiTableCell-paddingNone)':
+              {
+                paddingTop: theme.spacing(3.5),
+                paddingBottom: theme.spacing(3.5),
+              },
+          },
+        }),
+      },
     },
     MuiTableRow: {
       styleOverrides: {
         root: ({ theme }: OwnerStateThemeType) => ({
           '& .MuiTableCell-head:not(.MuiTableCell-paddingCheckbox):first-child, & .MuiTableCell-root:not(.MuiTableCell-paddingCheckbox):first-child ':
             {
-              paddingLeft: theme.spacing(5)
+              paddingLeft: theme.spacing(5),
             },
           '& .MuiTableCell-head:last-child, & .MuiTableCell-root:last-child': {
-            paddingRight: theme.spacing(5)
-          }
-        })
-      }
+            paddingRight: theme.spacing(5),
+          },
+        }),
+      },
     },
     MuiTableCell: {
       styleOverrides: {
         root: ({ theme }: OwnerStateThemeType) => ({
-          borderBottom: `1px solid ${theme.palette.divider}`
+          borderBottom: `1px solid ${theme.palette.divider}`,
         }),
         paddingCheckbox: ({ theme }: OwnerStateThemeType) => ({
-          paddingLeft: theme.spacing(2)
+          paddingLeft: theme.spacing(2),
         }),
         stickyHeader: ({ theme }: OwnerStateThemeType) => ({
-          backgroundColor: theme.palette.customColors.tableHeaderBg
-        })
-      }
-    }
+          backgroundColor: theme.palette.customColors.tableHeaderBg,
+        }),
+      },
+    },
   }
 }
 

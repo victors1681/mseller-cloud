@@ -11,7 +11,12 @@ import axios from 'axios'
 import authConfig from 'src/configs/auth'
 
 // ** Types
-import { AuthValuesType, LoginParams, ErrCallbackType, UserDataType } from './types'
+import {
+  AuthValuesType,
+  LoginParams,
+  ErrCallbackType,
+  UserDataType,
+} from './types'
 
 // ** Defaults
 const defaultProvider: AuthValuesType = {
@@ -20,7 +25,7 @@ const defaultProvider: AuthValuesType = {
   setUser: () => null,
   setLoading: () => Boolean,
   login: () => Promise.resolve(),
-  logout: () => Promise.resolve()
+  logout: () => Promise.resolve(),
 }
 
 const AuthContext = createContext(defaultProvider)
@@ -39,16 +44,18 @@ const AuthProvider = ({ children }: Props) => {
 
   useEffect(() => {
     const initAuth = async (): Promise<void> => {
-      const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)!
+      const storedToken = window.localStorage.getItem(
+        authConfig.storageTokenKeyName,
+      )!
       if (storedToken) {
         setLoading(true)
         await axios
           .get(authConfig.meEndpoint, {
             headers: {
-              Authorization: storedToken
-            }
+              Authorization: storedToken,
+            },
           })
-          .then(async response => {
+          .then(async (response) => {
             setLoading(false)
             setUser({ ...response.data.userData })
           })
@@ -58,7 +65,10 @@ const AuthProvider = ({ children }: Props) => {
             localStorage.removeItem('accessToken')
             setUser(null)
             setLoading(false)
-            if (authConfig.onTokenExpiration === 'logout' && !router.pathname.includes('login')) {
+            if (
+              authConfig.onTokenExpiration === 'logout' &&
+              !router.pathname.includes('login')
+            ) {
               router.replace('/login')
             }
           })
@@ -71,35 +81,42 @@ const AuthProvider = ({ children }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const handleLogin = (params: LoginParams, errorCallback?: ErrCallbackType) => {
-    
+  const handleLogin = (
+    params: LoginParams,
+    errorCallback?: ErrCallbackType,
+  ) => {
     params.returnToken = true
     axios
       .post(authConfig.loginEndpoint, params)
-      .then(async response => {
+      .then(async (response) => {
         params.rememberMe
-          ? window.localStorage.setItem(authConfig.storageTokenKeyName, response.data.accessToken)
+          ? window.localStorage.setItem(
+              authConfig.storageTokenKeyName,
+              response.data.accessToken,
+            )
           : null
         const returnUrl = router.query.returnUrl
 
         const currentUser = {
           id: response.data.kind,
-          role: "admin",
+          role: 'admin',
           email: response.data.email,
           fullName: response.data.displayName,
           username: response.data.displayName,
           password: params.password,
-          avatar: response.data.profilePicture
+          avatar: response.data.profilePicture,
         }
         setUser(currentUser)
-        params.rememberMe ? window.localStorage.setItem('userData', JSON.stringify(currentUser)) : null
+        params.rememberMe
+          ? window.localStorage.setItem('userData', JSON.stringify(currentUser))
+          : null
 
         const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
 
         router.replace(redirectURL as string)
       })
 
-      .catch(err => {
+      .catch((err) => {
         if (errorCallback) errorCallback(err)
       })
   }
@@ -117,7 +134,7 @@ const AuthProvider = ({ children }: Props) => {
     setUser,
     setLoading,
     login: handleLogin,
-    logout: handleLogout
+    logout: handleLogout,
   }
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>

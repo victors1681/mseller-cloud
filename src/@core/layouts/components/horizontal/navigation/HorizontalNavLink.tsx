@@ -40,25 +40,29 @@ interface Props {
 }
 
 const ListItem = styled(MuiListItem)<
-  ListItemProps & { component?: ElementType; href: string; target?: '_blank' | undefined }
+  ListItemProps & {
+    component?: ElementType
+    href: string
+    target?: '_blank' | undefined
+  }
 >(({ theme }) => ({
   width: 'auto',
   paddingTop: theme.spacing(2.25),
   color: theme.palette.text.primary,
   paddingBottom: theme.spacing(2.25),
   '&:hover': {
-    backgroundColor: theme.palette.action.hover
+    backgroundColor: theme.palette.action.hover,
   },
   '&.active, &.active:hover': {
-    backgroundColor: hexToRGBA(theme.palette.primary.main, 0.08)
+    backgroundColor: hexToRGBA(theme.palette.primary.main, 0.08),
   },
   '&.active .MuiTypography-root, &.active .MuiListItemIcon-root': {
-    color: theme.palette.primary.main
+    color: theme.palette.primary.main,
   },
   '&:focus-visible': {
     outline: 0,
-    backgroundColor: theme.palette.action.focus
-  }
+    backgroundColor: theme.palette.action.focus,
+  },
 }))
 
 const HorizontalNavLink = (props: Props) => {
@@ -83,7 +87,14 @@ const HorizontalNavLink = (props: Props) => {
 
   return (
     <CanViewNavLink navLink={item}>
-      <Wrapper {...(!hasParent ? { component: 'div', sx: { py: settings.skin === 'bordered' ? 2.625 : 2.75 } } : {})}>
+      <Wrapper
+        {...(!hasParent
+          ? {
+              component: 'div',
+              sx: { py: settings.skin === 'bordered' ? 2.625 : 2.75 },
+            }
+          : {})}
+      >
         <ListItem
           component={Link}
           disabled={item.disabled}
@@ -91,40 +102,55 @@ const HorizontalNavLink = (props: Props) => {
           className={clsx({ active: isNavLinkActive() })}
           target={item.openInNewTab ? '_blank' : undefined}
           href={item.path === undefined ? '/' : `${item.path}`}
-          onClick={e => {
+          onClick={(e) => {
             if (item.path === undefined) {
               e.preventDefault()
               e.stopPropagation()
             }
           }}
           sx={{
-            ...(item.disabled ? { pointerEvents: 'none' } : { cursor: 'pointer' }),
+            ...(item.disabled
+              ? { pointerEvents: 'none' }
+              : { cursor: 'pointer' }),
             ...(!hasParent
               ? {
                   px: 5.5,
                   borderRadius: 3.5,
                   '&.active, &.active:hover': {
                     boxShadow: 3,
-                    backgroundImage: theme =>
+                    backgroundImage: (theme) =>
                       `linear-gradient(98deg, ${theme.palette.customColors.primaryGradient}, ${theme.palette.primary.main} 94%)`,
                     '& .MuiTypography-root, & .MuiListItemIcon-root': {
-                      color: 'common.white'
-                    }
-                  }
+                      color: 'common.white',
+                    },
+                  },
                 }
-              : { px: 5 })
+              : { px: 5 }),
           }}
         >
-          <Box sx={{ gap: 2, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Box
+            sx={{
+              gap: 2,
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
             <Box
               sx={{
                 display: 'flex',
                 alignItems: 'center',
-                ...(menuTextTruncate && { overflow: 'hidden' })
+                ...(menuTextTruncate && { overflow: 'hidden' }),
               }}
             >
-              <ListItemIcon sx={{ color: 'text.primary', mr: !hasParent ? 2 : 3 }}>
-                <UserIcon icon={icon} fontSize={icon === navSubItemIcon ? '0.875rem' : '1.375rem'} />
+              <ListItemIcon
+                sx={{ color: 'text.primary', mr: !hasParent ? 2 : 3 }}
+              >
+                <UserIcon
+                  icon={icon}
+                  fontSize={icon === navSubItemIcon ? '0.875rem' : '1.375rem'}
+                />
               </ListItemIcon>
               <Typography {...(menuTextTruncate && { noWrap: true })}>
                 <Translations text={item.title} />
@@ -137,7 +163,7 @@ const HorizontalNavLink = (props: Props) => {
                 sx={{
                   height: 20,
                   fontWeight: 500,
-                  '& .MuiChip-label': { px: 1.5, textTransform: 'capitalize' }
+                  '& .MuiChip-label': { px: 1.5, textTransform: 'capitalize' },
                 }}
               />
             ) : null}

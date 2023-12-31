@@ -21,16 +21,24 @@ import AddNewCustomers from 'src/views/apps/invoice/add/AddNewCustomer'
 // ** Styled Component
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 
-const InvoiceAdd = ({ apiClientData, invoiceNumber }: InferGetStaticPropsType<typeof getStaticProps>) => {
+const InvoiceAdd = ({
+  apiClientData,
+  invoiceNumber,
+}: InferGetStaticPropsType<typeof getStaticProps>) => {
   // ** State
   const [addCustomerOpen, setAddCustomerOpen] = useState<boolean>(false)
-  const [selectedClient, setSelectedClient] = useState<InvoiceClientType | null>(null)
-  const [clients, setClients] = useState<InvoiceClientType[] | undefined>(apiClientData)
+  const [selectedClient, setSelectedClient] =
+    useState<InvoiceClientType | null>(null)
+  const [clients, setClients] = useState<InvoiceClientType[] | undefined>(
+    apiClientData,
+  )
 
   const toggleAddCustomerDrawer = () => setAddCustomerOpen(!addCustomerOpen)
 
   return (
-    <DatePickerWrapper sx={{ '& .react-datepicker-wrapper': { width: 'auto' } }}>
+    <DatePickerWrapper
+      sx={{ '& .react-datepicker-wrapper': { width: 'auto' } }}
+    >
       <Grid container spacing={6}>
         <Grid item xl={9} md={8} xs={12}>
           <AddCard
@@ -60,14 +68,18 @@ export const getStaticProps: GetStaticProps = async () => {
   const clientResponse = await axios.get('/apps/invoice/clients')
   const apiClientData: InvoiceClientType = clientResponse.data
 
-  const allInvoicesResponse = await axios.get('/apps/invoice/invoices', { params: { q: '', status: '' } })
-  const lastInvoiceNumber = Math.max(...allInvoicesResponse.data.allData.map((i: InvoiceType) => i.id))
+  const allInvoicesResponse = await axios.get('/apps/invoice/invoices', {
+    params: { q: '', status: '' },
+  })
+  const lastInvoiceNumber = Math.max(
+    ...allInvoicesResponse.data.allData.map((i: InvoiceType) => i.id),
+  )
 
   return {
     props: {
       apiClientData,
-      invoiceNumber: lastInvoiceNumber + 1
-    }
+      invoiceNumber: lastInvoiceNumber + 1,
+    },
   }
 }
 

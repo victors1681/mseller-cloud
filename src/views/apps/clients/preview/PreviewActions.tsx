@@ -15,29 +15,33 @@ interface Props {
   toggleSendInvoiceDrawer: () => void
 }
 
-const PreviewActions = ({ id, toggleSendInvoiceDrawer, toggleAddPaymentDrawer }: Props) => {
+const PreviewActions = ({
+  id,
+  toggleSendInvoiceDrawer,
+  toggleAddPaymentDrawer,
+}: Props) => {
   return (
     <Card>
       <CardContent>
         <Button
           fullWidth
           sx={{ mb: 3.5 }}
-          variant='contained'
+          variant="contained"
           onClick={toggleSendInvoiceDrawer}
-          startIcon={<Icon icon='mdi:send-outline' />}
+          startIcon={<Icon icon="mdi:send-outline" />}
         >
           Send Invoice
         </Button>
-        <Button fullWidth sx={{ mb: 3.5 }} color='secondary' variant='outlined'>
+        <Button fullWidth sx={{ mb: 3.5 }} color="secondary" variant="outlined">
           Download
         </Button>
         <Button
           fullWidth
-          target='_blank'
+          target="_blank"
           sx={{ mb: 3.5 }}
           component={Link}
-          color='secondary'
-          variant='outlined'
+          color="secondary"
+          variant="outlined"
           href={`/apps/invoice/print/${id}`}
         >
           Print
@@ -46,18 +50,18 @@ const PreviewActions = ({ id, toggleSendInvoiceDrawer, toggleAddPaymentDrawer }:
           fullWidth
           sx={{ mb: 3.5 }}
           component={Link}
-          color='secondary'
-          variant='outlined'
+          color="secondary"
+          variant="outlined"
           href={`/apps/invoice/edit/${id}`}
         >
           Edit Invoice
         </Button>
         <Button
           fullWidth
-          color='success'
-          variant='contained'
+          color="success"
+          variant="contained"
           onClick={toggleAddPaymentDrawer}
-          startIcon={<Icon icon='mdi:currency-usd' />}
+          startIcon={<Icon icon="mdi:currency-usd" />}
         >
           Add Payment
         </Button>

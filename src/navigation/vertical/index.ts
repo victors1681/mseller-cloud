@@ -15,25 +15,25 @@ const navigation = (): VerticalNavItemsType => {
         {
           title: 'Pedidos',
           icon: 'lets-icons:order',
-          path: '/apps/documents/list'
+          path: '/apps/documents/list',
         },
         {
           title: 'Transportes',
           icon: 'mdi:truck',
-          path: '/apps/transports/list'
+          path: '/apps/transports/list',
         },
         {
           title: 'Cobranza',
           icon: 'ph:money-fill',
-          path: '/apps/collections/edit'
+          path: '/apps/collections/edit',
         },
         {
           title: 'Visitas',
           icon: 'material-symbols:map-outline',
-          path: '/apps/visits/add'
-        }
-      ]
-    }, 
+          path: '/apps/visits/add',
+        },
+      ],
+    },
     {
       title: 'Data Maestra',
       icon: 'bxs:data',
@@ -41,45 +41,45 @@ const navigation = (): VerticalNavItemsType => {
         {
           title: 'Clientes',
           icon: 'mdi:account-details',
-          path: '/apps/clients/list'
+          path: '/apps/clients/list',
         },
         {
           title: 'Productos',
           icon: 'fluent-mdl2:product',
-          path: '/apps/products/preview'
+          path: '/apps/products/preview',
         },
         {
           title: 'Condiciones Pago',
           icon: 'mdi:account-payment',
-          path: '/apps/paymentType/edit'
+          path: '/apps/paymentType/edit',
         },
         {
           title: 'Localidades',
           icon: 'mdi:location',
-          path: '/apps/locations/add'
+          path: '/apps/locations/add',
         },
         {
           title: 'Vendedores',
           icon: 'gis:map-users',
-          path: '/apps/sellers/add'
+          path: '/apps/sellers/add',
         },
         {
           title: 'Distribuidores',
           icon: 'healthicons:truck-driver',
-          path: '/apps/drivers/add'
-        }
-      ]
-    }, 
+          path: '/apps/drivers/add',
+        },
+      ],
+    },
     {
       title: 'Configuración',
       icon: 'uil:setting',
       children: [
         {
           title: 'Usuarios',
-          path: '/apps/users/list'
-        }
-      ]
-    }, 
+          path: '/apps/users/list',
+        },
+      ],
+    },
     // {
     //   title: 'Second Page',
     //   path: '/second-page',

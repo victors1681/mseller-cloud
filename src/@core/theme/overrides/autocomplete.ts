@@ -7,10 +7,13 @@ const Autocomplete = (skin: Skin) => {
     MuiAutocomplete: {
       styleOverrides: {
         paper: ({ theme }: OwnerStateThemeType) => ({
-          ...(skin === 'bordered' && { boxShadow: 'none', border: `1px solid ${theme.palette.divider}` })
-        })
-      }
-    }
+          ...(skin === 'bordered' && {
+            boxShadow: 'none',
+            border: `1px solid ${theme.palette.divider}`,
+          }),
+        }),
+      },
+    },
   }
 }
 

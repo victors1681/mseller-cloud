@@ -8,7 +8,14 @@ import { CustomCheckboxImgProps } from 'src/@core/components/custom-checkbox/typ
 
 const CustomCheckboxImg = (props: CustomCheckboxImgProps) => {
   // ** Props
-  const { data, name, selected, gridProps, handleChange, color = 'primary' } = props
+  const {
+    data,
+    name,
+    selected,
+    gridProps,
+    handleChange,
+    color = 'primary',
+  } = props
 
   const { alt, img, value } = data
 
@@ -27,25 +34,32 @@ const CustomCheckboxImg = (props: CustomCheckboxImgProps) => {
             alignItems: 'center',
             flexDirection: 'column',
             justifyContent: 'center',
-            border: theme => `2px solid ${theme.palette.divider}`,
+            border: (theme) => `2px solid ${theme.palette.divider}`,
             '& img': {
               width: '100%',
               height: '100%',
-              objectFit: 'cover'
+              objectFit: 'cover',
             },
             ...(selected.includes(value)
               ? { borderColor: `${color}.main` }
               : {
-                  '&:hover': { borderColor: theme => `rgba(${theme.palette.customColors.main}, 0.25)` },
+                  '&:hover': {
+                    borderColor: (theme) =>
+                      `rgba(${theme.palette.customColors.main}, 0.25)`,
+                  },
                   '&:not(:hover)': {
-                    '& .MuiCheckbox-root': { display: 'none' }
-                  }
-                })
+                    '& .MuiCheckbox-root': { display: 'none' },
+                  },
+                }),
           }}
         >
-          {typeof img === 'string' ? <img src={img} alt={alt ?? `checkbox-image-${value}`} /> : img}
+          {typeof img === 'string' ? (
+            <img src={img} alt={alt ?? `checkbox-image-${value}`} />
+          ) : (
+            img
+          )}
           <Checkbox
-            size='small'
+            size="small"
             color={color}
             name={`${name}-${value}`}
             checked={selected.includes(value)}

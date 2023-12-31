@@ -27,7 +27,7 @@ import { hexToRGBA } from 'src/@core/utils/hex-to-rgba'
 const HorizontalLayoutWrapper = styled('div')({
   height: '100%',
   display: 'flex',
-  ...(themeConfig.horizontalMenuAnimation && { overflow: 'clip' })
+  ...(themeConfig.horizontalMenuAnimation && { overflow: 'clip' }),
 })
 
 const MainContentWrapper = styled(Box)<BoxProps>({
@@ -35,7 +35,7 @@ const MainContentWrapper = styled(Box)<BoxProps>({
   minWidth: 0,
   display: 'flex',
   minHeight: '100vh',
-  flexDirection: 'column'
+  flexDirection: 'column',
 })
 
 const Toolbar = styled(MuiToolbar)<ToolbarProps>(({ theme }) => ({
@@ -43,12 +43,12 @@ const Toolbar = styled(MuiToolbar)<ToolbarProps>(({ theme }) => ({
   padding: `${theme.spacing(0, 6)} !important`,
   [theme.breakpoints.down('sm')]: {
     paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(4)
+    paddingRight: theme.spacing(4),
   },
   [theme.breakpoints.down('xs')]: {
     paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(2)
-  }
+    paddingRight: theme.spacing(2),
+  },
 }))
 
 const ContentWrapper = styled('main')(({ theme }) => ({
@@ -58,8 +58,8 @@ const ContentWrapper = styled('main')(({ theme }) => ({
   transition: 'padding .25s ease-in-out',
   [theme.breakpoints.down('sm')]: {
     paddingLeft: theme.spacing(4),
-    paddingRight: theme.spacing(4)
-  }
+    paddingRight: theme.spacing(4),
+  },
 }))
 
 const HorizontalLayout = (props: LayoutProps) => {
@@ -72,7 +72,7 @@ const HorizontalLayout = (props: LayoutProps) => {
     footerProps,
     saveSettings,
     contentHeightFixed,
-    horizontalLayoutProps
+    horizontalLayoutProps,
   } = props
 
   // ** Vars
@@ -88,13 +88,16 @@ const HorizontalLayout = (props: LayoutProps) => {
   delete userAppBarProps.sx
 
   return (
-    <HorizontalLayoutWrapper className='layout-wrapper'>
-      <MainContentWrapper className='layout-content-wrapper' sx={{ ...(contentHeightFixed && { maxHeight: '100vh' }) }}>
+    <HorizontalLayoutWrapper className="layout-wrapper">
+      <MainContentWrapper
+        className="layout-content-wrapper"
+        sx={{ ...(contentHeightFixed && { maxHeight: '100vh' }) }}
+      >
         {/* Navbar (or AppBar) and Navigation Menu Wrapper */}
         <AppBar
-          color='default'
+          color="default"
           elevation={skin === 'bordered' ? 0 : 3}
-          className='layout-navbar-and-nav-container'
+          className="layout-navbar-and-nav-container"
           position={appBar === 'fixed' ? 'sticky' : 'static'}
           sx={{
             alignItems: 'center',
@@ -102,32 +105,46 @@ const HorizontalLayout = (props: LayoutProps) => {
             justifyContent: 'center',
             backgroundColor: 'background.paper',
             ...(appBar === 'static' && { zIndex: 13 }),
-            ...(skin === 'bordered' && { borderBottom: theme => `1px solid ${theme.palette.divider}` }),
-            transition: 'border-bottom 0.2s ease-in-out, backdrop-filter .25s ease-in-out, box-shadow .25s ease-in-out',
+            ...(skin === 'bordered' && {
+              borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+            }),
+            transition:
+              'border-bottom 0.2s ease-in-out, backdrop-filter .25s ease-in-out, box-shadow .25s ease-in-out',
             ...(appBar === 'fixed'
               ? appBarBlur && {
                   backdropFilter: 'blur(8px)',
-                  backgroundColor: theme => hexToRGBA(theme.palette.background.paper, 0.85)
+                  backgroundColor: (theme) =>
+                    hexToRGBA(theme.palette.background.paper, 0.85),
                 }
               : {}),
-            ...userAppBarStyle
+            ...userAppBarStyle,
           }}
           {...userAppBarProps}
         >
           {/* Navbar / AppBar */}
           <Box
-            className='layout-navbar'
+            className="layout-navbar"
             sx={{
               width: '100%',
-              ...(navHidden ? {} : { borderBottom: theme => `1px solid ${theme.palette.divider}` })
+              ...(navHidden
+                ? {}
+                : {
+                    borderBottom: (theme) =>
+                      `1px solid ${theme.palette.divider}`,
+                  }),
             }}
           >
             <Toolbar
-              className='navbar-content-container'
+              className="navbar-content-container"
               sx={{
                 mx: 'auto',
-                ...(contentWidth === 'boxed' && { '@media (min-width:1440px)': { maxWidth: 1440 } }),
-                minHeight: theme => `${(theme.mixins.toolbar.minHeight as number) - 1}px !important`
+                ...(contentWidth === 'boxed' && {
+                  '@media (min-width:1440px)': { maxWidth: 1440 },
+                }),
+                minHeight: (theme) =>
+                  `${
+                    (theme.mixins.toolbar.minHeight as number) - 1
+                  }px !important`,
               }}
             >
               <AppBarContent
@@ -143,21 +160,33 @@ const HorizontalLayout = (props: LayoutProps) => {
 
           {/* Navigation Menu */}
           {navHidden ? null : (
-            <Box className='layout-horizontal-nav' sx={{ width: '100%', ...horizontalLayoutProps?.navMenu?.sx }}>
+            <Box
+              className="layout-horizontal-nav"
+              sx={{ width: '100%', ...horizontalLayoutProps?.navMenu?.sx }}
+            >
               <Toolbar
-                className='horizontal-nav-content-container'
+                className="horizontal-nav-content-container"
                 sx={{
                   mx: 'auto',
-                  ...(contentWidth === 'boxed' && { '@media (min-width:1440px)': { maxWidth: 1440 } }),
-                  minHeight: theme =>
-                    `${(theme.mixins.toolbar.minHeight as number) - (skin === 'bordered' ? 1 : 0)}px !important`
+                  ...(contentWidth === 'boxed' && {
+                    '@media (min-width:1440px)': { maxWidth: 1440 },
+                  }),
+                  minHeight: (theme) =>
+                    `${
+                      (theme.mixins.toolbar.minHeight as number) -
+                      (skin === 'bordered' ? 1 : 0)
+                    }px !important`,
                 }}
               >
                 {(userNavMenuContent && userNavMenuContent(props)) || (
                   <Navigation
                     {...props}
                     horizontalNavItems={
-                      (horizontalLayoutProps as NonNullable<LayoutProps['horizontalLayoutProps']>).navMenu?.navItems
+                      (
+                        horizontalLayoutProps as NonNullable<
+                          LayoutProps['horizontalLayoutProps']
+                        >
+                      ).navMenu?.navItems
                     }
                   />
                 )}
@@ -168,21 +197,25 @@ const HorizontalLayout = (props: LayoutProps) => {
 
         {/* Content */}
         <ContentWrapper
-          className='layout-page-content'
+          className="layout-page-content"
           sx={{
             ...(contentHeightFixed && { display: 'flex', overflow: 'hidden' }),
             ...(contentWidth === 'boxed' && {
               mx: 'auto',
               '@media (min-width:1440px)': { maxWidth: 1440 },
-              '@media (min-width:1200px)': { maxWidth: '100%' }
-            })
+              '@media (min-width:1200px)': { maxWidth: '100%' },
+            }),
           }}
         >
           {children}
         </ContentWrapper>
 
         {/* Footer */}
-        <Footer {...props} footerStyles={footerProps?.sx} footerContent={footerProps?.content} />
+        <Footer
+          {...props}
+          footerStyles={footerProps?.sx}
+          footerContent={footerProps?.content}
+        />
 
         {/* Customizer */}
         {themeConfig.disableCustomizer || hidden ? null : <Customizer />}
@@ -191,9 +224,9 @@ const HorizontalLayout = (props: LayoutProps) => {
         {scrollToTop ? (
           scrollToTop(props)
         ) : (
-          <ScrollToTop className='mui-fixed'>
-            <Fab color='primary' size='small' aria-label='scroll back to top'>
-              <Icon icon='mdi:arrow-up' />
+          <ScrollToTop className="mui-fixed">
+            <Fab color="primary" size="small" aria-label="scroll back to top">
+              <Icon icon="mdi:arrow-up" />
             </Fab>
           </ScrollToTop>
         )}

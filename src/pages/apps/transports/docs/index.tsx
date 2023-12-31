@@ -23,12 +23,18 @@ import format from 'date-fns/format'
 
 // ** Store & Actions Imports
 import { useDispatch, useSelector } from 'react-redux'
-import {  deleteInvoice, fetchTransportDocsData } from 'src/store/apps/transports'
+import {
+  deleteInvoice,
+  fetchTransportDocsData,
+} from 'src/store/apps/transports'
 
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
 import { ThemeColor } from 'src/@core/layouts/types'
-import { DocumentoEntregaType, TransporteType } from 'src/types/apps/transportType'
+import {
+  DocumentoEntregaType,
+  TransporteType,
+} from 'src/types/apps/transportType'
 
 // ** Custom Components Imports
 import CustomChip from 'src/@core/components/mui/chip'
@@ -38,7 +44,11 @@ import OptionsMenu from 'src/@core/components/option-menu'
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import formatDate from 'src/utils/formatDate'
 import formatCurrency from 'src/utils/formatCurrency'
-import { TransportStatusEnum, transportStatusLabels, transportStatusObj } from '../utils/transportMappings'
+import {
+  TransportStatusEnum,
+  transportStatusLabels,
+  transportStatusObj,
+} from '../utils/transportMappings'
 import CardWidgetsDocsDeliveryOverview from 'src/views/ui/cards/widgets/CardWidgetsDocsDeliveryOverview'
 import CardStatisticsTransport from 'src/views/ui/cards/statistics/CardStatisticsTransport'
 import DocDetailModal from './docDetailModal'
@@ -67,7 +77,7 @@ interface CellType {
 // ** Styled component for the link in the dataTable
 const LinkStyled = styled(Link)(({ theme }) => ({
   textDecoration: 'none',
-  color: theme.palette.primary.main
+  color: theme.palette.primary.main,
 }))
 
 // ** Vars
@@ -77,12 +87,8 @@ const invoiceStatusObj: InvoiceStatusObj = {
   Draft: { color: 'primary', icon: 'mdi:content-save-outline' },
   'Partial Payment': { color: 'warning', icon: 'mdi:chart-pie' },
   'Past Due': { color: 'error', icon: 'mdi:information-outline' },
-  Downloaded: { color: 'info', icon: 'mdi:arrow-down' }
+  Downloaded: { color: 'info', icon: 'mdi:arrow-down' },
 }
-
-
-
-
 
 // ** renders client column
 
@@ -92,7 +98,9 @@ const defaultColumns: GridColDef[] = [
     field: 'id',
     minWidth: 120,
     headerName: '#',
-    renderCell: ({ row }: CellType) => <DocDetailModal title={row.noDocEntrega} data={row}/>
+    renderCell: ({ row }: CellType) => (
+      <DocDetailModal title={row.noDocEntrega} data={row} />
+    ),
   },
   {
     flex: 0.25,
@@ -103,16 +111,20 @@ const defaultColumns: GridColDef[] = [
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography noWrap variant='body2' sx={{ color: 'text.primary', textTransform: 'capitalize' }}>
+            <Typography
+              noWrap
+              variant="body2"
+              sx={{ color: 'text.primary', textTransform: 'capitalize' }}
+            >
               {row.cliente.nombre}
             </Typography>
-            <Typography noWrap variant='caption'>
+            <Typography noWrap variant="caption">
               {row.cliente.codigo}
             </Typography>
           </Box>
         </Box>
       )
-    }
+    },
   },
   {
     flex: 0.25,
@@ -120,21 +132,23 @@ const defaultColumns: GridColDef[] = [
     minWidth: 200,
     headerName: 'Vendedor',
     renderCell: ({ row }: CellType) => {
-
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 600 }}>
+            <Typography
+              noWrap
+              variant="body2"
+              sx={{ color: 'text.primary', fontWeight: 600 }}
+            >
               {row.vendedor.nombre}
             </Typography>
-            <Typography noWrap variant='caption'>
+            <Typography noWrap variant="caption">
               {row.vendedor.codigo}
             </Typography>
           </Box>
         </Box>
       )
-    }
+    },
   },
   {
     flex: 0.15,
@@ -142,25 +156,32 @@ const defaultColumns: GridColDef[] = [
     minWidth: 100,
     headerName: 'Total',
     renderCell: ({ row }: CellType) => {
-
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography noWrap variant='body2' sx={{ color: 'text.primary', textTransform: 'capitalize' }}>
-              {row.status === TransportStatusEnum.Entregado ? formatCurrency(row.bruto_E) : formatCurrency(row.bruto)}
+            <Typography
+              noWrap
+              variant="body2"
+              sx={{ color: 'text.primary', textTransform: 'capitalize' }}
+            >
+              {row.status === TransportStatusEnum.Entregado
+                ? formatCurrency(row.bruto_E)
+                : formatCurrency(row.bruto)}
             </Typography>
           </Box>
         </Box>
       )
-    }
+    },
   },
-  
+
   {
     flex: 0.18,
     minWidth: 150,
     field: 'date',
     headerName: 'Fecha',
-    renderCell: ({ row }: CellType) => <Typography variant='body2'>{formatDate(row.fecha)}</Typography>
+    renderCell: ({ row }: CellType) => (
+      <Typography variant="body2">{formatDate(row.fecha)}</Typography>
+    ),
   },
   {
     flex: 0.1,
@@ -170,28 +191,40 @@ const defaultColumns: GridColDef[] = [
     renderCell: ({ row }: CellType) => {
       return (
         <CustomChip
-          skin='light'
-          size='small'
-          label={transportStatusLabels[row?.status] || ""}
+          skin="light"
+          size="small"
+          label={transportStatusLabels[row?.status] || ''}
           color={transportStatusObj[row.status]}
           sx={{ textTransform: 'capitalize' }}
         />
       )
-    }
+    },
   },
 ]
 
 /* eslint-disable */
 const CustomInput = forwardRef((props: CustomInputProps, ref) => {
-  const startDate = props.start !== null ? format(props.start, 'MM/dd/yyyy') : ''
-  const endDate = props.end !== null ? ` - ${format(props.end, 'MM/dd/yyyy')}` : null
+  const startDate =
+    props.start !== null ? format(props.start, 'MM/dd/yyyy') : ''
+  const endDate =
+    props.end !== null ? ` - ${format(props.end, 'MM/dd/yyyy')}` : null
 
   const value = `${startDate}${endDate !== null ? endDate : ''}`
-  props.start === null && props.dates.length && props.setDates ? props.setDates([]) : null
+  props.start === null && props.dates.length && props.setDates
+    ? props.setDates([])
+    : null
   const updatedProps = { ...props }
   delete updatedProps.setDates
 
-  return <TextField fullWidth inputRef={ref} {...updatedProps} label={props.label || ''} value={value} />
+  return (
+    <TextField
+      fullWidth
+      inputRef={ref}
+      {...updatedProps}
+      label={props.label || ''}
+      value={value}
+    />
+  )
 })
 /* eslint-enable */
 
@@ -206,22 +239,22 @@ const TransportDocs = (props: TransportDocsProps) => {
   const [endDateRange, setEndDateRange] = useState<any>(null)
   const [selectedRows, setSelectedRows] = useState<GridRowId[]>([])
   const [startDateRange, setStartDateRange] = useState<any>(null)
-  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 })
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10,
+  })
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
   const store = useSelector((state: RootState) => state.transports)
-  console.log("storestorestore", store)
+  console.log('storestorestore', store)
   useEffect(() => {
-    dispatch(
-      fetchTransportDocsData(props.noTransporte)
-    )
+    dispatch(fetchTransportDocsData(props.noTransporte))
   }, [dispatch, statusValue, value, dates])
 
   const handleFilter = (val: string) => {
     setValue(val)
   }
-
 
   const handleOnChangeRange = (dates: any) => {
     const [start, end] = dates
@@ -243,20 +276,22 @@ const TransportDocs = (props: TransportDocsProps) => {
       renderCell: ({ row }: CellType) => (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <MapModal data={[row]}></MapModal>
-          <SignatureModal url={row.firmaUrl}/>
+          <SignatureModal url={row.firmaUrl} />
         </Box>
-      )
-    }
+      ),
+    },
   ]
 
   return (
     <DatePickerWrapper>
       <Grid container spacing={6}>
         <Grid item xs={6}>
-          <CardStatisticsTransport docsData={store.docsData}/>
+          <CardStatisticsTransport docsData={store.docsData} />
         </Grid>
         <Grid item xs={6}>
-          <CardWidgetsDocsDeliveryOverview docsData={store.docsData?.documentos  || []}/>
+          <CardWidgetsDocsDeliveryOverview
+            docsData={store.docsData?.documentos || []}
+          />
         </Grid>
         <Grid item xs={12}>
           <Card>
@@ -269,8 +304,8 @@ const TransportDocs = (props: TransportDocsProps) => {
               pageSizeOptions={[10, 25, 50]}
               paginationModel={paginationModel}
               onPaginationModelChange={setPaginationModel}
-              onRowSelectionModelChange={rows => setSelectedRows(rows)}
-              getRowId={row => row.noDocEntrega}
+              onRowSelectionModelChange={(rows) => setSelectedRows(rows)}
+              getRowId={(row) => row.noDocEntrega}
             />
           </Card>
         </Grid>

@@ -58,10 +58,19 @@ const AclGuard = (props: AclGuardProps) => {
   }
 
   // If guest guard or no guard is true or any error page
-  if (guestGuard || router.route === '/404' || router.route === '/500' || !authGuard) {
+  if (
+    guestGuard ||
+    router.route === '/404' ||
+    router.route === '/500' ||
+    !authGuard
+  ) {
     // If user is logged in and his ability is built
     if (auth.user && ability) {
-      return <AbilityContext.Provider value={ability}>{children}</AbilityContext.Provider>
+      return (
+        <AbilityContext.Provider value={ability}>
+          {children}
+        </AbilityContext.Provider>
+      )
     } else {
       // If user is not logged in (render pages like login, register etc..)
       return <>{children}</>
@@ -69,12 +78,20 @@ const AclGuard = (props: AclGuardProps) => {
   }
 
   // Check the access of current user and render pages
-  if (ability && auth.user && ability.can(aclAbilities.action, aclAbilities.subject)) {
+  if (
+    ability &&
+    auth.user &&
+    ability.can(aclAbilities.action, aclAbilities.subject)
+  ) {
     if (router.route === '/') {
       return <Spinner />
     }
 
-    return <AbilityContext.Provider value={ability}>{children}</AbilityContext.Provider>
+    return (
+      <AbilityContext.Provider value={ability}>
+        {children}
+      </AbilityContext.Provider>
+    )
   }
 
   // Render Not Authorized component if the current user has limited access

@@ -20,7 +20,9 @@ import { styled, useTheme } from '@mui/material/styles'
 import FormHelperText from '@mui/material/FormHelperText'
 import InputAdornment from '@mui/material/InputAdornment'
 import Typography, { TypographyProps } from '@mui/material/Typography'
-import MuiFormControlLabel, { FormControlLabelProps } from '@mui/material/FormControlLabel'
+import MuiFormControlLabel, {
+  FormControlLabelProps,
+} from '@mui/material/FormControlLabel'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -49,65 +51,68 @@ const LoginIllustrationWrapper = styled(Box)<BoxProps>(({ theme }) => ({
   padding: theme.spacing(20),
   paddingRight: '0 !important',
   [theme.breakpoints.down('lg')]: {
-    padding: theme.spacing(10)
-  }
+    padding: theme.spacing(10),
+  },
 }))
 
 const LoginIllustration = styled('img')(({ theme }) => ({
-  backgroundImage: 'url(https://source.unsplash.com/collection/962362/desktop-and-tech)',
+  backgroundImage:
+    'url(https://source.unsplash.com/collection/962362/desktop-and-tech)',
   backgroundRepeat: 'no-repeat',
   backgroundSize: 'cover',
   backgroundPosition: 'center',
 
- maxWidth: '48rem',
+  maxWidth: '48rem',
   [theme.breakpoints.down('lg')]: {
-    maxWidth: '35rem'
-  }
+    maxWidth: '35rem',
+  },
 }))
 
 const RightWrapper = styled(Box)<BoxProps>(({ theme }) => ({
   width: '100%',
   [theme.breakpoints.up('md')]: {
-    maxWidth: 450
-  }
+    maxWidth: 450,
+  },
 }))
 
 const BoxWrapper = styled(Box)<BoxProps>(({ theme }) => ({
   [theme.breakpoints.down('xl')]: {
-    width: '100%'
+    width: '100%',
   },
   [theme.breakpoints.down('md')]: {
-    maxWidth: 400
-  }
+    maxWidth: 400,
+  },
 }))
 
 const TypographyStyled = styled(Typography)<TypographyProps>(({ theme }) => ({
   fontWeight: 600,
   marginBottom: theme.spacing(1.5),
-  [theme.breakpoints.down('md')]: { mt: theme.spacing(8) }
+  [theme.breakpoints.down('md')]: { mt: theme.spacing(8) },
 }))
 
 const LinkStyled = styled(Link)(({ theme }) => ({
   fontSize: '0.875rem',
   textDecoration: 'none',
-  color: theme.palette.primary.main
+  color: theme.palette.primary.main,
 }))
 
-const FormControlLabel = styled(MuiFormControlLabel)<FormControlLabelProps>(({ theme }) => ({
-  '& .MuiFormControlLabel-label': {
-    fontSize: '0.875rem',
-    color: theme.palette.text.secondary
-  }
-}))
+const FormControlLabel = styled(MuiFormControlLabel)<FormControlLabelProps>(
+  ({ theme }) => ({
+    '& .MuiFormControlLabel-label': {
+      fontSize: '0.875rem',
+      color: theme.palette.text.secondary,
+    },
+  }),
+)
 
 const schema = yup.object().shape({
   email: yup.string().email().required(),
-  password: yup.string().min(5).required()
+  password: yup.string().min(5).required(),
 })
 
 const defaultValues = {
   password: '',
-  email: ''
+  email: '',
 }
 
 interface FormData {
@@ -133,11 +138,11 @@ const LoginPage = () => {
     control,
     setError,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
   } = useForm({
     defaultValues,
     mode: 'onBlur',
-    resolver: yupResolver(schema)
+    resolver: yupResolver(schema),
   })
 
   const onSubmit = (data: FormData) => {
@@ -145,23 +150,41 @@ const LoginPage = () => {
     auth.login({ email, password, rememberMe }, () => {
       setError('email', {
         type: 'manual',
-        message: 'Email or Password is invalid'
+        message: 'Email or Password is invalid',
       })
     })
   }
 
-  const imageSource = skin === 'bordered' ? 'auth-v2-login-illustration-bordered' : 'auth-v2-login-illustration'
+  const imageSource =
+    skin === 'bordered'
+      ? 'auth-v2-login-illustration-bordered'
+      : 'auth-v2-login-illustration'
 
   return (
-    <Box className='content-right'>
+    <Box className="content-right">
       {!hidden ? (
-        <Box sx={{ flex: 1, display: 'flex', position: 'relative', alignItems: 'center', justifyContent: 'center',  backgroundImage: 'url(https://source.unsplash.com/collection/962362/desktop-and-tech)',
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center' }}>
-        </Box>
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            position: 'relative',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundImage:
+              'url(https://source.unsplash.com/collection/962362/desktop-and-tech)',
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        ></Box>
       ) : null}
-      <RightWrapper sx={skin === 'bordered' && !hidden ? { borderLeft: `1px solid ${theme.palette.divider}` } : {}}>
+      <RightWrapper
+        sx={
+          skin === 'bordered' && !hidden
+            ? { borderLeft: `1px solid ${theme.palette.divider}` }
+            : {}
+        }
+      >
         <Box
           sx={{
             p: 12,
@@ -169,7 +192,7 @@ const LoginPage = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: 'background.paper'
+            backgroundColor: 'background.paper',
           }}
         >
           <BoxWrapper>
@@ -180,63 +203,89 @@ const LoginPage = () => {
                 display: 'flex',
                 position: 'absolute',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
               }}
             >
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <img src='/images/logo/mseller-logo-dark.png' alt='logo' height='50' style={{ paddingLeft: '10px' }} />
+                <img
+                  src="/images/logo/mseller-logo-dark.png"
+                  alt="logo"
+                  height="50"
+                  style={{ paddingLeft: '10px' }}
+                />
               </Box>
-
             </Box>
             <Box sx={{ mb: 6 }}>
-              <TypographyStyled variant='h5'>Bienvenido a {themeConfig.templateName}! 👋🏻</TypographyStyled>
-              <Typography variant='body2'>Por favor, inicia sesión en tu cuenta.</Typography>
+              <TypographyStyled variant="h5">
+                Bienvenido a {themeConfig.templateName}! 👋🏻
+              </TypographyStyled>
+              <Typography variant="body2">
+                Por favor, inicia sesión en tu cuenta.
+              </Typography>
             </Box>
-            <form noValidate autoComplete='off' onSubmit={handleSubmit(onSubmit)}>
+            <form
+              noValidate
+              autoComplete="off"
+              onSubmit={handleSubmit(onSubmit)}
+            >
               <FormControl fullWidth sx={{ mb: 4 }}>
                 <Controller
-                  name='email'
+                  name="email"
                   control={control}
                   rules={{ required: true }}
                   render={({ field: { value, onChange, onBlur } }) => (
                     <TextField
                       autoFocus
-                      label='Email'
+                      label="Email"
                       value={value}
                       onBlur={onBlur}
                       onChange={onChange}
                       error={Boolean(errors.email)}
-                      placeholder='correo eléctronico'
+                      placeholder="correo eléctronico"
                     />
                   )}
                 />
-                {errors.email && <FormHelperText sx={{ color: 'error.main' }}>{errors.email.message}</FormHelperText>}
+                {errors.email && (
+                  <FormHelperText sx={{ color: 'error.main' }}>
+                    {errors.email.message}
+                  </FormHelperText>
+                )}
               </FormControl>
               <FormControl fullWidth>
-                <InputLabel htmlFor='auth-login-v2-password' error={Boolean(errors.password)}>
+                <InputLabel
+                  htmlFor="auth-login-v2-password"
+                  error={Boolean(errors.password)}
+                >
                   Clave
                 </InputLabel>
                 <Controller
-                  name='password'
+                  name="password"
                   control={control}
                   rules={{ required: true }}
                   render={({ field: { value, onChange, onBlur } }) => (
                     <OutlinedInput
                       value={value}
                       onBlur={onBlur}
-                      label='Clave'
+                      label="Clave"
                       onChange={onChange}
-                      id='auth-login-v2-password'
+                      id="auth-login-v2-password"
                       error={Boolean(errors.password)}
                       type={showPassword ? 'text' : 'password'}
                       endAdornment={
-                        <InputAdornment position='end'>
+                        <InputAdornment position="end">
                           <IconButton
-                            edge='end'
-                            onMouseDown={e => e.preventDefault()}
+                            edge="end"
+                            onMouseDown={(e) => e.preventDefault()}
                             onClick={() => setShowPassword(!showPassword)}
                           >
-                            <Icon icon={showPassword ? 'mdi:eye-outline' : 'mdi:eye-off-outline'} fontSize={20} />
+                            <Icon
+                              icon={
+                                showPassword
+                                  ? 'mdi:eye-outline'
+                                  : 'mdi:eye-off-outline'
+                              }
+                              fontSize={20}
+                            />
                           </IconButton>
                         </InputAdornment>
                       }
@@ -244,29 +293,55 @@ const LoginPage = () => {
                   )}
                 />
                 {errors.password && (
-                  <FormHelperText sx={{ color: 'error.main' }} id=''>
+                  <FormHelperText sx={{ color: 'error.main' }} id="">
                     {errors.password.message}
                   </FormHelperText>
                 )}
               </FormControl>
               <Box
-                sx={{ mb: 4, display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}
+                sx={{
+                  mb: 4,
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  justifyContent: 'space-between',
+                }}
               >
                 <FormControlLabel
-                  label='Recuerdame'
-                  control={<Checkbox checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} />}
+                  label="Recuerdame"
+                  control={
+                    <Checkbox
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                    />
+                  }
                 />
-                <LinkStyled href='/forgot-password'>Olvidó su clave?</LinkStyled>
+                <LinkStyled href="/forgot-password">
+                  Olvidó su clave?
+                </LinkStyled>
               </Box>
-              <Button fullWidth size='large' type='submit' variant='contained' sx={{ mb: 7 }}>
+              <Button
+                fullWidth
+                size="large"
+                type="submit"
+                variant="contained"
+                sx={{ mb: 7 }}
+              >
                 Iniciar Sesión
               </Button>
-              <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
-                <Typography variant='body2' sx={{ mr: 2 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  justifyContent: 'center',
+                }}
+              >
+                <Typography variant="body2" sx={{ mr: 2 }}>
                   Nuevo usuario?
                 </Typography>
-                <Typography variant='body2'>
-                  <LinkStyled href='/register'>Crear una cuenta</LinkStyled>
+                <Typography variant="body2">
+                  <LinkStyled href="/register">Crear una cuenta</LinkStyled>
                 </Typography>
               </Box>
               {/* <Divider sx={{ my: theme => `${theme.spacing(5)} !important` }}>or</Divider> */}

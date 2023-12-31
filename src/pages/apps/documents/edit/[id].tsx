@@ -1,5 +1,10 @@
 // ** Next Import
-import { GetStaticPaths, GetStaticProps, GetStaticPropsContext, InferGetStaticPropsType } from 'next/types'
+import {
+  GetStaticPaths,
+  GetStaticProps,
+  GetStaticPropsContext,
+  InferGetStaticPropsType,
+} from 'next/types'
 
 // ** Third Party Imports
 import axios from 'axios'
@@ -13,9 +18,13 @@ import Edit from 'src/views/apps/invoice/edit/Edit'
 // ** Styled Component
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 
-const InvoiceEdit = ({ id }: InferGetStaticPropsType<typeof getStaticProps>) => {
+const InvoiceEdit = ({
+  id,
+}: InferGetStaticPropsType<typeof getStaticProps>) => {
   return (
-    <DatePickerWrapper sx={{ '& .react-datepicker-wrapper': { width: 'auto' } }}>
+    <DatePickerWrapper
+      sx={{ '& .react-datepicker-wrapper': { width: 'auto' } }}
+    >
       <Edit id={id} />
     </DatePickerWrapper>
   )
@@ -26,20 +35,22 @@ export const getStaticPaths: GetStaticPaths = async () => {
   const data: InvoiceType[] = await res.data.allData
 
   const paths = data.map((item: InvoiceType) => ({
-    params: { id: `${item.id}` }
+    params: { id: `${item.id}` },
   }))
 
   return {
     paths,
-    fallback: false
+    fallback: false,
   }
 }
 
-export const getStaticProps: GetStaticProps = ({ params }: GetStaticPropsContext) => {
+export const getStaticProps: GetStaticProps = ({
+  params,
+}: GetStaticPropsContext) => {
   return {
     props: {
-      id: params?.id
-    }
+      id: params?.id,
+    },
   }
 }
 

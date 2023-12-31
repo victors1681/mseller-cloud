@@ -2,7 +2,11 @@
 import { Palette } from '@mui/material'
 import { Skin, ThemeColor } from 'src/@core/layouts/types'
 
-const DefaultPalette = (mode: Palette['mode'], skin: Skin, themeColor: ThemeColor): Palette => {
+const DefaultPalette = (
+  mode: Palette['mode'],
+  skin: Skin,
+  themeColor: ThemeColor,
+): Palette => {
   // ** Vars
   const whiteColor = '#FFF'
   const lightColor = '58, 53, 65'
@@ -46,48 +50,48 @@ const DefaultPalette = (mode: Palette['mode'], skin: Skin, themeColor: ThemeColo
       avatarBg: mode === 'light' ? '#F0EFF0' : '#3F3B59',
       darkBg: skin === 'bordered' ? '#312D4B' : '#28243D',
       lightBg: skin === 'bordered' ? whiteColor : '#F4F5FA',
-      tableHeaderBg: mode === 'light' ? '#F9FAFC' : '#3D3759'
+      tableHeaderBg: mode === 'light' ? '#F9FAFC' : '#3D3759',
     },
     mode: mode,
     common: {
       black: '#000',
-      white: whiteColor
+      white: whiteColor,
     },
     primary: {
       light: '#9E69FD',
       main: '#9155FD',
       dark: '#804BDF',
-      contrastText: whiteColor
+      contrastText: whiteColor,
     },
     secondary: {
       light: '#9C9FA4',
       main: '#8A8D93',
       dark: '#777B82',
-      contrastText: whiteColor
+      contrastText: whiteColor,
     },
     error: {
       light: '#FF6166',
       main: '#FF4C51',
       dark: '#E04347',
-      contrastText: whiteColor
+      contrastText: whiteColor,
     },
     warning: {
       light: '#FFCA64',
       main: '#FFB400',
       dark: '#E09E00',
-      contrastText: whiteColor
+      contrastText: whiteColor,
     },
     info: {
       light: '#32BAFF',
       main: '#16B1FF',
       dark: '#139CE0',
-      contrastText: whiteColor
+      contrastText: whiteColor,
     },
     success: {
       light: '#6AD01F',
       main: '#56CA00',
       dark: '#4CB200',
-      contrastText: whiteColor
+      contrastText: whiteColor,
     },
     grey: {
       50: '#FAFAFA',
@@ -103,17 +107,17 @@ const DefaultPalette = (mode: Palette['mode'], skin: Skin, themeColor: ThemeColo
       A100: '#F5F5F5',
       A200: '#EEEEEE',
       A400: '#BDBDBD',
-      A700: '#616161'
+      A700: '#616161',
     },
     text: {
       primary: `rgba(${mainColor}, 0.87)`,
       secondary: `rgba(${mainColor}, 0.6)`,
-      disabled: `rgba(${mainColor}, 0.38)`
+      disabled: `rgba(${mainColor}, 0.38)`,
     },
     divider: `rgba(${mainColor}, 0.12)`,
     background: {
       paper: mode === 'light' ? whiteColor : '#312D4B',
-      default: defaultBgColor()
+      default: defaultBgColor(),
     },
     action: {
       active: `rgba(${mainColor}, 0.54)`,
@@ -121,8 +125,8 @@ const DefaultPalette = (mode: Palette['mode'], skin: Skin, themeColor: ThemeColo
       selected: `rgba(${mainColor}, 0.08)`,
       disabled: `rgba(${mainColor}, 0.26)`,
       disabledBackground: `rgba(${mainColor}, 0.12)`,
-      focus: `rgba(${mainColor}, 0.12)`
-    }
+      focus: `rgba(${mainColor}, 0.12)`,
+    },
   } as Palette
 }
 

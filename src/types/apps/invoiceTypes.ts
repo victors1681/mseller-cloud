@@ -82,7 +82,6 @@ export interface Vendedor {
   localidad: number
 }
 
-
 export type InvoicePaymentType = {
   iban: string
   totalDue: string

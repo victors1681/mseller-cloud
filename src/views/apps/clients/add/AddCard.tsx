@@ -52,16 +52,25 @@ interface Props {
   setSelectedClient: (val: InvoiceClientType | null) => void
 }
 
-const CustomInput = forwardRef(({ ...props }: PickerProps, ref: ForwardedRef<HTMLElement>) => {
-  return <TextField size='small' inputRef={ref} sx={{ width: { sm: '250px', xs: '170px' } }} {...props} />
-})
+const CustomInput = forwardRef(
+  ({ ...props }: PickerProps, ref: ForwardedRef<HTMLElement>) => {
+    return (
+      <TextField
+        size="small"
+        inputRef={ref}
+        sx={{ width: { sm: '250px', xs: '170px' } }}
+        {...props}
+      />
+    )
+  },
+)
 
 const MUITableCell = styled(TableCell)<TableCellBaseProps>(({ theme }) => ({
   borderBottom: 0,
   paddingLeft: '0 !important',
   paddingRight: '0 !important',
   paddingTop: `${theme.spacing(1)} !important`,
-  paddingBottom: `${theme.spacing(1)} !important`
+  paddingBottom: `${theme.spacing(1)} !important`,
 }))
 
 const CalcWrapper = styled(Box)<BoxProps>(({ theme }) => ({
@@ -69,8 +78,8 @@ const CalcWrapper = styled(Box)<BoxProps>(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'space-between',
   '&:not(:last-of-type)': {
-    marginBottom: theme.spacing(2)
-  }
+    marginBottom: theme.spacing(2),
+  },
 }))
 
 const RepeatingContent = styled(Grid)<GridProps>(({ theme }) => ({
@@ -81,22 +90,22 @@ const RepeatingContent = styled(Grid)<GridProps>(({ theme }) => ({
   border: `1px solid ${theme.palette.divider}`,
   '& .col-title': {
     top: '-1.5rem',
-    position: 'absolute'
+    position: 'absolute',
   },
   [theme.breakpoints.down('lg')]: {
     '& .col-title': {
       top: '0',
-      position: 'relative'
-    }
-  }
+      position: 'relative',
+    },
+  },
 }))
 
 const RepeaterWrapper = styled(CardContent)<CardContentProps>(({ theme }) => ({
   paddingTop: theme.spacing(12),
   paddingBottom: theme.spacing(12),
   '& .repeater-wrapper + .repeater-wrapper': {
-    marginTop: theme.spacing(12)
-  }
+    marginTop: theme.spacing(12),
+  },
 }))
 
 const InvoiceAction = styled(Box)<BoxProps>(({ theme }) => ({
@@ -104,13 +113,15 @@ const InvoiceAction = styled(Box)<BoxProps>(({ theme }) => ({
   flexDirection: 'column',
   justifyContent: 'flex-start',
   padding: theme.spacing(2, 1),
-  borderLeft: `1px solid ${theme.palette.divider}`
+  borderLeft: `1px solid ${theme.palette.divider}`,
 }))
 
 const CustomSelectItem = styled(MenuItem)<MenuItemProps>(({ theme }) => ({
   color: theme.palette.success.main,
   backgroundColor: 'transparent !important',
-  '&:hover': { backgroundColor: `${alpha(theme.palette.success.main, 0.1)} !important` }
+  '&:hover': {
+    backgroundColor: `${alpha(theme.palette.success.main, 0.1)} !important`,
+  },
 }))
 
 const now = new Date()
@@ -118,7 +129,13 @@ const tomorrowDate = now.setDate(now.getDate() + 7)
 
 const AddCard = (props: Props) => {
   // ** Props
-  const { clients, invoiceNumber, selectedClient, setSelectedClient, toggleAddCustomerDrawer } = props
+  const {
+    clients,
+    invoiceNumber,
+    selectedClient,
+    setSelectedClient,
+    toggleAddCustomerDrawer,
+  } = props
 
   // ** States
   const [count, setCount] = useState<number>(1)
@@ -141,7 +158,7 @@ const AddCard = (props: Props) => {
   const handleInvoiceChange = (event: SelectChangeEvent) => {
     setSelected(event.target.value)
     if (clients !== undefined) {
-      setSelectedClient(clients.filter(i => i.name === event.target.value)[0])
+      setSelectedClient(clients.filter((i) => i.name === event.target.value)[0])
     }
   }
 
@@ -159,113 +176,136 @@ const AddCard = (props: Props) => {
                 <svg
                   width={30}
                   height={25}
-                  version='1.1'
-                  viewBox='0 0 30 23'
-                  xmlns='http://www.w3.org/2000/svg'
-                  xmlnsXlink='http://www.w3.org/1999/xlink'
+                  version="1.1"
+                  viewBox="0 0 30 23"
+                  xmlns="http://www.w3.org/2000/svg"
+                  xmlnsXlink="http://www.w3.org/1999/xlink"
                 >
-                  <g stroke='none' strokeWidth='1' fill='none' fillRule='evenodd'>
-                    <g id='Artboard' transform='translate(-95.000000, -51.000000)'>
-                      <g id='logo' transform='translate(95.000000, 50.000000)'>
+                  <g
+                    stroke="none"
+                    strokeWidth="1"
+                    fill="none"
+                    fillRule="evenodd"
+                  >
+                    <g
+                      id="Artboard"
+                      transform="translate(-95.000000, -51.000000)"
+                    >
+                      <g id="logo" transform="translate(95.000000, 50.000000)">
                         <path
-                          id='Combined-Shape'
+                          id="Combined-Shape"
                           fill={theme.palette.primary.main}
-                          d='M30,21.3918362 C30,21.7535219 29.9019196,22.1084381 29.7162004,22.4188007 C29.1490236,23.366632 27.9208668,23.6752135 26.9730355,23.1080366 L26.9730355,23.1080366 L23.714971,21.1584295 C23.1114106,20.7972624 22.7419355,20.1455972 22.7419355,19.4422291 L22.7419355,19.4422291 L22.741,12.7425689 L15,17.1774194 L7.258,12.7425689 L7.25806452,19.4422291 C7.25806452,20.1455972 6.88858935,20.7972624 6.28502902,21.1584295 L3.0269645,23.1080366 C2.07913318,23.6752135 0.850976404,23.366632 0.283799571,22.4188007 C0.0980803893,22.1084381 2.0190442e-15,21.7535219 0,21.3918362 L0,3.58469444 L0.00548573643,3.43543209 L0.00548573643,3.43543209 L0,3.5715689 C3.0881846e-16,2.4669994 0.8954305,1.5715689 2,1.5715689 C2.36889529,1.5715689 2.73060353,1.67359571 3.04512412,1.86636639 L15,9.19354839 L26.9548759,1.86636639 C27.2693965,1.67359571 27.6311047,1.5715689 28,1.5715689 C29.1045695,1.5715689 30,2.4669994 30,3.5715689 L30,3.5715689 Z'
+                          d="M30,21.3918362 C30,21.7535219 29.9019196,22.1084381 29.7162004,22.4188007 C29.1490236,23.366632 27.9208668,23.6752135 26.9730355,23.1080366 L26.9730355,23.1080366 L23.714971,21.1584295 C23.1114106,20.7972624 22.7419355,20.1455972 22.7419355,19.4422291 L22.7419355,19.4422291 L22.741,12.7425689 L15,17.1774194 L7.258,12.7425689 L7.25806452,19.4422291 C7.25806452,20.1455972 6.88858935,20.7972624 6.28502902,21.1584295 L3.0269645,23.1080366 C2.07913318,23.6752135 0.850976404,23.366632 0.283799571,22.4188007 C0.0980803893,22.1084381 2.0190442e-15,21.7535219 0,21.3918362 L0,3.58469444 L0.00548573643,3.43543209 L0.00548573643,3.43543209 L0,3.5715689 C3.0881846e-16,2.4669994 0.8954305,1.5715689 2,1.5715689 C2.36889529,1.5715689 2.73060353,1.67359571 3.04512412,1.86636639 L15,9.19354839 L26.9548759,1.86636639 C27.2693965,1.67359571 27.6311047,1.5715689 28,1.5715689 C29.1045695,1.5715689 30,2.4669994 30,3.5715689 L30,3.5715689 Z"
                         />
                         <polygon
-                          id='Rectangle'
-                          opacity='0.077704'
+                          id="Rectangle"
+                          opacity="0.077704"
                           fill={theme.palette.common.black}
-                          points='0 8.58870968 7.25806452 12.7505183 7.25806452 16.8305646'
+                          points="0 8.58870968 7.25806452 12.7505183 7.25806452 16.8305646"
                         />
                         <polygon
-                          id='Rectangle'
-                          opacity='0.077704'
+                          id="Rectangle"
+                          opacity="0.077704"
                           fill={theme.palette.common.black}
-                          points='0 8.58870968 7.25806452 12.6445567 7.25806452 15.1370162'
+                          points="0 8.58870968 7.25806452 12.6445567 7.25806452 15.1370162"
                         />
                         <polygon
-                          id='Rectangle'
-                          opacity='0.077704'
+                          id="Rectangle"
+                          opacity="0.077704"
                           fill={theme.palette.common.black}
-                          points='22.7419355 8.58870968 30 12.7417372 30 16.9537453'
-                          transform='translate(26.370968, 12.771227) scale(-1, 1) translate(-26.370968, -12.771227) '
+                          points="22.7419355 8.58870968 30 12.7417372 30 16.9537453"
+                          transform="translate(26.370968, 12.771227) scale(-1, 1) translate(-26.370968, -12.771227) "
                         />
                         <polygon
-                          id='Rectangle'
-                          opacity='0.077704'
+                          id="Rectangle"
+                          opacity="0.077704"
                           fill={theme.palette.common.black}
-                          points='22.7419355 8.58870968 30 12.6409734 30 15.2601969'
-                          transform='translate(26.370968, 11.924453) scale(-1, 1) translate(-26.370968, -11.924453) '
+                          points="22.7419355 8.58870968 30 12.6409734 30 15.2601969"
+                          transform="translate(26.370968, 11.924453) scale(-1, 1) translate(-26.370968, -11.924453) "
                         />
                         <path
-                          id='Rectangle'
-                          fillOpacity='0.15'
+                          id="Rectangle"
+                          fillOpacity="0.15"
                           fill={theme.palette.common.white}
-                          d='M3.04512412,1.86636639 L15,9.19354839 L15,9.19354839 L15,17.1774194 L0,8.58649679 L0,3.5715689 C3.0881846e-16,2.4669994 0.8954305,1.5715689 2,1.5715689 C2.36889529,1.5715689 2.73060353,1.67359571 3.04512412,1.86636639 Z'
+                          d="M3.04512412,1.86636639 L15,9.19354839 L15,9.19354839 L15,17.1774194 L0,8.58649679 L0,3.5715689 C3.0881846e-16,2.4669994 0.8954305,1.5715689 2,1.5715689 C2.36889529,1.5715689 2.73060353,1.67359571 3.04512412,1.86636639 Z"
                         />
                         <path
-                          id='Rectangle'
-                          fillOpacity='0.35'
+                          id="Rectangle"
+                          fillOpacity="0.35"
                           fill={theme.palette.common.white}
-                          transform='translate(22.500000, 8.588710) scale(-1, 1) translate(-22.500000, -8.588710) '
-                          d='M18.0451241,1.86636639 L30,9.19354839 L30,9.19354839 L30,17.1774194 L15,8.58649679 L15,3.5715689 C15,2.4669994 15.8954305,1.5715689 17,1.5715689 C17.3688953,1.5715689 17.7306035,1.67359571 18.0451241,1.86636639 Z'
+                          transform="translate(22.500000, 8.588710) scale(-1, 1) translate(-22.500000, -8.588710) "
+                          d="M18.0451241,1.86636639 L30,9.19354839 L30,9.19354839 L30,17.1774194 L15,8.58649679 L15,3.5715689 C15,2.4669994 15.8954305,1.5715689 17,1.5715689 C17.3688953,1.5715689 17.7306035,1.67359571 18.0451241,1.86636639 Z"
                         />
                       </g>
                     </g>
                   </g>
                 </svg>
                 <Typography
-                  variant='h6'
-                  sx={{ ml: 2.5, fontWeight: 600, lineHeight: 'normal', textTransform: 'uppercase' }}
+                  variant="h6"
+                  sx={{
+                    ml: 2.5,
+                    fontWeight: 600,
+                    lineHeight: 'normal',
+                    textTransform: 'uppercase',
+                  }}
                 >
                   {themeConfig.templateName}
                 </Typography>
               </Box>
               <div>
-                <Typography variant='body2' sx={{ mb: 1 }}>
+                <Typography variant="body2" sx={{ mb: 1 }}>
                   Office 149, 450 South Brand Brooklyn
                 </Typography>
-                <Typography variant='body2' sx={{ mb: 1 }}>
+                <Typography variant="body2" sx={{ mb: 1 }}>
                   San Diego County, CA 91905, USA
                 </Typography>
-                <Typography variant='body2'>+1 (123) 456 7891, +44 (876) 543 2198</Typography>
+                <Typography variant="body2">
+                  +1 (123) 456 7891, +44 (876) 543 2198
+                </Typography>
               </div>
             </Box>
           </Grid>
           <Grid item xl={6} xs={12}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: { xl: 'flex-end', xs: 'flex-start' } }}>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: { xl: 'flex-end', xs: 'flex-start' },
+              }}
+            >
               <Box sx={{ mb: 4, display: 'flex', alignItems: 'center' }}>
-                <Typography variant='h6' sx={{ mr: 2, width: '105px' }}>
+                <Typography variant="h6" sx={{ mr: 2, width: '105px' }}>
                   Invoice
                 </Typography>
                 <TextField
-                  size='small'
+                  size="small"
                   value={invoiceNumber}
                   sx={{ width: { sm: '250px', xs: '170px' } }}
                   InputProps={{
                     disabled: true,
-                    startAdornment: <InputAdornment position='start'>#</InputAdornment>
+                    startAdornment: (
+                      <InputAdornment position="start">#</InputAdornment>
+                    ),
                   }}
                 />
               </Box>
               <Box sx={{ mb: 4, display: 'flex', alignItems: 'center' }}>
-                <Typography variant='body2' sx={{ mr: 3, width: '100px' }}>
+                <Typography variant="body2" sx={{ mr: 3, width: '100px' }}>
                   Date Issued:
                 </Typography>
                 <DatePicker
-                  id='issue-date'
+                  id="issue-date"
                   selected={issueDate}
                   customInput={<CustomInput />}
                   onChange={(date: Date) => setIssueDate(date)}
                 />
               </Box>
               <Box sx={{ display: 'flex' }}>
-                <Typography variant='body2' sx={{ mr: 3, width: '100px' }}>
+                <Typography variant="body2" sx={{ mr: 3, width: '100px' }}>
                   Date Due:
                 </Typography>
                 <DatePicker
-                  id='due-date'
+                  id="due-date"
                   selected={dueDate}
                   customInput={<CustomInput />}
                   onChange={(date: Date) => setDueDate(date)}
@@ -281,18 +321,33 @@ const AddCard = (props: Props) => {
       <CardContent>
         <Grid container>
           <Grid item xs={12} sm={6} sx={{ mb: { lg: 0, xs: 4 } }}>
-            <Typography variant='body2' sx={{ mb: 3.5, color: 'text.primary', fontWeight: 600 }}>
+            <Typography
+              variant="body2"
+              sx={{ mb: 3.5, color: 'text.primary', fontWeight: 600 }}
+            >
               Invoice To:
             </Typography>
-            <Select size='small' value={selected} onChange={handleInvoiceChange} sx={{ mb: 4, width: '200px' }}>
-              <CustomSelectItem value='' onClick={handleAddNewCustomer}>
-                <Box sx={{ display: 'flex', alignItems: 'center', color: 'success.main', '& svg': { mr: 2 } }}>
-                  <Icon icon='mdi:plus' fontSize={20} />
+            <Select
+              size="small"
+              value={selected}
+              onChange={handleInvoiceChange}
+              sx={{ mb: 4, width: '200px' }}
+            >
+              <CustomSelectItem value="" onClick={handleAddNewCustomer}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    color: 'success.main',
+                    '& svg': { mr: 2 },
+                  }}
+                >
+                  <Icon icon="mdi:plus" fontSize={20} />
                   Add New Customer
                 </Box>
               </CustomSelectItem>
               {clients !== undefined &&
-                clients.map(client => (
+                clients.map((client) => (
                   <MenuItem key={client.name} value={client.name}>
                     {client.name}
                   </MenuItem>
@@ -300,24 +355,32 @@ const AddCard = (props: Props) => {
             </Select>
             {selectedClient !== null && selectedClient !== undefined ? (
               <div>
-                <Typography variant='body2' sx={{ mb: 1 }}>
+                <Typography variant="body2" sx={{ mb: 1 }}>
                   {selectedClient.company}
                 </Typography>
-                <Typography variant='body2' sx={{ mb: 1 }}>
+                <Typography variant="body2" sx={{ mb: 1 }}>
                   {selectedClient.address}
                 </Typography>
-                <Typography variant='body2' sx={{ mb: 1 }}>
+                <Typography variant="body2" sx={{ mb: 1 }}>
                   {selectedClient.contact}
                 </Typography>
-                <Typography variant='body2' sx={{ mb: 1 }}>
+                <Typography variant="body2" sx={{ mb: 1 }}>
                   {selectedClient.companyEmail}
                 </Typography>
               </div>
             ) : null}
           </Grid>
-          <Grid item xs={12} sm={6} sx={{ display: 'flex', justifyContent: ['flex-start', 'flex-end'] }}>
+          <Grid
+            item
+            xs={12}
+            sm={6}
+            sx={{ display: 'flex', justifyContent: ['flex-start', 'flex-end'] }}
+          >
             <div>
-              <Typography variant='body2' sx={{ mb: 3.5, color: 'text.primary', fontWeight: 600 }}>
+              <Typography
+                variant="body2"
+                sx={{ mb: 3.5, color: 'text.primary', fontWeight: 600 }}
+              >
                 Bill To:
               </Typography>
               <TableContainer>
@@ -359,87 +422,130 @@ const AddCard = (props: Props) => {
             const Tag = i === 0 ? Box : Collapse
 
             return (
-              <Tag key={i} className='repeater-wrapper' {...(i !== 0 ? { in: true } : {})}>
+              <Tag
+                key={i}
+                className="repeater-wrapper"
+                {...(i !== 0 ? { in: true } : {})}
+              >
                 <Grid container>
                   <RepeatingContent item xs={12}>
-                    <Grid container sx={{ py: 4, width: '100%', pr: { lg: 0, xs: 4 } }}>
-                      <Grid item lg={6} md={5} xs={12} sx={{ px: 4, my: { lg: 0, xs: 4 } }}>
+                    <Grid
+                      container
+                      sx={{ py: 4, width: '100%', pr: { lg: 0, xs: 4 } }}
+                    >
+                      <Grid
+                        item
+                        lg={6}
+                        md={5}
+                        xs={12}
+                        sx={{ px: 4, my: { lg: 0, xs: 4 } }}
+                      >
                         <Typography
-                          variant='body2'
-                          className='col-title'
+                          variant="body2"
+                          className="col-title"
                           sx={{ fontWeight: '600', mb: { md: 2, xs: 0 } }}
                         >
                           Item
                         </Typography>
-                        <Select fullWidth size='small' defaultValue='App Design'>
-                          <MenuItem value='App Design'>App Design</MenuItem>
-                          <MenuItem value='App Customization'>App Customization</MenuItem>
-                          <MenuItem value='ABC Template'>ABC Template</MenuItem>
-                          <MenuItem value='App Development'>App Development</MenuItem>
+                        <Select
+                          fullWidth
+                          size="small"
+                          defaultValue="App Design"
+                        >
+                          <MenuItem value="App Design">App Design</MenuItem>
+                          <MenuItem value="App Customization">
+                            App Customization
+                          </MenuItem>
+                          <MenuItem value="ABC Template">ABC Template</MenuItem>
+                          <MenuItem value="App Development">
+                            App Development
+                          </MenuItem>
                         </Select>
                         <TextField
                           rows={2}
                           fullWidth
                           multiline
-                          size='small'
+                          size="small"
                           sx={{ mt: 3.5 }}
-                          defaultValue='Customization & Bug Fixes'
+                          defaultValue="Customization & Bug Fixes"
                         />
                       </Grid>
-                      <Grid item lg={2} md={3} xs={12} sx={{ px: 4, my: { lg: 0, xs: 4 } }}>
+                      <Grid
+                        item
+                        lg={2}
+                        md={3}
+                        xs={12}
+                        sx={{ px: 4, my: { lg: 0, xs: 4 } }}
+                      >
                         <Typography
-                          variant='body2'
-                          className='col-title'
+                          variant="body2"
+                          className="col-title"
                           sx={{ fontWeight: '600', mb: { md: 2, xs: 0 } }}
                         >
                           Cost
                         </Typography>
                         <TextField
-                          size='small'
-                          type='number'
-                          placeholder='24'
-                          defaultValue='24'
+                          size="small"
+                          type="number"
+                          placeholder="24"
+                          defaultValue="24"
                           InputProps={{ inputProps: { min: 0 } }}
                         />
                         <Box sx={{ mt: 3.5 }}>
-                          <Typography component='span' variant='body2'>
+                          <Typography component="span" variant="body2">
                             Discount:
                           </Typography>{' '}
-                          <Typography component='span' variant='body2'>
+                          <Typography component="span" variant="body2">
                             0%
                           </Typography>
-                          <Tooltip title='Tax 1' placement='top'>
-                            <Typography component='span' variant='body2' sx={{ mx: 2 }}>
+                          <Tooltip title="Tax 1" placement="top">
+                            <Typography
+                              component="span"
+                              variant="body2"
+                              sx={{ mx: 2 }}
+                            >
                               0%
                             </Typography>
                           </Tooltip>
-                          <Tooltip title='Tax 2' placement='top'>
-                            <Typography component='span' variant='body2'>
+                          <Tooltip title="Tax 2" placement="top">
+                            <Typography component="span" variant="body2">
                               0%
                             </Typography>
                           </Tooltip>
                         </Box>
                       </Grid>
-                      <Grid item lg={2} md={2} xs={12} sx={{ px: 4, my: { lg: 0, xs: 4 } }}>
+                      <Grid
+                        item
+                        lg={2}
+                        md={2}
+                        xs={12}
+                        sx={{ px: 4, my: { lg: 0, xs: 4 } }}
+                      >
                         <Typography
-                          variant='body2'
-                          className='col-title'
+                          variant="body2"
+                          className="col-title"
                           sx={{ fontWeight: '600', mb: { md: 2, xs: 0 } }}
                         >
                           Hours
                         </Typography>
                         <TextField
-                          size='small'
-                          type='number'
-                          placeholder='1'
-                          defaultValue='1'
+                          size="small"
+                          type="number"
+                          placeholder="1"
+                          defaultValue="1"
                           InputProps={{ inputProps: { min: 0 } }}
                         />
                       </Grid>
-                      <Grid item lg={2} md={1} xs={12} sx={{ px: 4, my: { lg: 0 }, mt: 2 }}>
+                      <Grid
+                        item
+                        lg={2}
+                        md={1}
+                        xs={12}
+                        sx={{ px: 4, my: { lg: 0 }, mt: 2 }}
+                      >
                         <Typography
-                          variant='body2'
-                          className='col-title'
+                          variant="body2"
+                          className="col-title"
                           sx={{ fontWeight: '600', mb: { md: 2, xs: 0 } }}
                         >
                           Price
@@ -448,8 +554,8 @@ const AddCard = (props: Props) => {
                       </Grid>
                     </Grid>
                     <InvoiceAction>
-                      <IconButton size='small' onClick={deleteForm}>
-                        <Icon icon='mdi:close' fontSize={20} />
+                      <IconButton size="small" onClick={deleteForm}>
+                        <Icon icon="mdi:close" fontSize={20} />
                       </IconButton>
                     </InvoiceAction>
                   </RepeatingContent>
@@ -462,9 +568,9 @@ const AddCard = (props: Props) => {
         <Grid container sx={{ mt: 4 }}>
           <Grid item xs={12} sx={{ px: 0 }}>
             <Button
-              size='small'
-              variant='contained'
-              startIcon={<Icon icon='mdi:plus' fontSize={20} />}
+              size="small"
+              variant="contained"
+              startIcon={<Icon icon="mdi:plus" fontSize={20} />}
               onClick={() => setCount(count + 1)}
             >
               Add Item
@@ -478,36 +584,49 @@ const AddCard = (props: Props) => {
         <Grid container>
           <Grid item xs={12} sm={9} sx={{ order: { sm: 1, xs: 2 } }}>
             <Box sx={{ mb: 4, display: 'flex', alignItems: 'center' }}>
-              <Typography variant='body2' sx={{ mr: 2, fontWeight: 600 }}>
+              <Typography variant="body2" sx={{ mr: 2, fontWeight: 600 }}>
                 Salesperson:
               </Typography>
-              <TextField size='small' sx={{ maxWidth: '150px' }} defaultValue='Tommy Shelby' />
+              <TextField
+                size="small"
+                sx={{ maxWidth: '150px' }}
+                defaultValue="Tommy Shelby"
+              />
             </Box>
-            <TextField size='small' sx={{ maxWidth: '300px' }} placeholder='Thanks for your business' />
+            <TextField
+              size="small"
+              sx={{ maxWidth: '300px' }}
+              placeholder="Thanks for your business"
+            />
           </Grid>
-          <Grid item xs={12} sm={3} sx={{ mb: { sm: 0, xs: 4 }, order: { sm: 2, xs: 1 } }}>
+          <Grid
+            item
+            xs={12}
+            sm={3}
+            sx={{ mb: { sm: 0, xs: 4 }, order: { sm: 2, xs: 1 } }}
+          >
             <CalcWrapper>
-              <Typography variant='body2'>Subtotal:</Typography>
-              <Typography variant='body2' sx={{ fontWeight: 600 }}>
+              <Typography variant="body2">Subtotal:</Typography>
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>
                 $1800
               </Typography>
             </CalcWrapper>
             <CalcWrapper>
-              <Typography variant='body2'>Discount:</Typography>
-              <Typography variant='body2' sx={{ fontWeight: 600 }}>
+              <Typography variant="body2">Discount:</Typography>
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>
                 $28
               </Typography>
             </CalcWrapper>
             <CalcWrapper>
-              <Typography variant='body2'>Tax:</Typography>
-              <Typography variant='body2' sx={{ fontWeight: 600 }}>
+              <Typography variant="body2">Tax:</Typography>
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>
                 21%
               </Typography>
             </CalcWrapper>
             <Divider />
             <CalcWrapper>
-              <Typography variant='body2'>Total:</Typography>
-              <Typography variant='body2' sx={{ fontWeight: 600 }}>
+              <Typography variant="body2">Total:</Typography>
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>
                 $1690
               </Typography>
             </CalcWrapper>
@@ -518,15 +637,15 @@ const AddCard = (props: Props) => {
       <Divider />
 
       <CardContent>
-        <InputLabel htmlFor='invoice-note' sx={{ mb: 2 }}>
+        <InputLabel htmlFor="invoice-note" sx={{ mb: 2 }}>
           Note:
         </InputLabel>
         <TextField
           rows={2}
           fullWidth
           multiline
-          id='invoice-note'
-          defaultValue='It was a pleasure working with you and your team. We hope you will keep us in mind for future freelance projects. Thank You!'
+          id="invoice-note"
+          defaultValue="It was a pleasure working with you and your team. We hope you will keep us in mind for future freelance projects. Thank You!"
         />
       </CardContent>
     </Card>

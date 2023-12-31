@@ -42,13 +42,6 @@ import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import formatCurrency from 'src/utils/formatCurrency'
 import { ClienteType } from 'src/types/apps/clientTypes'
 
-interface InvoiceStatusObj {
-  [key: string]: {
-    icon: string
-    color: ThemeColor
-  }
-}
-
 interface CustomInputProps {
   dates: Date[]
   label: string
@@ -64,9 +57,8 @@ interface CellType {
 // ** Styled component for the link in the dataTable
 const LinkStyled = styled(Link)(({ theme }) => ({
   textDecoration: 'none',
-  color: theme.palette.primary.main
+  color: theme.palette.primary.main,
 }))
-
 
 const defaultColumns: GridColDef[] = [
   {
@@ -74,7 +66,11 @@ const defaultColumns: GridColDef[] = [
     field: 'id',
     minWidth: 80,
     headerName: 'Código',
-    renderCell: ({ row }: CellType) => <LinkStyled href={`/apps/invoice/preview/${row.codigo}`}>{`${row.codigo}`}</LinkStyled>
+    renderCell: ({ row }: CellType) => (
+      <LinkStyled
+        href={`/apps/invoice/preview/${row.codigo}`}
+      >{`${row.codigo}`}</LinkStyled>
+    ),
   },
   {
     flex: 0.35,
@@ -82,55 +78,69 @@ const defaultColumns: GridColDef[] = [
     minWidth: 300,
     headerName: 'Nombre/Dir',
     renderCell: ({ row }: CellType) => {
-
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 600, textTransform: 'capitalize' }}>
+            <Typography
+              noWrap
+              variant="body2"
+              sx={{
+                color: 'text.primary',
+                fontWeight: 600,
+                textTransform: 'capitalize',
+              }}
+            >
               {row.nombre}
             </Typography>
-            <Typography noWrap variant='caption'>
+            <Typography noWrap variant="caption">
               {row.direccion} - {row.ciudad}
             </Typography>
           </Box>
         </Box>
       )
-    }
+    },
   },
   {
-    flex: 0.20,
+    flex: 0.2,
     field: 'seller',
     minWidth: 200,
     headerName: 'Vendedor',
     renderCell: ({ row }: CellType) => {
-
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 600 }}>
+            <Typography
+              noWrap
+              variant="body2"
+              sx={{ color: 'text.primary', fontWeight: 600 }}
+            >
               {row.vendedor.nombre}
             </Typography>
-            <Typography noWrap variant='caption'>
+            <Typography noWrap variant="caption">
               {row.vendedor.codigo}
             </Typography>
           </Box>
         </Box>
       )
-    }
+    },
   },
   {
     flex: 0.15,
     minWidth: 130,
     field: 'rnc',
     headerName: 'RNC',
-    renderCell: ({ row }: CellType) => <Typography variant='body2'>{row.rnc}</Typography>
+    renderCell: ({ row }: CellType) => (
+      <Typography variant="body2">{row.rnc}</Typography>
+    ),
   },
   {
     flex: 0.1,
     minWidth: 90,
     field: 'total',
     headerName: 'Tipo',
-    renderCell: ({ row }: CellType) => <Typography variant='body2'>{row.tipoCliente}</Typography>
+    renderCell: ({ row }: CellType) => (
+      <Typography variant="body2">{row.tipoCliente}</Typography>
+    ),
   },
 
   {
@@ -138,22 +148,35 @@ const defaultColumns: GridColDef[] = [
     minWidth: 120,
     field: 'balance',
     headerName: 'Balance',
-    renderCell: ({ row }: CellType) => <Typography variant='body2'>{formatCurrency(row.balance)}</Typography>
-
+    renderCell: ({ row }: CellType) => (
+      <Typography variant="body2">{formatCurrency(row.balance)}</Typography>
+    ),
   },
 ]
 
 /* eslint-disable */
 const CustomInput = forwardRef((props: CustomInputProps, ref) => {
-  const startDate = props.start !== null ? format(props.start, 'MM/dd/yyyy') : ''
-  const endDate = props.end !== null ? ` - ${format(props.end, 'MM/dd/yyyy')}` : null
+  const startDate =
+    props.start !== null ? format(props.start, 'MM/dd/yyyy') : ''
+  const endDate =
+    props.end !== null ? ` - ${format(props.end, 'MM/dd/yyyy')}` : null
 
   const value = `${startDate}${endDate !== null ? endDate : ''}`
-  props.start === null && props.dates.length && props.setDates ? props.setDates([]) : null
+  props.start === null && props.dates.length && props.setDates
+    ? props.setDates([])
+    : null
   const updatedProps = { ...props }
   delete updatedProps.setDates
 
-  return <TextField fullWidth inputRef={ref} {...updatedProps} label={props.label || ''} value={value} />
+  return (
+    <TextField
+      fullWidth
+      inputRef={ref}
+      {...updatedProps}
+      label={props.label || ''}
+      value={value}
+    />
+  )
 })
 /* eslint-enable */
 
@@ -163,7 +186,10 @@ const InvoiceList = () => {
   const [value, setValue] = useState<string>('')
   const [statusValue, setStatusValue] = useState<string>('')
   const [selectedRows, setSelectedRows] = useState<GridRowId[]>([])
-  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 20 })
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 20,
+  })
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
@@ -176,51 +202,60 @@ const InvoiceList = () => {
         dates,
         query: value,
         procesado: statusValue,
-        pageNumber: paginationModel.page
-      })
+        pageNumber: paginationModel.page,
+      }),
     )
   }, [])
 
-  const handlePagination = useCallback((values: any) => {
-    setPaginationModel(values)
-    dispatch(
-      fetchData({
-        dates,
-        query: value,
-        procesado: statusValue,
-        pageNumber: values.page
-      })
-    )
-  }, [paginationModel, value, statusValue])
+  const handlePagination = useCallback(
+    (values: any) => {
+      setPaginationModel(values)
+      dispatch(
+        fetchData({
+          dates,
+          query: value,
+          procesado: statusValue,
+          pageNumber: values.page,
+        }),
+      )
+    },
+    [paginationModel, value, statusValue],
+  )
 
-  const performRequest = useCallback((value: string) => {
-    dispatch(
-      fetchData({
-        dates,
-        query: value,
-        procesado: statusValue,
-        pageNumber: paginationModel.page
-      })
-    )
-
-  }, [dispatch, statusValue, value, dates, paginationModel])
+  const performRequest = useCallback(
+    (value: string) => {
+      dispatch(
+        fetchData({
+          dates,
+          query: value,
+          procesado: statusValue,
+          pageNumber: paginationModel.page,
+        }),
+      )
+    },
+    [dispatch, statusValue, value, dates, paginationModel],
+  )
 
   const fn = useCallback(
     debounce((val: string) => {
       setPaginationModel({ page: 1, pageSize: 20 })
       performRequest(val)
-    }, 900), [])
+    }, 900),
+    [],
+  )
 
-  const handleFilter = useCallback((val: string) => {
-    fn.clear();
-    setValue(val)
-    fn(val)
-  }, [fn])
+  const handleFilter = useCallback(
+    (val: string) => {
+      fn.clear()
+      setValue(val)
+      fn(val)
+    },
+    [fn],
+  )
 
   const handleStatusValue = (e: SelectChangeEvent) => {
     setStatusValue(e.target.value)
   }
-
 
   const columns: GridColDef[] = [
     ...defaultColumns,
@@ -232,14 +267,21 @@ const InvoiceList = () => {
       headerName: 'Actions',
       renderCell: ({ row }: CellType) => (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Tooltip title='Aprobar'>
-            <IconButton size='small' onClick={() => dispatch(deleteClient(row.codigo))}>
-              <Icon icon='material-symbols:order-approve' fontSize={20} />
+          <Tooltip title="Aprobar">
+            <IconButton
+              size="small"
+              onClick={() => dispatch(deleteClient(row.codigo))}
+            >
+              <Icon icon="material-symbols:order-approve" fontSize={20} />
             </IconButton>
           </Tooltip>
-          <Tooltip title='View'>
-            <IconButton size='small' component={Link} href={`/apps/invoice/preview/${row.codigo}`}>
-              <Icon icon='mdi:eye-outline' fontSize={20} />
+          <Tooltip title="View">
+            <IconButton
+              size="small"
+              component={Link}
+              href={`/apps/invoice/preview/${row.codigo}`}
+            >
+              <Icon icon="mdi:eye-outline" fontSize={20} />
             </IconButton>
           </Tooltip>
           <OptionsMenu
@@ -249,22 +291,22 @@ const InvoiceList = () => {
             options={[
               {
                 text: 'Download',
-                icon: <Icon icon='mdi:download' fontSize={20} />
+                icon: <Icon icon="mdi:download" fontSize={20} />,
               },
               {
                 text: 'Edit',
                 href: `/apps/invoice/edit/${row.codigo}`,
-                icon: <Icon icon='mdi:pencil-outline' fontSize={20} />
+                icon: <Icon icon="mdi:pencil-outline" fontSize={20} />,
               },
               {
                 text: 'Duplicate',
-                icon: <Icon icon='mdi:content-copy' fontSize={20} />
-              }
+                icon: <Icon icon="mdi:content-copy" fontSize={20} />,
+              },
             ]}
           />
         </Box>
-      )
-    }
+      ),
+    },
   ]
 
   return (
@@ -272,63 +314,65 @@ const InvoiceList = () => {
       <Grid container spacing={6}>
         <Grid item xs={12}>
           <Card>
-            <CardHeader title='Clientes' />
+            <CardHeader title="Clientes" />
             <CardContent>
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
                   <FormControl fullWidth>
-                    <InputLabel id='invoice-status-select'>Vendedor</InputLabel>
+                    <InputLabel id="invoice-status-select">Vendedor</InputLabel>
                     <Select
                       fullWidth
                       value={statusValue}
                       sx={{ mr: 4, mb: 2 }}
-                      label='Vendedor'
+                      label="Vendedor"
                       onChange={handleStatusValue}
-                      labelId='invoice-status-select'
+                      labelId="invoice-status-select"
                     >
-                      <MenuItem value=''>none</MenuItem>
-
+                      <MenuItem value="">none</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
                   <FormControl fullWidth>
-                    <InputLabel id='invoice-status-select'>Activo</InputLabel>
+                    <InputLabel id="invoice-status-select">Activo</InputLabel>
                     <Select
                       fullWidth
                       value={statusValue}
                       sx={{ mr: 4, mb: 2 }}
-                      label='Activo'
+                      label="Activo"
                       onChange={handleStatusValue}
-                      labelId='invoice-status-select'
+                      labelId="invoice-status-select"
                     >
-                      <MenuItem value=''>none</MenuItem>
-
+                      <MenuItem value="">none</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
-
               </Grid>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12}>
           <Card>
-            <TableHeader value={value} selectedRows={selectedRows} handleFilter={handleFilter} placeholder='Cliente, NoPedido' />
+            <TableHeader
+              value={value}
+              selectedRows={selectedRows}
+              handleFilter={handleFilter}
+              placeholder="Nombre o código"
+            />
             <DataGrid
               autoHeight
               pagination
               rows={store.data}
               columns={columns}
-              disableRowSelectionOnClick 
+              disableRowSelectionOnClick
               paginationModel={paginationModel}
               onPaginationModelChange={handlePagination}
-              onRowSelectionModelChange={rows => setSelectedRows(rows)}
-              getRowId={row => row.codigo}
-              paginationMode='server'
+              onRowSelectionModelChange={(rows) => setSelectedRows(rows)}
+              getRowId={(row) => row.codigo}
+              paginationMode="server"
               loading={store.isLoading}
-              rowCount={store.totalResults}// 
+              rowCount={store.totalResults} //
             />
           </Card>
         </Grid>

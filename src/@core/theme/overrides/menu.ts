@@ -18,11 +18,13 @@ const Menu = (skin: Skin) => {
           '& .MuiMenu-paper': {
             borderRadius: 5,
             boxShadow: boxShadow(theme),
-            ...(skin === 'bordered' && { border: `1px solid ${theme.palette.divider}` })
-          }
-        })
-      }
-    }
+            ...(skin === 'bordered' && {
+              border: `1px solid ${theme.palette.divider}`,
+            }),
+          },
+        }),
+      },
+    },
   }
 }
 

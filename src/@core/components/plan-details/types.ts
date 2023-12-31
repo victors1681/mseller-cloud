@@ -25,7 +25,12 @@ export type PricingFaqType = {
   question: string
 }
 
-export type PricingTableRowType = { feature: string; starter: boolean; pro: boolean | string; enterprise: boolean }
+export type PricingTableRowType = {
+  feature: string
+  starter: boolean
+  pro: boolean | string
+  enterprise: boolean
+}
 
 export type PricingTableType = {
   header: { title: string; subtitle: string; isPro?: boolean }[]

@@ -20,12 +20,12 @@ export const store = configureStore({
     calendar,
     permissions,
     transports,
-    clients
+    clients,
   },
-  middleware: getDefaultMiddleware =>
+  middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false
-    })
+      serializableCheck: false,
+    }),
 })
 
 export type AppDispatch = typeof store.dispatch

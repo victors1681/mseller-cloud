@@ -15,11 +15,16 @@ const FallbackSpinner = ({ sx }: { sx?: BoxProps['sx'] }) => {
         alignItems: 'center',
         flexDirection: 'column',
         justifyContent: 'center',
-        ...sx
+        ...sx,
       }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <img src='/images/logo/m-mseller.png' alt='logo' height='50' style={{ paddingLeft: '10px' }} />
+        <img
+          src="/images/logo/m-mseller.png"
+          alt="logo"
+          height="50"
+          style={{ paddingLeft: '10px' }}
+        />
       </Box>
       <CircularProgress disableShrink sx={{ mt: 6 }} />
     </Box>

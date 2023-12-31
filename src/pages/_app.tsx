@@ -7,12 +7,9 @@ import { Router } from 'next/router'
 import type { NextPage } from 'next'
 import type { AppProps } from 'next/app'
 
-
-
 // ** Store Imports
 import { store } from 'src/store'
 import { Provider } from 'react-redux'
-
 
 // ** Loader Import
 import NProgress from 'nprogress'
@@ -44,7 +41,10 @@ import Spinner from 'src/@core/components/spinner'
 
 // ** Contexts
 import { AuthProvider } from 'src/context/AuthContext'
-import { SettingsConsumer, SettingsProvider } from 'src/@core/context/settingsContext'
+import {
+  SettingsConsumer,
+  SettingsProvider,
+} from 'src/@core/context/settingsContext'
 
 // ** Styled Components
 import ReactHotToast from 'src/@core/styles/libs/react-hot-toast'
@@ -110,7 +110,10 @@ const App = (props: ExtendedAppProps) => {
   // Variables
   const contentHeightFixed = Component.contentHeightFixed ?? false
   const getLayout =
-    Component.getLayout ?? (page => <UserLayout contentHeightFixed={contentHeightFixed}>{page}</UserLayout>)
+    Component.getLayout ??
+    ((page) => (
+      <UserLayout contentHeightFixed={contentHeightFixed}>{page}</UserLayout>
+    ))
 
   const setConfig = Component.setConfig ?? undefined
 
@@ -126,26 +129,38 @@ const App = (props: ExtendedAppProps) => {
         <Head>
           <title>{`${themeConfig.templateName} - Conecta tu fuerza de ventas y distribución`}</title>
           <meta
-            name='description'
+            name="description"
             content={`${themeConfig.templateName} – Admin dashboard`}
           />
-          <meta name='keywords' content='Mobile Seller, iPad, iPhone, distribución, ventas' />
-          <meta name='viewport' content='initial-scale=1, width=device-width' />
+          <meta
+            name="keywords"
+            content="Mobile Seller, iPad, iPhone, distribución, ventas"
+          />
+          <meta name="viewport" content="initial-scale=1, width=device-width" />
         </Head>
 
         <AuthProvider>
-          <SettingsProvider {...(setConfig ? { pageSettings: setConfig() } : {})}>
+          <SettingsProvider
+            {...(setConfig ? { pageSettings: setConfig() } : {})}
+          >
             <SettingsConsumer>
               {({ settings }) => {
                 return (
                   <ThemeComponent settings={settings}>
                     <Guard authGuard={authGuard} guestGuard={guestGuard}>
-                      <AclGuard aclAbilities={aclAbilities} guestGuard={guestGuard} authGuard={authGuard}>
+                      <AclGuard
+                        aclAbilities={aclAbilities}
+                        guestGuard={guestGuard}
+                        authGuard={authGuard}
+                      >
                         {getLayout(<Component {...pageProps} />)}
                       </AclGuard>
                     </Guard>
                     <ReactHotToast>
-                      <Toaster position={settings.toastPosition} toastOptions={{ className: 'react-hot-toast' }} />
+                      <Toaster
+                        position={settings.toastPosition}
+                        toastOptions={{ className: 'react-hot-toast' }}
+                      />
                     </ReactHotToast>
                   </ThemeComponent>
                 )
@@ -154,7 +169,7 @@ const App = (props: ExtendedAppProps) => {
           </SettingsProvider>
         </AuthProvider>
       </CacheProvider>
-      </Provider>
+    </Provider>
   )
 }
 

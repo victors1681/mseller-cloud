@@ -75,7 +75,7 @@ interface CellType {
 // ** Styled component for the link in the dataTable
 const LinkStyled = styled(Link)(({ theme }) => ({
   textDecoration: 'none',
-  color: theme.palette.primary.main
+  color: theme.palette.primary.main,
 }))
 
 // ** Vars
@@ -85,41 +85,44 @@ const invoiceStatusObj: InvoiceStatusObj = {
   Draft: { color: 'primary', icon: 'mdi:content-save-outline' },
   'Partial Payment': { color: 'warning', icon: 'mdi:chart-pie' },
   'Past Due': { color: 'error', icon: 'mdi:information-outline' },
-  Downloaded: { color: 'info', icon: 'mdi:arrow-down' }
+  Downloaded: { color: 'info', icon: 'mdi:arrow-down' },
 }
 
 const orderStatusLabels = {
-  "0": "Pendiente",
-  "1": "Procesado",
-  "3": "Retenido",
-  "5": "Pendinete Imprimir",
-  "6": "Condicion Crédito",
-  "7": "Backorder",
-  "8": "Error Integración",
-  "9": "Listo Para Integrar",
-  "10": "Enviado al ERP",
+  '0': 'Pendiente',
+  '1': 'Procesado',
+  '3': 'Retenido',
+  '5': 'Pendinete Imprimir',
+  '6': 'Condicion Crédito',
+  '7': 'Backorder',
+  '8': 'Error Integración',
+  '9': 'Listo Para Integrar',
+  '10': 'Enviado al ERP',
 }
 
 const orderStatusObj: UserStatusType = {
-  
-  "1": 'success',
-  "10": 'success',
-  "0": 'warning',
-  "3": 'info',
-  "9": 'secondary',
-  "5": 'primary',
-  "8": 'error'
+  '1': 'success',
+  '10': 'success',
+  '0': 'warning',
+  '3': 'info',
+  '9': 'secondary',
+  '5': 'primary',
+  '8': 'error',
 }
-
 
 // ** renders client column
 const renderClient = (row: OrderType) => {
   if (row.avatarUrl) {
-    return <CustomAvatar src={row.avatarUrl} sx={{ mr: 3, width: '1.875rem', height: '1.875rem' }} />
+    return (
+      <CustomAvatar
+        src={row.avatarUrl}
+        sx={{ mr: 3, width: '1.875rem', height: '1.875rem' }}
+      />
+    )
   } else {
     return (
       <CustomAvatar
-        skin='light'
+        skin="light"
         color={(row.avatarColor as ThemeColor) || ('primary' as ThemeColor)}
         sx={{ mr: 3, fontSize: '.8rem', width: '1.875rem', height: '1.875rem' }}
       >
@@ -135,64 +138,84 @@ const defaultColumns: GridColDef[] = [
     field: 'id',
     minWidth: 120,
     headerName: '#',
-    renderCell: ({ row }: CellType) => <LinkStyled href={`/apps/invoice/preview/${row.noPedidoStr}`}>{`#${row.noPedidoStr}`}</LinkStyled>
+    renderCell: ({ row }: CellType) => (
+      <LinkStyled
+        href={`/apps/invoice/preview/${row.noPedidoStr}`}
+      >{`#${row.noPedidoStr}`}</LinkStyled>
+    ),
   },
   {
     flex: 0.25,
     field: 'seller',
     minWidth: 250,
     headerName: 'Vendedor',
-    renderCell: ({ row }: CellType) => { 
-
+    renderCell: ({ row }: CellType) => {
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           {renderClient(row)}
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 600 }}>
+            <Typography
+              noWrap
+              variant="body2"
+              sx={{ color: 'text.primary', fontWeight: 600 }}
+            >
               {row.vendedor.nombre}
             </Typography>
-            <Typography noWrap variant='caption'>
+            <Typography noWrap variant="caption">
               {row.vendedor.codigo}
             </Typography>
           </Box>
         </Box>
       )
-    }
+    },
   },
   {
     flex: 0.25,
     field: 'client',
     minWidth: 300,
     headerName: 'Cliente',
-    renderCell: ({ row }: CellType) => { 
-
+    renderCell: ({ row }: CellType) => {
       return (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}> 
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography noWrap variant='body2' sx={{ color: 'text.primary', fontWeight: 600, textTransform: 'capitalize' }}>
+            <Typography
+              noWrap
+              variant="body2"
+              sx={{
+                color: 'text.primary',
+                fontWeight: 600,
+                textTransform: 'capitalize',
+              }}
+            >
               {row.nombreCliente}
             </Typography>
-            <Typography noWrap variant='caption'>
+            <Typography noWrap variant="caption">
               {row.codigoCliente} - {row.condicion.descripcion}
             </Typography>
           </Box>
         </Box>
       )
-    }
+    },
   },
   {
     flex: 0.1,
     minWidth: 90,
     field: 'total',
     headerName: 'Total',
-    renderCell: ({ row }: CellType) => <Typography variant='body2'>{`${formatCurrency(row.total) || 0}`}</Typography>
+    renderCell: ({ row }: CellType) => (
+      <Typography variant="body2">{`${
+        formatCurrency(row.total) || 0
+      }`}</Typography>
+    ),
   },
   {
     flex: 0.15,
     minWidth: 130,
     field: 'issuedDate',
     headerName: 'Fecha',
-    renderCell: ({ row }: CellType) => <Typography variant='body2'>{formatDate(row.fecha)}</Typography>
+    renderCell: ({ row }: CellType) => (
+      <Typography variant="body2">{formatDate(row.fecha)}</Typography>
+    ),
   },
   {
     flex: 0.1,
@@ -202,28 +225,40 @@ const defaultColumns: GridColDef[] = [
     renderCell: ({ row }: CellType) => {
       return (
         <CustomChip
-          skin='light'
-          size='small'
-          label={orderStatusLabels[row?.procesado] || ""}
+          skin="light"
+          size="small"
+          label={orderStatusLabels[row?.procesado] || ''}
           color={orderStatusObj[row.procesado]}
           sx={{ textTransform: 'capitalize' }}
         />
       )
-    }
+    },
   },
 ]
 
 /* eslint-disable */
 const CustomInput = forwardRef((props: CustomInputProps, ref) => {
-  const startDate = props.start !== null ? format(props.start, 'MM/dd/yyyy') : ''
-  const endDate = props.end !== null ? ` - ${format(props.end, 'MM/dd/yyyy')}` : null
+  const startDate =
+    props.start !== null ? format(props.start, 'MM/dd/yyyy') : ''
+  const endDate =
+    props.end !== null ? ` - ${format(props.end, 'MM/dd/yyyy')}` : null
 
   const value = `${startDate}${endDate !== null ? endDate : ''}`
-  props.start === null && props.dates.length && props.setDates ? props.setDates([]) : null
+  props.start === null && props.dates.length && props.setDates
+    ? props.setDates([])
+    : null
   const updatedProps = { ...props }
   delete updatedProps.setDates
 
-  return <TextField fullWidth inputRef={ref} {...updatedProps} label={props.label || ''} value={value} />
+  return (
+    <TextField
+      fullWidth
+      inputRef={ref}
+      {...updatedProps}
+      label={props.label || ''}
+      value={value}
+    />
+  )
 })
 /* eslint-enable */
 
@@ -235,19 +270,22 @@ const InvoiceList = () => {
   const [endDateRange, setEndDateRange] = useState<any>(null)
   const [selectedRows, setSelectedRows] = useState<GridRowId[]>([])
   const [startDateRange, setStartDateRange] = useState<any>(null)
-  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 })
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10,
+  })
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
   const store = useSelector((state: RootState) => state.invoice)
-console.log("storestorestore", store)
+  console.log('storestorestore', store)
   useEffect(() => {
     dispatch(
       fetchData({
         dates,
         q: value,
-        procesado: statusValue
-      })
+        procesado: statusValue,
+      }),
     )
   }, [dispatch, statusValue, value, dates])
 
@@ -278,14 +316,21 @@ console.log("storestorestore", store)
       headerName: 'Actions',
       renderCell: ({ row }: CellType) => (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Tooltip title='Aprobar'>
-            <IconButton size='small' onClick={() => dispatch(deleteInvoice(row.id))}>
-              <Icon icon='material-symbols:order-approve' fontSize={20} />
+          <Tooltip title="Aprobar">
+            <IconButton
+              size="small"
+              onClick={() => dispatch(deleteInvoice(row.id))}
+            >
+              <Icon icon="material-symbols:order-approve" fontSize={20} />
             </IconButton>
           </Tooltip>
-          <Tooltip title='View'>
-            <IconButton size='small' component={Link} href={`/apps/invoice/preview/${row.id}`}>
-              <Icon icon='mdi:eye-outline' fontSize={20} />
+          <Tooltip title="View">
+            <IconButton
+              size="small"
+              component={Link}
+              href={`/apps/invoice/preview/${row.id}`}
+            >
+              <Icon icon="mdi:eye-outline" fontSize={20} />
             </IconButton>
           </Tooltip>
           <OptionsMenu
@@ -295,22 +340,22 @@ console.log("storestorestore", store)
             options={[
               {
                 text: 'Download',
-                icon: <Icon icon='mdi:download' fontSize={20} />
+                icon: <Icon icon="mdi:download" fontSize={20} />,
               },
               {
                 text: 'Edit',
                 href: `/apps/invoice/edit/${row.noPedidoStr}`,
-                icon: <Icon icon='mdi:pencil-outline' fontSize={20} />
+                icon: <Icon icon="mdi:pencil-outline" fontSize={20} />,
               },
               {
                 text: 'Duplicate',
-                icon: <Icon icon='mdi:content-copy' fontSize={20} />
-              }
+                icon: <Icon icon="mdi:content-copy" fontSize={20} />,
+              },
             ]}
           />
         </Box>
-      )
-    }
+      ),
+    },
   ]
 
   return (
@@ -318,62 +363,74 @@ console.log("storestorestore", store)
       <Grid container spacing={6}>
         <Grid item xs={12}>
           <Card>
-            <CardHeader title='Filters' />
+            <CardHeader title="Filters" />
             <CardContent>
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={4}>
                   <FormControl fullWidth>
-                    <InputLabel id='invoice-status-select'>Estado de la orden</InputLabel>
+                    <InputLabel id="invoice-status-select">
+                      Estado de la orden
+                    </InputLabel>
 
                     <Select
                       fullWidth
                       value={statusValue}
                       sx={{ mr: 4, mb: 2 }}
-                      label='Estado de la orden'
+                      label="Estado de la orden"
                       onChange={handleStatusValue}
-                      labelId='invoice-status-select'
+                      labelId="invoice-status-select"
                     >
-                      <MenuItem value=''>none</MenuItem>
-                      {Object.keys(orderStatusLabels).map( k  => {
-                         return <MenuItem value={k}>{orderStatusLabels[k]}</MenuItem>
+                      <MenuItem value="">none</MenuItem>
+                      {Object.keys(orderStatusLabels).map((k) => {
+                        return (
+                          <MenuItem value={k}>{orderStatusLabels[k]}</MenuItem>
+                        )
                       })}
                     </Select>
                   </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={4}>
                   <FormControl fullWidth>
-                    <InputLabel id='invoice-status-select'>Condición de Pago</InputLabel>
+                    <InputLabel id="invoice-status-select">
+                      Condición de Pago
+                    </InputLabel>
 
                     <Select
                       fullWidth
                       value={statusValue}
                       sx={{ mr: 4, mb: 2 }}
-                      label='Estado de la orden'
+                      label="Estado de la orden"
                       onChange={handleStatusValue}
-                      labelId='invoice-status-select'
+                      labelId="invoice-status-select"
                     >
-                      <MenuItem value=''>none</MenuItem>
-                      {Object.keys(orderStatusLabels).map( k  => {
-                         return <MenuItem value={k}>{orderStatusLabels[k]}</MenuItem>
+                      <MenuItem value="">none</MenuItem>
+                      {Object.keys(orderStatusLabels).map((k) => {
+                        return (
+                          <MenuItem value={k}>{orderStatusLabels[k]}</MenuItem>
+                        )
                       })}
                     </Select>
                   </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={4}>
                   <FormControl fullWidth>
-                    <InputLabel id='invoice-status-select'>Localidad</InputLabel>
+                    <InputLabel id="invoice-status-select">
+                      Localidad
+                    </InputLabel>
 
                     <Select
                       fullWidth
                       value={statusValue}
                       sx={{ mr: 4, mb: 2 }}
-                      label='Estado de la orden'
+                      label="Estado de la orden"
                       onChange={handleStatusValue}
-                      labelId='invoice-status-select'
+                      labelId="invoice-status-select"
                     >
-                      <MenuItem value=''>none</MenuItem>
-                      {Object.keys(orderStatusLabels).map( k  => {
-                         return <MenuItem value={k}>{orderStatusLabels[k]}</MenuItem>
+                      <MenuItem value="">none</MenuItem>
+                      {Object.keys(orderStatusLabels).map((k) => {
+                        return (
+                          <MenuItem value={k}>{orderStatusLabels[k]}</MenuItem>
+                        )
                       })}
                     </Select>
                   </FormControl>
@@ -381,37 +438,42 @@ console.log("storestorestore", store)
 
                 <Grid item xs={12} sm={4}>
                   <FormControl fullWidth>
-                    <InputLabel id='invoice-status-select'>Tipo Documento</InputLabel>
+                    <InputLabel id="invoice-status-select">
+                      Tipo Documento
+                    </InputLabel>
 
                     <Select
                       fullWidth
                       value={statusValue}
                       sx={{ mr: 4, mb: 2 }}
-                      label='Estado de la orden'
+                      label="Estado de la orden"
                       onChange={handleStatusValue}
-                      labelId='invoice-status-select'
+                      labelId="invoice-status-select"
                     >
-                      <MenuItem value=''>none</MenuItem>
-                      <MenuItem value='2'>Pedido</MenuItem>
-                      <MenuItem value='2'>Cotización</MenuItem>
-
+                      <MenuItem value="">none</MenuItem>
+                      <MenuItem value="2">Pedido</MenuItem>
+                      <MenuItem value="2">Cotización</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
 
-                <Grid  xs={12} sm={4} >
-            
-                <Autocomplete
-        multiple
-        options={[{title: "test"}]}
-        filterSelectedOptions
-        defaultValue={[{title: "test"}]}
-        id='autocomplete-multiple-outlined'
-        getOptionLabel={option => option.title || ''}
-        sx={{  mt: 3, ml: 3,  }}
-        renderInput={params => <TextField {...params} label='Vendedores' placeholder='Vendedores' />}
-      />
-    
+                <Grid xs={12} sm={4}>
+                  <Autocomplete
+                    multiple
+                    options={[{ title: 'test' }]}
+                    filterSelectedOptions
+                    defaultValue={[{ title: 'test' }]}
+                    id="autocomplete-multiple-outlined"
+                    getOptionLabel={(option) => option.title || ''}
+                    sx={{ mt: 3, ml: 3 }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Vendedores"
+                        placeholder="Vendedores"
+                      />
+                    )}
+                  />
                 </Grid>
                 <Grid item xs={12} sm={4}>
                   <DatePicker
@@ -422,13 +484,13 @@ console.log("storestorestore", store)
                     selected={startDateRange}
                     startDate={startDateRange}
                     shouldCloseOnSelect={false}
-                    id='date-range-picker-months'
+                    id="date-range-picker-months"
                     onChange={handleOnChangeRange}
                     customInput={
                       <CustomInput
                         dates={dates}
                         setDates={setDates}
-                        label='Fecha'
+                        label="Fecha"
                         end={endDateRange as number | Date}
                         start={startDateRange as number | Date}
                       />
@@ -441,7 +503,12 @@ console.log("storestorestore", store)
         </Grid>
         <Grid item xs={12}>
           <Card>
-            <TableHeader value={value} selectedRows={selectedRows} handleFilter={handleFilter} placeholder='Cliente, NoPedido' />
+            <TableHeader
+              value={value}
+              selectedRows={selectedRows}
+              handleFilter={handleFilter}
+              placeholder="Cliente, NoPedido"
+            />
             <DataGrid
               autoHeight
               pagination
@@ -452,8 +519,8 @@ console.log("storestorestore", store)
               pageSizeOptions={[10, 25, 50]}
               paginationModel={paginationModel}
               onPaginationModelChange={setPaginationModel}
-              onRowSelectionModelChange={rows => setSelectedRows(rows)}
-              getRowId={row =>  row.noPedidoStr}
+              onRowSelectionModelChange={(rows) => setSelectedRows(rows)}
+              getRowId={(row) => row.noPedidoStr}
             />
           </Card>
         </Grid>

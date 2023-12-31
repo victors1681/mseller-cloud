@@ -17,33 +17,35 @@ interface Redux {
 }
 
 // ** Fetch Invoices
-export const fetchData = createAsyncThunk('appInvoice/fetchData', async (params: DataParams) => {
-  
-  if(params.procesado === ''){
-    delete params.procesado;
-  }
-  const response = await axios.get('/api/document/orders', {
-    params
-  })
+export const fetchData = createAsyncThunk(
+  'appInvoice/fetchData',
+  async (params: DataParams) => {
+    if (params.procesado === '') {
+      delete params.procesado
+    }
+    const response = await axios.get('/api/document/orders', {
+      params,
+    })
 
-  return {
-    invoices: response.data,
-    params,
-    allData: [],
-    total: response.data.length
-  }
-})
+    return {
+      invoices: response.data,
+      params,
+      allData: [],
+      total: response.data.length,
+    }
+  },
+)
 
 export const deleteInvoice = createAsyncThunk(
   'appInvoice/deleteData',
   async (id: number | string, { getState, dispatch }: Redux) => {
     const response = await axios.delete('/apps/invoice/delete', {
-      data: id
+      data: id,
     })
     await dispatch(fetchData(getState().invoice.params))
 
     return response.data
-  }
+  },
 )
 
 export const appInvoiceSlice = createSlice({
@@ -52,18 +54,17 @@ export const appInvoiceSlice = createSlice({
     data: [],
     total: 1,
     params: {},
-    allData: []
+    allData: [],
   },
   reducers: {},
-  extraReducers: builder => {
-    
+  extraReducers: (builder) => {
     builder.addCase(fetchData.fulfilled, (state, action) => {
       state.data = action.payload.invoices
       state.params = action.payload.params
       state.allData = action.payload.allData
       state.total = action.payload.total
     })
-  }
+  },
 })
 
 export default appInvoiceSlice.reducer

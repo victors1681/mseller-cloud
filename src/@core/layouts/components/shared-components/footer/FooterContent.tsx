@@ -10,7 +10,7 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 
 const LinkStyled = styled(Link)(({ theme }) => ({
   textDecoration: 'none',
-  color: theme.palette.primary.main
+  color: theme.palette.primary.main,
 }))
 
 const FooterContent = () => {
@@ -18,11 +18,18 @@ const FooterContent = () => {
   const hidden = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'))
 
   return (
-    <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+      }}
+    >
       <Typography sx={{ mr: 2 }}>
         {`© ${new Date().getFullYear()}, Made with `}
         {` by `}
-        <LinkStyled target='_blank' href='https://mseller.app'>
+        <LinkStyled target="_blank" href="https://mseller.app">
           Mobile Seller LLC
         </LinkStyled>
       </Typography>

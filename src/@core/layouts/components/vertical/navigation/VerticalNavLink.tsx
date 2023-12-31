@@ -12,7 +12,9 @@ import { styled } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import Box, { BoxProps } from '@mui/material/Box'
 import ListItemIcon from '@mui/material/ListItemIcon'
-import ListItemButton, { ListItemButtonProps } from '@mui/material/ListItemButton'
+import ListItemButton, {
+  ListItemButtonProps,
+} from '@mui/material/ListItemButton'
 
 // ** Configs Import
 import themeConfig from 'src/configs/themeConfig'
@@ -43,7 +45,11 @@ interface Props {
 
 // ** Styled Components
 const MenuNavLink = styled(ListItemButton)<
-  ListItemButtonProps & { component?: ElementType; href: string; target?: '_blank' | undefined }
+  ListItemButtonProps & {
+    component?: ElementType
+    href: string
+    target?: '_blank' | undefined
+  }
 >(({ theme }) => ({
   width: '100%',
   borderTopRightRadius: 100,
@@ -53,12 +59,12 @@ const MenuNavLink = styled(ListItemButton)<
   '&.active': {
     '&, &:hover': {
       boxShadow: theme.shadows[3],
-      backgroundImage: `linear-gradient(98deg, ${theme.palette.customColors.primaryGradient}, ${theme.palette.primary.main} 94%)`
+      backgroundImage: `linear-gradient(98deg, ${theme.palette.customColors.primaryGradient}, ${theme.palette.primary.main} 94%)`,
     },
     '& .MuiTypography-root, & .MuiListItemIcon-root': {
-      color: `${theme.palette.common.white} !important`
-    }
-  }
+      color: `${theme.palette.common.white} !important`,
+    },
+  },
 }))
 
 const MenuItemTextMetaWrapper = styled(Box)<BoxProps>(({ theme }) => ({
@@ -68,7 +74,7 @@ const MenuItemTextMetaWrapper = styled(Box)<BoxProps>(({ theme }) => ({
   gap: theme.spacing(2),
   justifyContent: 'space-between',
   transition: 'opacity .25s ease-in-out',
-  ...(themeConfig.menuTextTruncate && { overflow: 'hidden' })
+  ...(themeConfig.menuTextTruncate && { overflow: 'hidden' }),
 }))
 
 const VerticalNavLink = ({
@@ -80,7 +86,7 @@ const VerticalNavLink = ({
   isSubToSub,
   collapsedNavWidth,
   toggleNavVisibility,
-  navigationBorderWidth
+  navigationBorderWidth,
 }: Props) => {
   // ** Hooks
   const router = useRouter()
@@ -102,7 +108,7 @@ const VerticalNavLink = ({
     <CanViewNavLink navLink={item}>
       <ListItem
         disablePadding
-        className='nav-link'
+        className="nav-link"
         disabled={item.disabled || false}
         sx={{ mt: 1.5, px: '0 !important' }}
       >
@@ -112,7 +118,7 @@ const VerticalNavLink = ({
           className={isNavLinkActive() ? 'active' : ''}
           href={item.path === undefined ? '/' : `${item.path}`}
           {...(item.openInNewTab ? { target: '_blank' } : null)}
-          onClick={e => {
+          onClick={(e) => {
             if (item.path === undefined) {
               e.preventDefault()
               e.stopPropagation()
@@ -123,9 +129,17 @@ const VerticalNavLink = ({
           }}
           sx={{
             py: 2.25,
-            ...(item.disabled ? { pointerEvents: 'none' } : { cursor: 'pointer' }),
-            pl: navCollapsed && !navHover ? (collapsedNavWidth - navigationBorderWidth - 24) / 8 : 5.5,
-            pr: navCollapsed && !navHover ? ((collapsedNavWidth - navigationBorderWidth - 24) / 2 - 5) / 4 : 3.5
+            ...(item.disabled
+              ? { pointerEvents: 'none' }
+              : { cursor: 'pointer' }),
+            pl:
+              navCollapsed && !navHover
+                ? (collapsedNavWidth - navigationBorderWidth - 24) / 8
+                : 5.5,
+            pr:
+              navCollapsed && !navHover
+                ? ((collapsedNavWidth - navigationBorderWidth - 24) / 2 - 5) / 4
+                : 3.5,
           }}
         >
           {isSubToSub ? null : (
@@ -138,8 +152,8 @@ const VerticalNavLink = ({
                 '& svg': {
                   fontSize: '0.875rem',
                   ...(!parent ? { fontSize: '1.5rem' } : {}),
-                  ...(parent && item.icon ? { fontSize: '0.875rem' } : {})
-                }
+                  ...(parent && item.icon ? { fontSize: '0.875rem' } : {}),
+                },
               }}
             >
               <UserIcon icon={icon as string} />
@@ -149,12 +163,15 @@ const VerticalNavLink = ({
           <MenuItemTextMetaWrapper
             sx={{
               ...(isSubToSub ? { ml: 9 } : {}),
-              ...(navCollapsed && !navHover ? { opacity: 0 } : { opacity: 1 })
+              ...(navCollapsed && !navHover ? { opacity: 0 } : { opacity: 1 }),
             }}
           >
             <Typography
-              {...((themeConfig.menuTextTruncate || (!themeConfig.menuTextTruncate && navCollapsed && !navHover)) && {
-                noWrap: true
+              {...((themeConfig.menuTextTruncate ||
+                (!themeConfig.menuTextTruncate &&
+                  navCollapsed &&
+                  !navHover)) && {
+                noWrap: true,
               })}
             >
               <Translations text={item.title} />
@@ -166,7 +183,7 @@ const VerticalNavLink = ({
                 sx={{
                   height: 20,
                   fontWeight: 500,
-                  '& .MuiChip-label': { px: 1.5, textTransform: 'capitalize' }
+                  '& .MuiChip-label': { px: 1.5, textTransform: 'capitalize' },
                 }}
               />
             ) : null}

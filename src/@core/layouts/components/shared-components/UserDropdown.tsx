@@ -33,7 +33,7 @@ const BadgeContentSpan = styled('span')(({ theme }) => ({
   height: 8,
   borderRadius: '50%',
   backgroundColor: theme.palette.success.main,
-  boxShadow: `0 0 0 2px ${theme.palette.background.paper}`
+  boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
 }))
 
 const UserDropdown = (props: Props) => {
@@ -72,8 +72,8 @@ const UserDropdown = (props: Props) => {
     '& svg': {
       mr: 2,
       fontSize: '1.375rem',
-      color: 'text.primary'
-    }
+      color: 'text.primary',
+    },
   }
 
   const handleLogout = () => {
@@ -84,20 +84,20 @@ const UserDropdown = (props: Props) => {
   return (
     <Fragment>
       <Badge
-        overlap='circular'
+        overlap="circular"
         onClick={handleDropdownOpen}
         sx={{ ml: 2, cursor: 'pointer' }}
         badgeContent={<BadgeContentSpan />}
         anchorOrigin={{
           vertical: 'bottom',
-          horizontal: 'right'
+          horizontal: 'right',
         }}
       >
         <Avatar
-          alt='John Doe'
+          alt="John Doe"
           onClick={handleDropdownOpen}
           sx={{ width: 40, height: 40 }}
-          src='/images/avatars/1.png'
+          src="/images/avatars/1.png"
         />
       </Badge>
       <Menu
@@ -105,24 +105,44 @@ const UserDropdown = (props: Props) => {
         open={Boolean(anchorEl)}
         onClose={() => handleDropdownClose()}
         sx={{ '& .MuiMenu-paper': { width: 230, mt: 4 } }}
-        anchorOrigin={{ vertical: 'bottom', horizontal: direction === 'ltr' ? 'right' : 'left' }}
-        transformOrigin={{ vertical: 'top', horizontal: direction === 'ltr' ? 'right' : 'left' }}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: direction === 'ltr' ? 'right' : 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: direction === 'ltr' ? 'right' : 'left',
+        }}
       >
         <Box sx={{ pt: 2, pb: 3, px: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Badge
-              overlap='circular'
+              overlap="circular"
               badgeContent={<BadgeContentSpan />}
               anchorOrigin={{
                 vertical: 'bottom',
-                horizontal: 'right'
+                horizontal: 'right',
               }}
             >
-              <Avatar alt='John Doe' src='/images/avatars/1.png' sx={{ width: '2.5rem', height: '2.5rem' }} />
+              <Avatar
+                alt="John Doe"
+                src="/images/avatars/1.png"
+                sx={{ width: '2.5rem', height: '2.5rem' }}
+              />
             </Badge>
-            <Box sx={{ display: 'flex', ml: 3, alignItems: 'flex-start', flexDirection: 'column' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                ml: 3,
+                alignItems: 'flex-start',
+                flexDirection: 'column',
+              }}
+            >
               <Typography sx={{ fontWeight: 600 }}>John Doe</Typography>
-              <Typography variant='body2' sx={{ fontSize: '0.8rem', color: 'text.disabled' }}>
+              <Typography
+                variant="body2"
+                sx={{ fontSize: '0.8rem', color: 'text.disabled' }}
+              >
                 Admin
               </Typography>
             </Box>
@@ -131,47 +151,50 @@ const UserDropdown = (props: Props) => {
         <Divider sx={{ mt: '0 !important' }} />
         <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose()}>
           <Box sx={styles}>
-            <Icon icon='mdi:account-outline' />
+            <Icon icon="mdi:account-outline" />
             Profile
           </Box>
         </MenuItem>
         <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose()}>
           <Box sx={styles}>
-            <Icon icon='mdi:email-outline' />
+            <Icon icon="mdi:email-outline" />
             Inbox
           </Box>
         </MenuItem>
         <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose()}>
           <Box sx={styles}>
-            <Icon icon='mdi:message-outline' />
+            <Icon icon="mdi:message-outline" />
             Chat
           </Box>
         </MenuItem>
         <Divider />
         <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose()}>
           <Box sx={styles}>
-            <Icon icon='mdi:cog-outline' />
+            <Icon icon="mdi:cog-outline" />
             Settings
           </Box>
         </MenuItem>
         <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose()}>
           <Box sx={styles}>
-            <Icon icon='mdi:currency-usd' />
+            <Icon icon="mdi:currency-usd" />
             Pricing
           </Box>
         </MenuItem>
         <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose()}>
           <Box sx={styles}>
-            <Icon icon='mdi:help-circle-outline' />
+            <Icon icon="mdi:help-circle-outline" />
             FAQ
           </Box>
         </MenuItem>
         <Divider />
         <MenuItem
           onClick={handleLogout}
-          sx={{ py: 2, '& svg': { mr: 2, fontSize: '1.375rem', color: 'text.primary' } }}
+          sx={{
+            py: 2,
+            '& svg': { mr: 2, fontSize: '1.375rem', color: 'text.primary' },
+          }}
         >
-          <Icon icon='mdi:logout-variant' />
+          <Icon icon="mdi:logout-variant" />
           Logout
         </MenuItem>
       </Menu>

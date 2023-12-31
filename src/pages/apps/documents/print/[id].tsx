@@ -2,7 +2,12 @@
 import { ReactNode } from 'react'
 
 // ** Next Import
-import { GetStaticPaths, GetStaticProps, GetStaticPropsContext, InferGetStaticPropsType } from 'next/types'
+import {
+  GetStaticPaths,
+  GetStaticProps,
+  GetStaticPropsContext,
+  InferGetStaticPropsType,
+} from 'next/types'
 
 // ** Third Party Imports
 import axios from 'axios'
@@ -16,7 +21,9 @@ import BlankLayout from 'src/@core/layouts/BlankLayout'
 // ** Demo Components Imports
 import PrintPage from 'src/views/apps/invoice/print/PrintPage'
 
-const InvoicePrint = ({ id }: InferGetStaticPropsType<typeof getStaticProps>) => {
+const InvoicePrint = ({
+  id,
+}: InferGetStaticPropsType<typeof getStaticProps>) => {
   return <PrintPage id={id} />
 }
 
@@ -25,20 +32,22 @@ export const getStaticPaths: GetStaticPaths = async () => {
   const data: InvoiceType[] = await res.data.allData
 
   const paths = data.map((item: InvoiceType) => ({
-    params: { id: `${item.id}` }
+    params: { id: `${item.id}` },
   }))
 
   return {
     paths,
-    fallback: false
+    fallback: false,
   }
 }
 
-export const getStaticProps: GetStaticProps = ({ params }: GetStaticPropsContext) => {
+export const getStaticProps: GetStaticProps = ({
+  params,
+}: GetStaticPropsContext) => {
   return {
     props: {
-      id: params?.id
-    }
+      id: params?.id,
+    },
   }
 }
 
@@ -46,7 +55,7 @@ InvoicePrint.getLayout = (page: ReactNode) => <BlankLayout>{page}</BlankLayout>
 
 InvoicePrint.setConfig = () => {
   return {
-    mode: 'light'
+    mode: 'light',
   }
 }
 

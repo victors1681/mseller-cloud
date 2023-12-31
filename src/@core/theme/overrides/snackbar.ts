@@ -9,10 +9,13 @@ const Snackbar = (skin: Skin) => {
         root: ({ theme }: OwnerStateThemeType) => ({
           ...(skin === 'bordered' && { boxShadow: 'none' }),
           backgroundColor: `rgb(${theme.palette.customColors.main})`,
-          color: theme.palette.common[theme.palette.mode === 'light' ? 'white' : 'black']
-        })
-      }
-    }
+          color:
+            theme.palette.common[
+              theme.palette.mode === 'light' ? 'white' : 'black'
+            ],
+        }),
+      },
+    },
   }
 }
 

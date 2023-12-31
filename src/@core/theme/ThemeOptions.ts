@@ -16,7 +16,10 @@ import overrides from './overrides'
 import typography from './typography'
 import breakpoints from './breakpoints'
 
-const themeOptions = (settings: Settings, overrideMode: PaletteMode): ThemeOptions => {
+const themeOptions = (
+  settings: Settings,
+  overrideMode: PaletteMode,
+): ThemeOptions => {
   // ** Vars
   const { skin, mode, direction, themeColor } = settings
 
@@ -28,20 +31,24 @@ const themeOptions = (settings: Settings, overrideMode: PaletteMode): ThemeOptio
       breakpoints: breakpoints(),
       direction,
       components: overrides(settings),
-      palette: palette(mode === 'semi-dark' ? overrideMode : mode, skin, themeColor),
+      palette: palette(
+        mode === 'semi-dark' ? overrideMode : mode,
+        skin,
+        themeColor,
+      ),
       ...spacing,
       shape: {
-        borderRadius: 6
+        borderRadius: 6,
       },
       mixins: {
         toolbar: {
-          minHeight: 64
-        }
+          minHeight: 64,
+        },
       },
       shadows: shadows(mode === 'semi-dark' ? overrideMode : mode),
-      typography
+      typography,
     },
-    userThemeConfig
+    userThemeConfig,
   )
 
   return deepmerge(mergedThemeConfig, {
@@ -49,9 +56,13 @@ const themeOptions = (settings: Settings, overrideMode: PaletteMode): ThemeOptio
       primary: {
         ...(mergedThemeConfig.palette
           ? mergedThemeConfig.palette[themeColor]
-          : palette(mode === 'semi-dark' ? overrideMode : mode, skin, themeColor).primary)
-      }
-    }
+          : palette(
+              mode === 'semi-dark' ? overrideMode : mode,
+              skin,
+              themeColor,
+            ).primary),
+      },
+    },
   })
 }
 

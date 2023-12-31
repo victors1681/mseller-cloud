@@ -34,7 +34,9 @@ const CardSnippet = (props: CardSnippetProps) => {
 
   // ** States
   const [showCode, setShowCode] = useState<boolean>(false)
-  const [tabValue, setTabValue] = useState<'tsx' | 'jsx'>(code.tsx !== null ? 'tsx' : 'jsx')
+  const [tabValue, setTabValue] = useState<'tsx' | 'jsx'>(
+    code.tsx !== null ? 'tsx' : 'jsx',
+  )
 
   // ** Hooks
   const clipboard = useClipboard()
@@ -58,7 +60,7 @@ const CardSnippet = (props: CardSnippetProps) => {
   const handleClick = () => {
     clipboard.copy(codeToCopy())
     toast.success('The source code has been copied to your clipboard.', {
-      duration: 2000
+      duration: 2000,
     })
   }
 
@@ -83,9 +85,9 @@ const CardSnippet = (props: CardSnippetProps) => {
           : {
               action: (
                 <IconButton onClick={() => setShowCode(!showCode)}>
-                  <Icon icon='mdi:code-tags' fontSize={20} />
+                  <Icon icon="mdi:code-tags" fontSize={20} />
                 </IconButton>
-              )
+              ),
             })}
       />
       <CardContent>{children}</CardContent>
@@ -93,38 +95,52 @@ const CardSnippet = (props: CardSnippetProps) => {
         <Collapse in={showCode}>
           <Divider sx={{ my: '0 !important' }} />
 
-          <CardContent sx={{ position: 'relative', '& pre': { m: '0 !important', maxHeight: 500 } }}>
-            <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+          <CardContent
+            sx={{
+              position: 'relative',
+              '& pre': { m: '0 !important', maxHeight: 500 },
+            }}
+          >
+            <Box
+              sx={{
+                mb: 4,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+              }}
+            >
               <ToggleButtonGroup
                 exclusive
-                size='small'
-                color='primary'
+                size="small"
+                color="primary"
                 value={tabValue}
-                onChange={(e, newValue) => (newValue !== null ? setTabValue(newValue) : null)}
+                onChange={(e, newValue) =>
+                  newValue !== null ? setTabValue(newValue) : null
+                }
               >
                 {code.tsx !== null ? (
-                  <ToggleButton value='tsx'>
-                    <Icon icon='mdi:language-typescript' fontSize={20} />
+                  <ToggleButton value="tsx">
+                    <Icon icon="mdi:language-typescript" fontSize={20} />
                   </ToggleButton>
                 ) : null}
                 {code.jsx !== null ? (
-                  <ToggleButton value='jsx'>
-                    <Icon icon='mdi:language-javascript' fontSize={20} />
+                  <ToggleButton value="jsx">
+                    <Icon icon="mdi:language-javascript" fontSize={20} />
                   </ToggleButton>
                 ) : null}
               </ToggleButtonGroup>
             </Box>
-            <Tooltip title='Copy the source' placement='top'>
+            <Tooltip title="Copy the source" placement="top">
               <IconButton
                 onClick={handleClick}
                 sx={{
                   top: '5rem',
                   color: 'grey.100',
                   right: '2.5625rem',
-                  position: 'absolute'
+                  position: 'absolute',
                 }}
               >
-                <Icon icon='mdi:content-copy' fontSize={20} />
+                <Icon icon="mdi:content-copy" fontSize={20} />
               </IconButton>
             </Tooltip>
             <div>{renderCode()}</div>

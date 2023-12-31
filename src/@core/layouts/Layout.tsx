@@ -23,7 +23,11 @@ const Layout = (props: LayoutProps) => {
       }
     } else {
       if (isCollapsed.current) {
-        saveSettings({ ...settings, navCollapsed: true, layout: settings.lastLayout })
+        saveSettings({
+          ...settings,
+          navCollapsed: true,
+          layout: settings.lastLayout,
+        })
         isCollapsed.current = false
       } else {
         if (settings.lastLayout !== settings.layout) {

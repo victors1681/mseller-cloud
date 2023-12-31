@@ -9,11 +9,13 @@ const Popover = (skin: Skin) => {
         root: ({ theme }: OwnerStateThemeType) => ({
           '& .MuiPopover-paper': {
             boxShadow: theme.shadows[skin === 'bordered' ? 0 : 6],
-            ...(skin === 'bordered' && { border: `1px solid ${theme.palette.divider}` })
-          }
-        })
-      }
-    }
+            ...(skin === 'bordered' && {
+              border: `1px solid ${theme.palette.divider}`,
+            }),
+          },
+        }),
+      },
+    },
   }
 }
 

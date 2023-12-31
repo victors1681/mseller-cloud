@@ -7,12 +7,12 @@ const Avatar = () => {
       styleOverrides: {
         colorDefault: ({ theme }: OwnerStateThemeType) => ({
           color: theme.palette.text.secondary,
-          backgroundColor: theme.palette.customColors.avatarBg
+          backgroundColor: theme.palette.customColors.avatarBg,
         }),
         rounded: {
-          borderRadius: 5
-        }
-      }
+          borderRadius: 5,
+        },
+      },
     },
     MuiAvatarGroup: {
       styleOverrides: {
@@ -24,17 +24,17 @@ const Avatar = () => {
               '&:hover': {
                 zIndex: 2,
                 boxShadow: theme.shadows[3],
-                transform: 'translateY(-4px)'
-              }
-            }
+                transform: 'translateY(-4px)',
+              },
+            },
           },
           justifyContent: 'flex-end',
           '.MuiCard-root & .MuiAvatar-root': {
-            borderColor: theme.palette.background.paper
-          }
-        })
-      }
-    }
+            borderColor: theme.palette.background.paper,
+          },
+        }),
+      },
+    },
   }
 }
 

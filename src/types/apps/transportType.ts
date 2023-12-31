@@ -1,5 +1,5 @@
-import { TransportStatusEnum } from "src/pages/apps/transports/utils/transportMappings"
-import { ClienteType, VendedorType } from "./clientTypes"
+import { TransportStatusEnum } from 'src/pages/apps/transports/utils/transportMappings'
+import { ClienteType, VendedorType } from './clientTypes'
 
 export interface TransportResponse {
   transportes: TransporteType[]
@@ -36,10 +36,10 @@ export interface LocalidadType {
 }
 
 export enum TypoPagoEnum {
-  Cash = "efectivo",
-  Check = "cheque",
-  Transfer = "transferencia",
-  Credit = "credito",
+  Cash = 'efectivo',
+  Check = 'cheque',
+  Transfer = 'transferencia',
+  Credit = 'credito',
 }
 
 export interface DocumentoEntregaResponseAxios {
@@ -60,52 +60,51 @@ export interface DocumentoEntregaResponse {
 }
 
 export interface DocumentoEntregaType {
-    bruto_E: number
-    descuento: number
-    descuento_E: number
-    impuestos_E: number
-    neto_E: number
-    fechaRecibido: string
-    procesado: boolean
-    fechaProcesado: any
-    status: TransportStatusEnum
-    firmaUrl: string
-    montoRecibido: number
-    devuelta: number
-    tipoPago: TypoPagoEnum | string
-    entregaLongitud: number
-    entregaLatitud: number
-    impresion: number
-    referencia: string
-    fechaEntrega: string
-    modificada: boolean
-    recibida: boolean
-    vendedor: VendedorType
-    noDocEntrega: string
-    codigoCliente: string
-    fecha: string
-    noPedido: string
-    codigoVendedor: string
-    tipoDocumento: string
-    ncf: string
-    confirmado: boolean
-    bruto: number
-    impuestos: number
-    neto: number
-    condicionPago: string
-    fechaVencimiento: string
-    noOrden: string
-    observacion: string
-    permitirEditar: boolean
-    secuenciaEntrega: number
-    detalle: DocumentoEntregaDetalleType[]
-    cliente: ClienteType
-    codigoMotivoRechazo: string
-    motivoRechazo: MotivoRechazo
-    NcfAutoActualizado: boolean
-    NcfFechaAutoActualizado: string
+  bruto_E: number
+  descuento: number
+  descuento_E: number
+  impuestos_E: number
+  neto_E: number
+  fechaRecibido: string
+  procesado: boolean
+  fechaProcesado: any
+  status: TransportStatusEnum
+  firmaUrl: string
+  montoRecibido: number
+  devuelta: number
+  tipoPago: TypoPagoEnum | string
+  entregaLongitud: number
+  entregaLatitud: number
+  impresion: number
+  referencia: string
+  fechaEntrega: string
+  modificada: boolean
+  recibida: boolean
+  vendedor: VendedorType
+  noDocEntrega: string
+  codigoCliente: string
+  fecha: string
+  noPedido: string
+  codigoVendedor: string
+  tipoDocumento: string
+  ncf: string
+  confirmado: boolean
+  bruto: number
+  impuestos: number
+  neto: number
+  condicionPago: string
+  fechaVencimiento: string
+  noOrden: string
+  observacion: string
+  permitirEditar: boolean
+  secuenciaEntrega: number
+  detalle: DocumentoEntregaDetalleType[]
+  cliente: ClienteType
+  codigoMotivoRechazo: string
+  motivoRechazo: MotivoRechazo
+  NcfAutoActualizado: boolean
+  NcfFechaAutoActualizado: string
 }
-
 
 export interface DocumentoEntregaDetalleType {
   producto: Producto

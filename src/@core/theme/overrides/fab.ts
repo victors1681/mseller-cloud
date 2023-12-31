@@ -5,10 +5,10 @@ const FabButton = () => {
     MuiFab: {
       styleOverrides: {
         default: ({ theme }: OwnerStateThemeType) => ({
-          color: theme.palette.text.primary
-        })
-      }
-    }
+          color: theme.palette.text.primary,
+        }),
+      },
+    },
   }
 }
 

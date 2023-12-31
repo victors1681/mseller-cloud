@@ -9,11 +9,18 @@ import { NextRouter } from 'next/router'
  * @param item
  * @param activeItem
  */
-export const handleURLQueries = (router: NextRouter, path: string | undefined): boolean => {
+export const handleURLQueries = (
+  router: NextRouter,
+  path: string | undefined,
+): boolean => {
   if (Object.keys(router.query).length && path) {
     const arr = Object.keys(router.query)
 
-    return router.asPath.includes(path) && router.asPath.includes(router.query[arr[0]] as string) && path !== '/'
+    return (
+      router.asPath.includes(path) &&
+      router.asPath.includes(router.query[arr[0]] as string) &&
+      path !== '/'
+    )
   }
 
   return false
@@ -46,7 +53,8 @@ export const hasActiveChild = (item: NavGroup, currentURL: string): boolean => {
       child &&
       childPath &&
       currentURL &&
-      (childPath === currentURL || (currentURL.includes(childPath) && childPath !== '/'))
+      (childPath === currentURL ||
+        (currentURL.includes(childPath) && childPath !== '/'))
     ) {
       return true
     }
@@ -63,14 +71,19 @@ export const hasActiveChild = (item: NavGroup, currentURL: string): boolean => {
  * @param openGroup
  * @param currentActiveGroup
  */
-export const removeChildren = (children: NavLink[], openGroup: string[], currentActiveGroup: string[]) => {
+export const removeChildren = (
+  children: NavLink[],
+  openGroup: string[],
+  currentActiveGroup: string[],
+) => {
   children.forEach((child: NavLink) => {
     if (!currentActiveGroup.includes(child.title)) {
       const index = openGroup.indexOf(child.title)
       if (index > -1) openGroup.splice(index, 1)
 
       // @ts-ignore
-      if (child.children) removeChildren(child.children, openGroup, currentActiveGroup)
+      if (child.children)
+        removeChildren(child.children, openGroup, currentActiveGroup)
     }
   })
 }

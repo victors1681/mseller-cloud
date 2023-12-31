@@ -29,31 +29,38 @@ const TableHeader = (props: TableHeaderProps) => {
         display: 'flex',
         flexWrap: 'wrap',
         alignItems: 'center',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
       }}
     >
       <Select
-        size='small'
+        size="small"
         displayEmpty
-        defaultValue=''
+        defaultValue=""
         sx={{ mr: 4, mb: 2 }}
         disabled={selectedRows && selectedRows.length === 0}
-        renderValue={selected => (selected.length === 0 ? 'Acciones' : selected)}
+        renderValue={(selected) =>
+          selected.length === 0 ? 'Acciones' : selected
+        }
       >
         <MenuItem disabled>Acciones</MenuItem>
-        <MenuItem value='1'>Aprobar</MenuItem>
-        <MenuItem value='3'>Retener</MenuItem>
-        <MenuItem value='delete'>Eliminar</MenuItem>
+        <MenuItem value="1">Aprobar</MenuItem>
+        <MenuItem value="3">Retener</MenuItem>
+        <MenuItem value="delete">Eliminar</MenuItem>
       </Select>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
         <TextField
-          size='small'
+          size="small"
           value={value}
           sx={{ mr: 4, mb: 2 }}
           placeholder={props.placeholder}
-          onChange={e => handleFilter(e.target.value)}
+          onChange={(e) => handleFilter(e.target.value)}
         />
-        <Button sx={{ mb: 2 }} component={Link} variant='contained' href='/apps/invoice/add'>
+        <Button
+          sx={{ mb: 2 }}
+          component={Link}
+          variant="contained"
+          href="/apps/invoice/add"
+        >
           Crear Pedido
         </Button>
       </Box>

@@ -20,7 +20,7 @@ const styleCache = () =>
   createCache({
     key: 'rtl',
     prepend: true,
-    stylisPlugins: [stylisRTLPlugin]
+    stylisPlugins: [stylisRTLPlugin],
   })
 
 const Direction = (props: DirectionProps) => {

@@ -9,47 +9,104 @@ import { CustomRadioBasicProps } from 'src/@core/components/custom-radio/types'
 
 const CustomRadioBasic = (props: CustomRadioBasicProps) => {
   // ** Props
-  const { name, data, selected, gridProps, handleChange, color = 'primary' } = props
+  const {
+    name,
+    data,
+    selected,
+    gridProps,
+    handleChange,
+    color = 'primary',
+  } = props
 
   const { meta, title, value, content } = data
 
   const renderData = () => {
     if (meta && title && content) {
       return (
-        <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Box
+          sx={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
           <Box
             sx={{
               mb: 1,
               width: '100%',
               display: 'flex',
               alignItems: 'flex-start',
-              justifyContent: 'space-between'
+              justifyContent: 'space-between',
             }}
           >
-            {typeof title === 'string' ? <Typography sx={{ mr: 2, fontWeight: 500 }}>{title}</Typography> : title}
-            {typeof meta === 'string' ? <Typography sx={{ color: 'text.secondary' }}>{meta}</Typography> : meta}
+            {typeof title === 'string' ? (
+              <Typography sx={{ mr: 2, fontWeight: 500 }}>{title}</Typography>
+            ) : (
+              title
+            )}
+            {typeof meta === 'string' ? (
+              <Typography sx={{ color: 'text.secondary' }}>{meta}</Typography>
+            ) : (
+              meta
+            )}
           </Box>
-          {typeof content === 'string' ? <Typography variant='body2'>{content}</Typography> : content}
+          {typeof content === 'string' ? (
+            <Typography variant="body2">{content}</Typography>
+          ) : (
+            content
+          )}
         </Box>
       )
     } else if (meta && title && !content) {
       return (
-        <Box sx={{ width: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-          {typeof title === 'string' ? <Typography sx={{ mr: 2, fontWeight: 500 }}>{title}</Typography> : title}
-          {typeof meta === 'string' ? <Typography sx={{ color: 'text.secondary' }}>{meta}</Typography> : meta}
+        <Box
+          sx={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+          }}
+        >
+          {typeof title === 'string' ? (
+            <Typography sx={{ mr: 2, fontWeight: 500 }}>{title}</Typography>
+          ) : (
+            title
+          )}
+          {typeof meta === 'string' ? (
+            <Typography sx={{ color: 'text.secondary' }}>{meta}</Typography>
+          ) : (
+            meta
+          )}
         </Box>
       )
     } else if (!meta && title && content) {
       return (
         <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-          {typeof title === 'string' ? <Typography sx={{ mb: 1, fontWeight: 500 }}>{title}</Typography> : title}
-          {typeof content === 'string' ? <Typography variant='body2'>{content}</Typography> : content}
+          {typeof title === 'string' ? (
+            <Typography sx={{ mb: 1, fontWeight: 500 }}>{title}</Typography>
+          ) : (
+            title
+          )}
+          {typeof content === 'string' ? (
+            <Typography variant="body2">{content}</Typography>
+          ) : (
+            content
+          )}
         </Box>
       )
     } else if (!meta && !title && content) {
-      return typeof content === 'string' ? <Typography variant='body2'>{content}</Typography> : content
+      return typeof content === 'string' ? (
+        <Typography variant="body2">{content}</Typography>
+      ) : (
+        content
+      )
     } else if (!meta && title && !content) {
-      return typeof title === 'string' ? <Typography sx={{ fontWeight: 500 }}>{title}</Typography> : title
+      return typeof title === 'string' ? (
+        <Typography sx={{ fontWeight: 500 }}>{title}</Typography>
+      ) : (
+        title
+      )
     } else {
       return null
     }
@@ -68,15 +125,20 @@ const CustomRadioBasic = (props: CustomRadioBasicProps) => {
             cursor: 'pointer',
             position: 'relative',
             alignItems: 'flex-start',
-            border: theme => `1px solid ${theme.palette.divider}`,
+            border: (theme) => `1px solid ${theme.palette.divider}`,
             ...(selected === value
               ? { borderColor: `${color}.main` }
-              : { '&:hover': { borderColor: theme => `rgba(${theme.palette.customColors.main}, 0.25)` } })
+              : {
+                  '&:hover': {
+                    borderColor: (theme) =>
+                      `rgba(${theme.palette.customColors.main}, 0.25)`,
+                  },
+                }),
           }}
         >
           <Radio
             name={name}
-            size='small'
+            size="small"
             color={color}
             value={value}
             onChange={handleChange}

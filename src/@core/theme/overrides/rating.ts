@@ -8,11 +8,11 @@ const Rating = () => {
         root: ({ theme }: OwnerStateThemeType) => ({
           color: theme.palette.warning.main,
           '& svg': {
-            flexShrink: 0
-          }
-        })
-      }
-    }
+            flexShrink: 0,
+          },
+        }),
+      },
+    },
   }
 }
 

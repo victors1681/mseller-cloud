@@ -12,7 +12,10 @@ import Alert from '@mui/material/Alert'
 import axios from 'axios'
 
 // ** Types
-import { SingleInvoiceType, InvoiceLayoutProps } from 'src/types/apps/invoiceTypes'
+import {
+  SingleInvoiceType,
+  InvoiceLayoutProps,
+} from 'src/types/apps/invoiceTypes'
 
 // ** Demo Components Imports
 import PreviewCard from 'src/views/apps/transports/preview/PreviewCard'
@@ -31,7 +34,7 @@ const InvoicePreview = ({ noTransporte }: InvoiceLayoutProps) => {
   useEffect(() => {
     axios
       .get('/api/transport/single-transport', { params: { noTransporte } })
-      .then(res => {
+      .then((res) => {
         setData(res.data)
         setError(false)
       })
@@ -59,17 +62,24 @@ const InvoicePreview = ({ noTransporte }: InvoiceLayoutProps) => {
             />
           </Grid>
         </Grid>
-        <SendtransportsDrawer open={sendInvoiceOpen} toggle={toggleSendInvoiceDrawer} />
-        <AddPaymentDrawer open={addPaymentOpen} toggle={toggleAddPaymentDrawer} />
+        <SendtransportsDrawer
+          open={sendInvoiceOpen}
+          toggle={toggleSendInvoiceDrawer}
+        />
+        <AddPaymentDrawer
+          open={addPaymentOpen}
+          toggle={toggleAddPaymentDrawer}
+        />
       </>
     )
   } else if (error) {
     return (
       <Grid container spacing={6}>
         <Grid item xs={12}>
-          <Alert severity='error'>
-            Invoice with the id: {noTransporte} does not exist. Please check the list of invoices:{' '}
-            <Link href='/apps/invoice/list'>Invoice List</Link>
+          <Alert severity="error">
+            Invoice with the id: {noTransporte} does not exist. Please check the
+            list of invoices:{' '}
+            <Link href="/apps/invoice/list">Invoice List</Link>
           </Alert>
         </Grid>
       </Grid>

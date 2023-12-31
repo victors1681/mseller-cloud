@@ -7,7 +7,8 @@ import { Settings } from 'src/@core/context/settingsContext'
 
 export type OwnerStateThemeType = {
   theme: Theme
-  ownerState: ComponentsPropsList[keyof ComponentsPropsList] & Record<string, unknown>
+  ownerState: ComponentsPropsList[keyof ComponentsPropsList] &
+    Record<string, unknown>
 }
 
 // ** Overrides Imports
@@ -101,7 +102,7 @@ const Overrides = (settings: Settings) => {
     pagination,
     autocomplete,
     MuiTypography,
-    MuiToggleButton
+    MuiToggleButton,
   )
 }
 

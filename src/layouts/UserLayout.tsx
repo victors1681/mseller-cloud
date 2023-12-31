@@ -33,7 +33,12 @@ interface Props {
 const AppBrand = () => {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-      <img src='/images/logo/mseller-logo-dark.png' alt='logo' height='50' style={{paddingLeft: '10px'}} />
+      <img
+        src="/images/logo/mseller-logo-dark.png"
+        alt="logo"
+        height="50"
+        style={{ paddingLeft: '10px' }}
+      />
     </Box>
   )
 }
@@ -69,37 +74,41 @@ const UserLayout = ({ children, contentHeightFixed }: Props) => {
       verticalLayoutProps={{
         navMenu: {
           navItems: VerticalNavItems(),
-          branding: () => <AppBrand/>
+          branding: () => <AppBrand />,
           // Uncomment the below line when using server-side menu in vertical layout and comment the above line
           // navItems: verticalMenuItems
         },
         appBar: {
-          content: props => (
+          content: (props) => (
             <VerticalAppBarContent
               hidden={hidden}
               settings={settings}
               saveSettings={saveSettings}
               toggleNavVisibility={props.toggleNavVisibility}
             />
-          )
-        }
+          ),
+        },
       }}
       {...(settings.layout === 'horizontal' && {
         horizontalLayoutProps: {
           navMenu: {
-            navItems: HorizontalNavItems()
+            navItems: HorizontalNavItems(),
 
             // Uncomment the below line when using server-side menu in horizontal layout and comment the above line
             // navItems: horizontalMenuItems
           },
           appBar: {
-            content: () => <HorizontalAppBarContent settings={settings} saveSettings={saveSettings} />
-          }
-        }
+            content: () => (
+              <HorizontalAppBarContent
+                settings={settings}
+                saveSettings={saveSettings}
+              />
+            ),
+          },
+        },
       })}
     >
       {children}
-      
     </Layout>
   )
 }

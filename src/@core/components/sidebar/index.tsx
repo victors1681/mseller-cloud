@@ -10,7 +10,16 @@ import { SidebarType } from './type'
 
 const Sidebar = (props: BoxProps & SidebarType) => {
   // ** Props
-  const { sx, show, direction, children, hideBackdrop, onOpen, onClose, backDropClick } = props
+  const {
+    sx,
+    show,
+    direction,
+    children,
+    hideBackdrop,
+    onOpen,
+    onClose,
+    backDropClick,
+  } = props
 
   const handleBackdropClick = () => {
     if (backDropClick) {
@@ -41,7 +50,7 @@ const Sidebar = (props: BoxProps & SidebarType) => {
           ...(direction === 'right'
             ? { left: 'auto', right: show ? 0 : '-100%' }
             : { right: 'auto', left: show ? 0 : '-100%' }),
-          ...sx
+          ...sx,
         }}
       >
         {children}
@@ -51,7 +60,10 @@ const Sidebar = (props: BoxProps & SidebarType) => {
           open={show}
           transitionDuration={250}
           onClick={handleBackdropClick}
-          sx={{ position: 'absolute', zIndex: theme => theme.zIndex.drawer - 1 }}
+          sx={{
+            position: 'absolute',
+            zIndex: (theme) => theme.zIndex.drawer - 1,
+          }}
         />
       )}
     </Fragment>
@@ -61,5 +73,5 @@ const Sidebar = (props: BoxProps & SidebarType) => {
 export default Sidebar
 
 Sidebar.defaultProps = {
-  direction: 'left'
+  direction: 'left',
 }
