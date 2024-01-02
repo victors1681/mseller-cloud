@@ -15,6 +15,7 @@ import paymentTypes from 'src/store/apps/paymentType'
 import sellers from 'src/store/apps/seller'
 import drivers from 'src/store/apps/driver'
 import locations from 'src/store/apps/location'
+import collections from 'src/store/apps/collections'
 
 export const store = configureStore({
   reducer: {
@@ -31,6 +32,7 @@ export const store = configureStore({
     sellers,
     drivers,
     locations,
+    collections,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

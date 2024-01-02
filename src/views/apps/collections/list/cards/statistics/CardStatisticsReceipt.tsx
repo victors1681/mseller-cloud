@@ -19,13 +19,14 @@ import { Button, Divider } from '@mui/material'
 import { DocumentoEntregaResponse } from 'src/types/apps/transportType'
 import formatDate from 'src/utils/formatDate'
 import {
-  transportStatusLabels,
-  transportStatusObj,
-} from 'src/pages/apps/transports/utils/transportMappings'
+  collectionStatusLabels,
+  collectionStatusObj,
+} from 'src/pages/apps/collections/utils/collectionMappings'
 import CustomChip from 'src/@core/components/mui/chip'
 import Link from 'next/link'
 import React from 'react'
-import LoadingWrapper from '../../LoadingWrapper'
+import LoadingWrapper from '../../../../../ui/LoadingWrapper'
+import { CollectionType } from 'src/types/apps/collectionType'
 interface DataType {
   icon: string
   stats: string
@@ -33,22 +34,22 @@ interface DataType {
   color: ThemeColor
 }
 
-const renderStats = (docsData: DocumentoEntregaResponse | null) => {
+const renderStats = (collection: CollectionType | null) => {
   const data: DataType[] = [
     {
-      stats: docsData?.entregadas?.toString() || '',
+      stats: collection?.entregadas?.toString() || '',
       title: 'Entregadas',
       color: 'success',
       icon: 'tabler:truck-delivery',
     },
     {
-      stats: docsData?.entregarDespues?.toString() || '',
+      stats: collection?.entregarDespues?.toString() || '',
       title: 'Entregar Después',
       color: 'info',
       icon: 'quill:send-later',
     },
     {
-      stats: docsData?.noEntregadas?.toString() || '',
+      stats: collection?.noEntregadas?.toString() || '',
       color: 'warning',
       title: 'No Entregadas',
       icon: 'dashicons:no',
@@ -75,11 +76,11 @@ const renderStats = (docsData: DocumentoEntregaResponse | null) => {
 }
 
 interface Props {
-  docsData: DocumentoEntregaResponse | null
+  collection: CollectionType
   isLoading: boolean
 }
 
-const CardStatisticsTransport = (props: Props) => {
+const CardStatisticsReceipt = (props: Props) => {
   return (
     <Card>
       <LoadingWrapper isLoading={props.isLoading}>
@@ -91,9 +92,9 @@ const CardStatisticsTransport = (props: Props) => {
                 component={Link}
                 startIcon={<Icon icon="ep:back" />}
                 variant="text"
-                href="/apps/transports/list"
+                href="/apps/collections/list"
               >
-                Regresar Transporte
+                Regresar Depositos
               </Button>
             }
             titleTypographyProps={{
@@ -108,9 +109,9 @@ const CardStatisticsTransport = (props: Props) => {
               <Grid item xs={6} md={6}>
                 <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
                   <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                    <Typography variant="body2">No. Transporte</Typography>
+                    <Typography variant="body2">No. Deposito</Typography>
                     <Typography variant="h6">
-                      {props.docsData?.noTransporte}
+                      {props.collection?.noDepositoStr}
                     </Typography>
                   </Box>
                 </Box>
@@ -120,7 +121,7 @@ const CardStatisticsTransport = (props: Props) => {
                   <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                     <Typography variant="body2">Distribuidor</Typography>
                     <Typography variant="h6">
-                      {props.docsData?.distribuidor.nombre}
+                      {props.collection?.vendedor.nombre}
                     </Typography>
                   </Box>
                 </Box>
@@ -134,9 +135,13 @@ const CardStatisticsTransport = (props: Props) => {
                       skin="light"
                       size="small"
                       label={
-                        transportStatusLabels[props.docsData?.status || 0] || ''
+                        collectionStatusLabels[
+                          props.collection?.procesado || 0
+                        ] || ''
                       }
-                      color={transportStatusObj[props.docsData?.status || '']}
+                      color={
+                        collectionStatusObj[props.collection?.procesado || '']
+                      }
                       sx={{ textTransform: 'capitalize' }}
                     />
                   </Box>
@@ -147,7 +152,7 @@ const CardStatisticsTransport = (props: Props) => {
                   <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                     <Typography variant="body2">Fecha</Typography>
                     <Typography variant="h6">
-                      {formatDate(props.docsData?.fecha || '')}
+                      {formatDate(props.collection?.fecha || '')}
                     </Typography>
                   </Box>
                 </Box>
@@ -155,7 +160,7 @@ const CardStatisticsTransport = (props: Props) => {
               <Grid item xs={12} md={12}>
                 <Divider sx={{ mt: 5, mb: 5 }}></Divider>
               </Grid>
-              {renderStats(props.docsData)}
+              {renderStats(props.collection)}
             </Grid>
           </CardContent>
         </>
@@ -164,4 +169,4 @@ const CardStatisticsTransport = (props: Props) => {
   )
 }
 
-export default CardStatisticsTransport
+export default CardStatisticsReceipt

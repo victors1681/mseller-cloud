@@ -28,7 +28,7 @@ import {
 import { TransportStatusEnum } from 'src/pages/apps/transports/utils/transportMappings'
 import formatCurrency from 'src/utils/formatCurrency'
 import React from 'react'
-import LoadingWrapper from '../../LoadingWrapper'
+import LoadingWrapper from '../../../../../ui/LoadingWrapper'
 
 interface Props {
   docsData: DocumentoEntregaType[]

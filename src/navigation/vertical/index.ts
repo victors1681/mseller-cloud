@@ -25,12 +25,12 @@ const navigation = (): VerticalNavItemsType => {
         {
           title: 'Cobranza',
           icon: 'ph:money-fill',
-          path: '/apps/collections/edit',
+          path: '/apps/collections/list',
         },
         {
           title: 'Visitas',
           icon: 'material-symbols:map-outline',
-          path: '/apps/visits/add',
+          path: '/apps/visits/list',
         },
       ],
     },

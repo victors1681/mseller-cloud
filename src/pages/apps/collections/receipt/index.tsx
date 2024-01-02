@@ -1,17 +1,11 @@
 // ** React Imports
 import { useState, useEffect, forwardRef } from 'react'
 
-// ** Next Import
-import Link from 'next/link'
-
 // ** MUI Imports
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
-import Tooltip from '@mui/material/Tooltip'
-import { styled } from '@mui/material/styles'
 import TextField from '@mui/material/TextField'
-import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import { DataGrid, GridColDef, GridRowId } from '@mui/x-data-grid'
 
@@ -23,15 +17,11 @@ import format from 'date-fns/format'
 
 // ** Store & Actions Imports
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  deleteInvoice,
-  fetchTransportDocsData,
-} from 'src/store/apps/transports'
+import { fetchSingleCollectionData } from 'src/store/apps/collections'
 
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
 import { ThemeColor } from 'src/@core/layouts/types'
-import { DocumentoEntregaType } from 'src/types/apps/transportType'
 
 // ** Custom Components Imports
 import CustomChip from 'src/@core/components/mui/chip'
@@ -42,15 +32,16 @@ import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import formatDate from 'src/utils/formatDate'
 import formatCurrency from 'src/utils/formatCurrency'
 import {
-  TransportStatusEnum,
-  transportStatusLabels,
-  transportStatusObj,
-} from '../utils/transportMappings'
-import CardWidgetsDocsDeliveryOverview from 'src/views/apps/transports/list/cards/widgets/CardWidgetsDocsDeliveryOverview'
-import CardStatisticsTransport from 'src/views/apps/transports/list/cards/statistics/CardStatisticsTransport'
+  collectionStatusLabels,
+  collectionStatusObj,
+} from '../utils/collectionMappings'
+
 import DocDetailModal from './docDetailModal'
 import MapModal from 'src/views/apps/transports/docs/MapModal'
 import SignatureModal from 'src/views/apps/transports/docs/SignatureModal'
+import { ReceiptType } from 'src/types/apps/collectionType'
+import CardStatisticsReceipt from 'src/views/apps/collections/list/cards/statistics/CardStatisticsReceipt'
+import CardWidgetsReceiptOverview from 'src/views/apps/collections/list/cards/widgets/CardWidgetsReceiptOverview'
 
 interface InvoiceStatusObj {
   [key: string]: {
@@ -68,23 +59,7 @@ interface CustomInputProps {
 }
 
 interface CellType {
-  row: DocumentoEntregaType
-}
-
-// ** Styled component for the link in the dataTable
-const LinkStyled = styled(Link)(({ theme }) => ({
-  textDecoration: 'none',
-  color: theme.palette.primary.main,
-}))
-
-// ** Vars
-const invoiceStatusObj: InvoiceStatusObj = {
-  Sent: { color: 'secondary', icon: 'mdi:send' },
-  Paid: { color: 'success', icon: 'mdi:check' },
-  Draft: { color: 'primary', icon: 'mdi:content-save-outline' },
-  'Partial Payment': { color: 'warning', icon: 'mdi:chart-pie' },
-  'Past Due': { color: 'error', icon: 'mdi:information-outline' },
-  Downloaded: { color: 'info', icon: 'mdi:arrow-down' },
+  row: ReceiptType
 }
 
 // ** renders client column
@@ -96,7 +71,7 @@ const defaultColumns: GridColDef[] = [
     minWidth: 120,
     headerName: '#',
     renderCell: ({ row }: CellType) => (
-      <DocDetailModal title={row.noDocEntrega} data={row} />
+      <DocDetailModal title={row.noDepositoStr} data={row} />
     ),
   },
   {
@@ -161,9 +136,7 @@ const defaultColumns: GridColDef[] = [
               variant="body2"
               sx={{ color: 'text.primary', textTransform: 'capitalize' }}
             >
-              {row.status === TransportStatusEnum.Entregado
-                ? formatCurrency(row.bruto_E)
-                : formatCurrency(row.bruto)}
+              {formatCurrency(row.totalCobro)}
             </Typography>
           </Box>
         </Box>
@@ -190,8 +163,8 @@ const defaultColumns: GridColDef[] = [
         <CustomChip
           skin="light"
           size="small"
-          label={transportStatusLabels[row?.status] || ''}
-          color={transportStatusObj[row.status]}
+          label={collectionStatusLabels[row?.procesado] || ''}
+          color={collectionStatusObj[row.procesado]}
           sx={{ textTransform: 'capitalize' }}
         />
       )
@@ -226,7 +199,7 @@ const CustomInput = forwardRef((props: CustomInputProps, ref) => {
 /* eslint-enable */
 
 interface TransportDocsProps {
-  noTransporte: string
+  noDeposito: string
 }
 const TransportDocs = (props: TransportDocsProps) => {
   // ** State
@@ -243,10 +216,10 @@ const TransportDocs = (props: TransportDocsProps) => {
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
-  const store = useSelector((state: RootState) => state.transports)
+  const store = useSelector((state: RootState) => state.collections)
   console.log('storestorestore', store)
   useEffect(() => {
-    dispatch(fetchTransportDocsData(props.noTransporte))
+    dispatch(fetchSingleCollectionData(props.noDeposito))
   }, [dispatch, statusValue, value, dates])
 
   const handleFilter = (val: string) => {
@@ -283,14 +256,14 @@ const TransportDocs = (props: TransportDocsProps) => {
     <DatePickerWrapper>
       <Grid container spacing={6}>
         <Grid item xs={6}>
-          <CardStatisticsTransport
-            docsData={store.docsData}
+          <CardStatisticsReceipt
+            collection={store.collectionData}
             isLoading={store.isLoading}
           />
         </Grid>
         <Grid item xs={6}>
-          <CardWidgetsDocsDeliveryOverview
-            docsData={store.docsData?.documentos || []}
+          <CardWidgetsReceiptOverview
+            collection={store.collectionData}
             isLoading={store.isLoading}
           />
         </Grid>
@@ -299,13 +272,13 @@ const TransportDocs = (props: TransportDocsProps) => {
             <DataGrid
               autoHeight
               pagination
-              rows={store.docsData?.documentos || []}
+              rows={store.collectionData?.recibos || []}
               columns={columns}
               disableRowSelectionOnClick
               paginationModel={paginationModel}
               onPaginationModelChange={setPaginationModel}
               onRowSelectionModelChange={(rows) => setSelectedRows(rows)}
-              getRowId={(row) => row.noDocEntrega}
+              getRowId={(row: ReceiptType) => row.noReciboStr}
               loading={store.isLoading}
             />
           </Card>
