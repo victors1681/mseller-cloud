@@ -11,7 +11,7 @@ const handler = async (
   try {
     const { procesado, parameter2 } = req.query
 
-    const response = await axios.get('http://localhost:5162/portal/Producto', {
+    const response = await axios.get('http://localhost:5186/portal/Producto', {
       params: req.query,
     })
     res.status(200).json(response.data)

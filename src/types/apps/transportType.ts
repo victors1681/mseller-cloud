@@ -1,5 +1,8 @@
 import { TransportStatusEnum } from 'src/pages/apps/transports/utils/transportMappings'
-import { ClienteType, VendedorType } from './clientTypes'
+import { ClienteType } from './clientTypes'
+import { LocalidadType } from './locationType'
+import { VendedorType } from './sellerType'
+import { DistribuidorType } from './driverType'
 
 export interface TransportResponse {
   transportes: TransporteType[]
@@ -9,7 +12,7 @@ export interface TransportResponse {
 }
 
 export interface TransporteListType {
-  distribuidor: Distribuidor
+  distribuidor: DistribuidorType
   procesado: boolean
   status: number
   localidad: LocalidadType
@@ -22,7 +25,7 @@ export interface TransporteListType {
 }
 
 export interface TransporteType {
-  distribuidor: Distribuidor
+  distribuidor: DistribuidorType
   procesado: boolean
   status: number
   localidad: LocalidadType
@@ -32,20 +35,6 @@ export interface TransporteType {
   fecha: string
   observacion: string
   documentosEntrega: DocumentoEntregaType[]
-}
-
-export interface Distribuidor {
-  codigo: string
-  nombre: string
-  rutas: string
-  ficha: string
-  localidad: number
-}
-
-export interface LocalidadType {
-  id: number
-  codigo: any
-  descripcion: string
 }
 
 export enum TypoPagoEnum {
@@ -64,7 +53,7 @@ export interface DocumentoEntregaResponse {
   codigoDistribuidor: string
   fecha: string
   documentos: DocumentoEntregaType[]
-  distribuidor: Distribuidor
+  distribuidor: DistribuidorType
   procesado: boolean
   status: number
   entregadas: number

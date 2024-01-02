@@ -26,8 +26,6 @@ export interface AxiosResponse<T> {
 export const fetchData = createAsyncThunk(
   'appDocuments/fetchData',
   async (params: DataParams) => {
-    console.log('params', params)
-
     if (params.procesado === '') {
       delete params.procesado
     }

@@ -9,12 +9,12 @@ import {
   DocumentoEntregaResponseAxios,
   DocumentoEntregaType,
   TransporteListType,
-  TransporteType,
 } from 'src/types/apps/transportType'
 import { PaginatedResponse } from 'src/types/apps/response'
+import { getDateParam } from 'src/utils/getDateParam'
 
 interface DataParams {
-  noTransporte: string
+  query: string
   dates?: Date[]
   status?: string
   pageNumber?: number
@@ -39,7 +39,10 @@ export const fetchData = createAsyncThunk(
       any,
       AxiosResponse<PaginatedResponse<TransporteListType>>
     >('/api/transport/transports', {
-      params,
+      params: {
+        ...params,
+        ...getDateParam(params.dates),
+      },
     })
 
     return {

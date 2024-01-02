@@ -12,7 +12,7 @@ const handler = async (
     const { procesado, parameter2 } = req.query
 
     const response = await axios.get(
-      'http://localhost:5186/portal/Transporte',
+      'http://localhost:5186/portal/CondicionPago',
       {
         params: req.query,
       },

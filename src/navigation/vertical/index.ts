@@ -51,7 +51,7 @@ const navigation = (): VerticalNavItemsType => {
         {
           title: 'Condiciones Pago',
           icon: 'mdi:account-payment',
-          path: '/apps/paymentType/list',
+          path: '/apps/paymentTypes/list',
         },
         {
           title: 'Localidades',

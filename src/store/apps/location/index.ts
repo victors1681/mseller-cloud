@@ -4,12 +4,13 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 // ** Axios Imports
 import axios from 'axios'
+import { LocalidadType } from 'src/types/apps/locationType'
 import { PaginatedResponse } from 'src/types/apps/response'
-import { ProductType } from 'src/types/apps/productTypes'
 
 interface DataParams {
   query: string
-  status?: string
+  dates?: Date[]
+  procesado?: string
   pageNumber: number
 }
 
@@ -22,18 +23,18 @@ export interface AxiosResponse<T> {
   data: T
 }
 
-// ** Fetch Products
+// ** Fetch Locations
 export const fetchData = createAsyncThunk(
-  'appProduct/fetchData',
+  'appLocation/fetchData',
   async (params: DataParams) => {
     console.log('params', params)
-    if (params.status === '') {
-      delete params.status
+    if (params.procesado === '') {
+      delete params.procesado
     }
     const response = await axios.get<
       any,
-      AxiosResponse<PaginatedResponse<ProductType>>
-    >('/api/product/products', {
+      AxiosResponse<PaginatedResponse<LocalidadType>>
+    >('/api/location/locations', {
       params,
     })
 
@@ -51,22 +52,22 @@ export const fetchData = createAsyncThunk(
   },
 )
 
-export const deleteProduct = createAsyncThunk(
-  'appProduct/deleteData',
+export const deleteLocation = createAsyncThunk(
+  'appLocation/deleteData',
   async (id: number | string, { getState, dispatch }: Redux) => {
-    const response = await axios.delete('/apps/product/delete', {
+    const response = await axios.delete('/apps/Location/delete', {
       data: id,
     })
-    await dispatch(fetchData(getState().Product.params))
+    await dispatch(fetchData(getState().Location.params))
 
     return response.data
   },
 )
 
-export const appProductSlice = createSlice({
-  name: 'appProduct',
+export const appLocationSlice = createSlice({
+  name: 'appLocation',
   initialState: {
-    data: [] as ProductType[],
+    data: [] as LocalidadType[],
     params: {},
     allData: [],
     pageNumber: 0,
@@ -103,4 +104,4 @@ export const appProductSlice = createSlice({
   },
 })
 
-export default appProductSlice.reducer
+export default appLocationSlice.reducer

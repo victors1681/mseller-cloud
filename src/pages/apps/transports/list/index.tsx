@@ -238,7 +238,7 @@ const TransportList = () => {
     dispatch(
       fetchData({
         dates,
-        noTransporte: value,
+        query: value,
         status: statusValue,
         pageNumber: paginationModel.page,
       }),
@@ -250,7 +250,7 @@ const TransportList = () => {
       dispatch(
         fetchData({
           dates,
-          noTransporte: value,
+          query: value,
           status: statusValue,
           pageNumber: paginationModel.page,
         }),
@@ -261,7 +261,7 @@ const TransportList = () => {
 
   const fn = useCallback(
     debounce((val: string) => {
-      setPaginationModel({ page: 1, pageSize: 20 })
+      setPaginationModel({ page: 0, pageSize: 20 })
       performRequest(val)
     }, 900),
     [],
@@ -284,7 +284,7 @@ const TransportList = () => {
       dispatch(
         fetchData({
           dates,
-          noTransporte: value,
+          query: value,
           status: statusValue,
           pageNumber: values.page,
         }),
@@ -293,6 +293,14 @@ const TransportList = () => {
     [paginationModel, value, statusValue],
   )
 
+  const handleOnChangeRange = (dates: any) => {
+    const [start, end] = dates
+    if (start !== null && end !== null) {
+      setDates(dates)
+    }
+    setStartDateRange(start)
+    setEndDateRange(end)
+  }
   const columns: GridColDef[] = [
     ...defaultColumns,
     {
@@ -440,7 +448,28 @@ const TransportList = () => {
                     )}
                   />
                 </Grid>
-                <Grid item xs={12} sm={4}></Grid>
+                <Grid item xs={12} sm={4}>
+                  <DatePicker
+                    isClearable
+                    selectsRange
+                    monthsShown={2}
+                    endDate={endDateRange}
+                    selected={startDateRange}
+                    startDate={startDateRange}
+                    shouldCloseOnSelect={false}
+                    id="date-range-picker-months"
+                    onChange={handleOnChangeRange}
+                    customInput={
+                      <CustomInput
+                        dates={dates}
+                        setDates={setDates}
+                        label="Fecha"
+                        end={endDateRange as number | Date}
+                        start={startDateRange as number | Date}
+                      />
+                    }
+                  />
+                </Grid>
               </Grid>
             </CardContent>
           </Card>

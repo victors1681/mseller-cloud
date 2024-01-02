@@ -1,4 +1,6 @@
-import { LocalidadType } from './transportType'
+import { LocalidadType } from './locationType'
+import { CondicionPagoType } from './paymentTypeTypes'
+import { VendedorType } from './sellerType'
 
 export interface ClienteType {
   codigo: string
@@ -35,24 +37,8 @@ export interface ClienteType {
   condicionPago?: CondicionPagoType
 }
 
-export interface VendedorType {
-  codigo: string
-  nombre: string
-  email: string
-  status: string
-  localidad: number
-}
-
 export interface GeoLocalizacionType {
   codigo_cliente: string
   longitud: number
   latitud: number
-}
-
-export interface CondicionPagoType {
-  id: number
-  condicionPago: string
-  dias: number
-  tipo_condicion: string
-  descripcion: string
 }
