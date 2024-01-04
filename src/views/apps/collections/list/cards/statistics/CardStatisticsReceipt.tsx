@@ -21,7 +21,7 @@ import formatDate from 'src/utils/formatDate'
 import {
   collectionStatusLabels,
   collectionStatusObj,
-} from 'src/pages/apps/collections/utils/collectionMappings'
+} from 'src/utils/collectionMappings'
 import CustomChip from 'src/@core/components/mui/chip'
 import Link from 'next/link'
 import React from 'react'
@@ -36,24 +36,24 @@ interface DataType {
 
 const renderStats = (collection: CollectionType | null) => {
   const data: DataType[] = [
-    {
-      stats: collection?.entregadas?.toString() || '',
-      title: 'Entregadas',
-      color: 'success',
-      icon: 'tabler:truck-delivery',
-    },
-    {
-      stats: collection?.entregarDespues?.toString() || '',
-      title: 'Entregar Después',
-      color: 'info',
-      icon: 'quill:send-later',
-    },
-    {
-      stats: collection?.noEntregadas?.toString() || '',
-      color: 'warning',
-      title: 'No Entregadas',
-      icon: 'dashicons:no',
-    },
+    // {
+    //   stats: collection?.entregadas?.toString() || '',
+    //   title: 'Entregadas',
+    //   color: 'success',
+    //   icon: 'tabler:truck-delivery',
+    // },
+    // {
+    //   stats: collection?.entregarDespues?.toString() || '',
+    //   title: 'Entregar Después',
+    //   color: 'info',
+    //   icon: 'quill:send-later',
+    // },
+    // {
+    //   stats: collection?.noEntregadas?.toString() || '',
+    //   color: 'warning',
+    //   title: 'No Entregadas',
+    //   icon: 'dashicons:no',
+    // },
   ]
 
   return data.map((sale: DataType, index: number) => (
@@ -121,7 +121,7 @@ const CardStatisticsReceipt = (props: Props) => {
                   <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                     <Typography variant="body2">Distribuidor</Typography>
                     <Typography variant="h6">
-                      {props.collection?.vendedor.nombre}
+                      {props.collection?.notaDeposito}
                     </Typography>
                   </Box>
                 </Box>

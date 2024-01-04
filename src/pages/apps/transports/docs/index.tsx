@@ -45,7 +45,7 @@ import {
   TransportStatusEnum,
   transportStatusLabels,
   transportStatusObj,
-} from '../utils/transportMappings'
+} from '../../../../utils/transportMappings'
 import CardWidgetsDocsDeliveryOverview from 'src/views/apps/transports/list/cards/widgets/CardWidgetsDocsDeliveryOverview'
 import CardStatisticsTransport from 'src/views/apps/transports/list/cards/statistics/CardStatisticsTransport'
 import DocDetailModal from './docDetailModal'

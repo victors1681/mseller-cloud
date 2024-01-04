@@ -89,7 +89,7 @@ const invoiceStatusObj: InvoiceStatusObj = {
   Downloaded: { color: 'info', icon: 'mdi:arrow-down' },
 }
 
-const orderStatusLabels = {
+const orderStatusLabels: any = {
   '0': 'Pendiente',
   '1': 'Procesado',
   '3': 'Retenido',
@@ -101,7 +101,7 @@ const orderStatusLabels = {
   '10': 'Enviado al ERP',
 }
 
-const orderStatusObj = {
+const orderStatusObj: any = {
   '1': 'success',
   '10': 'success',
   '0': 'warning',
@@ -362,7 +362,7 @@ const InvoiceList = () => {
           <Tooltip title="Aprobar">
             <IconButton
               size="small"
-              onClick={() => dispatch(deleteInvoice(row.id))}
+              onClick={() => dispatch(deleteInvoice(row.noPedidoStr))}
             >
               <Icon icon="material-symbols:order-approve" fontSize={20} />
             </IconButton>
@@ -371,7 +371,7 @@ const InvoiceList = () => {
             <IconButton
               size="small"
               component={Link}
-              href={`/apps/invoice/preview/${row.id}`}
+              href={`/apps/invoice/preview/${row.noPedidoStr}`}
             >
               <Icon icon="mdi:eye-outline" fontSize={20} />
             </IconButton>
@@ -507,7 +507,7 @@ const InvoiceList = () => {
                     filterSelectedOptions
                     defaultValue={[{ title: 'test' }]}
                     id="autocomplete-multiple-outlined"
-                    getOptionLabel={(option) => option.title || ''}
+                    getOptionLabel={(option: any) => option.title || ''}
                     sx={{ mt: 3, ml: 3 }}
                     renderInput={(params) => (
                       <TextField

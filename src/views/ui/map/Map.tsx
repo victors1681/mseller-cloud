@@ -4,7 +4,7 @@ import { Wrapper, Status } from '@googlemaps/react-wrapper'
 import { createCustomEqual } from 'fast-equals'
 import { isLatLngLiteral } from '@googlemaps/typescript-guards'
 import { DocumentoEntregaType } from 'src/types/apps/transportType'
-import { TransportStatusEnum } from 'src/pages/apps/transports/utils/transportMappings'
+import { TransportStatusEnum } from 'src/utils/transportMappings'
 
 const innerFn: any = (deepEqual: any) => (a: any, b: any) => {
   if (

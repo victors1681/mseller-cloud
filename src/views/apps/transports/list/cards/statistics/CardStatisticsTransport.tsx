@@ -21,7 +21,7 @@ import formatDate from 'src/utils/formatDate'
 import {
   transportStatusLabels,
   transportStatusObj,
-} from 'src/pages/apps/transports/utils/transportMappings'
+} from 'src/utils/transportMappings'
 import CustomChip from 'src/@core/components/mui/chip'
 import Link from 'next/link'
 import React from 'react'

@@ -34,12 +34,7 @@ import { fetchData } from 'src/store/apps/collections'
 
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
-import { ThemeColor } from 'src/@core/layouts/types'
 import { CollectionType } from 'src/types/apps/collectionType'
-import { DateType } from 'src/types/forms/reactDatepickerTypes'
-
-// ** Utils Import
-import { getInitials } from 'src/@core/utils/get-initials'
 
 // ** Custom Components Imports
 import CustomChip from 'src/@core/components/mui/chip'
@@ -54,15 +49,8 @@ import Autocomplete from '@mui/material/Autocomplete'
 import {
   collectionStatusLabels,
   collectionStatusObj,
-} from '../utils/collectionMappings'
+} from '../../../../utils/collectionMappings'
 import { debounce } from '@mui/material'
-
-interface InvoiceStatusObj {
-  [key: string]: {
-    icon: string
-    color: ThemeColor
-  }
-}
 
 interface CustomInputProps {
   dates: Date[]
@@ -81,16 +69,6 @@ const LinkStyled = styled(Link)(({ theme }) => ({
   textDecoration: 'none',
   color: theme.palette.primary.main,
 }))
-
-// ** Vars
-const invoiceStatusObj: InvoiceStatusObj = {
-  Sent: { color: 'secondary', icon: 'mdi:send' },
-  Paid: { color: 'success', icon: 'mdi:check' },
-  Draft: { color: 'primary', icon: 'mdi:content-save-outline' },
-  'Partial Payment': { color: 'warning', icon: 'mdi:chart-pie' },
-  'Past Due': { color: 'error', icon: 'mdi:information-outline' },
-  Downloaded: { color: 'info', icon: 'mdi:arrow-down' },
-}
 
 // ** renders client column
 const renderClient = (row: CollectionType) => {
@@ -358,7 +336,7 @@ const TransportList = () => {
                       labelId="invoice-status-select"
                     >
                       <MenuItem value="">none</MenuItem>
-                      {Object.keys(collectionStatusLabels).map((k) => {
+                      {Object.keys(collectionStatusLabels).map((k: any) => {
                         return (
                           <MenuItem value={k}>
                             {collectionStatusLabels[k]}
@@ -383,7 +361,7 @@ const TransportList = () => {
                       labelId="invoice-status-select"
                     >
                       <MenuItem value="">none</MenuItem>
-                      {Object.keys(collectionStatusLabels).map((k) => {
+                      {Object.keys(collectionStatusLabels).map((k: any) => {
                         return (
                           <MenuItem value={k}>
                             {collectionStatusLabels[k]}
@@ -408,7 +386,7 @@ const TransportList = () => {
                       labelId="invoice-status-select"
                     >
                       <MenuItem value="">none</MenuItem>
-                      {Object.keys(collectionStatusLabels).map((k) => {
+                      {Object.keys(collectionStatusLabels).map((k: any) => {
                         return (
                           <MenuItem value={k}>
                             {collectionStatusLabels[k]}
@@ -447,7 +425,7 @@ const TransportList = () => {
                     filterSelectedOptions
                     defaultValue={[{ title: 'test' }]}
                     id="autocomplete-multiple-outlined"
-                    getOptionLabel={(option) => option.title || ''}
+                    getOptionLabel={(option: any) => option.title || ''}
                     sx={{ mt: 3, ml: 3 }}
                     renderInput={(params) => (
                       <TextField

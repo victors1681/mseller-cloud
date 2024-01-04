@@ -34,7 +34,7 @@ import formatCurrency from 'src/utils/formatCurrency'
 import {
   collectionStatusLabels,
   collectionStatusObj,
-} from '../utils/collectionMappings'
+} from '../../../../utils/collectionMappings'
 
 import DocDetailModal from './docDetailModal'
 import MapModal from 'src/views/apps/transports/docs/MapModal'
@@ -245,8 +245,8 @@ const TransportDocs = (props: TransportDocsProps) => {
       headerName: 'Actions',
       renderCell: ({ row }: CellType) => (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <MapModal data={[row]}></MapModal>
-          <SignatureModal url={row.firmaUrl} />
+          {/* <MapModal data={[row]}></MapModal>
+          <SignatureModal url={row.} /> */}
         </Box>
       ),
     },

@@ -1,6 +1,7 @@
 import moment from 'moment'
 
 export const formatDate = (date: string) => {
+  //@ts-ignore
   const userLanguage = navigator.language || navigator.userLanguage
   moment.locale(userLanguage)
 

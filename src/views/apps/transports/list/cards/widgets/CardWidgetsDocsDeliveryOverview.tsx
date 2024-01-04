@@ -25,7 +25,7 @@ import {
   DocumentoEntregaType,
   TypoPagoEnum,
 } from 'src/types/apps/transportType'
-import { TransportStatusEnum } from 'src/pages/apps/transports/utils/transportMappings'
+import { TransportStatusEnum } from 'src/utils/transportMappings'
 import formatCurrency from 'src/utils/formatCurrency'
 import React from 'react'
 import LoadingWrapper from '../../../../../ui/LoadingWrapper'

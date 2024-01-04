@@ -35,7 +35,7 @@ import CustomChip from 'src/@core/components/mui/chip'
 import {
   transportStatusLabels,
   transportStatusObj,
-} from '../utils/transportMappings'
+} from '../../../../utils/transportMappings'
 import formatDate from 'src/utils/formatDate'
 
 const LinkStyled = styled(Link)(({ theme }) => ({

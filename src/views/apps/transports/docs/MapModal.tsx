@@ -13,7 +13,7 @@ import CustomAvatar from 'src/@core/components/mui/avatar'
 import { DialogContent, IconButton, Tooltip } from '@mui/material'
 import { Map } from 'src/views/ui/map'
 import { DocumentoEntregaType } from 'src/types/apps/transportType'
-import { TransportStatusEnum } from 'src/pages/apps/transports/utils/transportMappings'
+import { TransportStatusEnum } from 'src/utils/transportMappings'
 
 const emails = ['username@gmail.com', 'user02@gmail.com']
 

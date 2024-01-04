@@ -29,7 +29,7 @@ import CustomChip from 'src/@core/components/mui/chip'
 import {
   collectionStatusLabels,
   collectionStatusObj,
-} from '../utils/collectionMappings'
+} from '../../../../utils/collectionMappings'
 import formatDate from 'src/utils/formatDate'
 import { ReceiptDetailType, ReceiptType } from 'src/types/apps/collectionType'
 

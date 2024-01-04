@@ -57,7 +57,7 @@ import Autocomplete from '@mui/material/Autocomplete'
 import {
   transportStatusLabels,
   transportStatusObj,
-} from '../utils/transportMappings'
+} from '../../../../utils/transportMappings'
 import { debounce } from '@mui/material'
 
 interface InvoiceStatusObj {
@@ -182,7 +182,7 @@ const defaultColumns: GridColDef[] = [
         <CustomChip
           skin="light"
           size="small"
-          label={transportStatusLabels[row?.status?.toString()] || ''}
+          label={transportStatusLabels[row?.status] || ''}
           color={transportStatusObj[row.status]}
           sx={{ textTransform: 'capitalize' }}
         />
@@ -348,7 +348,7 @@ const TransportList = () => {
                       labelId="invoice-status-select"
                     >
                       <MenuItem value="">none</MenuItem>
-                      {Object.keys(transportStatusLabels).map((k) => {
+                      {Object.keys(transportStatusLabels).map((k: any) => {
                         return (
                           <MenuItem value={k}>
                             {transportStatusLabels[k]}
@@ -373,7 +373,7 @@ const TransportList = () => {
                       labelId="invoice-status-select"
                     >
                       <MenuItem value="">none</MenuItem>
-                      {Object.keys(transportStatusLabels).map((k) => {
+                      {Object.keys(transportStatusLabels).map((k: any) => {
                         return (
                           <MenuItem value={k}>
                             {transportStatusLabels[k]}
@@ -398,7 +398,7 @@ const TransportList = () => {
                       labelId="invoice-status-select"
                     >
                       <MenuItem value="">none</MenuItem>
-                      {Object.keys(transportStatusLabels).map((k) => {
+                      {Object.keys(transportStatusLabels).map((k: any) => {
                         return (
                           <MenuItem value={k}>
                             {transportStatusLabels[k]}
@@ -437,7 +437,7 @@ const TransportList = () => {
                     filterSelectedOptions
                     defaultValue={[{ title: 'test' }]}
                     id="autocomplete-multiple-outlined"
-                    getOptionLabel={(option) => option.title || ''}
+                    getOptionLabel={(option: any) => option.title || ''}
                     sx={{ mt: 3, ml: 3 }}
                     renderInput={(params) => (
                       <TextField

@@ -91,6 +91,6 @@ export type InvoicePaymentType = {
 }
 
 export type SingleInvoiceType = {
-  invoice: InvoiceType
+  invoice: any
   paymentDetails: InvoicePaymentType
 }

@@ -25,7 +25,7 @@ import {
   DocumentoEntregaType,
   TypoPagoEnum,
 } from 'src/types/apps/transportType'
-import { TransportStatusEnum } from 'src/pages/apps/transports/utils/transportMappings'
+import { TransportStatusEnum } from 'src/utils/transportMappings'
 import formatCurrency from 'src/utils/formatCurrency'
 import React from 'react'
 import LoadingWrapper from '../../../../../ui/LoadingWrapper'
@@ -36,27 +36,29 @@ interface Props {
   isLoading: boolean
 }
 
-const getStats = (docsData: CollectionType) => {
-  const cashArr = docsData.recibos.filter(
+const getStats = (collection: CollectionType) => {
+  const cashArr = collection?.recibos.filter(
     (f) => f.tipoPago === PaymentTypeEnum.Efectivo,
   )
   const cash = cashArr.reduce((a, c) => (a += c.totalCobro), 0)
 
-  const checkArr = docsData.recibos.filter(
+  const checkArr = collection?.recibos.filter(
     (f) => f.tipoPago === PaymentTypeEnum.Cheque,
   )
   const check = checkArr.reduce((a, c) => (a += c.totalCobro), 0)
 
-  const transferArr = docsData.recibos.filter(
+  const transferArr = collection?.recibos.filter(
     (f) => f.tipoPago === PaymentTypeEnum.Transferencia,
   )
   const transfer = transferArr.reduce((a, c) => (a += c.totalCobro), 0)
 
-  const ckFuturistArr = docsData.recibos.filter((f) => f.ckFuturista === true)
+  const ckFuturistArr = collection?.recibos.filter(
+    (f) => f.ckFuturista === true,
+  )
 
   const ckFuturist = ckFuturistArr.reduce((a, c) => (a += c.totalCobro), 0)
-  const total = docsData.totalCobrado
-  const totalDocs = docsData.recibos.length
+  const total = collection?.totalCobrado
+  const totalDocs = collection?.recibos.length
   //const donut = [cash/total * 100, check/total * 100, transfer/total * 100, credit/total * 100]
   //const donut = [cash, check, transfer, credit]
   const donut = [
@@ -80,7 +82,7 @@ const CardWidgetsReceiptOverview = (props: Props) => {
   // ** Hook
   const theme = useTheme()
 
-  const data = getStats(props.collection)
+  const data = (!props.isLoading && getStats(props.collection)) || ({} as any)
 
   const options = React.useCallback(
     () =>

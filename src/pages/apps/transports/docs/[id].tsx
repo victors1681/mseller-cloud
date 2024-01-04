@@ -10,7 +10,6 @@ import {
 import axios from 'axios'
 
 // ** Types
-import { InvoiceType } from 'src/types/apps/invoiceTypes'
 
 // ** Demo Components Imports
 import Docs from './index'
@@ -23,9 +22,9 @@ const InvoicePreview = ({
 
 export const getStaticPaths: GetStaticPaths = async () => {
   //const res = await axios.get('/api/transport/transports')
-  const data = [] //: InvoiceType[] = await res.data.allData
+  const data = [] as any //: InvoiceType[] = await res.data.allData
 
-  const paths = data.map((item: InvoiceType) => ({
+  const paths = data.map((item: any) => ({
     params: { id: `${item.id}` },
   }))
 

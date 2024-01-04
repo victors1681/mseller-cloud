@@ -206,13 +206,12 @@ const InvoiceList = () => {
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
-  const store = useSelector((state: RootState) => state.Products)
+  const store = useSelector((state: RootState) => state.products)
 
   //Initial Load
   useEffect(() => {
     dispatch(
       fetchData({
-        dates,
         query: value,
         status: statusValue,
         pageNumber: paginationModel.page,
@@ -225,7 +224,6 @@ const InvoiceList = () => {
       setPaginationModel(values)
       dispatch(
         fetchData({
-          dates,
           query: value,
           status: statusValue,
           pageNumber: values.page,
@@ -239,7 +237,6 @@ const InvoiceList = () => {
     (value: string) => {
       dispatch(
         fetchData({
-          dates,
           query: value,
           status: statusValue,
           pageNumber: paginationModel.page,

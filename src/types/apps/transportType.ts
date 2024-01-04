@@ -1,4 +1,4 @@
-import { TransportStatusEnum } from 'src/pages/apps/transports/utils/transportMappings'
+import { TransportStatusEnum } from 'src/utils/transportMappings'
 import { ClienteType } from './clientTypes'
 import { LocalidadType } from './locationType'
 import { VendedorType } from './sellerType'
