@@ -6,6 +6,7 @@ import axios from 'axios'
 
 // ** Types
 import { Dispatch } from 'redux'
+import restClient from 'src/configs/restClient'
 import { SendMsgParamsType } from 'src/types/apps/chatTypes'
 
 // ** Fetch User Profile

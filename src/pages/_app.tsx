@@ -23,9 +23,6 @@ import type { EmotionCache } from '@emotion/cache'
 import { defaultACLObj } from 'src/configs/acl'
 import themeConfig from 'src/configs/themeConfig'
 
-// ** Fake-DB Import
-import 'src/@fake-db'
-
 // ** Third Party Import
 import { Toaster } from 'react-hot-toast'
 
@@ -103,7 +100,7 @@ const Guard = ({ children, authGuard, guestGuard }: GuardProps) => {
     return <AuthGuard fallback={<Spinner />}>{children}</AuthGuard>
   }
 }
-configureRestClient('http://localhost:3000')
+configureRestClient()
 
 // ** Configure JSS & ClassName
 const App = (props: ExtendedAppProps) => {

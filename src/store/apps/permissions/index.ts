@@ -3,6 +3,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 // ** Axios Imports
 import axios from 'axios'
+import restClient from 'src/configs/restClient'
 
 interface DataParams {
   q: string

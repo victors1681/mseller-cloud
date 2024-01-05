@@ -25,9 +25,8 @@ export const axiosSetClientUrl = (config?: Config) => {
 }
 export const configureRestClient = (baseURL?: string): void => {
   // Base API path
-  //restClient.defaults.baseURL = publicRuntimeConfig.INV_MGMT_API_ENDPOINT;
-  restClient.interceptors.request.use((config: any) => {
-    const newConfig = { ...getExceptions(config, baseURL) }
+  restClient.interceptors.request.use((config) => {
+    const newConfig = { ...getExceptions(config, baseURL) } as any
 
     const storedToken = window.localStorage.getItem(
       authConfig.storageTokenKeyName,
