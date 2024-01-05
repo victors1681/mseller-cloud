@@ -1,7 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next/types'
-import axios from 'axios'
 import restClient from 'src/configs/restClient'
-import https from 'https'
 const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
   try {
     const { method, query } = req
