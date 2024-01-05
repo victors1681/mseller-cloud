@@ -1,25 +1,36 @@
 import type { NextApiRequest, NextApiResponse } from 'next/types'
 import axios from 'axios'
 import restClient from 'src/configs/restClient'
-
+import https from 'https'
 const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
   try {
     const { method, query } = req
-    const { path } = query
+    const { path, ...params } = query
     const fullPath = `${Array.isArray(path) ? path?.join('/') : ''}`
 
-    axios.defaults.baseURL =
-      process.env.NODE_ENV === 'production'
-        ? 'https://mseller-portal-api.azurewebsites.net'
-        : 'http://localhost:5186'
+    // axios.defaults.baseURL =
+    //   process.env.NODE_ENV === 'production'
+    //     ? 'https://mseller-portal-api.azurewebsites.net'
+    //     : 'http://localhost:5186'
 
-    restClient.defaults.baseURL = 'https://mseller-portal-api.azurewebsites.net'
+    restClient.defaults.baseURL = 'https://portal-int-api.mseller.app'
 
+    const agent = new https.Agent({
+      rejectUnauthorized: false,
+    })
+
+    //URL coming from the user configuration
+    //const targetUrl = req.headers['x-url']
+    //console.log('targetUrl', targetUrl)
+
+    //console.log(req.headers.authorization)
     switch (method) {
       case 'GET':
+        params
         const response = await restClient.get(fullPath, {
-          params: req.query,
+          params: params,
           headers: req.headers,
+          // httpsAgent: agent,
         })
 
         res.status(200).json(response.data)
@@ -42,6 +53,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
         res.status(405).end(`Method ${method} Not Allowed`)
     }
   } catch (error: any) {
+    console.log('error', error)
     if (error.code === 'ECONNRESET' || error.code === 'ECONNABORTED') {
       console.error('Connection was terminated or aborted:', error.message)
     } else {

@@ -61,6 +61,7 @@ const AuthProvider = ({ children }: Props) => {
 
         try {
           const response = await getUserByAccessToken(storedToken)
+          axiosSetClientUrl(response?.business.config)
           setLoading(false)
           if (response) {
             response.role = 'admin' //temporary
