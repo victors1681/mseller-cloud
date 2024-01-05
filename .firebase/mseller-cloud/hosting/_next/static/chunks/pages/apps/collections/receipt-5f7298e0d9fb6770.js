@@ -1,1 +1,0 @@
-(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[660],{29e3:function(n,_,e){(window.__NEXT_P=window.__NEXT_P||[]).push(["/apps/collections/receipt",function(){return e(72544)}])}},function(n){n.O(0,[885,135,657,519,863,326,559,506,866,544,774,888,179],function(){return n(n.s=29e3)}),_N_E=n.O()}]);

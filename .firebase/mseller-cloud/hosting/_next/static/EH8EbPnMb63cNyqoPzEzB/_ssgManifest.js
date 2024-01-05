@@ -1,1 +1,0 @@
-self.__SSG_MANIFEST=new Set(["\u002Fapps\u002Fcollections\u002Freceipt\u002F[id]","\u002Fapps\u002Ftransports\u002Fdocs\u002F[id]"]);self.__SSG_MANIFEST_CB&&self.__SSG_MANIFEST_CB()
