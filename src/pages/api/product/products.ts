@@ -10,8 +10,11 @@ const handler = async (
 ) => {
   try {
     const { procesado, parameter2 } = req.query
-
-    const response = await axios.get('http://localhost:5186/portal/Producto', {
+    axios.defaults.baseURL =
+      process.env.NODE_ENV === 'production'
+        ? 'https://mseller-portal-api.azurewebsites.net'
+        : 'http://localhost:5186'
+    const response = await axios.get('/portal/Producto', {
       params: req.query,
     })
     res.status(200).json(response.data)

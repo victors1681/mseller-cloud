@@ -9,12 +9,13 @@ const handler = async (
   res: NextApiResponse<ResponseData>,
 ) => {
   try {
-    const response = await axios.get(
-      'http://localhost:5186/portal/Cobro/Deposito',
-      {
-        params: req.query,
-      },
-    )
+    axios.defaults.baseURL =
+      process.env.NODE_ENV === 'production'
+        ? 'https://mseller-portal-api.azurewebsites.net'
+        : 'http://localhost:5186'
+    const response = await axios.get('/Cobro/Deposito', {
+      params: req.query,
+    })
     res.status(200).json(response.data)
   } catch (error: any) {
     if (error.code === 'ECONNRESET' || error.code === 'ECONNABORTED') {
