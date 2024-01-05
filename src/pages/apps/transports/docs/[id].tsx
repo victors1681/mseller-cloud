@@ -6,9 +6,6 @@ import {
   InferGetStaticPropsType,
 } from 'next/types'
 
-// ** Third Party Imports
-import axios from 'axios'
-
 // ** Types
 
 // ** Demo Components Imports

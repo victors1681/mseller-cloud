@@ -8,16 +8,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     const { path, ...params } = query
     const fullPath = `${Array.isArray(path) ? path?.join('/') : ''}`
 
-    // axios.defaults.baseURL =
-    //   process.env.NODE_ENV === 'production'
-    //     ? 'https://mseller-portal-api.azurewebsites.net'
-    //     : 'http://localhost:5186'
-
     restClient.defaults.baseURL = 'https://portal-int-api.mseller.app'
-
-    const agent = new https.Agent({
-      rejectUnauthorized: false,
-    })
 
     //URL coming from the user configuration
     //const targetUrl = req.headers['x-url']
@@ -32,7 +23,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
           headers: {
             Authorization: req.headers.authorization,
           },
-          //httpsAgent: agent,
         })
 
         res.status(200).json(response.data)
