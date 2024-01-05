@@ -7,6 +7,7 @@ import axios from 'axios'
 import { CollectionType, ReceiptType } from 'src/types/apps/collectionType'
 import { PaginatedResponse } from 'src/types/apps/response'
 import { getDateParam } from 'src/utils/getDateParam'
+import restClient from 'src/configs/restClient'
 
 interface DataParams {
   query: string
@@ -30,10 +31,10 @@ export const fetchData = createAsyncThunk(
     if (params.status === '') {
       delete params.status
     }
-    const response = await axios.get<
+    const response = await restClient.get<
       any,
       AxiosResponse<PaginatedResponse<CollectionType>>
-    >('/api/collection/collections', {
+    >('/api/portal/Cobro', {
       params: {
         ...params,
         ...getDateParam(params.dates),
@@ -58,7 +59,7 @@ export const fetchData = createAsyncThunk(
 export const deleteInvoice = createAsyncThunk(
   'appCollection/deleteData',
   async (id: number | string, { getState, dispatch }: Redux) => {
-    const response = await axios.delete('/apps/transport/delete', {
+    const response = await restClient.delete('/api/Cobro/Deposito', {
       data: id,
     })
     await dispatch(fetchData(getState().transport.params))
@@ -70,8 +71,8 @@ export const deleteInvoice = createAsyncThunk(
 export const fetchSingleCollectionData = createAsyncThunk(
   'appCollection/docs',
   async (noDeposito: number | string, { getState, dispatch }: Redux) => {
-    const response = await axios.get<any, AxiosResponse<CollectionType>>(
-      '/api/collection/collection',
+    const response = await restClient.get<any, AxiosResponse<CollectionType>>(
+      '/api/portal/Cobro/Deposito',
       {
         params: { noDeposito },
       },

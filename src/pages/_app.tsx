@@ -65,6 +65,7 @@ import 'src/iconify-bundle/icons-bundle-react'
 
 // ** Global css styles
 import '../../styles/globals.css'
+import { configureRestClient } from 'src/configs/restClient'
 
 // ** Extend App Props with Emotion
 type ExtendedAppProps = AppProps & {
@@ -102,6 +103,7 @@ const Guard = ({ children, authGuard, guestGuard }: GuardProps) => {
     return <AuthGuard fallback={<Spinner />}>{children}</AuthGuard>
   }
 }
+configureRestClient('http://localhost:3000')
 
 // ** Configure JSS & ClassName
 const App = (props: ExtendedAppProps) => {

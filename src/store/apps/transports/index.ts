@@ -12,6 +12,7 @@ import {
 } from 'src/types/apps/transportType'
 import { PaginatedResponse } from 'src/types/apps/response'
 import { getDateParam } from 'src/utils/getDateParam'
+import restClient from 'src/configs/restClient'
 
 interface DataParams {
   query: string
@@ -35,10 +36,10 @@ export const fetchData = createAsyncThunk(
     if (params.status === '') {
       delete params.status
     }
-    const response = await axios.get<
+    const response = await restClient.get<
       any,
       AxiosResponse<PaginatedResponse<TransporteListType>>
-    >('/api/transport/transports', {
+    >('/api/portal/Transporte', {
       params: {
         ...params,
         ...getDateParam(params.dates),
@@ -63,7 +64,7 @@ export const fetchData = createAsyncThunk(
 export const deleteInvoice = createAsyncThunk(
   'appTransport/deleteData',
   async (id: number | string, { getState, dispatch }: Redux) => {
-    const response = await axios.delete('/apps/transport/delete', {
+    const response = await restClient.delete('/apps/transport/delete', {
       data: id,
     })
     await dispatch(fetchData(getState().transport.params))
@@ -75,8 +76,8 @@ export const deleteInvoice = createAsyncThunk(
 export const fetchTransportDocsData = createAsyncThunk(
   'appTransport/docs',
   async (noTransporte: number | string, { getState, dispatch }: Redux) => {
-    const response = await axios.get<any, DocumentoEntregaResponseAxios>(
-      '/api/transport/transport-docs',
+    const response = await restClient.get<any, DocumentoEntregaResponseAxios>(
+      '/api/portal/Transporte/DocumentosEntrega',
       {
         params: { noTransporte },
       },

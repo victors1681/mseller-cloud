@@ -6,6 +6,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axios from 'axios'
 import { PaginatedResponse } from 'src/types/apps/response'
 import { ProductType } from 'src/types/apps/productTypes'
+import restClient from 'src/configs/restClient'
 
 interface DataParams {
   query: string
@@ -30,10 +31,10 @@ export const fetchData = createAsyncThunk(
     if (params.status === '') {
       delete params.status
     }
-    const response = await axios.get<
+    const response = await restClient.get<
       any,
       AxiosResponse<PaginatedResponse<ProductType>>
-    >('/api/product/products', {
+    >('/api/portal/Producto', {
       params,
     })
 
@@ -54,7 +55,7 @@ export const fetchData = createAsyncThunk(
 export const deleteProduct = createAsyncThunk(
   'appProduct/deleteData',
   async (id: number | string, { getState, dispatch }: Redux) => {
-    const response = await axios.delete('/apps/product/delete', {
+    const response = await restClient.delete('/apps/product/delete', {
       data: id,
     })
     await dispatch(fetchData(getState().Product.params))

@@ -12,7 +12,7 @@ interface DataParams {
 export const fetchData = createAsyncThunk(
   'appPermissions/fetchData',
   async (params: DataParams) => {
-    const response = await axios.get('/apps/permissions/data', {
+    const response = await restClient.get('/apps/permissions/data', {
       params,
     })
 

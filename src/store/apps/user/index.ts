@@ -21,7 +21,7 @@ interface Redux {
 export const fetchData = createAsyncThunk(
   'appUsers/fetchData',
   async (params: DataParams) => {
-    const response = await axios.get('/apps/users/list', {
+    const response = await restClient.get('/apps/users/list', {
       params,
     })
 
@@ -49,7 +49,7 @@ export const addUser = createAsyncThunk(
 export const deleteUser = createAsyncThunk(
   'appUsers/deleteUser',
   async (id: number | string, { getState, dispatch }: Redux) => {
-    const response = await axios.delete('/apps/users/delete', {
+    const response = await restClient.delete('/apps/users/delete', {
       data: id,
     })
     dispatch(fetchData(getState().user.params))

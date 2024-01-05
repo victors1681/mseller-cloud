@@ -12,7 +12,7 @@ import { SendMsgParamsType } from 'src/types/apps/chatTypes'
 export const fetchUserProfile = createAsyncThunk(
   'appChat/fetchUserProfile',
   async () => {
-    const response = await axios.get('/apps/chat/users/profile-user')
+    const response = await restClient.get('/apps/chat/users/profile-user')
 
     return response.data
   },
@@ -22,7 +22,7 @@ export const fetchUserProfile = createAsyncThunk(
 export const fetchChatsContacts = createAsyncThunk(
   'appChat/fetchChatsContacts',
   async () => {
-    const response = await axios.get('/apps/chat/chats-and-contacts')
+    const response = await restClient.get('/apps/chat/chats-and-contacts')
 
     return response.data
   },
@@ -32,7 +32,7 @@ export const fetchChatsContacts = createAsyncThunk(
 export const selectChat = createAsyncThunk(
   'appChat/selectChat',
   async (id: number | string, { dispatch }: { dispatch: Dispatch<any> }) => {
-    const response = await axios.get('/apps/chat/get-chat', {
+    const response = await restClient.get('/apps/chat/get-chat', {
       params: {
         id,
       },

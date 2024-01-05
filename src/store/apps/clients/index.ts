@@ -6,6 +6,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axios from 'axios'
 import { ClienteType } from 'src/types/apps/clientTypes'
 import { PaginatedResponse } from 'src/types/apps/response'
+import restClient from 'src/configs/restClient'
 
 interface DataParams {
   query: string
@@ -31,10 +32,10 @@ export const fetchData = createAsyncThunk(
     if (params.procesado === '') {
       delete params.procesado
     }
-    const response = await axios.get<
+    const response = await restClient.get<
       any,
       AxiosResponse<PaginatedResponse<ClienteType>>
-    >('/api/client/clients', {
+    >('/api/portal/Cliente', {
       params,
     })
 
@@ -55,7 +56,7 @@ export const fetchData = createAsyncThunk(
 export const deleteClient = createAsyncThunk(
   'appClient/deleteData',
   async (id: number | string, { getState, dispatch }: Redux) => {
-    const response = await axios.delete('/apps/Client/delete', {
+    const response = await restClient.delete('/api/portal/Cliente', {
       data: id,
     })
     await dispatch(fetchData(getState().Client.params))

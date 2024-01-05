@@ -45,7 +45,7 @@ const UserDropdown = (props: Props) => {
 
   // ** Hooks
   const router = useRouter()
-  const { logout } = useAuth()
+  const { logout, user } = useAuth()
 
   // ** Vars
   const { direction } = settings
@@ -94,10 +94,10 @@ const UserDropdown = (props: Props) => {
         }}
       >
         <Avatar
-          alt="John Doe"
+          alt={`${user?.firstName} ${user?.lastName}`}
           onClick={handleDropdownOpen}
           sx={{ width: 40, height: 40 }}
-          src="/images/avatars/1.png"
+          src={user?.photoURL}
         />
       </Badge>
       <Menu
@@ -125,8 +125,8 @@ const UserDropdown = (props: Props) => {
               }}
             >
               <Avatar
-                alt="John Doe"
-                src="/images/avatars/1.png"
+                alt={`${user?.firstName} ${user?.lastName}`}
+                src={user?.photoURL}
                 sx={{ width: '2.5rem', height: '2.5rem' }}
               />
             </Badge>
@@ -138,12 +138,14 @@ const UserDropdown = (props: Props) => {
                 flexDirection: 'column',
               }}
             >
-              <Typography sx={{ fontWeight: 600 }}>John Doe</Typography>
+              <Typography sx={{ fontWeight: 600 }}>
+                {user?.firstName} {user?.lastName}
+              </Typography>
               <Typography
                 variant="body2"
                 sx={{ fontSize: '0.8rem', color: 'text.disabled' }}
               >
-                Admin
+                {user?.type}
               </Typography>
             </Box>
           </Box>

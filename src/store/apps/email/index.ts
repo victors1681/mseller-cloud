@@ -6,6 +6,7 @@ import axios from 'axios'
 
 // ** Types
 import { Dispatch } from 'redux'
+import restClient from 'src/configs/restClient'
 import {
   MailType,
   UpdateMailLabelType,
@@ -23,7 +24,7 @@ interface ReduxType {
 export const fetchMails = createAsyncThunk(
   'appEmail/fetchMails',
   async (params: FetchMailParamsType) => {
-    const response = await axios.get('/apps/email/emails', {
+    const response = await restClient.get('/apps/email/emails', {
       params,
     })
 
@@ -35,7 +36,7 @@ export const fetchMails = createAsyncThunk(
 export const getCurrentMail = createAsyncThunk(
   'appEmail/selectMail',
   async (id: number | string) => {
-    const response = await axios.get('/apps/email/get-email', {
+    const response = await restClient.get('/apps/email/get-email', {
       params: {
         id,
       },
@@ -84,7 +85,9 @@ export const updateMailLabel = createAsyncThunk(
 export const paginateMail = createAsyncThunk(
   'appEmail/paginateMail',
   async (params: PaginateMailParamsType) => {
-    const response = await axios.get('/apps/email/paginate-email', { params })
+    const response = await restClient.get('/apps/email/paginate-email', {
+      params,
+    })
 
     return response.data
   },

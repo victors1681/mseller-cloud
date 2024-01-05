@@ -6,6 +6,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axios from 'axios'
 import { PaginatedResponse } from 'src/types/apps/response'
 import { getDateParam } from 'src/utils/getDateParam'
+import restClient from 'src/configs/restClient'
 
 interface DataParams {
   query: string
@@ -30,10 +31,10 @@ export const fetchData = createAsyncThunk(
       delete params.procesado
     }
 
-    const response = await axios.get<
+    const response = await restClient.get<
       any,
       AxiosResponse<PaginatedResponse<DocumentType>>
-    >('/api/document/orders', {
+    >('/api/portal/Pedido', {
       params: {
         ...params,
         ...getDateParam(params.dates),
@@ -57,7 +58,7 @@ export const fetchData = createAsyncThunk(
 export const deleteInvoice = createAsyncThunk(
   'appDocuments/deleteData',
   async (id: number | string, { getState, dispatch }: Redux) => {
-    const response = await axios.delete('/apps/invoice/delete', {
+    const response = await restClient.delete('/api/portal/Pedido', {
       data: id,
     })
     await dispatch(fetchData(getState().invoice.params))

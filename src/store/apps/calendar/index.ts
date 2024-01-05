@@ -15,7 +15,7 @@ import {
 export const fetchEvents = createAsyncThunk(
   'appCalendar/fetchEvents',
   async (calendars: CalendarFiltersType[]) => {
-    const response = await axios.get('/apps/calendar/events', {
+    const response = await restClient.get('/apps/calendar/events', {
       params: {
         calendars,
       },
@@ -63,7 +63,7 @@ export const updateEvent = createAsyncThunk(
 export const deleteEvent = createAsyncThunk(
   'appCalendar/deleteEvent',
   async (id: number | string, { dispatch }) => {
-    const response = await axios.delete('/apps/calendar/remove-event', {
+    const response = await restClient.delete('/apps/calendar/remove-event', {
       params: { id },
     })
     await dispatch(

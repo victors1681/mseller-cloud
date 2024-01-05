@@ -6,6 +6,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axios from 'axios'
 import { LocalidadType } from 'src/types/apps/locationType'
 import { PaginatedResponse } from 'src/types/apps/response'
+import restClient from 'src/configs/restClient'
 
 interface DataParams {
   query: string
@@ -31,10 +32,10 @@ export const fetchData = createAsyncThunk(
     if (params.procesado === '') {
       delete params.procesado
     }
-    const response = await axios.get<
+    const response = await restClient.get<
       any,
       AxiosResponse<PaginatedResponse<LocalidadType>>
-    >('/api/location/locations', {
+    >('/api/portal/Localidad', {
       params,
     })
 
@@ -55,7 +56,7 @@ export const fetchData = createAsyncThunk(
 export const deleteLocation = createAsyncThunk(
   'appLocation/deleteData',
   async (id: number | string, { getState, dispatch }: Redux) => {
-    const response = await axios.delete('/apps/Location/delete', {
+    const response = await restClient.delete('/apps/Location/delete', {
       data: id,
     })
     await dispatch(fetchData(getState().Location.params))
