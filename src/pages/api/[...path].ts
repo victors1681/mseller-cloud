@@ -29,8 +29,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
         params
         const response = await restClient.get(fullPath, {
           params: params,
-          headers: req.headers,
-          // httpsAgent: agent,
+          headers: {
+            Authorization: req.headers.authorization,
+          },
+          //httpsAgent: agent,
         })
 
         res.status(200).json(response.data)
@@ -53,7 +55,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
         res.status(405).end(`Method ${method} Not Allowed`)
     }
   } catch (error: any) {
-    console.log('error', error)
     if (error.code === 'ECONNRESET' || error.code === 'ECONNABORTED') {
       console.error('Connection was terminated or aborted:', error.message)
     } else {
