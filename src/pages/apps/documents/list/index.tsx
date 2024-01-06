@@ -53,6 +53,7 @@ import formatDate from 'src/utils/formatDate'
 import formatCurrency from 'src/utils/formatCurrency'
 import Autocomplete from '@mui/material/Autocomplete'
 import { debounce } from '@mui/material'
+import { SellerAutocomplete } from 'src/views/ui/sellerAutoComplete'
 
 interface InvoiceStatusObj {
   [key: string]: {
@@ -270,6 +271,7 @@ const InvoiceList = () => {
   const [endDateRange, setEndDateRange] = useState<any>(null)
   const [selectedRows, setSelectedRows] = useState<GridRowId[]>([])
   const [startDateRange, setStartDateRange] = useState<any>(null)
+  const [selectedSellers, setSelectedSellers] = useState<any>(null)
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 20,
@@ -288,6 +290,7 @@ const InvoiceList = () => {
           query: value,
           procesado: statusValue,
           pageNumber: values.page,
+          vendedores: selectedSellers,
         }),
       )
     },
@@ -301,9 +304,10 @@ const InvoiceList = () => {
         query: value,
         procesado: statusValue,
         pageNumber: paginationModel.page,
+        vendedores: selectedSellers,
       }),
     )
-  }, [dispatch, statusValue, dates])
+  }, [dispatch, statusValue, dates, selectedSellers])
 
   const performRequest = useCallback(
     (value: string) => {
@@ -313,6 +317,7 @@ const InvoiceList = () => {
           query: value,
           procesado: statusValue,
           pageNumber: paginationModel.page,
+          vendedores: selectedSellers,
         }),
       )
     },
@@ -501,22 +506,7 @@ const InvoiceList = () => {
                 </Grid>
 
                 <Grid xs={12} sm={4}>
-                  <Autocomplete
-                    multiple
-                    options={[{ title: 'test' }]}
-                    filterSelectedOptions
-                    defaultValue={[{ title: 'test' }]}
-                    id="autocomplete-multiple-outlined"
-                    getOptionLabel={(option: any) => option.title || ''}
-                    sx={{ mt: 3, ml: 3 }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Vendedores"
-                        placeholder="Vendedores"
-                      />
-                    )}
-                  />
+                  <SellerAutocomplete multiple callBack={setSelectedSellers} />
                 </Grid>
                 <Grid item xs={12} sm={4}>
                   <DatePicker

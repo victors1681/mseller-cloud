@@ -27,11 +27,7 @@ export interface AxiosResponse<T> {
 // ** Fetch PaymentTypes
 export const fetchData = createAsyncThunk(
   'appSeller/fetchData',
-  async (params: DataParams) => {
-    console.log('params', params)
-    if (params.procesado === '') {
-      delete params.procesado
-    }
+  async (params?: DataParams) => {
     const response = await restClient.get<
       any,
       AxiosResponse<PaginatedResponse<VendedorType>>

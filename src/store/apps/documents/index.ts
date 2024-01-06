@@ -13,6 +13,7 @@ interface DataParams {
   dates?: Date[]
   procesado?: string
   pageNumber?: number
+  vendedores?: string
 }
 
 interface Redux {
@@ -101,8 +102,8 @@ export const appDocumentsSlice = createSlice({
       state.pageNumber = action.payload.pageNumber
       state.pageSize = action.payload.pageSize
       state.totalPages = action.payload.totalPages
-      state.totalResults = action.payload.totalResults
-      state.isLoading = false
+      ;(state.totalResults = action.payload.totalResults),
+        (state.isLoading = false)
     })
   },
 })

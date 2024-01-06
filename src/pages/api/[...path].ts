@@ -6,7 +6,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     const { path, ...params } = query
     const fullPath = `${Array.isArray(path) ? path?.join('/') : ''}`
 
-    restClient.defaults.baseURL = 'https://portal-int-api.mseller.app'
+    //restClient.defaults.baseURL = 'https://portal-int-api.mseller.app'
+
+    restClient.defaults.baseURL =
+      process.env.NODE_ENV === 'production'
+        ? 'https://portal-int-api.mseller.app'
+        : 'http://localhost:5186'
 
     //URL coming from the user configuration
     //const targetUrl = req.headers['x-url']
