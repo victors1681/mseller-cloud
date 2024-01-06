@@ -18,6 +18,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     //console.log('targetUrl', targetUrl)
 
     //console.log(req.headers.authorization)
+    console.log('fullPathfullPath', fullPath)
     switch (method) {
       case 'GET':
         params

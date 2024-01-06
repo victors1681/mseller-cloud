@@ -1,3 +1,6 @@
+import { ClienteType } from './clientTypes'
+import { LocalidadType } from './locationType'
+
 export type InvoiceStatus = 'Paid' | string
 
 export type InvoiceLayoutProps = {
@@ -13,18 +16,26 @@ export type InvoiceClientType = {
   companyEmail: string
 }
 
-export interface OrderType {
+export enum TipoDocumentoEnum {
+  ORDER = 'order',
+  QUOTE = 'quote',
+}
+
+export interface DocumentType {
+  num_reg: string
   noPedidoStr: string
   noPedido: number
   codigoVendedor: string
-  tipoDocumento: string
+  tipoDocumento: TipoDocumentoEnum
   confirmado: boolean
   tipoPedido: string
+  localidad: LocalidadType
   codigoCliente: string
   nombreCliente: string
   nuevoCliente: boolean
   fecha: string
   nota: string
+  cliente: ClienteType
   emailVendedor: string
   condicionPago: string
   noContacto: string
@@ -64,8 +75,38 @@ export interface OrderType {
   condicion: Condicion
   vendedor: Vendedor
   clienteNuevo: any
-  detalle: any[]
+  detalle: DocumentTypeDetail[]
 }
+
+export interface DocumentTypeDetail {
+  id: string
+  noPedidoStr: string
+  noPedido: number
+  codigoVendedor: string
+  codigoProducto: string
+  cantidad: number
+  descripcion: string
+  precio: number
+  impuesto: number
+  porcientoImpuesto: number
+  descuento: number
+  porcientoDescuento: number
+  factor: number
+  factorOriginal: number
+  isc: number
+  adv: number
+  subTotal: number
+  editar: number
+  productoRef: string
+  idArea: number
+  grupoId: string
+  area: string
+  unidad: string
+  tipoImpuesto: string
+  cantidadOriginal: number
+  promocion: boolean
+}
+
 export interface Condicion {
   id: number
   condicionPago: string

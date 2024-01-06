@@ -45,7 +45,14 @@ restClient.interceptors.response.use(
   },
   (error) => {
     if (error.response.status === 401) {
-      window.location.reload()
+      console.error(
+        'StatusCode:',
+        error.response.status,
+        error.response.statusText,
+      )
+      if (typeof window !== 'undefined') {
+        window?.location.reload()
+      }
     }
     return error
   },

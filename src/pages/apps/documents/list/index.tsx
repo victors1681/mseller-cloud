@@ -35,7 +35,7 @@ import { fetchData, deleteInvoice } from 'src/store/apps/documents'
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
 import { ThemeColor } from 'src/@core/layouts/types'
-import { OrderType } from 'src/types/apps/invoiceTypes'
+import { DocumentType } from 'src/types/apps/documentTypes'
 import { DateType } from 'src/types/forms/reactDatepickerTypes'
 
 // ** Utils Import
@@ -73,7 +73,7 @@ interface CustomInputProps {
 }
 
 interface CellType {
-  row: OrderType
+  row: DocumentType
 }
 
 // ** Styled component for the link in the dataTable
@@ -116,7 +116,7 @@ const orderStatusObj: any = {
 }
 
 // ** renders client column
-const renderClient = (row: OrderType) => {
+const renderClient = (row: DocumentType) => {
   if (row.avatarUrl) {
     return (
       <CustomAvatar
@@ -144,7 +144,7 @@ const defaultColumns: GridColDef[] = [
     headerName: '#',
     renderCell: ({ row }: CellType) => (
       <LinkStyled
-        href={`/apps/invoice/preview/${row.noPedidoStr}`}
+        href={`/apps/documents/preview/${row.noPedidoStr}`}
       >{`${row.noPedidoStr}`}</LinkStyled>
     ),
   },
@@ -418,7 +418,7 @@ const InvoiceList = () => {
             <IconButton
               size="small"
               component={Link}
-              href={`/apps/invoice/preview/${row.noPedidoStr}`}
+              href={`/apps/documents/preview/${row.noPedidoStr}`}
             >
               <Icon icon="mdi:eye-outline" fontSize={20} />
             </IconButton>
@@ -434,7 +434,7 @@ const InvoiceList = () => {
               },
               {
                 text: 'Edit',
-                href: `/apps/invoice/edit/${row.noPedidoStr}`,
+                href: `/apps/documents/edit/${row.noPedidoStr}`,
                 icon: <Icon icon="mdi:pencil-outline" fontSize={20} />,
               },
               {
