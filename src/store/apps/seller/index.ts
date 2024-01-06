@@ -65,7 +65,7 @@ export const appSellerSlice = createSlice({
   name: 'appSeller',
   initialState: {
     data: [] as VendedorType[],
-    params: {},
+    params: {} as any,
     allData: [],
     pageNumber: 0,
     pageSize: 0,
