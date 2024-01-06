@@ -33,7 +33,7 @@ const PreviewActions = ({
           variant="outlined"
           onClick={navigation.goBack}
         >
-          Close
+          Cerrar
         </Button>
         <Button
           fullWidth
