@@ -323,7 +323,7 @@ const TransportList = () => {
       <Grid container spacing={6}>
         <Grid item xs={12}>
           <Card>
-            <CardHeader title="Filters" />
+            <CardHeader title="Cobranza" />
             <CardContent>
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={4}>

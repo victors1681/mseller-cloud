@@ -34,6 +34,7 @@ const defaultProvider: AuthValuesType = {
   setLoading: () => Boolean,
   login: () => Promise.resolve(),
   logout: () => Promise.resolve(),
+  loadingForm: false,
 }
 
 const AuthContext = createContext(defaultProvider)
@@ -46,6 +47,7 @@ const AuthProvider = ({ children }: Props) => {
   // ** States
   const [user, setUser] = useState<UserDataType | null>(defaultProvider.user)
   const [loading, setLoading] = useState<boolean>(defaultProvider.loading)
+  const [loadingForm, setLoadingForm] = useState<boolean>(false)
 
   // ** Hooks
   const router = useRouter()
@@ -79,6 +81,7 @@ const AuthProvider = ({ children }: Props) => {
           ) {
             router.replace('/login')
           }
+          setLoading(false)
         }
       } else {
         setLoading(false)
@@ -93,6 +96,7 @@ const AuthProvider = ({ children }: Props) => {
     params: LoginParams,
     errorCallback?: ErrCallbackType,
   ) => {
+    setLoadingForm(true)
     params.returnSecureToken = true
     axios
       .post(authConfig.loginEndpoint, params)
@@ -124,6 +128,7 @@ const AuthProvider = ({ children }: Props) => {
 
       .catch((err) => {
         if (errorCallback) errorCallback(err)
+        setLoadingForm(false)
       })
   }
 
@@ -141,6 +146,7 @@ const AuthProvider = ({ children }: Props) => {
     setLoading,
     login: handleLogin,
     logout: handleLogout,
+    loadingForm,
   }
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>

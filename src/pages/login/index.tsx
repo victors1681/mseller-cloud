@@ -20,6 +20,8 @@ import { styled, useTheme } from '@mui/material/styles'
 import FormHelperText from '@mui/material/FormHelperText'
 import InputAdornment from '@mui/material/InputAdornment'
 import Typography, { TypographyProps } from '@mui/material/Typography'
+import LoadingButton from '@mui/lab/LoadingButton'
+
 import MuiFormControlLabel, {
   FormControlLabelProps,
 } from '@mui/material/FormControlLabel'
@@ -242,6 +244,7 @@ const LoginPage = () => {
                       onChange={onChange}
                       error={Boolean(errors.email)}
                       placeholder="correo eléctronico"
+                      disabled={auth.loadingForm}
                     />
                   )}
                 />
@@ -255,6 +258,7 @@ const LoginPage = () => {
                 <InputLabel
                   htmlFor="auth-login-v2-password"
                   error={Boolean(errors.password)}
+                  disabled={auth.loadingForm}
                 >
                   Clave
                 </InputLabel>
@@ -320,15 +324,16 @@ const LoginPage = () => {
                   Olvidó su clave?
                 </LinkStyled>
               </Box>
-              <Button
+              <LoadingButton
                 fullWidth
                 size="large"
                 type="submit"
                 variant="contained"
                 sx={{ mb: 7 }}
+                loading={auth.loadingForm}
               >
                 Iniciar Sesión
-              </Button>
+              </LoadingButton>
               <Box
                 sx={{
                   display: 'flex',
