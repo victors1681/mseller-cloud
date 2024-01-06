@@ -27,11 +27,7 @@ export interface AxiosResponse<T> {
 // ** Fetch Locations
 export const fetchData = createAsyncThunk(
   'appLocation/fetchData',
-  async (params: DataParams) => {
-    console.log('params', params)
-    if (params.procesado === '') {
-      delete params.procesado
-    }
+  async (params?: DataParams) => {
     const response = await restClient.get<
       any,
       AxiosResponse<PaginatedResponse<LocalidadType>>
@@ -69,7 +65,7 @@ export const appLocationSlice = createSlice({
   name: 'appLocation',
   initialState: {
     data: [] as LocalidadType[],
-    params: {},
+    params: {} as any,
     allData: [],
     pageNumber: 0,
     pageSize: 0,

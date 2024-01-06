@@ -327,27 +327,6 @@ const InvoiceList = () => {
                 />
               }
             />
-            <CardContent>
-              <Grid container spacing={3}>
-                <Grid item xs={12} sm={6}>
-                  <FormControl fullWidth>
-                    <InputLabel id="invoice-status-select">Activo</InputLabel>
-                    <Select
-                      fullWidth
-                      value={statusValue}
-                      sx={{ mr: 4, mb: 2 }}
-                      label="Activo"
-                      onChange={handleStatusValue}
-                      labelId="invoice-status-select"
-                    >
-                      <MenuItem value="">none</MenuItem>
-                      <MenuItem value="A">Activo</MenuItem>
-                      <MenuItem value="I">Inactivo</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-              </Grid>
-            </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12}>

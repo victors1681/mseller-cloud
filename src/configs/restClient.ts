@@ -39,6 +39,18 @@ export const configureRestClient = (baseURL?: string): void => {
   })
 }
 
+restClient.interceptors.response.use(
+  (response) => {
+    return response
+  },
+  (error) => {
+    if (error.response.status === 401) {
+      window.location.reload()
+    }
+    return error
+  },
+)
+
 export const setBaseURLofRestClient = (baseURL?: string): void => {
   restClient.defaults.baseURL = baseURL
 }

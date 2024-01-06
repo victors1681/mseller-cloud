@@ -52,13 +52,12 @@ import TableHeader from 'src/views/apps/transports/list/TableHeader'
 // ** Styled Components
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import formatDate from 'src/utils/formatDate'
-import formatCurrency from 'src/utils/formatCurrency'
-import Autocomplete from '@mui/material/Autocomplete'
 import {
   transportStatusLabels,
   transportStatusObj,
 } from '../../../../utils/transportMappings'
 import { debounce } from '@mui/material'
+import { DriverAutocomplete } from 'src/views/ui/driverAutoComplete'
 
 interface InvoiceStatusObj {
   [key: string]: {
@@ -225,6 +224,7 @@ const TransportList = () => {
   const [endDateRange, setEndDateRange] = useState<any>(null)
   const [selectedRows, setSelectedRows] = useState<GridRowId[]>([])
   const [startDateRange, setStartDateRange] = useState<any>(null)
+  const [selectedDrivers, setSelectedDrivers] = useState<any>(null)
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 20,
@@ -233,7 +233,7 @@ const TransportList = () => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
   const store = useSelector((state: RootState) => state.transports)
-  console.log('storestorestore', store)
+
   useEffect(() => {
     dispatch(
       fetchData({
@@ -241,9 +241,10 @@ const TransportList = () => {
         query: value,
         status: statusValue,
         pageNumber: paginationModel.page,
+        distribuidores: selectedDrivers,
       }),
     )
-  }, [statusValue])
+  }, [statusValue, selectedDrivers, dates])
 
   const performRequest = useCallback(
     (value: string) => {
@@ -253,10 +254,11 @@ const TransportList = () => {
           query: value,
           status: statusValue,
           pageNumber: paginationModel.page,
+          distribuidores: selectedDrivers,
         }),
       )
     },
-    [dispatch, statusValue, value, dates, paginationModel],
+    [dispatch, statusValue, value, dates, selectedDrivers, paginationModel],
   )
 
   const fn = useCallback(
@@ -287,10 +289,11 @@ const TransportList = () => {
           query: value,
           status: statusValue,
           pageNumber: values.page,
+          distribuidores: selectedDrivers,
         }),
       )
     },
-    [paginationModel, value, statusValue],
+    [paginationModel, value, selectedDrivers, statusValue],
   )
 
   const handleOnChangeRange = (dates: any) => {
@@ -431,22 +434,7 @@ const TransportList = () => {
                 </Grid>
 
                 <Grid xs={12} sm={4}>
-                  <Autocomplete
-                    multiple
-                    options={[{ title: 'test' }]}
-                    filterSelectedOptions
-                    defaultValue={[{ title: 'test' }]}
-                    id="autocomplete-multiple-outlined"
-                    getOptionLabel={(option: any) => option.title || ''}
-                    sx={{ mt: 3, ml: 3 }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Distribuidores"
-                        placeholder="Distribuidores"
-                      />
-                    )}
-                  />
+                  <DriverAutocomplete multiple callBack={setSelectedDrivers} />
                 </Grid>
                 <Grid item xs={12} sm={4}>
                   <DatePicker

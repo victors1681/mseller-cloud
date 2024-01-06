@@ -54,6 +54,8 @@ import formatCurrency from 'src/utils/formatCurrency'
 import Autocomplete from '@mui/material/Autocomplete'
 import { debounce } from '@mui/material'
 import { SellerAutocomplete } from 'src/views/ui/sellerAutoComplete'
+import { LocationAutocomplete } from 'src/views/ui/locationAutoComplete'
+import { PaymentTypeAutocomplete } from 'src/views/ui/paymentTypeAutoComplete'
 
 interface InvoiceStatusObj {
   [key: string]: {
@@ -91,6 +93,7 @@ const invoiceStatusObj: InvoiceStatusObj = {
 }
 
 const orderStatusLabels: any = {
+  '': 'Ninguno',
   '0': 'Pendiente',
   '1': 'Procesado',
   '3': 'Retenido',
@@ -268,10 +271,13 @@ const InvoiceList = () => {
   const [dates, setDates] = useState<Date[]>([])
   const [value, setValue] = useState<string>('')
   const [statusValue, setStatusValue] = useState<string>('')
+  const [documentTypeValue, setDocumentTypeValue] = useState<string>('')
   const [endDateRange, setEndDateRange] = useState<any>(null)
   const [selectedRows, setSelectedRows] = useState<GridRowId[]>([])
   const [startDateRange, setStartDateRange] = useState<any>(null)
   const [selectedSellers, setSelectedSellers] = useState<any>(null)
+  const [selectedLocation, setSelectedLocation] = useState<any>(null)
+  const [selectedPaymentType, setSelectedPaymentType] = useState<any>(null)
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 20,
@@ -291,10 +297,20 @@ const InvoiceList = () => {
           procesado: statusValue,
           pageNumber: values.page,
           vendedores: selectedSellers,
+          localidad: selectedLocation,
+          condicionPago: selectedPaymentType,
+          tipoDocumento: documentTypeValue,
         }),
       )
     },
-    [paginationModel, value, statusValue],
+    [
+      paginationModel,
+      value,
+      statusValue,
+      selectedLocation,
+      selectedPaymentType,
+      documentTypeValue,
+    ],
   )
 
   useEffect(() => {
@@ -305,9 +321,20 @@ const InvoiceList = () => {
         procesado: statusValue,
         pageNumber: paginationModel.page,
         vendedores: selectedSellers,
+        localidad: selectedLocation,
+        condicionPago: selectedPaymentType,
+        tipoDocumento: documentTypeValue,
       }),
     )
-  }, [dispatch, statusValue, dates, selectedSellers])
+  }, [
+    dispatch,
+    statusValue,
+    dates,
+    selectedSellers,
+    selectedLocation,
+    selectedPaymentType,
+    documentTypeValue,
+  ])
 
   const performRequest = useCallback(
     (value: string) => {
@@ -318,10 +345,21 @@ const InvoiceList = () => {
           procesado: statusValue,
           pageNumber: paginationModel.page,
           vendedores: selectedSellers,
+          localidad: selectedLocation,
+          condicionPago: selectedPaymentType,
+          tipoDocumento: documentTypeValue,
         }),
       )
     },
-    [dispatch, statusValue, value, dates, paginationModel],
+    [
+      dispatch,
+      statusValue,
+      value,
+      dates,
+      selectedSellers,
+      paginationModel,
+      selectedLocation,
+    ],
   )
 
   const fn = useCallback(
@@ -343,6 +381,10 @@ const InvoiceList = () => {
 
   const handleStatusValue = (e: SelectChangeEvent) => {
     setStatusValue(e.target.value)
+  }
+
+  const handleDocumentTypeValue = (e: SelectChangeEvent) => {
+    setDocumentTypeValue(e.target.value)
   }
 
   const handleOnChangeRange = (dates: any) => {
@@ -416,7 +458,7 @@ const InvoiceList = () => {
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={4}>
                   <FormControl fullWidth>
-                    <InputLabel id="invoice-status-select">
+                    <InputLabel id="order-status-select">
                       Estado de la orden
                     </InputLabel>
 
@@ -426,81 +468,43 @@ const InvoiceList = () => {
                       sx={{ mr: 4, mb: 2 }}
                       label="Estado de la orden"
                       onChange={handleStatusValue}
-                      labelId="invoice-status-select"
+                      labelId="order-status-select"
                     >
                       <MenuItem value="">none</MenuItem>
-                      {Object.keys(orderStatusLabels).map((k) => {
+                      {Object.keys(orderStatusLabels).map((k, index) => {
                         return (
-                          <MenuItem value={k}>{orderStatusLabels[k]}</MenuItem>
+                          <MenuItem value={k} key={`${k}-${index}`}>
+                            {orderStatusLabels[k]}
+                          </MenuItem>
                         )
                       })}
                     </Select>
                   </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={4}>
-                  <FormControl fullWidth>
-                    <InputLabel id="invoice-status-select">
-                      Condición de Pago
-                    </InputLabel>
-
-                    <Select
-                      fullWidth
-                      value={statusValue}
-                      sx={{ mr: 4, mb: 2 }}
-                      label="Estado de la orden"
-                      onChange={handleStatusValue}
-                      labelId="invoice-status-select"
-                    >
-                      <MenuItem value="">none</MenuItem>
-                      {Object.keys(orderStatusLabels).map((k) => {
-                        return (
-                          <MenuItem value={k}>{orderStatusLabels[k]}</MenuItem>
-                        )
-                      })}
-                    </Select>
-                  </FormControl>
+                  <PaymentTypeAutocomplete callBack={setSelectedPaymentType} />
                 </Grid>
                 <Grid item xs={12} sm={4}>
-                  <FormControl fullWidth>
-                    <InputLabel id="invoice-status-select">
-                      Localidad
-                    </InputLabel>
-
-                    <Select
-                      fullWidth
-                      value={statusValue}
-                      sx={{ mr: 4, mb: 2 }}
-                      label="Estado de la orden"
-                      onChange={handleStatusValue}
-                      labelId="invoice-status-select"
-                    >
-                      <MenuItem value="">none</MenuItem>
-                      {Object.keys(orderStatusLabels).map((k) => {
-                        return (
-                          <MenuItem value={k}>{orderStatusLabels[k]}</MenuItem>
-                        )
-                      })}
-                    </Select>
-                  </FormControl>
+                  <LocationAutocomplete callBack={setSelectedLocation} />
                 </Grid>
 
                 <Grid item xs={12} sm={4}>
                   <FormControl fullWidth>
-                    <InputLabel id="invoice-status-select">
+                    <InputLabel id="documentType-status-select">
                       Tipo Documento
                     </InputLabel>
 
                     <Select
                       fullWidth
-                      value={statusValue}
+                      value={documentTypeValue}
                       sx={{ mr: 4, mb: 2 }}
-                      label="Estado de la orden"
-                      onChange={handleStatusValue}
-                      labelId="invoice-status-select"
+                      label="Tipo Documento"
+                      onChange={handleDocumentTypeValue}
+                      labelId="documentType-status-select"
                     >
                       <MenuItem value="">none</MenuItem>
-                      <MenuItem value="2">Pedido</MenuItem>
-                      <MenuItem value="2">Cotización</MenuItem>
+                      <MenuItem value="order">Pedido</MenuItem>
+                      <MenuItem value="invoice">Cotización</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>

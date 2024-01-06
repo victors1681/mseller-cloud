@@ -14,6 +14,7 @@ interface DataParams {
   dates?: Date[]
   status?: string
   pageNumber?: number
+  distribuidores?: string
 }
 
 export interface AxiosResponse<T> {

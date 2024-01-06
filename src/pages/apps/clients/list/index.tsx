@@ -41,6 +41,7 @@ import TableHeader from 'src/views/apps/clients/list/TableHeader'
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import formatCurrency from 'src/utils/formatCurrency'
 import { ClienteType } from 'src/types/apps/clientTypes'
+import { SellerAutocomplete } from 'src/views/ui/sellerAutoComplete'
 
 interface CustomInputProps {
   dates: Date[]
@@ -197,11 +198,12 @@ const InvoiceList = () => {
   const [value, setValue] = useState<string>('')
   const [statusValue, setStatusValue] = useState<string>('')
   const [selectedRows, setSelectedRows] = useState<GridRowId[]>([])
+  const [selectedSellers, setSelectedSellers] = useState<any>(null)
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 20,
   })
-
+  console.log(selectedSellers)
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
   const store = useSelector((state: RootState) => state.clients)
@@ -214,9 +216,10 @@ const InvoiceList = () => {
         query: value,
         procesado: statusValue,
         pageNumber: paginationModel.page,
+        vendedor: selectedSellers,
       }),
     )
-  }, [])
+  }, [selectedSellers])
 
   const handlePagination = useCallback(
     (values: any) => {
@@ -227,10 +230,11 @@ const InvoiceList = () => {
           query: value,
           procesado: statusValue,
           pageNumber: values.page,
+          vendedor: selectedSellers,
         }),
       )
     },
-    [paginationModel, value, statusValue],
+    [paginationModel, value, statusValue, selectedSellers],
   )
 
   const performRequest = useCallback(
@@ -241,10 +245,11 @@ const InvoiceList = () => {
           query: value,
           procesado: statusValue,
           pageNumber: paginationModel.page,
+          vendedor: selectedSellers,
         }),
       )
     },
-    [dispatch, statusValue, value, dates, paginationModel],
+    [dispatch, statusValue, value, dates, paginationModel, selectedSellers],
   )
 
   const fn = useCallback(
@@ -331,35 +336,7 @@ const InvoiceList = () => {
             <CardContent>
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
-                  <FormControl fullWidth>
-                    <InputLabel id="invoice-status-select">Vendedor</InputLabel>
-                    <Select
-                      fullWidth
-                      value={statusValue}
-                      sx={{ mr: 4, mb: 2 }}
-                      label="Vendedor"
-                      onChange={handleStatusValue}
-                      labelId="invoice-status-select"
-                    >
-                      <MenuItem value="">none</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <FormControl fullWidth>
-                    <InputLabel id="invoice-status-select">Activo</InputLabel>
-                    <Select
-                      fullWidth
-                      value={statusValue}
-                      sx={{ mr: 4, mb: 2 }}
-                      label="Activo"
-                      onChange={handleStatusValue}
-                      labelId="invoice-status-select"
-                    >
-                      <MenuItem value="">none</MenuItem>
-                    </Select>
-                  </FormControl>
+                  <SellerAutocomplete callBack={setSelectedSellers} />
                 </Grid>
               </Grid>
             </CardContent>

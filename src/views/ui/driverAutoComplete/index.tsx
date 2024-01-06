@@ -2,26 +2,26 @@ import { Autocomplete, AutocompleteValue, TextField } from '@mui/material'
 import { SyntheticEvent, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/store'
-import { fetchData as fetchSellers } from 'src/store/apps/seller'
+import { fetchData as fetchDrivers } from 'src/store/apps/driver'
 
-interface SellerAutocompleteProps {
-  multiple?: boolean
-  callBack: (values: AutocompleteValue<SellerOptions, any, any, any>) => void
+interface DriverAutocompleteProps {
+  multiple: boolean
+  callBack: (values: AutocompleteValue<DriverOptions, any, any, any>) => void
 }
 
-interface SellerOptions {
+interface DriverOptions {
   label: string
   codigo: string
 }
-export const SellerAutocomplete = (props: SellerAutocompleteProps) => {
+export const DriverAutocomplete = (props: DriverAutocompleteProps) => {
   const dispatch = useDispatch<AppDispatch>()
-  const sellerStore = useSelector((state: RootState) => state.sellers)
+  const driverStore = useSelector((state: RootState) => state.drivers)
 
   useEffect(() => {
-    if (!sellerStore?.data?.length) {
-      dispatch(fetchSellers())
+    if (!driverStore?.data?.length) {
+      dispatch(fetchDrivers())
     }
-  }, [sellerStore.data])
+  }, [driverStore.data])
 
   const handleSelection = (
     _: SyntheticEvent<Element, Event>,
@@ -35,20 +35,24 @@ export const SellerAutocomplete = (props: SellerAutocompleteProps) => {
   }
   return (
     <Autocomplete
-      multiple={!!props.multiple}
-      options={sellerStore.data.map((v) => ({
+      multiple={props.multiple}
+      options={driverStore.data.map((v) => ({
         label: v.nombre,
         codigo: v.codigo,
       }))}
       filterSelectedOptions
       // defaultValue={[]}
       isOptionEqualToValue={(option, value) => option.codigo === value.codigo}
-      id="sellers-dropdown"
+      id="drivers-dropdown"
       getOptionLabel={(option) => `${option.codigo}-${option.label}` || ''}
       sx={{ mt: 3, ml: 3 }}
       onChange={handleSelection}
       renderInput={(params) => (
-        <TextField {...params} label="Vendedores" placeholder="Vendedores" />
+        <TextField
+          {...params}
+          label="Distribuidores"
+          placeholder="Distribuidores"
+        />
       )}
     />
   )

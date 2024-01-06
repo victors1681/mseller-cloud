@@ -51,6 +51,7 @@ import {
   collectionStatusObj,
 } from '../../../../utils/collectionMappings'
 import { debounce } from '@mui/material'
+import { SellerAutocomplete } from 'src/views/ui/sellerAutoComplete'
 
 interface CustomInputProps {
   dates: Date[]
@@ -213,6 +214,7 @@ const TransportList = () => {
   const [endDateRange, setEndDateRange] = useState<any>(null)
   const [selectedRows, setSelectedRows] = useState<GridRowId[]>([])
   const [startDateRange, setStartDateRange] = useState<any>(null)
+  const [selectedSellers, setSelectedSellers] = useState<any>(null)
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 20,
@@ -229,9 +231,10 @@ const TransportList = () => {
         query: value,
         status: statusValue,
         pageNumber: paginationModel.page,
+        distribuidores: selectedSellers,
       }),
     )
-  }, [statusValue])
+  }, [statusValue, selectedSellers])
 
   const performRequest = useCallback(
     (value: string) => {
@@ -241,10 +244,11 @@ const TransportList = () => {
           query: value,
           status: statusValue,
           pageNumber: paginationModel.page,
+          distribuidores: selectedSellers,
         }),
       )
     },
-    [dispatch, statusValue, value, dates, paginationModel],
+    [dispatch, statusValue, value, dates, selectedSellers, paginationModel],
   )
 
   const fn = useCallback(
@@ -275,10 +279,11 @@ const TransportList = () => {
           query: value,
           status: statusValue,
           pageNumber: values.page,
+          distribuidores: selectedSellers,
         }),
       )
     },
-    [paginationModel, value, statusValue],
+    [paginationModel, value, selectedSellers, statusValue],
   )
 
   const handleOnChangeRange = (dates: any) => {
@@ -419,22 +424,7 @@ const TransportList = () => {
                 </Grid>
 
                 <Grid xs={12} sm={4}>
-                  <Autocomplete
-                    multiple
-                    options={[{ title: 'test' }]}
-                    filterSelectedOptions
-                    defaultValue={[{ title: 'test' }]}
-                    id="autocomplete-multiple-outlined"
-                    getOptionLabel={(option: any) => option.title || ''}
-                    sx={{ mt: 3, ml: 3 }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Distribuidores"
-                        placeholder="Distribuidores"
-                      />
-                    )}
-                  />
+                  <SellerAutocomplete multiple callBack={setSelectedSellers} />
                 </Grid>
                 <Grid item xs={12} sm={4}>
                   <DatePicker

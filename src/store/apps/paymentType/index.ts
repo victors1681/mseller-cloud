@@ -2,8 +2,6 @@
 import { Dispatch } from 'redux'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
-// ** Axios Imports
-import axios from 'axios'
 import { CondicionPagoType } from 'src/types/apps/paymentTypeTypes'
 import { PaginatedResponse } from 'src/types/apps/response'
 import restClient from 'src/configs/restClient'
@@ -27,11 +25,7 @@ export interface AxiosResponse<T> {
 // ** Fetch PaymentTypes
 export const fetchData = createAsyncThunk(
   'appPaymentType/fetchData',
-  async (params: DataParams) => {
-    console.log('params', params)
-    if (params.procesado === '') {
-      delete params.procesado
-    }
+  async (params?: DataParams) => {
     const response = await restClient.get<
       any,
       AxiosResponse<PaginatedResponse<CondicionPagoType>>
@@ -69,7 +63,7 @@ export const appPaymentTypeSlice = createSlice({
   name: 'appPaymentType',
   initialState: {
     data: [] as CondicionPagoType[],
-    params: {},
+    params: {} as any,
     allData: [],
     pageNumber: 0,
     pageSize: 0,

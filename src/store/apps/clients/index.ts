@@ -13,6 +13,7 @@ interface DataParams {
   dates?: Date[]
   procesado?: string
   pageNumber: number
+  vendedor?: string
 }
 
 interface Redux {

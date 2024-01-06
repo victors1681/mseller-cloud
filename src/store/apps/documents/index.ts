@@ -14,6 +14,9 @@ interface DataParams {
   procesado?: string
   pageNumber?: number
   vendedores?: string
+  localidad?: string
+  condicionPago?: string
+  tipoDocumento?: string
 }
 
 interface Redux {

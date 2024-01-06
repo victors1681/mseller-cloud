@@ -27,11 +27,7 @@ export interface AxiosResponse<T> {
 // ** Fetch PaymentTypes
 export const fetchData = createAsyncThunk(
   'appDriver/fetchData',
-  async (params: DataParams) => {
-    console.log('params', params)
-    if (params.procesado === '') {
-      delete params.procesado
-    }
+  async (params?: DataParams) => {
     const response = await restClient.get<
       any,
       AxiosResponse<PaginatedResponse<DistribuidorType>>
@@ -69,7 +65,7 @@ export const appDriverSlice = createSlice({
   name: 'appDriver',
   initialState: {
     data: [] as DistribuidorType[],
-    params: {},
+    params: {} as any,
     allData: [],
     pageNumber: 0,
     pageSize: 0,
