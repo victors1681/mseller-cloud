@@ -21,7 +21,7 @@ export const LocationAutocomplete = (props: LocationAutocompleteProps) => {
     if (!locationStore?.data?.length) {
       dispatch(fetchLocations())
     }
-  }, [locationStore.data])
+  }, [locationStore.data?.length])
 
   const handleSelection = (
     _: SyntheticEvent<Element, Event>,

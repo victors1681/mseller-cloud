@@ -270,7 +270,7 @@ const InvoiceList = () => {
   // ** State
   const [dates, setDates] = useState<Date[]>([])
   const [value, setValue] = useState<string>('')
-  const [statusValue, setStatusValue] = useState<string>('')
+  const [statusValue, setStatusValue] = useState<string>('0')
   const [documentTypeValue, setDocumentTypeValue] = useState<string>('')
   const [endDateRange, setEndDateRange] = useState<any>(null)
   const [selectedRows, setSelectedRows] = useState<GridRowId[]>([])

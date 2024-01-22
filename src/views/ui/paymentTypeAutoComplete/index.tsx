@@ -25,7 +25,7 @@ export const PaymentTypeAutocomplete = (
     if (!locationStore?.data?.length) {
       dispatch(fetchPaymentTypes())
     }
-  }, [locationStore.data])
+  }, [locationStore.data?.length])
 
   const handleSelection = (
     _: SyntheticEvent<Element, Event>,

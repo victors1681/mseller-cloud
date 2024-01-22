@@ -102,6 +102,7 @@ export const apptransportslice = createSlice({
     totalResults: 0,
     total: 0,
     isLoading: true,
+    isFailed: false,
     params: {},
     collectionData: {} as CollectionType,
   },
@@ -109,9 +110,11 @@ export const apptransportslice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchData.pending, (state, action) => {
       state.isLoading = true
+      state.isFailed = false
     })
     builder.addCase(fetchData.rejected, (state, action) => {
       state.isLoading = false
+      state.isFailed = true
       state.collectionsData = []
       state.total = 0
       state.pageNumber = 0
@@ -128,13 +131,16 @@ export const apptransportslice = createSlice({
       state.totalPages = action.payload.totalPages
       state.totalResults = action.payload.totalResults
       state.isLoading = false
+      state.isFailed = false
     })
 
     builder.addCase(fetchSingleCollectionData.pending, (state, action) => {
       state.isLoading = true
+      state.isFailed = false
     })
     builder.addCase(fetchSingleCollectionData.rejected, (state, action) => {
       state.isLoading = false
+      state.isFailed = true
     })
 
     builder.addCase(fetchSingleCollectionData.fulfilled, (state, action) => {

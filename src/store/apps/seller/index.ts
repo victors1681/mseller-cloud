@@ -9,10 +9,9 @@ import { PaginatedResponse } from 'src/types/apps/response'
 import restClient from 'src/configs/restClient'
 
 interface DataParams {
-  query: string
-  dates?: Date[]
-  procesado?: string
-  pageNumber: number
+  query?: string
+  pageSize?: number
+  pageNumber?: number
 }
 
 interface Redux {

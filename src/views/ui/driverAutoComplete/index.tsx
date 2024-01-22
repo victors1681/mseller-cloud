@@ -21,7 +21,7 @@ export const DriverAutocomplete = (props: DriverAutocompleteProps) => {
     if (!driverStore?.data?.length) {
       dispatch(fetchDrivers())
     }
-  }, [driverStore.data])
+  }, [driverStore.data?.length])
 
   const handleSelection = (
     _: SyntheticEvent<Element, Event>,

@@ -27,6 +27,7 @@ import Link from 'next/link'
 import React from 'react'
 import LoadingWrapper from '../../../../../ui/LoadingWrapper'
 import { CollectionType } from 'src/types/apps/collectionType'
+import formatCurrency from 'src/utils/formatCurrency'
 interface DataType {
   icon: string
   stats: string
@@ -36,24 +37,30 @@ interface DataType {
 
 const renderStats = (collection: CollectionType | null) => {
   const data: DataType[] = [
-    // {
-    //   stats: collection?.entregadas?.toString() || '',
-    //   title: 'Entregadas',
-    //   color: 'success',
-    //   icon: 'tabler:truck-delivery',
-    // },
-    // {
-    //   stats: collection?.entregarDespues?.toString() || '',
-    //   title: 'Entregar Después',
-    //   color: 'info',
-    //   icon: 'quill:send-later',
-    // },
-    // {
-    //   stats: collection?.noEntregadas?.toString() || '',
-    //   color: 'warning',
-    //   title: 'No Entregadas',
-    //   icon: 'dashicons:no',
-    // },
+    {
+      stats:
+        collection?.tipoTransaccion?.toLowerCase() === 'p'
+          ? 'Personal'
+          : 'Bancaria',
+      title: 'Tipo deposito',
+      color: 'success',
+      icon:
+        collection?.tipoTransaccion?.toLowerCase() === 'p'
+          ? 'game-icons:receive-money'
+          : 'mdi:bank',
+    },
+    {
+      stats: formatCurrency(collection?.totalCobrado || 0),
+      title: 'Total Cobrado',
+      color: 'info',
+      icon: 'vaadin:calc-book',
+    },
+    {
+      stats: formatCurrency(collection?.totalCobrado || 0),
+      color: 'warning',
+      title: 'Total General',
+      icon: 'ep:list',
+    },
   ]
 
   return data.map((sale: DataType, index: number) => (
@@ -119,9 +126,10 @@ const CardStatisticsReceipt = (props: Props) => {
               <Grid item xs={6} md={6}>
                 <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
                   <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                    <Typography variant="body2">Distribuidor</Typography>
+                    <Typography variant="body2">Vendedor</Typography>
                     <Typography variant="h6">
-                      {props.collection?.notaDeposito}
+                      {props.collection?.vendedor.codigo}-
+                      {props.collection?.vendedor.nombre}
                     </Typography>
                   </Box>
                 </Box>

@@ -7,6 +7,7 @@ import axios from 'axios'
 import { DistribuidorType } from 'src/types/apps/driverType'
 import { PaginatedResponse } from 'src/types/apps/response'
 import restClient from 'src/configs/restClient'
+import toast from 'react-hot-toast'
 
 interface DataParams {
   query: string
@@ -73,19 +74,23 @@ export const appDriverSlice = createSlice({
     totalResults: 0,
     total: 0,
     isLoading: true,
+    isFailed: false,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(fetchData.pending, (state, action) => {
       state.isLoading = true
+      state.isFailed = false
     })
     builder.addCase(fetchData.rejected, (state, action) => {
       state.isLoading = false
+      state.isFailed = true
       state.data = []
       state.total = 0
       state.pageNumber = 0
       state.pageSize = 0
       state.totalPages = 0
+      toast.error('Error al cargar los distribuidores')
     })
     builder.addCase(fetchData.fulfilled, (state, action) => {
       state.data = action.payload.data
@@ -95,8 +100,9 @@ export const appDriverSlice = createSlice({
       state.pageNumber = action.payload.pageNumber
       state.pageSize = action.payload.pageSize
       state.totalPages = action.payload.totalPages
-      ;(state.totalResults = action.payload.totalResults),
-        (state.isLoading = false)
+      state.totalResults = action.payload.totalResults
+      state.isLoading = false
+      state.isFailed = false
     })
   },
 })

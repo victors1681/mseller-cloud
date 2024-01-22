@@ -265,6 +265,7 @@ const TransportDocs = (props: TransportDocsProps) => {
           <CardWidgetsReceiptOverview
             collection={store.collectionData}
             isLoading={store.isLoading}
+            isFailed={store.isFailed}
           />
         </Grid>
         <Grid item xs={12}>

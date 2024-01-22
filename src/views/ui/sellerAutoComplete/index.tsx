@@ -19,9 +19,13 @@ export const SellerAutocomplete = (props: SellerAutocompleteProps) => {
 
   useEffect(() => {
     if (!sellerStore?.data?.length) {
-      dispatch(fetchSellers())
+      dispatch(
+        fetchSellers({
+          pageSize: 50,
+        }),
+      )
     }
-  }, [sellerStore.data])
+  }, [sellerStore.data?.length])
 
   const handleSelection = (
     _: SyntheticEvent<Element, Event>,
