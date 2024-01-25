@@ -108,11 +108,12 @@ const App = (props: ExtendedAppProps) => {
 
   // Variables
   const contentHeightFixed = Component.contentHeightFixed ?? false
-  const getLayout =
-    Component.getLayout ??
-    ((page) => (
-      <UserLayout contentHeightFixed={contentHeightFixed}>{page}</UserLayout>
-    ))
+  const getLayout = /print/.test(props.router.route)
+    ? Component.getLayout ?? ((page) => <>{page}</>)
+    : Component.getLayout ??
+      ((page) => (
+        <UserLayout contentHeightFixed={contentHeightFixed}>{page}</UserLayout>
+      ))
 
   const setConfig = Component.setConfig ?? undefined
 

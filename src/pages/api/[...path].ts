@@ -12,7 +12,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     axios.defaults.baseURL =
       process.env.NODE_ENV === 'production'
         ? 'https://portal-int-api.mseller.app'
-        : 'http://localhost:5186'
+        : 'https://portal-int-api.mseller.app' //'http://localhost:5186'
 
     //URL coming from the user configuration
     //const targetUrl = req.headers['x-url']

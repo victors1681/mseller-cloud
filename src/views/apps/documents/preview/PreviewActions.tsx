@@ -42,7 +42,7 @@ const PreviewActions = ({
           component={Link}
           color="secondary"
           variant="outlined"
-          href={`/apps/invoice/print/${id}`}
+          href={`/apps/documents/print/${id}`}
         >
           Imprimir
         </Button>
@@ -52,7 +52,7 @@ const PreviewActions = ({
           component={Link}
           color="secondary"
           variant="outlined"
-          href={`/apps/invoice/edit/${id}`}
+          href={`#`}
         >
           Editar
         </Button>
