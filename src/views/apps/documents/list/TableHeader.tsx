@@ -4,21 +4,24 @@ import Link from 'next/link'
 // ** MUI Imports
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import Select from '@mui/material/Select'
+import Select, { SelectChangeEvent } from '@mui/material/Select'
 import { GridRowId } from '@mui/x-data-grid'
 import MenuItem from '@mui/material/MenuItem'
 import TextField from '@mui/material/TextField'
+import { ReactNode } from 'react'
+import React from 'react'
 
 interface TableHeaderProps {
   value: string
-  selectedRows: GridRowId[]
+  selectedRows: string[]
   handleFilter: (val: string) => void
+  handleAction: (event: SelectChangeEvent<string>, child: ReactNode) => void
   placeholder: string
 }
 
 const TableHeader = (props: TableHeaderProps) => {
   // ** Props
-  const { value, selectedRows, handleFilter } = props
+  const { value, selectedRows, handleFilter, handleAction } = props
 
   return (
     <Box
@@ -35,17 +38,19 @@ const TableHeader = (props: TableHeaderProps) => {
       <Select
         size="small"
         displayEmpty
-        defaultValue=""
+        defaultValue={value}
+        value={value}
         sx={{ mr: 4, mb: 2 }}
         disabled={selectedRows && selectedRows.length === 0}
-        renderValue={(selected) =>
-          selected.length === 0 ? 'Acciones' : selected
-        }
+        onChange={handleAction}
+        // renderValue={(selected) =>
+        //   selected.length === 0 ? 'Acciones' : selected
+        // }
       >
-        <MenuItem disabled>Acciones</MenuItem>
-        <MenuItem value="1">Aprobar</MenuItem>
+        <MenuItem value="-1">Acciones</MenuItem>
+        <MenuItem value="9">Aprobar</MenuItem>
         <MenuItem value="3">Retener</MenuItem>
-        <MenuItem value="delete">Eliminar</MenuItem>
+        {/* <MenuItem value="delete">Eliminar</MenuItem> */}
       </Select>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
         <TextField

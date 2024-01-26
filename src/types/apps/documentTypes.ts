@@ -21,6 +21,22 @@ export enum TipoDocumentoEnum {
   QUOTE = 'quote',
 }
 
+export interface StatusParam {
+  noPedidoStr: string
+  status: DocumentStatus
+}
+
+export enum DocumentStatus {
+  Pending = 0,
+  Processed = 1,
+  Retained = 3,
+  PendingPrint = 5,
+  CreditCondition = 6,
+  Backorder = 7,
+  IntegrationError = 8,
+  ReadyForIntegration = 9,
+  SentToERP = 10,
+}
 export interface DocumentType {
   num_reg: string
   noPedidoStr: string
@@ -54,7 +70,7 @@ export interface DocumentType {
   noFactura: string
   noOrden: string
   avatarUrl: string
-  procesado: number
+  procesado: DocumentStatus | number
   fechaProcesado: any
   impedimento: boolean
   notaImpedimento: string

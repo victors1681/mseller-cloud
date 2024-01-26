@@ -12,14 +12,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     axios.defaults.baseURL =
       process.env.NODE_ENV === 'production'
         ? 'https://portal-int-api.mseller.app'
-        : 'https://portal-int-api.mseller.app' //'http://localhost:5186'
+        : 'http://localhost:5186' //'https://cerveceriavegana.mseller.app:8190'
 
     //URL coming from the user configuration
     //const targetUrl = req.headers['x-url']
     //console.log('targetUrl', targetUrl)
 
     //console.log(req.headers.authorization)
-    console.log('Call from:', fullPath)
+    console.log('Call from:', fullPath, 'payload', params)
     switch (method) {
       case 'GET':
         const response = await axios.get(fullPath, {
@@ -31,14 +31,24 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
         res.status(200).json(response.data)
         break
       case 'POST':
-        // Handle POST request logic
+        const postResponse = await axios.post(fullPath, req.body, {
+          params: params,
+          headers: {
+            Authorization: req.headers.authorization,
+          },
+        })
         // Access request body using req.body
-        res.status(200).json({ method, path: fullPath, data: req.body })
+        res.status(200).json(postResponse.data)
         break
       case 'PUT':
-        // Handle PUT request logic
+        const putResponse = await axios.put(fullPath, req.body, {
+          params: params,
+          headers: {
+            Authorization: req.headers.authorization,
+          },
+        })
         // Access request body using req.body
-        res.status(200).json({ method, path: fullPath, data: req.body })
+        res.status(200).json(putResponse.data)
         break
       case 'DELETE':
         // Handle DELETE request logic

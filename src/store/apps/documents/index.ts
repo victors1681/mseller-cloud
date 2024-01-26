@@ -7,7 +7,9 @@ import axios from 'axios'
 import { PaginatedResponse } from 'src/types/apps/response'
 import { getDateParam } from 'src/utils/getDateParam'
 import restClient from 'src/configs/restClient'
-
+import { DocumentStatus, StatusParam } from 'src/types/apps/documentTypes'
+import toast from 'react-hot-toast'
+import { DocumentType } from 'src/types/apps/documentTypes'
 interface DataParams {
   query: string
   dates?: Date[]
@@ -71,6 +73,33 @@ export const deleteInvoice = createAsyncThunk(
   },
 )
 
+interface DocumentStatusList {
+  noPedidoStr: string
+  status: DocumentStatus
+}
+interface StatusUpdateResponse {
+  data: DocumentStatusList[]
+}
+export const changeDocumentStatus = createAsyncThunk(
+  'appDocuments/deleteData',
+  async (status: StatusParam[], { getState, dispatch }: Redux) => {
+    try {
+      const response = await restClient.put<
+        StatusParam[],
+        StatusUpdateResponse
+      >('/api/portal/Pedido/ActualizarStatus', status)
+      //update status
+      console.log('statusstatusstatus', response)
+
+      dispatch(appDocumentsSlice.actions.updateDocumentStatus(response.data))
+
+      //return response.data
+    } catch (err) {
+      toast.error('Error al actualizar el documento')
+    }
+  },
+)
+
 export const appDocumentsSlice = createSlice({
   name: 'appDocuments',
   initialState: {
@@ -84,7 +113,20 @@ export const appDocumentsSlice = createSlice({
     total: 0,
     isLoading: true,
   },
-  reducers: {},
+  reducers: {
+    updateDocumentStatus: (state, action) => {
+      const payload = action.payload
+
+      payload.forEach((element: DocumentStatusList) => {
+        const index = state.data.findIndex(
+          (f: DocumentType) => f.noPedidoStr == element.noPedidoStr,
+        )
+        if (index > -1) {
+          state.data[index].procesado = element.status
+        }
+      })
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(fetchData.pending, (state, action) => {
       state.isLoading = true

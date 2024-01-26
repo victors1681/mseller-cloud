@@ -19,7 +19,12 @@ import Typography from '@mui/material/Typography'
 import FormControl from '@mui/material/FormControl'
 import CardContent from '@mui/material/CardContent'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
-import { DataGrid, GridColDef, GridRowId } from '@mui/x-data-grid'
+import {
+  DataGrid,
+  GridColDef,
+  GridRowId,
+  GridRowParams,
+} from '@mui/x-data-grid'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -30,12 +35,20 @@ import DatePicker from 'react-datepicker'
 
 // ** Store & Actions Imports
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchData, deleteInvoice } from 'src/store/apps/documents'
+import {
+  fetchData,
+  deleteInvoice,
+  changeDocumentStatus,
+} from 'src/store/apps/documents'
 
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
 import { ThemeColor } from 'src/@core/layouts/types'
-import { DocumentType } from 'src/types/apps/documentTypes'
+import {
+  DocumentStatus,
+  DocumentType,
+  StatusParam,
+} from 'src/types/apps/documentTypes'
 import { DateType } from 'src/types/forms/reactDatepickerTypes'
 
 // ** Utils Import
@@ -149,9 +162,9 @@ const defaultColumns: GridColDef[] = [
     ),
   },
   {
-    flex: 0.25,
+    flex: 0.2,
     field: 'seller',
-    minWidth: 250,
+    minWidth: 210,
     headerName: 'Vendedor',
     renderCell: ({ row }: CellType) => {
       return (
@@ -270,10 +283,11 @@ const InvoiceList = () => {
   // ** State
   const [dates, setDates] = useState<Date[]>([])
   const [value, setValue] = useState<string>('')
+  const [actionValue, setActionValue] = useState<string>('-1')
   const [statusValue, setStatusValue] = useState<string>('0')
   const [documentTypeValue, setDocumentTypeValue] = useState<string>('')
   const [endDateRange, setEndDateRange] = useState<any>(null)
-  const [selectedRows, setSelectedRows] = useState<GridRowId[]>([])
+  const [selectedRows, setSelectedRows] = useState<string[]>([])
   const [startDateRange, setStartDateRange] = useState<any>(null)
   const [selectedSellers, setSelectedSellers] = useState<any>(null)
   const [selectedLocation, setSelectedLocation] = useState<any>(null)
@@ -396,11 +410,53 @@ const InvoiceList = () => {
     setEndDateRange(end)
   }
 
+  const handleApproval = (noPedidoStr: string, status: DocumentStatus) => {
+    const label =
+      status === DocumentStatus.ReadyForIntegration
+        ? 'Seguro que deseas aprobar este pedido?'
+        : 'Seguro que deseas retener este pedido?'
+
+    const result = window.confirm(label)
+
+    // Check the user's choice
+    if (result) {
+      const payload = {
+        noPedidoStr,
+        status,
+      }
+      dispatch(changeDocumentStatus([payload]))
+    }
+  }
+
+  const handleSelectionAction = async (event: SelectChangeEvent<string>) => {
+    console.log(event.target.value)
+    console.log(selectedRows)
+    setActionValue(event.target.value)
+
+    const label = event.target.value === '9' ? 'aprobar' : 'retener'
+    const template = `Seguro que deseas ${label} ${selectedRows.length} documentos`
+    const result = window.confirm(template)
+
+    if (result) {
+      const payload = []
+      for (let row of selectedRows) {
+        const params: StatusParam = {
+          noPedidoStr: row,
+          status: parseInt(event.target.value) as any,
+        }
+        payload.push(params)
+      }
+      console.log('payloadpayload', payload)
+      await dispatch(changeDocumentStatus(payload))
+    }
+    setActionValue('-1')
+  }
+
   const columns: GridColDef[] = [
     ...defaultColumns,
     {
-      flex: 0.1,
-      minWidth: 130,
+      flex: 0.2,
+      minWidth: 140,
       sortable: false,
       field: 'actions',
       headerName: 'Actions',
@@ -409,12 +465,38 @@ const InvoiceList = () => {
           <Tooltip title="Aprobar">
             <IconButton
               size="small"
-              onClick={() => dispatch(deleteInvoice(row.noPedidoStr))}
+              color="success"
+              disabled={
+                ![DocumentStatus.Pending, DocumentStatus.Retained].includes(
+                  row.procesado,
+                )
+              }
+              onClick={() =>
+                handleApproval(
+                  row.noPedidoStr,
+                  DocumentStatus.ReadyForIntegration,
+                )
+              }
             >
               <Icon icon="material-symbols:order-approve" fontSize={20} />
             </IconButton>
           </Tooltip>
-          <Tooltip title="View">
+          <Tooltip title="Retener">
+            <IconButton
+              size="small"
+              color="warning"
+              disabled={![DocumentStatus.Pending].includes(row.procesado)}
+              onClick={() =>
+                handleApproval(row.noPedidoStr, DocumentStatus.Retained)
+              }
+            >
+              <Icon
+                icon="fluent:document-header-dismiss-24-filled"
+                fontSize={20}
+              />
+            </IconButton>
+          </Tooltip>
+          {/* <Tooltip title="View">
             <IconButton
               size="small"
               component={Link}
@@ -422,7 +504,7 @@ const InvoiceList = () => {
             >
               <Icon icon="mdi:eye-outline" fontSize={20} />
             </IconButton>
-          </Tooltip>
+          </Tooltip> */}
           <OptionsMenu
             iconProps={{ fontSize: 20 }}
             iconButtonProps={{ size: 'small' }}
@@ -541,21 +623,27 @@ const InvoiceList = () => {
         <Grid item xs={12}>
           <Card>
             <TableHeader
-              value={value}
+              value={actionValue}
               selectedRows={selectedRows}
               handleFilter={handleFilter}
+              handleAction={handleSelectionAction}
               placeholder="Cliente, NoPedido"
             />
             <DataGrid
               autoHeight
               pagination
               checkboxSelection
+              isRowSelectable={(params: GridRowParams) =>
+                params.row.procesado === DocumentStatus.Pending
+              }
               rows={store.data}
               columns={columns}
               disableRowSelectionOnClick
               paginationModel={paginationModel}
               onPaginationModelChange={handlePagination}
-              onRowSelectionModelChange={(rows) => setSelectedRows(rows)}
+              onRowSelectionModelChange={(rows) =>
+                setSelectedRows(rows as string[])
+              }
               getRowId={(row) => row.noPedidoStr}
               paginationMode="server"
               loading={store.isLoading}
