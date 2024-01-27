@@ -12,7 +12,8 @@ import { ReactNode } from 'react'
 import React from 'react'
 
 interface TableHeaderProps {
-  value: string
+  searchValue: string
+  actionValue: string
   selectedRows: string[]
   handleFilter: (val: string) => void
   handleAction: (event: SelectChangeEvent<string>, child: ReactNode) => void
@@ -21,7 +22,8 @@ interface TableHeaderProps {
 
 const TableHeader = (props: TableHeaderProps) => {
   // ** Props
-  const { value, selectedRows, handleFilter, handleAction } = props
+  const { searchValue, actionValue, selectedRows, handleFilter, handleAction } =
+    props
 
   return (
     <Box
@@ -38,14 +40,11 @@ const TableHeader = (props: TableHeaderProps) => {
       <Select
         size="small"
         displayEmpty
-        defaultValue={value}
-        value={value}
+        defaultValue={actionValue}
+        value={actionValue}
         sx={{ mr: 4, mb: 2 }}
         disabled={selectedRows && selectedRows.length === 0}
         onChange={handleAction}
-        // renderValue={(selected) =>
-        //   selected.length === 0 ? 'Acciones' : selected
-        // }
       >
         <MenuItem value="-1">Acciones</MenuItem>
         <MenuItem value="9">Aprobar</MenuItem>
@@ -55,7 +54,7 @@ const TableHeader = (props: TableHeaderProps) => {
       <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
         <TextField
           size="small"
-          value={value}
+          value={searchValue}
           sx={{ mr: 4, mb: 2 }}
           placeholder={props.placeholder}
           onChange={(e) => handleFilter(e.target.value)}

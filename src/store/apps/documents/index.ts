@@ -88,8 +88,6 @@ export const changeDocumentStatus = createAsyncThunk(
         StatusParam[],
         StatusUpdateResponse
       >('/api/portal/Pedido/ActualizarStatus', status)
-      //update status
-      console.log('statusstatusstatus', response)
 
       dispatch(appDocumentsSlice.actions.updateDocumentStatus(response.data))
 

@@ -429,8 +429,6 @@ const InvoiceList = () => {
   }
 
   const handleSelectionAction = async (event: SelectChangeEvent<string>) => {
-    console.log(event.target.value)
-    console.log(selectedRows)
     setActionValue(event.target.value)
 
     const label = event.target.value === '9' ? 'aprobar' : 'retener'
@@ -446,7 +444,6 @@ const InvoiceList = () => {
         }
         payload.push(params)
       }
-      console.log('payloadpayload', payload)
       await dispatch(changeDocumentStatus(payload))
     }
     setActionValue('-1')
@@ -623,7 +620,8 @@ const InvoiceList = () => {
         <Grid item xs={12}>
           <Card>
             <TableHeader
-              value={actionValue}
+              actionValue={actionValue}
+              searchValue={value}
               selectedRows={selectedRows}
               handleFilter={handleFilter}
               handleAction={handleSelectionAction}
