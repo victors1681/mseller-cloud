@@ -20,7 +20,15 @@ export const getExceptions = (config: AxiosRequestConfig, baseURL?: string) => {
 
 export const axiosSetClientUrl = (config?: Config) => {
   if (config?.serverUrl) {
-    restClient.defaults.headers['X-URL'] = config.serverUrl
+    if (config.testMode) {
+      restClient.defaults.headers[
+        'X-URL'
+      ] = `${config.sandboxUrl}:${config.sandboxPort}`
+    } else {
+      restClient.defaults.headers[
+        'X-URL'
+      ] = `${config.serverUrl}:${config.serverPort}`
+    }
   }
 }
 export const configureRestClient = (baseURL?: string): void => {

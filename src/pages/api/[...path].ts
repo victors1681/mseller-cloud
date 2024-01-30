@@ -9,14 +9,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
 
     //restClient.defaults.baseURL = 'https://portal-int-api.mseller.app'
 
+    const targetUrl = req.headers['x-url']
+    console.log('targetUrl', targetUrl)
+
     axios.defaults.baseURL =
       process.env.NODE_ENV === 'production'
-        ? 'https://portal-int-api.mseller.app'
+        ? (targetUrl as string) // 'https://portal-int-api.mseller.app'
         : 'http://localhost:5186' //'https://cerveceriavegana.mseller.app:8190'
 
     //URL coming from the user configuration
-    //const targetUrl = req.headers['x-url']
-    //console.log('targetUrl', targetUrl)
 
     //console.log(req.headers.authorization)
     console.log('Call from:', fullPath, 'payload', params)
