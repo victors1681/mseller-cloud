@@ -13,7 +13,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     console.log('targetUrl', targetUrl)
 
     axios.defaults.baseURL =
-      process.env.NODE_ENV === 'production'
+      process.env.NODE_ENV === 'development'
         ? (targetUrl as string) // 'https://portal-int-api.mseller.app'
         : 'http://localhost:5186' //'https://cerveceriavegana.mseller.app:8190'
 

@@ -109,6 +109,10 @@ export interface Config {
   trackingLocation: boolean
   v4: boolean
   orderEmailTemplateID: number
+  portalSandboxPort: string
+  portalSandboxUrl: string
+  portalServerPort: string
+  portalServerUrl: string
 }
 
 export interface Metadaum {

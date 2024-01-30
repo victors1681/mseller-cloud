@@ -23,11 +23,11 @@ export const axiosSetClientUrl = (config?: Config) => {
     if (config.testMode) {
       restClient.defaults.headers[
         'X-URL'
-      ] = `${config.sandboxUrl}:${config.sandboxPort}`
+      ] = `${config.portalSandboxUrl}:${config.portalSandboxPort}`
     } else {
       restClient.defaults.headers[
         'X-URL'
-      ] = `${config.serverUrl}:${config.serverPort}`
+      ] = `${config.portalServerUrl}:${config.portalServerPort}`
     }
   }
 }
