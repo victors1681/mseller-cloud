@@ -158,3 +158,24 @@ export interface Producto {
   tipoImpuesto: string
   apartado: number
 }
+
+interface EntregaProducto {
+  descripcion: string
+  unidad: string
+}
+
+interface DetalleEntrega {
+  codigoProducto: string
+  devolver: number
+  recibidas: number
+  vendidas: number
+  productoDetalle: EntregaProducto
+}
+
+export interface ReporteEntrega {
+  fecha: string
+  noTransporte: string
+  distribuidorNombre: string
+  distribuidorCodigo: string
+  detalle: DetalleEntrega[]
+}

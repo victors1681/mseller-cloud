@@ -74,6 +74,34 @@ export const deleteInvoice = createAsyncThunk(
   },
 )
 
+export const closeTransport = createAsyncThunk(
+  'appTransport/closeTransport',
+  async (NoTransporte: number | string, { getState, dispatch }: Redux) => {
+    const response = await restClient.put(
+      'api/portal/Transporte/ForzarCierre',
+      {
+        NoTransporte, //add usuario
+      },
+    )
+    await dispatch(fetchData(getState().transport.params))
+
+    return response.data
+  },
+)
+
+export const deliveryReport = async (noTransporte: string) => {
+  const response = await restClient.get(
+    '/api/portal/Transporte/ReporteEntrega',
+    {
+      params: {
+        noTransporte,
+      },
+    },
+  )
+  console.log(response.data)
+  return response.data
+}
+
 export const fetchTransportDocsData = createAsyncThunk(
   'appTransport/docs',
   async (noTransporte: number | string, { getState, dispatch }: Redux) => {

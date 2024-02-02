@@ -322,7 +322,30 @@ const TransportList = () => {
             >
               <Icon icon="mdi:eye-outline" fontSize={20} />
             </IconButton>
-          </Tooltip>
+          </Tooltip>{' '}
+          <OptionsMenu
+            iconProps={{ fontSize: 20 }}
+            iconButtonProps={{ size: 'small' }}
+            menuProps={{ sx: { '& .MuiMenuItem-root svg': { mr: 2 } } }}
+            options={[
+              {
+                text: 'Cerrar Transporte',
+                icon: <Icon icon="ri:file-close-fill" fontSize={20} />,
+                menuItemProps: {
+                  onClick: () => alert('hello'),
+                },
+              },
+              {
+                text: 'Duplicate',
+                icon: <Icon icon="mdi:content-copy" fontSize={20} />,
+              },
+              {
+                text: 'Imprimir Reporte Entrega',
+                icon: <Icon icon="ri:file-close-fill" fontSize={20} />,
+                href: `/apps/transports/print/${row.noTransporte}/`,
+              },
+            ]}
+          />
         </Box>
       ),
     },
