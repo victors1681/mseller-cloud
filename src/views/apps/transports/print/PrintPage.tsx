@@ -47,6 +47,9 @@ const InvoicePreview = ({ id }: DocumentPreviewProps) => {
     try {
       let responseInfo = await deliveryReport(id)
       setData(responseInfo)
+      setTimeout(() => {
+        window.print()
+      }, 500)
     } catch (err) {
       console.error(err)
     }
@@ -56,28 +59,10 @@ const InvoicePreview = ({ id }: DocumentPreviewProps) => {
     initRequest()
   }, [id])
 
-  useEffect(() => {
-    setTimeout(() => {
-      window.print()
-    }, 500)
-  }, [])
-
-  const toggleSendInvoiceDrawer = () => setSendInvoiceOpen(!sendInvoiceOpen)
-  const toggleAddPaymentDrawer = () => setAddPaymentOpen(!addPaymentOpen)
-
   if (data) {
     return (
       <>
         <PreviewCard data={data} />
-
-        {/* <SendInvoiceDrawer
-          open={sendInvoiceOpen}
-          toggle={toggleSendInvoiceDrawer}
-        /> */}
-        {/* <AddPaymentDrawer
-          open={addPaymentOpen}
-          toggle={toggleAddPaymentDrawer}
-        /> */}
       </>
     )
   } else if (error) {
@@ -85,8 +70,8 @@ const InvoicePreview = ({ id }: DocumentPreviewProps) => {
       <Grid container spacing={6}>
         <Grid item xs={12}>
           <Alert severity="error">
-            Pedido: {id} no existe. Por favor diríjase al listado de pedidos:{' '}
-            <Link href="/apps/documents/list">Pedidos</Link>
+            Transporte: {id} no existe. Por favor diríjase al listado de
+            transportes: <Link href="/apps/transports/list">Transportes</Link>
           </Alert>
         </Grid>
       </Grid>
