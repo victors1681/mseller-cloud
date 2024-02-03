@@ -332,17 +332,8 @@ const TransportList = () => {
                 text: 'Cerrar Transporte',
                 icon: <Icon icon="ri:file-close-fill" fontSize={20} />,
                 menuItemProps: {
-                  onClick: () => alert('hello'),
+                  onClick: () => alert('Aún pendiente por implementar. '),
                 },
-              },
-              {
-                text: 'Duplicate',
-                icon: <Icon icon="mdi:content-copy" fontSize={20} />,
-              },
-              {
-                text: 'Imprimir Reporte Entrega',
-                icon: <Icon icon="ri:file-close-fill" fontSize={20} />,
-                href: `/apps/transports/print/${row.noTransporte}/`,
               },
             ]}
           />

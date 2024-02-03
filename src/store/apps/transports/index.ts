@@ -98,7 +98,18 @@ export const deliveryReport = async (noTransporte: string) => {
       },
     },
   )
-  console.log(response.data)
+  return response.data
+}
+
+export const deliveryReportAmount = async (noTransporte: string) => {
+  const response = await restClient.get(
+    '/api/portal/Transporte/ReporteEntregaMontos',
+    {
+      params: {
+        noTransporte,
+      },
+    },
+  )
   return response.data
 }
 

@@ -24,12 +24,12 @@ import { useAuth } from 'src/hooks/useAuth'
 import formatCurrency from 'src/utils/formatCurrency'
 import {
   DocumentoEntregaResponse,
-  ReporteEntrega,
+  ReporteEntregaMonto,
 } from 'src/types/apps/transportType'
 import { TableFooter } from '@mui/material'
 
 interface Props {
-  data: ReporteEntrega | null
+  data: ReporteEntregaMonto | null
 }
 
 const MUITableCell = styled(TableCell)<TableCellBaseProps>(({ theme }) => ({
@@ -38,6 +38,15 @@ const MUITableCell = styled(TableCell)<TableCellBaseProps>(({ theme }) => ({
   paddingRight: '0 !important',
   paddingTop: `${theme.spacing(1)} !important`,
   paddingBottom: `${theme.spacing(1)} !important`,
+}))
+
+const CalcWrapper = styled(Box)<BoxProps>(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  '&:not(:last-of-type)': {
+    marginBottom: theme.spacing(2),
+  },
 }))
 
 const CustomTableCell = styled(TableCell)<BoxProps>(({ theme }) => ({
@@ -83,7 +92,22 @@ const PreviewCard = ({ data }: Props) => {
                   </MUITableCell>
                   <MUITableCell>
                     <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      {data.distribuidorCodigo}-{data.distribuidorNombre}
+                      {data.distribuidor.codigo}-{data.distribuidor.nombre}
+                    </Typography>
+                  </MUITableCell>
+                </TableRow>
+
+                <TableRow>
+                  <MUITableCell>
+                    <Typography variant="body2">Vendedores:</Typography>
+                  </MUITableCell>
+                  <MUITableCell>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      {data.vendedores.map((c) => (
+                        <Typography variant="caption" sx={{ mr: 0.9 }}>
+                          {c.codigo.trim()}-{c.nombre.trimEnd()} |
+                        </Typography>
+                      ))}
                     </Typography>
                   </MUITableCell>
                 </TableRow>
@@ -123,6 +147,18 @@ const PreviewCard = ({ data }: Props) => {
           </Grid>
         </CardContent>
 
+        <div>
+          <Typography variant="body1" sx={{ mr: 2, fontWeight: 600 }}>
+            Clientes
+          </Typography>
+          <Box sx={{ mb: 2 }}>
+            {data.clientes.map((c) => (
+              <Typography variant="caption" sx={{ mr: 0.9 }}>
+                {c.codigo.trim()}-{c.nombre.trimEnd()} |
+              </Typography>
+            ))}
+          </Box>
+        </div>
         <Divider />
 
         <Divider />
@@ -133,10 +169,14 @@ const PreviewCard = ({ data }: Props) => {
               <TableRow>
                 <CustomHeaderTableCell>Código</CustomHeaderTableCell>
                 <CustomHeaderTableCell>Descripción</CustomHeaderTableCell>
+                <CustomHeaderTableCell>Cant.</CustomHeaderTableCell>
                 <CustomHeaderTableCell>Un</CustomHeaderTableCell>
-                <CustomHeaderTableCell>Recibida</CustomHeaderTableCell>
-                <CustomHeaderTableCell>Vendidas</CustomHeaderTableCell>
-                <CustomHeaderTableCell>Devolver</CustomHeaderTableCell>
+                <CustomHeaderTableCell>Precio</CustomHeaderTableCell>
+                <CustomHeaderTableCell>Bruto</CustomHeaderTableCell>
+                <CustomHeaderTableCell>% Desc.</CustomHeaderTableCell>
+                <CustomHeaderTableCell>Desc.</CustomHeaderTableCell>
+                <CustomHeaderTableCell>Imp.</CustomHeaderTableCell>
+                <CustomHeaderTableCell>Neto</CustomHeaderTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -146,29 +186,73 @@ const PreviewCard = ({ data }: Props) => {
                   <CustomTableCell>
                     {detalle.productoDetalle.descripcion}
                   </CustomTableCell>
+                  <CustomTableCell>{detalle.cantidad}</CustomTableCell>
                   <CustomTableCell>
                     {detalle.productoDetalle.unidad}
                   </CustomTableCell>
-                  <CustomTableCell>{detalle.recibidas}</CustomTableCell>
-                  <CustomTableCell>{detalle.vendidas}</CustomTableCell>
-                  <CustomTableCell>{detalle.devolver}</CustomTableCell>
+                  <CustomTableCell>
+                    {formatCurrency(detalle.precio)}
+                  </CustomTableCell>
+                  <CustomTableCell>
+                    {formatCurrency(detalle.bruto)}
+                  </CustomTableCell>
+                  <CustomTableCell>
+                    {detalle.porcientoDescuento}%
+                  </CustomTableCell>
+                  <CustomTableCell>
+                    {formatCurrency(detalle.descuento)}
+                  </CustomTableCell>
+                  <CustomTableCell>
+                    {formatCurrency(detalle.impuesto)}
+                  </CustomTableCell>
+                  <CustomTableCell>
+                    {formatCurrency(detalle.subTotal)}
+                  </CustomTableCell>
                 </TableRow>
               ))}
             </TableBody>
             <TableFooter>
               <CustomHeaderTableCell></CustomHeaderTableCell>
               <CustomHeaderTableCell></CustomHeaderTableCell>
+              <CustomHeaderTableCell></CustomHeaderTableCell>
+              <CustomHeaderTableCell></CustomHeaderTableCell>
+              <CustomHeaderTableCell></CustomHeaderTableCell>
+              <CustomHeaderTableCell></CustomHeaderTableCell>
+              <CustomHeaderTableCell></CustomHeaderTableCell>
+              <CustomHeaderTableCell></CustomHeaderTableCell>
               <CustomHeaderTableCell>Total:</CustomHeaderTableCell>
               <CustomHeaderTableCell>
-                {data.detalle.reduce((acc, c) => acc + c.recibidas, 0)}
-              </CustomHeaderTableCell>
-              <CustomHeaderTableCell>
-                {data.detalle.reduce((acc, c) => acc + c.vendidas, 0)}
-              </CustomHeaderTableCell>
-              <CustomHeaderTableCell>
-                {data.detalle.reduce((acc, c) => acc + c.devolver, 0)}
+                {formatCurrency(data.neto)}
               </CustomHeaderTableCell>
             </TableFooter>
+          </Table>
+        </TableContainer>
+        <br />
+        <br />
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <CustomHeaderTableCell>Efectivo</CustomHeaderTableCell>
+                <CustomHeaderTableCell>Cheques</CustomHeaderTableCell>
+                <CustomHeaderTableCell>Transferencia</CustomHeaderTableCell>
+                <CustomHeaderTableCell>Crédito</CustomHeaderTableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <TableRow>
+                <CustomTableCell>
+                  {formatCurrency(data.efectivo)}
+                </CustomTableCell>
+                <CustomTableCell>{formatCurrency(data.cheque)}</CustomTableCell>
+                <CustomTableCell>
+                  {formatCurrency(data.transferencia)}
+                </CustomTableCell>
+                <CustomTableCell>
+                  {formatCurrency(data.credito)}
+                </CustomTableCell>
+              </TableRow>
+            </TableBody>
           </Table>
         </TableContainer>
       </Card>

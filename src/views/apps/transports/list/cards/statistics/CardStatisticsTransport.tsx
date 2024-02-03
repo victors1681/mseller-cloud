@@ -26,6 +26,7 @@ import CustomChip from 'src/@core/components/mui/chip'
 import Link from 'next/link'
 import React from 'react'
 import LoadingWrapper from '../../../../../ui/LoadingWrapper'
+import OptionsMenu from 'src/@core/components/option-menu'
 interface DataType {
   icon: string
   stats: string
@@ -102,6 +103,50 @@ const CardStatisticsTransport = (props: Props) => {
                 letterSpacing: '0.15px !important',
               },
             }}
+            action={
+              <OptionsMenu
+                options={[
+                  {
+                    icon: (
+                      <Icon
+                        name="material-symbols:print"
+                        icon="tabler:report-money"
+                      ></Icon>
+                    ),
+                    text: 'Resumen de entrega',
+                    menuItemProps: {
+                      onClick: () => {
+                        window.open(
+                          `/apps/transports/printDeliveryReportAmount/${props.docsData?.noTransporte}/`,
+                          '_blank',
+                        )
+                      },
+                    },
+                  },
+                  {
+                    icon: (
+                      <Icon
+                        name="material-symbols:print"
+                        icon="material-symbols:print"
+                      ></Icon>
+                    ),
+                    text: 'Entrega productos',
+                    menuItemProps: {
+                      onClick: () => {
+                        window.open(
+                          `/apps/transports/print/${props.docsData?.noTransporte}/`,
+                          '_blank',
+                        )
+                      },
+                    },
+                  },
+                ]}
+                iconButtonProps={{
+                  size: 'small',
+                  sx: { color: 'text.secondary' },
+                }}
+              />
+            }
           />
           <CardContent>
             <Grid container>

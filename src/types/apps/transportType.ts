@@ -169,6 +169,7 @@ interface DetalleEntrega {
   devolver: number
   recibidas: number
   vendidas: number
+  promocion: number
   productoDetalle: EntregaProducto
 }
 
@@ -178,4 +179,42 @@ export interface ReporteEntrega {
   distribuidorNombre: string
   distribuidorCodigo: string
   detalle: DetalleEntrega[]
+}
+
+interface ClienteReport {
+  codigo: string
+  nombre: string
+}
+
+interface ProductoDetalle {
+  descripcion: string
+  unidad: string
+}
+
+interface Detalle {
+  codigoProducto: string
+  cantidad: number
+  precio: number
+  bruto: number
+  porcientoDescuento: number
+  descuento: number
+  impuesto: number
+  subTotal: number
+  promocion: number
+  productoDetalle: ProductoDetalle
+}
+
+export interface ReporteEntregaMonto {
+  fecha: string
+  noTransporte: string
+  distribuidor: DistribuidorType
+  totalDocumentos: number
+  vendedores: VendedorType[]
+  clientes: ClienteReport[]
+  efectivo: number
+  cheque: number
+  transferencia: number
+  credito: number
+  neto: number
+  detalle: Detalle[]
 }
