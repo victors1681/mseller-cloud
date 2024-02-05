@@ -353,14 +353,14 @@ const TransportList = () => {
                 <Grid item xs={12} sm={4}>
                   <FormControl fullWidth>
                     <InputLabel id="invoice-status-select">
-                      Estado de la orden
+                      Estado del Transporte
                     </InputLabel>
 
                     <Select
                       fullWidth
                       value={statusValue}
                       sx={{ mr: 4, mb: 2 }}
-                      label="Estado de la orden"
+                      label="Estado del Transporte"
                       onChange={handleStatusValue}
                       labelId="invoice-status-select"
                     >
@@ -372,77 +372,6 @@ const TransportList = () => {
                           </MenuItem>
                         )
                       })}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <FormControl fullWidth>
-                    <InputLabel id="invoice-status-select">
-                      Condición de Pago
-                    </InputLabel>
-
-                    <Select
-                      fullWidth
-                      value={statusValue}
-                      sx={{ mr: 4, mb: 2 }}
-                      label="Estado de la orden"
-                      onChange={handleStatusValue}
-                      labelId="invoice-status-select"
-                    >
-                      <MenuItem value="">none</MenuItem>
-                      {Object.keys(transportStatusLabels).map((k: any) => {
-                        return (
-                          <MenuItem value={k}>
-                            {transportStatusLabels[k]}
-                          </MenuItem>
-                        )
-                      })}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <FormControl fullWidth>
-                    <InputLabel id="invoice-status-select">
-                      Localidad
-                    </InputLabel>
-
-                    <Select
-                      fullWidth
-                      value={statusValue}
-                      sx={{ mr: 4, mb: 2 }}
-                      label="Estado de la orden"
-                      onChange={handleStatusValue}
-                      labelId="invoice-status-select"
-                    >
-                      <MenuItem value="">none</MenuItem>
-                      {Object.keys(transportStatusLabels).map((k: any) => {
-                        return (
-                          <MenuItem value={k}>
-                            {transportStatusLabels[k]}
-                          </MenuItem>
-                        )
-                      })}
-                    </Select>
-                  </FormControl>
-                </Grid>
-
-                <Grid item xs={12} sm={4}>
-                  <FormControl fullWidth>
-                    <InputLabel id="invoice-status-select">
-                      Tipo Documento
-                    </InputLabel>
-
-                    <Select
-                      fullWidth
-                      value={statusValue}
-                      sx={{ mr: 4, mb: 2 }}
-                      label="Estado de la orden"
-                      onChange={handleStatusValue}
-                      labelId="invoice-status-select"
-                    >
-                      <MenuItem value="">none</MenuItem>
-                      <MenuItem value="2">Pedido</MenuItem>
-                      <MenuItem value="2">Cotización</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>

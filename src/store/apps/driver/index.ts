@@ -10,10 +10,11 @@ import restClient from 'src/configs/restClient'
 import toast from 'react-hot-toast'
 
 interface DataParams {
-  query: string
+  query?: string
   dates?: Date[]
   procesado?: string
-  pageNumber: number
+  pageNumber?: number
+  pageSize?: number
 }
 
 interface Redux {

@@ -21,7 +21,7 @@ export const SellerAutocomplete = (props: SellerAutocompleteProps) => {
     if (!sellerStore?.data?.length) {
       dispatch(
         fetchSellers({
-          pageSize: 50,
+          pageSize: 100,
         }),
       )
     }

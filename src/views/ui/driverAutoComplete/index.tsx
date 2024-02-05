@@ -19,7 +19,7 @@ export const DriverAutocomplete = (props: DriverAutocompleteProps) => {
 
   useEffect(() => {
     if (!driverStore?.data?.length) {
-      dispatch(fetchDrivers())
+      dispatch(fetchDrivers({ pageSize: 100 }))
     }
   }, [driverStore.data?.length])
 
