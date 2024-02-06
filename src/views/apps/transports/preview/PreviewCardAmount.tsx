@@ -222,7 +222,11 @@ const PreviewCard = ({ data }: Props) => {
               <CustomHeaderTableCell></CustomHeaderTableCell>
               <CustomHeaderTableCell>Total:</CustomHeaderTableCell>
               <CustomHeaderTableCell>
-                {formatCurrency(data.neto)}
+                <a
+                  href={`/apps/transports/printDeliveryReportAmount/${data.noTransporte}`}
+                >
+                  {formatCurrency(data.neto)}
+                </a>
               </CustomHeaderTableCell>
             </TableFooter>
           </Table>

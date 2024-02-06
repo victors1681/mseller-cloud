@@ -43,7 +43,7 @@ const InvoicePreview = ({ id }: DocumentPreviewProps) => {
   const [sendInvoiceOpen, setSendInvoiceOpen] = useState<boolean>(false)
 
   const router = useRouter()
-  const paymentType = router.query.paymentType as string
+  const paymentType = router?.query?.paymentType as string
 
   const initRequest = async () => {
     try {

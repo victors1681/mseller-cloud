@@ -106,8 +106,9 @@ export const deliveryReportAmount = async (
   noTransporte: string,
   paymentType?: string,
 ) => {
+  const paymentFilter = paymentType ? `?tipoPago=${paymentType}` : ``
   const response = await restClient.get(
-    `/api/portal/Transporte/ReporteEntregaMontos?tipoPago=${paymentType}`,
+    `/api/portal/Transporte/ReporteEntregaMontos${paymentFilter}`,
     {
       params: {
         noTransporte,
