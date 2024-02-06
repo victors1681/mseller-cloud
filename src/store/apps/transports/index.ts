@@ -8,13 +8,14 @@ import {
   DocumentoEntregaResponse,
   DocumentoEntregaResponseAxios,
   DocumentoEntregaType,
+  PaymentTypeEnum,
   TransporteListType,
 } from 'src/types/apps/transportType'
 import { PaginatedResponse } from 'src/types/apps/response'
 import { getDateParam } from 'src/utils/getDateParam'
 import restClient from 'src/configs/restClient'
 
-interface DataParams {
+export interface DataParams {
   query: string
   dates?: Date[]
   status?: string
@@ -101,9 +102,12 @@ export const deliveryReport = async (noTransporte: string) => {
   return response.data
 }
 
-export const deliveryReportAmount = async (noTransporte: string) => {
+export const deliveryReportAmount = async (
+  noTransporte: string,
+  paymentType?: string,
+) => {
   const response = await restClient.get(
-    '/api/portal/Transporte/ReporteEntregaMontos',
+    `/api/portal/Transporte/ReporteEntregaMontos?tipoPago=${paymentType}`,
     {
       params: {
         noTransporte,

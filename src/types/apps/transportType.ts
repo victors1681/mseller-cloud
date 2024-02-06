@@ -11,6 +11,13 @@ export interface TransportResponse {
   pageSize: number
 }
 
+export enum PaymentTypeEnum {
+  TRANSFER = 0,
+  CREDIT = 1,
+  CASH = 2,
+  CHECK = 3,
+}
+
 export interface TransporteListType {
   distribuidor: DistribuidorType
   procesado: boolean

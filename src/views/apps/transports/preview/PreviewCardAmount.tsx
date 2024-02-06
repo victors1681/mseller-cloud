@@ -233,10 +233,34 @@ const PreviewCard = ({ data }: Props) => {
           <Table>
             <TableHead>
               <TableRow>
-                <CustomHeaderTableCell>Efectivo</CustomHeaderTableCell>
-                <CustomHeaderTableCell>Cheques</CustomHeaderTableCell>
-                <CustomHeaderTableCell>Transferencia</CustomHeaderTableCell>
-                <CustomHeaderTableCell>Crédito</CustomHeaderTableCell>
+                <CustomHeaderTableCell>
+                  <a
+                    href={`/apps/transports/printDeliveryReportAmount/${data.noTransporte}/?paymentType=0`}
+                  >
+                    Efectivo
+                  </a>
+                </CustomHeaderTableCell>
+                <CustomHeaderTableCell>
+                  <a
+                    href={`/apps/transports/printDeliveryReportAmount/${data.noTransporte}/?paymentType=1`}
+                  >
+                    Cheques
+                  </a>
+                </CustomHeaderTableCell>
+                <CustomHeaderTableCell>
+                  <a
+                    href={`/apps/transports/printDeliveryReportAmount/${data.noTransporte}/?paymentType=2`}
+                  >
+                    Transferencia
+                  </a>
+                </CustomHeaderTableCell>
+                <CustomHeaderTableCell>
+                  <a
+                    href={`/apps/transports/printDeliveryReportAmount/${data.noTransporte}/?paymentType=3`}
+                  >
+                    Crédito
+                  </a>
+                </CustomHeaderTableCell>
               </TableRow>
             </TableHead>
             <TableBody>

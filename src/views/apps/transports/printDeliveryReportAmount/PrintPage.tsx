@@ -23,11 +23,13 @@ import {
 import { AsyncThunkAction, Dispatch, AnyAction } from '@reduxjs/toolkit'
 import {
   DocumentoEntregaResponse,
+  PaymentTypeEnum,
   ReporteEntrega,
   ReporteEntregaMonto,
 } from 'src/types/apps/transportType'
 import { RootState } from 'src/store'
 import { useSelector } from 'react-redux'
+import { useRouter } from 'next/router'
 
 interface DocumentPreviewProps {
   id: string
@@ -40,9 +42,12 @@ const InvoicePreview = ({ id }: DocumentPreviewProps) => {
   const [addPaymentOpen, setAddPaymentOpen] = useState<boolean>(false)
   const [sendInvoiceOpen, setSendInvoiceOpen] = useState<boolean>(false)
 
+  const router = useRouter()
+  const paymentType = router.query.paymentType as string
+
   const initRequest = async () => {
     try {
-      let responseInfo = await deliveryReportAmount(id)
+      let responseInfo = await deliveryReportAmount(id, paymentType)
       setData(responseInfo)
       setTimeout(() => {
         window.print()
