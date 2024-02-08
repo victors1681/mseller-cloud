@@ -128,8 +128,8 @@ const CardStatisticsReceipt = (props: Props) => {
                   <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                     <Typography variant="body2">Vendedor</Typography>
                     <Typography variant="h6">
-                      {props.collection?.vendedor.codigo}-
-                      {props.collection?.vendedor.nombre}
+                      {props.collection?.vendedor?.codigo}-
+                      {props.collection?.vendedor?.nombre}
                     </Typography>
                   </Box>
                 </Box>
