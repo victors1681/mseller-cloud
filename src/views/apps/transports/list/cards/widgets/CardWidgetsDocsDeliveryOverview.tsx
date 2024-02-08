@@ -32,7 +32,7 @@ import React from 'react'
 import LoadingWrapper from '../../../../../ui/LoadingWrapper'
 
 interface Props {
-  docsData: DocumentoEntregaResponse
+  docsData: DocumentoEntregaResponse | null
   isLoading: boolean
 }
 
