@@ -66,6 +66,12 @@ export interface DocumentoEntregaResponse {
   entregadas: number
   noEntregadas: number
   entregarDespues: number
+
+  efectivo: number
+  cheque: number
+  transferencia: number
+  credito: number
+  neto: number
 }
 
 export interface DocumentoEntregaType {

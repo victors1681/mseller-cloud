@@ -290,7 +290,7 @@ const TransportDocs = (props: TransportDocsProps) => {
         </Grid>
         <Grid item xs={6}>
           <CardWidgetsDocsDeliveryOverview
-            docsData={store.docsData?.documentos || []}
+            docsData={store.docsData}
             isLoading={store.isLoading}
           />
         </Grid>

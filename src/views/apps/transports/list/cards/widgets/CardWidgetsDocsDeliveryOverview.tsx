@@ -22,6 +22,7 @@ import ReactApexcharts from 'src/@core/components/react-apexcharts'
 // ** Util Import
 import { hexToRGBA } from 'src/@core/utils/hex-to-rgba'
 import {
+  DocumentoEntregaResponse,
   DocumentoEntregaType,
   TypoPagoEnum,
 } from 'src/types/apps/transportType'
@@ -31,17 +32,19 @@ import React from 'react'
 import LoadingWrapper from '../../../../../ui/LoadingWrapper'
 
 interface Props {
-  docsData: DocumentoEntregaType[]
+  docsData: DocumentoEntregaResponse
   isLoading: boolean
 }
 
-const getStats = (docsData: DocumentoEntregaType[]) => {
+const getStats = (data: DocumentoEntregaResponse) => {
+  const docsData = data.documentos
+
   const cashArr = docsData.filter(
     (f) =>
       f.status === TransportStatusEnum.Entregado &&
       f.tipoPago === TypoPagoEnum.Cash,
   )
-  const cash = cashArr.reduce((a, c) => (a += c.bruto_E), 0)
+  const cash = data.efectivo
 
   const checkArr = docsData.filter(
     (f) =>
@@ -55,19 +58,19 @@ const getStats = (docsData: DocumentoEntregaType[]) => {
       f.status === TransportStatusEnum.Entregado &&
       f.tipoPago === TypoPagoEnum.Credit,
   )
-  const credit = creditArr.reduce((a, c) => (a += c.bruto_E), 0)
+  const credit = data.credito
 
   const transferArr = docsData.filter(
     (f) =>
       f.status === TransportStatusEnum.Entregado &&
       f.tipoPago === TypoPagoEnum.Transfer,
   )
-  const transfer = transferArr.reduce((a, c) => (a += c.bruto_E), 0)
+  const transfer = data.transferencia
 
   const delivered = docsData.filter(
     (f) => f.status === TransportStatusEnum.Entregado,
   )
-  const total = delivered.reduce((a, c) => (a += c.bruto_E), 0)
+  const total = data.neto
 
   const totalDelivared = delivered.length
   const totalDocs = docsData.length
