@@ -36,7 +36,7 @@ interface Props {
   isLoading: boolean
 }
 
-const getStats = (data: DocumentoEntregaResponses) => {
+const getStats = (data: DocumentoEntregaResponse) => {
   const docsData = data?.documentos
 
   const cashArr = docsData.filter(
@@ -177,7 +177,7 @@ const CardWidgetsDocsDeliveryOverview = (props: Props) => {
               <ReactApexcharts
                 type="donut"
                 height={200}
-                series={data.donut}
+                series={data?.donut}
                 options={options()}
               />
             </Grid>
@@ -193,7 +193,7 @@ const CardWidgetsDocsDeliveryOverview = (props: Props) => {
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                   <Typography variant="body2">Total Entregas</Typography>
                   <Typography variant="h6">
-                    {formatCurrency(data.total)}
+                    {formatCurrency(data?.total || 0)}
                   </Typography>
                 </Box>
               </Box>
@@ -218,7 +218,7 @@ const CardWidgetsDocsDeliveryOverview = (props: Props) => {
                     <Typography variant="body2">Efectivo</Typography>
                   </Box>
                   <Typography sx={{ fontWeight: 600 }}>
-                    {formatCurrency(data.cash)}
+                    {formatCurrency(data?.cash || 0)}
                   </Typography>
                 </Grid>
                 <Grid item xs={6} sx={{ mb: 4 }}>
@@ -238,7 +238,7 @@ const CardWidgetsDocsDeliveryOverview = (props: Props) => {
                     <Typography variant="body2">Cheque</Typography>
                   </Box>
                   <Typography sx={{ fontWeight: 600 }}>
-                    {formatCurrency(data.check)}
+                    {formatCurrency(data?.check || 0)}
                   </Typography>
                 </Grid>
                 <Grid item xs={6}>
@@ -258,7 +258,7 @@ const CardWidgetsDocsDeliveryOverview = (props: Props) => {
                     <Typography variant="body2">Transferencia</Typography>
                   </Box>
                   <Typography sx={{ fontWeight: 600 }}>
-                    {formatCurrency(data.transfer)}
+                    {formatCurrency(data?.transfer || 0)}
                   </Typography>
                 </Grid>
                 <Grid item xs={6}>
@@ -278,7 +278,7 @@ const CardWidgetsDocsDeliveryOverview = (props: Props) => {
                     <Typography variant="body2">Crédito</Typography>
                   </Box>
                   <Typography sx={{ fontWeight: 600 }}>
-                    {formatCurrency(data.credit)}
+                    {formatCurrency(data?.credit || 0)}
                   </Typography>
                 </Grid>
               </Grid>
