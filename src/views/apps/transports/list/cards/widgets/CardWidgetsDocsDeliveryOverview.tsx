@@ -36,8 +36,8 @@ interface Props {
   isLoading: boolean
 }
 
-const getStats = (data: DocumentoEntregaResponse) => {
-  const docsData = data.documentos
+const getStats = (data: DocumentoEntregaResponses) => {
+  const docsData = data?.documentos
 
   const cashArr = docsData.filter(
     (f) =>
@@ -97,7 +97,7 @@ const CardWidgetsDocsDeliveryOverview = (props: Props) => {
   // ** Hook
   const theme = useTheme()
 
-  const data = getStats(props.docsData)
+  const data = props.docsData && getStats(props.docsData)
 
   const options = React.useCallback(
     () =>
