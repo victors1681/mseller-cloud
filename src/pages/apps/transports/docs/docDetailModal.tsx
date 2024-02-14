@@ -276,7 +276,7 @@ interface FooterProps {
   data: DocumentoEntregaType
 }
 const Footer = ({ data }: FooterProps) => {
-  const subtotal = data.detalle.reduce(
+  const total = data.detalle.reduce(
     (acc, c) => (acc += c.subtotal_E < 0 ? 0 : c.subtotal_E),
     0,
   )
@@ -289,7 +289,7 @@ const Footer = ({ data }: FooterProps) => {
     0,
   )
 
-  const total = subtotal + tax
+  const subtotal = total - discount + tax
 
   return (
     <CardContent>
@@ -345,26 +345,26 @@ const Footer = ({ data }: FooterProps) => {
           <CalcWrapper>
             <Typography variant="body2">Subtotal:</Typography>
             <Typography variant="body2" sx={{ fontWeight: 600 }}>
-              {formatCurrency(subtotal)}
+              {formatCurrency(data.bruto_E)}
             </Typography>
           </CalcWrapper>
           <CalcWrapper>
             <Typography variant="body2">Descuento:</Typography>
             <Typography variant="body2" sx={{ fontWeight: 600 }}>
-              {formatCurrency(discount)}
+              {formatCurrency(data.descuento_E)}
             </Typography>
           </CalcWrapper>
           <CalcWrapper>
             <Typography variant="body2">Impuesto:</Typography>
             <Typography variant="body2" sx={{ fontWeight: 600 }}>
-              {formatCurrency(tax)}
+              {formatCurrency(data.impuestos_E)}
             </Typography>
           </CalcWrapper>
           <Divider />
           <CalcWrapper>
             <Typography variant="body2">Total:</Typography>
             <Typography variant="body2" sx={{ fontWeight: 600 }}>
-              {formatCurrency(total)}
+              {formatCurrency(data.neto_E)}
             </Typography>
           </CalcWrapper>
         </Grid>
