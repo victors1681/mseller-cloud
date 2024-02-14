@@ -71,7 +71,7 @@ const columns: GridColDef[] = [
               {row.cantidad_E}
             </Typography>
             <Typography noWrap variant="caption">
-              O:{row.cantidad_E}
+              O:{row.cantidad}
             </Typography>
           </Box>
         </Box>
@@ -345,7 +345,7 @@ const Footer = ({ data }: FooterProps) => {
           <CalcWrapper>
             <Typography variant="body2">Subtotal:</Typography>
             <Typography variant="body2" sx={{ fontWeight: 600 }}>
-              {formatCurrency(data.bruto_E)}
+              {formatCurrency(data.neto_E)}
             </Typography>
           </CalcWrapper>
           <CalcWrapper>
@@ -364,7 +364,7 @@ const Footer = ({ data }: FooterProps) => {
           <CalcWrapper>
             <Typography variant="body2">Total:</Typography>
             <Typography variant="body2" sx={{ fontWeight: 600 }}>
-              {formatCurrency(data.neto_E)}
+              {formatCurrency(data.bruto_E)}
             </Typography>
           </CalcWrapper>
         </Grid>
