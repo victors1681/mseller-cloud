@@ -111,6 +111,16 @@ const PreviewCard = ({ data }: Props) => {
                     </Typography>
                   </MUITableCell>
                 </TableRow>
+                <TableRow>
+                  <MUITableCell>
+                    <Typography variant="body2">Total Documentos:</Typography>
+                  </MUITableCell>
+                  <MUITableCell>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      {data.totalDocumentos}
+                    </Typography>
+                  </MUITableCell>
+                </TableRow>
               </TableBody>
             </Grid>
             <Grid item sm={6} xs={6}>
