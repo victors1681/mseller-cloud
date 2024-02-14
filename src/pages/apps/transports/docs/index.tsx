@@ -282,13 +282,13 @@ const TransportDocs = (props: TransportDocsProps) => {
   return (
     <DatePickerWrapper>
       <Grid container spacing={6}>
-        <Grid item xs={6}>
+        <Grid item xs={12} md={6}>
           <CardStatisticsTransport
             docsData={store.docsData}
             isLoading={store.isLoading}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={12} md={6}>
           <CardWidgetsDocsDeliveryOverview
             docsData={store.docsData}
             isLoading={store.isLoading}

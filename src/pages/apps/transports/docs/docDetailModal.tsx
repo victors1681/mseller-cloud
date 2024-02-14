@@ -276,7 +276,7 @@ interface FooterProps {
   data: DocumentoEntregaType
 }
 const Footer = ({ data }: FooterProps) => {
-  const total = data.detalle.reduce(
+  const subtotal = data.detalle.reduce(
     (acc, c) => (acc += c.subtotal_E < 0 ? 0 : c.subtotal_E),
     0,
   )
@@ -289,7 +289,7 @@ const Footer = ({ data }: FooterProps) => {
     0,
   )
 
-  const subtotal = total - (discount + tax)
+  const total = subtotal + tax
 
   return (
     <CardContent>

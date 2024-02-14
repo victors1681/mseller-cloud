@@ -164,6 +164,7 @@ const PreviewCard = ({ data }: Props) => {
             <TableHead>
               <TableRow>
                 <TableCell>Cantidad</TableCell>
+                <TableCell>Código</TableCell>
                 <TableCell>Unidad</TableCell>
                 <TableCell>Descripción</TableCell>
                 <TableCell>Desc.</TableCell>
@@ -175,6 +176,7 @@ const PreviewCard = ({ data }: Props) => {
               {data.detalle.map((detalle) => (
                 <TableRow key={detalle.id}>
                   <TableCell>{detalle.cantidad}</TableCell>
+                  <TableCell>{detalle.codigoProducto}</TableCell>
                   <TableCell>{detalle.unidad}</TableCell>
                   <TableCell>{detalle.descripcion}</TableCell>
                   <TableCell>{detalle.descuento}%</TableCell>

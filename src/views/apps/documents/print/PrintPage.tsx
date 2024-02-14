@@ -16,9 +16,6 @@ import { DocumentType } from 'src/types/apps/documentTypes'
 
 // ** Demo Components Imports
 import PreviewCard from 'src/views/apps/documents/preview/PreviewCard'
-import PreviewActions from 'src/views/apps/documents/preview/PreviewActions'
-import AddPaymentDrawer from 'src/views/apps/documents/shared-drawer/AddPaymentDrawer'
-import SendInvoiceDrawer from 'src/views/apps/documents/shared-drawer/SendInvoiceDrawer'
 import restClient from 'src/configs/restClient'
 
 interface DocumentPreviewProps {
@@ -31,7 +28,7 @@ const InvoicePreview = ({ id }: DocumentPreviewProps) => {
   const [data, setData] = useState<null | DocumentType>(null)
   const [addPaymentOpen, setAddPaymentOpen] = useState<boolean>(false)
   const [sendInvoiceOpen, setSendInvoiceOpen] = useState<boolean>(false)
-  console.log('starging')
+
   useEffect(() => {
     restClient
       .get('/api/portal/Pedido/detalle', { params: { noPedidoStr: id } })
@@ -52,9 +49,6 @@ const InvoicePreview = ({ id }: DocumentPreviewProps) => {
       window.print()
     }, 500)
   }, [])
-
-  const toggleSendInvoiceDrawer = () => setSendInvoiceOpen(!sendInvoiceOpen)
-  const toggleAddPaymentDrawer = () => setAddPaymentOpen(!addPaymentOpen)
 
   if (data) {
     return (

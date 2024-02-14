@@ -31,7 +31,7 @@ const InvoicePreview = ({ id }: DocumentPreviewProps) => {
   const [data, setData] = useState<null | DocumentType>(null)
   const [addPaymentOpen, setAddPaymentOpen] = useState<boolean>(false)
   const [sendInvoiceOpen, setSendInvoiceOpen] = useState<boolean>(false)
-  console.log('starging')
+
   useEffect(() => {
     restClient
       .get('/api/portal/Pedido/detalle', { params: { noPedidoStr: id } })
@@ -47,9 +47,6 @@ const InvoicePreview = ({ id }: DocumentPreviewProps) => {
       })
   }, [id])
 
-  const toggleSendInvoiceDrawer = () => setSendInvoiceOpen(!sendInvoiceOpen)
-  const toggleAddPaymentDrawer = () => setAddPaymentOpen(!addPaymentOpen)
-
   if (data) {
     return (
       <>
@@ -58,11 +55,7 @@ const InvoicePreview = ({ id }: DocumentPreviewProps) => {
             <PreviewCard data={data} />
           </Grid>
           <Grid item xl={3} md={4} xs={12}>
-            <PreviewActions
-              id={id}
-              toggleAddPaymentDrawer={toggleAddPaymentDrawer}
-              toggleSendInvoiceDrawer={toggleSendInvoiceDrawer}
-            />
+            <PreviewActions data={data} />
           </Grid>
         </Grid>
         {/* <SendInvoiceDrawer
