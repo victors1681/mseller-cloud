@@ -13,7 +13,7 @@ import { DocumentType } from 'src/types/apps/documentTypes'
 interface DataParams {
   query: string
   dates?: Date[]
-  procesado?: string
+  procesado?: string | number
   pageNumber?: number
   vendedores?: string
   localidad?: string
@@ -35,8 +35,9 @@ export const fetchData = createAsyncThunk(
   async (params: DataParams) => {
     if (params.procesado === '') {
       delete params.procesado
+    } else {
+      params.procesado = parseInt(params.procesado as string)
     }
-
     const response = await restClient.get<
       any,
       AxiosResponse<PaginatedResponse<DocumentType>>

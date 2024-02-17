@@ -241,7 +241,7 @@ const defaultColumns: GridColDef[] = [
     headerName: 'Status',
     renderCell: ({ row }: CellType) => {
       return (
-        <Tooltip title={'test' + row.mensajesError}>
+        <Tooltip title={row.mensajesError}>
           <div style={{ width: '100px' }}>
             <CustomChip
               skin="light"
