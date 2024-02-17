@@ -241,13 +241,17 @@ const defaultColumns: GridColDef[] = [
     headerName: 'Status',
     renderCell: ({ row }: CellType) => {
       return (
-        <CustomChip
-          skin="light"
-          size="small"
-          label={orderStatusLabels[row?.procesado] || ''}
-          color={orderStatusObj[row.procesado]}
-          sx={{ textTransform: 'capitalize' }}
-        />
+        <Tooltip title={'test' + row.mensajesError}>
+          <div style={{ width: '100px' }}>
+            <CustomChip
+              skin="light"
+              size="small"
+              label={orderStatusLabels[row?.procesado] || ''}
+              color={orderStatusObj[row.procesado]}
+              sx={{ textTransform: 'capitalize' }}
+            />
+          </div>
+        </Tooltip>
       )
     },
   },
