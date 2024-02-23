@@ -22,6 +22,7 @@ import { DocumentType, TipoDocumentoEnum } from 'src/types/apps/documentTypes'
 import formatDate from 'src/utils/formatDate'
 import { useAuth } from 'src/hooks/useAuth'
 import formatCurrency from 'src/utils/formatCurrency'
+import formattedNumber from 'src/utils/formattedNumber'
 
 interface Props {
   data: DocumentType
@@ -179,7 +180,9 @@ const PreviewCard = ({ data }: Props) => {
                   <TableCell>{detalle.codigoProducto}</TableCell>
                   <TableCell>{detalle.unidad}</TableCell>
                   <TableCell>{detalle.descripcion}</TableCell>
-                  <TableCell>{detalle.descuento}%</TableCell>
+                  <TableCell>
+                    {formattedNumber(detalle.porcientoDescuento)}%
+                  </TableCell>
                   <TableCell>{formatCurrency(detalle.precio)}</TableCell>
                   <TableCell>{formatCurrency(detalle.subTotal)}</TableCell>
                 </TableRow>
