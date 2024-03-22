@@ -105,13 +105,22 @@ export const deliveryReport = async (noTransporte: string) => {
 export const deliveryReportAmount = async (
   noTransporte: string,
   paymentType?: string,
+  sellerCode?: string,
 ) => {
-  const paymentFilter = paymentType ? `?tipoPago=${paymentType}` : ``
+  let filter = {}
+  if (paymentType) {
+    Object.assign(filter, { TipoPago: paymentType })
+  }
+  if (sellerCode) {
+    Object.assign(filter, { CodigoVendedor: sellerCode })
+  }
+
   const response = await restClient.get(
-    `/api/portal/Transporte/ReporteEntregaMontos${paymentFilter}`,
+    `/api/portal/Transporte/ReporteEntregaMontos`,
     {
       params: {
         noTransporte,
+        ...filter,
       },
     },
   )

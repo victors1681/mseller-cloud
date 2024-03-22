@@ -44,10 +44,11 @@ const InvoicePreview = ({ id }: DocumentPreviewProps) => {
 
   const router = useRouter()
   const paymentType = router?.query?.paymentType as string
+  const sellerCode = router?.query?.sellerCode as string
 
   const initRequest = async () => {
     try {
-      let responseInfo = await deliveryReportAmount(id, paymentType)
+      let responseInfo = await deliveryReportAmount(id, paymentType, sellerCode)
       setData(responseInfo)
       setTimeout(() => {
         window.print()
