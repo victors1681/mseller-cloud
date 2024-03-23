@@ -1,14 +1,22 @@
-import 'firebase/firestore'
-import 'firebase/auth'
-import 'firebase/functions'
 import * as firebase from 'firebase/app'
 import firebaseConfig from './firebaseConfig'
 import { getFirestore } from 'firebase/firestore'
 import { getFunctions, httpsCallable } from 'firebase/functions'
 import { UserDataType } from 'src/context/types'
+import {
+  browserLocalPersistence,
+  browserSessionPersistence,
+  getAuth,
+  setPersistence,
+  signInWithEmailAndPassword,
+  signOut,
+} from 'firebase/auth'
+import { axiosSetClientUrl } from 'src/configs/restClient'
 
 // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig)
+const auth = getAuth(app)
+
 const db = getFirestore(app)
 const functions = getFunctions(app, 'us-east1')
 
@@ -41,5 +49,48 @@ export const getUserByAccessToken = async (
     throw err
   }
 }
+export const refreshAccessToken = async (): Promise<string | undefined> => {
+  const token = await auth.currentUser?.getIdToken(true)
+  return token
+}
 
-export { db, firebase, functions }
+export const getAllCurrentProfile = async (): Promise<
+  UserDataType | undefined
+> => {
+  const fn = httpsCallable(functions, 'getUserProfileV2')
+  const profileDataResponse = await fn()
+  const userData = profileDataResponse.data as UserDataType
+  axiosSetClientUrl(userData.business.config)
+  return userData
+}
+
+export const signInByEmail = async (
+  email: string,
+  password: string,
+  remember?: boolean,
+) => {
+  try {
+    await setPersistence(
+      auth,
+      remember ? browserLocalPersistence : browserSessionPersistence,
+    )
+
+    const response = await signInWithEmailAndPassword(auth, email, password)
+
+    return await getAllCurrentProfile()
+  } catch (error: any) {
+    console.log('Authentication error', error)
+    debugger
+    throw new Error(error.message)
+  }
+}
+
+export const handleSignOut = async () => {
+  try {
+    await signOut(auth)
+  } catch (error) {
+    console.error('Error signing out:', error)
+  }
+}
+
+export { db, firebase, functions, auth }

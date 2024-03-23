@@ -23,8 +23,14 @@ import {
   ErrCallbackType,
   UserDataType,
 } from './types'
-import { getUserByAccessToken } from 'src/firebase'
+import {
+  auth,
+  getAllCurrentProfile,
+  handleSignOut,
+  signInByEmail,
+} from 'src/firebase'
 import { axiosSetClientUrl } from 'src/configs/restClient'
+import { onAuthStateChanged } from 'firebase/auth'
 
 // ** Defaults
 const defaultProvider: AuthValuesType = {
@@ -53,90 +59,78 @@ const AuthProvider = ({ children }: Props) => {
   const router = useRouter()
 
   useEffect(() => {
-    const initAuth = async (): Promise<void> => {
-      const storedToken = window.localStorage.getItem(
-        authConfig.storageTokenKeyName,
-      )!
-
-      if (storedToken) {
+    const returnUrl = router.query.returnUrl
+    const initAuthentication = async () => {
+      onAuthStateChanged(auth, async (user) => {
         setLoading(true)
+        if (user) {
+          const uid = user.uid
 
-        try {
-          const response = await getUserByAccessToken(storedToken)
-          axiosSetClientUrl(response?.business.config)
-          setLoading(false)
-          if (response) {
-            response.role = 'admin' //temporary
-            setUser(response)
+          const userData = await getAllCurrentProfile()
+          if (userData) {
+            userData.role = 'admin' //TODO: Temporary forcing user role
+            setUser(userData)
+          } else {
+            handleLogout()
           }
-        } catch (err) {
-          localStorage.removeItem('userData')
-          localStorage.removeItem('refreshToken')
-          localStorage.removeItem('accessToken')
-          setUser(null)
-          setLoading(false)
-          if (
-            authConfig.onTokenExpiration === 'logout' &&
-            !router.pathname.includes('login')
-          ) {
-            router.replace('/login')
-          }
-          setLoading(false)
+
+          const updateAccessToken = await user.getIdToken()
+
+          window.localStorage.setItem(
+            authConfig.storageTokenKeyName,
+            updateAccessToken,
+          )
+          const redirectURL =
+            returnUrl && returnUrl !== '/' ? returnUrl : router.asPath
+          router.replace(redirectURL as string)
+        } else {
+          handleLogout()
         }
-      } else {
         setLoading(false)
-      }
+      })
     }
 
-    initAuth()
+    initAuthentication()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const handleLogin = (
+  const handleLogin = async (
     params: LoginParams,
     errorCallback?: ErrCallbackType,
   ) => {
     setLoadingForm(true)
     params.returnSecureToken = true
-    axios
-      .post(authConfig.loginEndpoint, params)
-      .then(async (response) => {
-        params.rememberMe
-          ? window.localStorage.setItem(
-              authConfig.storageTokenKeyName,
-              response.data.idToken,
-            )
-          : null
-        const returnUrl = router.query.returnUrl
 
-        const userdata = await getUserByAccessToken(response.data.idToken)
+    try {
+      const userData = await signInByEmail(
+        params.email,
+        params.password,
+        params.rememberMe,
+      )
 
-        axiosSetClientUrl(userdata?.business.config)
+      const returnUrl = router.query.returnUrl
 
-        if (userdata) {
-          userdata.role = 'admin' //temporary
-          setUser(userdata)
-        }
-        params.rememberMe
-          ? window.localStorage.setItem('userData', JSON.stringify(userdata))
-          : null
+      if (userData) {
+        userData.role = 'admin' //TODO: Temporary forcing user role
+        setUser(userData)
+      }
 
-        const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
+      const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
 
-        router.replace(redirectURL as string)
-      })
-
-      .catch((err) => {
-        if (errorCallback) errorCallback(err)
-        setLoadingForm(false)
-      })
+      router.replace(redirectURL as string)
+    } catch (err: any) {
+      if (errorCallback) errorCallback(err)
+      setLoadingForm(false)
+    }
   }
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await handleSignOut()
     setUser(null)
     window.localStorage.removeItem('userData')
     window.localStorage.removeItem(authConfig.storageTokenKeyName)
     router.push('/login')
+    setLoadingForm(false)
   }
 
   const values = {
