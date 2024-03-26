@@ -63,7 +63,7 @@ const AuthProvider = ({ children }: Props) => {
 
           const userData = await getAllCurrentProfile()
           if (userData) {
-            userData.role = 'admin' //TODO: Temporary forcing user role
+            //userData.role = 'admin' //TODO: Temporary forcing user role
             setUser(userData)
           } else {
             handleLogout()
@@ -106,7 +106,7 @@ const AuthProvider = ({ children }: Props) => {
       const returnUrl = router.query.returnUrl
 
       if (userData) {
-        userData.role = 'admin' //TODO: Temporary forcing user role
+        //userData.role = 'admin' //TODO: Temporary forcing user role
         setUser(userData)
       }
 

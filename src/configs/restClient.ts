@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios'
 import authConfig from 'src/configs/auth'
-import { Config } from 'src/context/types'
+import { IConfig } from 'src/types/apps/userTypes'
 
 export enum NetworkStatus {
   INITIAL = 0,
@@ -18,7 +18,7 @@ export const getExceptions = (config: AxiosRequestConfig, baseURL?: string) => {
   return config
 }
 
-export const axiosSetClientUrl = (config?: Config) => {
+export const axiosSetClientUrl = (config?: IConfig) => {
   if (config?.serverUrl) {
     if (config.testMode) {
       restClient.defaults.headers[

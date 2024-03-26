@@ -2,7 +2,6 @@ import * as firebase from 'firebase/app'
 import firebaseConfig from './firebaseConfig'
 import { getFirestore } from 'firebase/firestore'
 import { getFunctions, httpsCallable } from 'firebase/functions'
-import { UserTypes } from 'src/context/types'
 import {
   browserLocalPersistence,
   browserSessionPersistence,
@@ -12,6 +11,7 @@ import {
   signOut,
 } from 'firebase/auth'
 import { axiosSetClientUrl } from 'src/configs/restClient'
+import { UserTypes } from 'src/types/apps/userTypes'
 
 // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig)

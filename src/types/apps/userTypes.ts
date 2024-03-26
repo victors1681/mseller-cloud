@@ -90,39 +90,7 @@ export interface IBusiness {
     country: string
     street: string
   }
-  config: {
-    sandboxPort: string
-    sandboxUrl: string
-    serverPort: string
-    serverUrl: string
-
-    portalSandboxPort: string
-    portalSandboxUrl: string
-    portalServerPort: string
-    portalServerUrl: string
-
-    testMode: boolean
-    displayPriceWithTax: boolean
-    allowPriceBelowMinimum: boolean
-    allowOrderAboveCreditLimit: boolean
-    allowLoadLastOrders: boolean
-    allowLoadLastPrices: boolean
-    allowConfirmProductStock: boolean
-    allowCaptureCustomerGeolocation: boolean
-    showProducInfoPanel: boolean
-    captureTemporalDoc: boolean
-    orderEmailTemplateID: number
-    paymentEmailTemplateID: number
-    defaultUnitSelectorBox: boolean
-    allowQuote: boolean
-    v4: boolean
-    promocion: boolean
-    proximaOrden: boolean
-    trackingLocation: boolean
-    enableConfirmSelector: boolean
-    metadata: Array<{ [key: string]: any }>
-    integrations?: IIntegration[]
-  }
+  config: IConfig
   contact: string
   contactPhone: string
   email: string
@@ -138,4 +106,38 @@ export interface IBusiness {
   website: string
   logoUrl: string
   sellingPackaging: false
+}
+
+export interface IConfig {
+  sandboxPort: string
+  sandboxUrl: string
+  serverPort: string
+  serverUrl: string
+
+  portalSandboxPort: string
+  portalSandboxUrl: string
+  portalServerPort: string
+  portalServerUrl: string
+
+  testMode: boolean
+  displayPriceWithTax: boolean
+  allowPriceBelowMinimum: boolean
+  allowOrderAboveCreditLimit: boolean
+  allowLoadLastOrders: boolean
+  allowLoadLastPrices: boolean
+  allowConfirmProductStock: boolean
+  allowCaptureCustomerGeolocation: boolean
+  showProducInfoPanel: boolean
+  captureTemporalDoc: boolean
+  orderEmailTemplateID: number
+  paymentEmailTemplateID: number
+  defaultUnitSelectorBox: boolean
+  allowQuote: boolean
+  v4: boolean
+  promocion: boolean
+  proximaOrden: boolean
+  trackingLocation: boolean
+  enableConfirmSelector: boolean
+  metadata: Array<{ [key: string]: any }>
+  integrations?: IIntegration[]
 }
