@@ -82,7 +82,7 @@ interface StatusUpdateResponse {
   data: DocumentStatusList[]
 }
 export const changeDocumentStatus = createAsyncThunk(
-  'appDocuments/deleteData',
+  'appDocuments/changeStatus',
   async (status: StatusParam[], { getState, dispatch }: Redux) => {
     try {
       const response = await restClient.put<

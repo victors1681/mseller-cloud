@@ -3,7 +3,7 @@ import { Dispatch } from 'redux'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 // ** Axios Imports
-import axios from 'axios'
+import axios, { isAxiosError } from 'axios'
 import {
   DocumentoEntregaResponse,
   DocumentoEntregaResponseAxios,
@@ -14,6 +14,8 @@ import {
 import { PaginatedResponse } from 'src/types/apps/response'
 import { getDateParam } from 'src/utils/getDateParam'
 import restClient from 'src/configs/restClient'
+import { TransportStatusEnum } from 'src/utils/transportMappings'
+import toast from 'react-hot-toast'
 
 export interface DataParams {
   query: string
@@ -63,6 +65,37 @@ export const fetchData = createAsyncThunk(
   },
 )
 
+interface TransportStatusPayload {
+  transportNo: string
+  status: TransportStatusEnum
+}
+
+export const changeTransportStatus = createAsyncThunk(
+  'appTransport/changeStatus',
+  async (data: TransportStatusPayload, { getState, dispatch }: Redux) => {
+    try {
+      const payload = {
+        noTransporte: data.transportNo,
+        status: data.status,
+      }
+      const response = await restClient.put(
+        `/api/portal/Transporte/UpdateStatus?NoTransporte=${payload.noTransporte}&status=${payload.status}`,
+      )
+
+      if (response.status === 200) {
+        dispatch(apptransportslice.actions.updateTransportStatus(payload))
+        toast.success(response.data)
+      } else {
+        throw new Error(response.data.message)
+      }
+    } catch (err) {
+      toast.error(
+        `Error al actualizar el transporte: ${data.transportNo} con el status: ${data.status}`,
+      )
+    }
+  },
+)
+
 export const deleteInvoice = createAsyncThunk(
   'appTransport/deleteData',
   async (id: number | string, { getState, dispatch }: Redux) => {
@@ -75,18 +108,30 @@ export const deleteInvoice = createAsyncThunk(
   },
 )
 
-export const closeTransport = createAsyncThunk(
+export const forceCloseTransport = createAsyncThunk(
   'appTransport/closeTransport',
-  async (NoTransporte: number | string, { getState, dispatch }: Redux) => {
-    const response = await restClient.put(
-      'api/portal/Transporte/ForzarCierre',
-      {
-        NoTransporte, //add usuario
-      },
-    )
-    await dispatch(fetchData(getState().transport.params))
+  async (transportNo: number | string, { getState, dispatch }: Redux) => {
+    try {
+      const payload = {
+        noTransporte: transportNo,
+        status: TransportStatusEnum.Recibido,
+      }
 
-    return response.data
+      const response = await restClient.put(
+        `/api/portal/Transporte/ForzarCierre?noTransporte=${transportNo}`,
+      )
+
+      if (response.status === 200) {
+        dispatch(apptransportslice.actions.updateTransportStatus(payload))
+        toast.success(response.data.message)
+      } else {
+        throw new Error(response.data.message)
+      }
+
+      return response.data
+    } catch (err) {
+      toast.error(`Error al forzar cierre del transporte: ${transportNo}`)
+    }
   },
 )
 
@@ -154,7 +199,7 @@ export const fetchTransportDocsData = createAsyncThunk(
 export const apptransportslice = createSlice({
   name: 'appTransport',
   initialState: {
-    transportData: [] as any,
+    transportData: [] as TransporteListType[],
     pageNumber: 0,
     pageSize: 0,
     totalPages: 0,
@@ -182,7 +227,18 @@ export const apptransportslice = createSlice({
       neto: 0,
     } as DocumentoEntregaResponse | null,
   },
-  reducers: {},
+  reducers: {
+    updateTransportStatus: (state, action) => {
+      const payload = action.payload
+      const index = state.transportData.findIndex(
+        (f) => f.noTransporte === payload.noTransporte,
+      )
+
+      if (index > -1) {
+        state.transportData[index].status = payload.status
+      }
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(fetchData.pending, (state, action) => {
       state.isLoading = true

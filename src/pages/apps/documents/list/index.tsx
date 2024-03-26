@@ -19,12 +19,7 @@ import Typography from '@mui/material/Typography'
 import FormControl from '@mui/material/FormControl'
 import CardContent from '@mui/material/CardContent'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
-import {
-  DataGrid,
-  GridColDef,
-  GridRowId,
-  GridRowParams,
-} from '@mui/x-data-grid'
+import { DataGrid, GridColDef, GridRowParams } from '@mui/x-data-grid'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -35,11 +30,7 @@ import DatePicker from 'react-datepicker'
 
 // ** Store & Actions Imports
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  fetchData,
-  deleteInvoice,
-  changeDocumentStatus,
-} from 'src/store/apps/documents'
+import { fetchData, changeDocumentStatus } from 'src/store/apps/documents'
 
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
@@ -49,7 +40,6 @@ import {
   DocumentType,
   StatusParam,
 } from 'src/types/apps/documentTypes'
-import { DateType } from 'src/types/forms/reactDatepickerTypes'
 
 // ** Utils Import
 import { getInitials } from 'src/@core/utils/get-initials'
@@ -64,7 +54,6 @@ import TableHeader from 'src/views/apps/documents/list/TableHeader'
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import formatDate from 'src/utils/formatDate'
 import formatCurrency from 'src/utils/formatCurrency'
-import Autocomplete from '@mui/material/Autocomplete'
 import { debounce } from '@mui/material'
 import { SellerAutocomplete } from 'src/views/ui/sellerAutoComplete'
 import { LocationAutocomplete } from 'src/views/ui/locationAutoComplete'

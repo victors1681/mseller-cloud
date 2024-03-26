@@ -21,7 +21,7 @@ export enum PaymentTypeEnum {
 export interface TransporteListType {
   distribuidor: DistribuidorType
   procesado: boolean
-  status: number
+  status: TransportStatusEnum
   localidad: LocalidadType
   noTransporte: string
   localidadId: number

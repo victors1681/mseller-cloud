@@ -33,6 +33,8 @@ import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid'
 import formatCurrency from 'src/utils/formatCurrency'
 import CustomChip from 'src/@core/components/mui/chip'
 import {
+  TransportStatusEnum,
+  transportDocStatusLabels,
   transportStatusLabels,
   transportStatusObj,
 } from '../../../../utils/transportMappings'
@@ -289,7 +291,8 @@ const Footer = ({ data }: FooterProps) => {
     0,
   )
 
-  const subtotal = total - discount + tax
+  const selectedValue = (delivered: number, original: number) =>
+    data.status === TransportStatusEnum.Entregado ? delivered : original
 
   return (
     <CardContent>
@@ -310,7 +313,7 @@ const Footer = ({ data }: FooterProps) => {
             <CustomChip
               skin="light"
               size="small"
-              label={transportStatusLabels[data.status] || ''}
+              label={transportDocStatusLabels[data.status] || ''}
               color={transportStatusObj[data.status]}
               sx={{ textTransform: 'capitalize' }}
             />
@@ -345,26 +348,26 @@ const Footer = ({ data }: FooterProps) => {
           <CalcWrapper>
             <Typography variant="body2">Subtotal:</Typography>
             <Typography variant="body2" sx={{ fontWeight: 600 }}>
-              {formatCurrency(data.neto_E)}
+              {formatCurrency(selectedValue(data.bruto_E, data.bruto))}
             </Typography>
           </CalcWrapper>
           <CalcWrapper>
             <Typography variant="body2">Descuento:</Typography>
             <Typography variant="body2" sx={{ fontWeight: 600 }}>
-              {formatCurrency(data.descuento_E)}
+              {formatCurrency(selectedValue(data.descuento_E, data.descuento))}
             </Typography>
           </CalcWrapper>
           <CalcWrapper>
             <Typography variant="body2">Impuesto:</Typography>
             <Typography variant="body2" sx={{ fontWeight: 600 }}>
-              {formatCurrency(data.impuestos_E)}
+              {formatCurrency(selectedValue(data.impuestos_E, data.impuestos))}
             </Typography>
           </CalcWrapper>
           <Divider />
           <CalcWrapper>
             <Typography variant="body2">Total:</Typography>
             <Typography variant="body2" sx={{ fontWeight: 600 }}>
-              {formatCurrency(data.bruto_E)}
+              {formatCurrency(selectedValue(data.neto_E, data.neto))}
             </Typography>
           </CalcWrapper>
         </Grid>

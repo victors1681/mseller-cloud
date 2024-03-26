@@ -26,13 +26,27 @@ export const transportStatusLabels: Record<
   [TransportStatusEnum.Integrado]: 'Integrado',
   [TransportStatusEnum.Cancelado]: 'Cancelado',
   [TransportStatusEnum.Error]: 'Error',
-  [TransportStatusEnum.Entregado]: 'Entregado',
-  [TransportStatusEnum.NoEntregado]: 'No Entregado',
-  [TransportStatusEnum.EntDespues]: 'Ent.Después',
   [TransportStatusEnum.Integrado2]: 'Integrado',
   [TransportStatusEnum.Elaborando]: 'Elaborando',
   [TransportStatusEnum.ERP]: 'ERP',
   [TransportStatusEnum.Parcial]: 'Parcial',
+}
+
+export const transportDocStatusLabels: Record<
+  TransportStatusEnum | number,
+  string
+> = {
+  [TransportStatusEnum.Pendiente]: 'Pendiente',
+  [TransportStatusEnum.Sincronizado]: 'Sincronizado',
+  [TransportStatusEnum.Recibido]: 'Recibido',
+  [TransportStatusEnum.Procesado]: 'Procesado',
+  [TransportStatusEnum.Integrado]: 'Integrado',
+  [TransportStatusEnum.Cancelado]: 'Cancelado',
+  [TransportStatusEnum.Error]: 'Error',
+  [TransportStatusEnum.Entregado]: 'Entregado',
+  [TransportStatusEnum.NoEntregado]: 'No Entregado',
+  [TransportStatusEnum.EntDespues]: 'Ent.Después',
+  [TransportStatusEnum.Integrado2]: 'Integrado',
 }
 
 export const transportStatusObj = {

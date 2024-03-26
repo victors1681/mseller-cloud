@@ -43,6 +43,7 @@ import formatDate from 'src/utils/formatDate'
 import formatCurrency from 'src/utils/formatCurrency'
 import {
   TransportStatusEnum,
+  transportDocStatusLabels,
   transportStatusLabels,
   transportStatusObj,
 } from '../../../../utils/transportMappings'
@@ -190,7 +191,7 @@ const defaultColumns: GridColDef[] = [
         <CustomChip
           skin="light"
           size="small"
-          label={transportStatusLabels[row?.status] || ''}
+          label={transportDocStatusLabels[row?.status] || ''}
           color={transportStatusObj[row.status]}
           sx={{ textTransform: 'capitalize' }}
         />

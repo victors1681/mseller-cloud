@@ -30,16 +30,17 @@ import DatePicker from 'react-datepicker'
 
 // ** Store & Actions Imports
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchData, deleteInvoice } from 'src/store/apps/transports'
+import {
+  fetchData,
+  deleteInvoice,
+  changeTransportStatus,
+  forceCloseTransport,
+} from 'src/store/apps/transports'
 
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
 import { ThemeColor } from 'src/@core/layouts/types'
-import {
-  TransporteListType,
-  TransporteType,
-} from 'src/types/apps/transportType'
-import { DateType } from 'src/types/forms/reactDatepickerTypes'
+import { TransporteListType } from 'src/types/apps/transportType'
 
 // ** Utils Import
 import { getInitials } from 'src/@core/utils/get-initials'
@@ -53,11 +54,15 @@ import TableHeader from 'src/views/apps/transports/list/TableHeader'
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import formatDate from 'src/utils/formatDate'
 import {
+  TransportStatusEnum,
   transportStatusLabels,
   transportStatusObj,
 } from '../../../../utils/transportMappings'
 import { debounce } from '@mui/material'
 import { DriverAutocomplete } from 'src/views/ui/driverAutoComplete'
+import { useAuth } from 'src/hooks/useAuth'
+import TransportStatusSelect from '../transportStatusSelect'
+import ConfirmTransportStatus from '../confirmStatus'
 
 interface InvoiceStatusObj {
   [key: string]: {
@@ -225,14 +230,18 @@ const TransportList = () => {
   const [selectedRows, setSelectedRows] = useState<GridRowId[]>([])
   const [startDateRange, setStartDateRange] = useState<any>(null)
   const [selectedDrivers, setSelectedDrivers] = useState<any>(null)
+  const [selectTransportNumber, setSelectTransportNumber] = useState<string>('')
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 20,
   })
+  const [transportConfirmDialog, setTransportConfirmDialog] =
+    useState<boolean>(false)
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
   const store = useSelector((state: RootState) => state.transports)
+  const { accessControl, user } = useAuth()
 
   useEffect(() => {
     dispatch(
@@ -296,6 +305,40 @@ const TransportList = () => {
     [paginationModel, value, selectedDrivers, statusValue],
   )
 
+  const handleCloseTransport = async (transportNo: string) => {
+    const result = window.confirm(
+      `Seguro que deseas cerrar el transporte ${transportNo}? \n Todas las entregas aún no procesadas cambiarán a status entregar después`,
+    )
+
+    if (result) {
+      dispatch(forceCloseTransport(transportNo))
+    }
+  }
+
+  const handleChangeStatus = async (
+    status: TransportStatusEnum,
+    transportNo: string,
+  ) => {
+    let msg = ''
+    switch (status) {
+      case TransportStatusEnum.Pendiente: //Allow a distributor to re-load the transport in another device
+        msg = `Seguro que desea restaurar el transporte ${transportNo} en otro equipo? \n Útil si el equipo es robado, daños ó sin batería en transcurso de entrega`
+        break
+      case TransportStatusEnum.ERP: //
+        msg = `Seguro que desea marcar el transporte ${transportNo} como enviado al ERP? \n Útil cuando el transporte ya se envió al ERP y no se actualizó el MSeller`
+        break
+      default:
+        msg = `Seguro que desea cambiar el status a ${status} al transporte ${transportNo}`
+        break
+    }
+    const result = window.confirm(msg)
+
+    // Check the user's choice
+    if (result) {
+      dispatch(changeTransportStatus({ transportNo, status }))
+    }
+  }
+
   const handleOnChangeRange = (dates: any) => {
     const [start, end] = dates
     if (start !== null && end !== null) {
@@ -332,7 +375,63 @@ const TransportList = () => {
                 text: 'Cerrar Transporte',
                 icon: <Icon icon="ri:file-close-fill" fontSize={20} />,
                 menuItemProps: {
-                  onClick: () => alert('Aún pendiente por implementar. '),
+                  disabled:
+                    !accessControl?.transports.allowForceClose ||
+                    [
+                      TransportStatusEnum.Integrado,
+                      TransportStatusEnum.ERP,
+                      TransportStatusEnum.Cancelado,
+                    ].includes(row.status),
+                  onClick: () => handleCloseTransport(row.noTransporte),
+                },
+              },
+              {
+                text: 'Restaurar Dispositivo',
+                icon: <Icon icon="tabler:device-mobile-up" fontSize={20} />,
+                menuItemProps: {
+                  disabled:
+                    !accessControl?.transports.allowChangeStatus ||
+                    [
+                      TransportStatusEnum.Integrado,
+                      TransportStatusEnum.ERP,
+                      TransportStatusEnum.Cancelado,
+                      TransportStatusEnum.Pendiente,
+                    ].includes(row.status),
+                  onClick: () =>
+                    handleChangeStatus(
+                      TransportStatusEnum.Pendiente,
+                      row.noTransporte,
+                    ),
+                },
+              },
+              {
+                text: 'Transporte Enviado al ERP',
+                icon: <Icon icon="carbon:document-export" fontSize={20} />,
+                menuItemProps: {
+                  disabled:
+                    !accessControl?.transports.allowChangeStatus ||
+                    [
+                      TransportStatusEnum.Integrado,
+                      TransportStatusEnum.ERP,
+                      TransportStatusEnum.Cancelado,
+                      TransportStatusEnum.Pendiente,
+                    ].includes(row.status),
+                  onClick: () =>
+                    handleChangeStatus(
+                      TransportStatusEnum.ERP,
+                      row.noTransporte,
+                    ),
+                },
+              },
+              {
+                text: 'Cambiar Status',
+                icon: <Icon icon="tabler:status-change" fontSize={20} />,
+                menuItemProps: {
+                  disabled: user?.type !== 'superuser',
+                  onClick: () => {
+                    setSelectTransportNumber(row.noTransporte)
+                    setTransportConfirmDialog((prev) => !prev)
+                  },
                 },
               },
             ]}
@@ -344,6 +443,11 @@ const TransportList = () => {
 
   return (
     <DatePickerWrapper>
+      <ConfirmTransportStatus
+        transportNo={selectTransportNumber}
+        open={transportConfirmDialog}
+        setOpen={setTransportConfirmDialog}
+      />
       <Grid container spacing={6}>
         <Grid item xs={12}>
           <Card>
@@ -351,29 +455,10 @@ const TransportList = () => {
             <CardContent>
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={4}>
-                  <FormControl fullWidth>
-                    <InputLabel id="invoice-status-select">
-                      Estado del Transporte
-                    </InputLabel>
-
-                    <Select
-                      fullWidth
-                      value={statusValue}
-                      sx={{ mr: 4, mb: 2 }}
-                      label="Estado del Transporte"
-                      onChange={handleStatusValue}
-                      labelId="invoice-status-select"
-                    >
-                      <MenuItem value="">none</MenuItem>
-                      {Object.keys(transportStatusLabels).map((k: any) => {
-                        return (
-                          <MenuItem value={k}>
-                            {transportStatusLabels[k]}
-                          </MenuItem>
-                        )
-                      })}
-                    </Select>
-                  </FormControl>
+                  <TransportStatusSelect
+                    handleStatusValue={handleStatusValue}
+                    statusValue={statusValue}
+                  />
                 </Grid>
 
                 <Grid xs={12} sm={4}>

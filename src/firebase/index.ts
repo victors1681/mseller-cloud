@@ -2,7 +2,7 @@ import * as firebase from 'firebase/app'
 import firebaseConfig from './firebaseConfig'
 import { getFirestore } from 'firebase/firestore'
 import { getFunctions, httpsCallable } from 'firebase/functions'
-import { UserDataType } from 'src/context/types'
+import { UserTypes } from 'src/context/types'
 import {
   browserLocalPersistence,
   browserSessionPersistence,
@@ -39,11 +39,11 @@ if (process.env.NODE_ENV === 'development') {
 
 export const getUserByAccessToken = async (
   accessToken: string,
-): Promise<UserDataType | undefined> => {
+): Promise<UserTypes | undefined> => {
   try {
     const fn = httpsCallable(functions, 'getUserByAccessToken')
     const response = await fn({ accessToken })
-    return response.data as UserDataType
+    return response.data as UserTypes
   } catch (err) {
     console.error(err)
     throw err
@@ -55,11 +55,11 @@ export const refreshAccessToken = async (): Promise<string | undefined> => {
 }
 
 export const getAllCurrentProfile = async (): Promise<
-  UserDataType | undefined
+  UserTypes | undefined
 > => {
   const fn = httpsCallable(functions, 'getUserProfileV2')
   const profileDataResponse = await fn()
-  const userData = profileDataResponse.data as UserDataType
+  const userData = profileDataResponse.data as UserTypes
   axiosSetClientUrl(userData.business.config)
   return userData
 }

@@ -17,20 +17,15 @@ import axios from 'axios'
 import authConfig from 'src/configs/auth'
 
 // ** Types
-import {
-  AuthValuesType,
-  LoginParams,
-  ErrCallbackType,
-  UserDataType,
-} from './types'
+import { AuthValuesType, LoginParams, ErrCallbackType } from './types'
 import {
   auth,
   getAllCurrentProfile,
   handleSignOut,
   signInByEmail,
 } from 'src/firebase'
-import { axiosSetClientUrl } from 'src/configs/restClient'
 import { onAuthStateChanged } from 'firebase/auth'
+import { UserTypes } from 'src/types/apps/userTypes'
 
 // ** Defaults
 const defaultProvider: AuthValuesType = {
@@ -51,7 +46,7 @@ type Props = {
 
 const AuthProvider = ({ children }: Props) => {
   // ** States
-  const [user, setUser] = useState<UserDataType | null>(defaultProvider.user)
+  const [user, setUser] = useState<UserTypes | null>(defaultProvider.user)
   const [loading, setLoading] = useState<boolean>(defaultProvider.loading)
   const [loadingForm, setLoadingForm] = useState<boolean>(false)
 
@@ -141,6 +136,7 @@ const AuthProvider = ({ children }: Props) => {
     login: handleLogin,
     logout: handleLogout,
     loadingForm,
+    accessControl: user?.cloudAccess,
   }
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>
