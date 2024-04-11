@@ -3,6 +3,7 @@ import { ClienteType } from './clientTypes'
 import { LocalidadType } from './locationType'
 import { VendedorType } from './sellerType'
 import { DistribuidorType } from './driverType'
+import { NcfType } from './ncfTypes'
 
 export interface TransportResponse {
   transportes: TransporteType[]
@@ -230,4 +231,5 @@ export interface ReporteEntregaMonto {
   credito: number
   neto: number
   detalle: Detalle[]
+  tiposNcf: NcfType[]
 }

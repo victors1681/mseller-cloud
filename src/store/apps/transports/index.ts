@@ -151,6 +151,7 @@ export const deliveryReportAmount = async (
   noTransporte: string,
   paymentType?: string,
   sellerCode?: string,
+  customerType?: string,
 ) => {
   let filter = {}
   if (paymentType) {
@@ -158,6 +159,9 @@ export const deliveryReportAmount = async (
   }
   if (sellerCode) {
     Object.assign(filter, { CodigoVendedor: sellerCode })
+  }
+  if (customerType) {
+    Object.assign(filter, { TipoCliente: customerType })
   }
 
   const response = await restClient.get(

@@ -8,27 +8,10 @@ import Link from 'next/link'
 import Grid from '@mui/material/Grid'
 import Alert from '@mui/material/Alert'
 
-// ** Third Party Components
-import axios from 'axios'
-
-// ** Types
-import { DocumentType } from 'src/types/apps/documentTypes'
-
 // ** Demo Components Imports
 import PreviewCard from 'src/views/apps/transports/preview/PreviewCardAmount'
-import {
-  deliveryReportAmount,
-  fetchTransportDocsData,
-} from 'src/store/apps/transports'
-import { AsyncThunkAction, Dispatch, AnyAction } from '@reduxjs/toolkit'
-import {
-  DocumentoEntregaResponse,
-  PaymentTypeEnum,
-  ReporteEntrega,
-  ReporteEntregaMonto,
-} from 'src/types/apps/transportType'
-import { RootState } from 'src/store'
-import { useSelector } from 'react-redux'
+import { deliveryReportAmount } from 'src/store/apps/transports'
+import { ReporteEntregaMonto } from 'src/types/apps/transportType'
 import { useRouter } from 'next/router'
 
 interface DocumentPreviewProps {
@@ -45,10 +28,16 @@ const InvoicePreview = ({ id }: DocumentPreviewProps) => {
   const router = useRouter()
   const paymentType = router?.query?.paymentType as string
   const sellerCode = router?.query?.sellerCode as string
+  const customerType = router?.query?.customerType as string
 
   const initRequest = async () => {
     try {
-      let responseInfo = await deliveryReportAmount(id, paymentType, sellerCode)
+      let responseInfo = await deliveryReportAmount(
+        id,
+        paymentType,
+        sellerCode,
+        customerType,
+      )
       setData(responseInfo)
       setTimeout(() => {
         window.print()

@@ -65,12 +65,14 @@ const CustomTableCell = styled(TableCell)<BoxProps>(({ theme }) => ({
   padding: '0px',
   paddingTop: '1.2px',
   paddingBottom: '1.2px',
+  color: 'black !important',
 }))
 
 const CustomHeaderTableCell = styled(TableCell)<BoxProps>(({ theme }) => ({
   fontSize: '12px',
   padding: '2px',
   fontWeight: 'bold',
+  color: 'black !important',
 }))
 
 const StyledGrid = styled(Grid)(({ theme }) => ({
@@ -85,6 +87,8 @@ const PreviewCard = ({ data }: Props) => {
   const router = useRouter()
 
   const sellerCode = router?.query?.sellerCode as string | null
+
+  const customerType = router?.query?.customerType as string | null
   const getVariant = (param: string, value: string) =>
     router?.query?.[param] === value ? 'contained' : 'outlined'
 
@@ -121,9 +125,23 @@ const PreviewCard = ({ data }: Props) => {
         })
     }
 
+    const handleChangecustomerType = (event: SelectChangeEvent) => {
+      router
+        .push({
+          pathname: `/apps/transports/printDeliveryReportAmount/[id]`,
+          query: {
+            ...router.query,
+            customerType: event.target.value,
+          },
+        })
+        .then(() => {
+          router.reload()
+        })
+    }
+
     return (
       <div>
-        <StyledGrid container sx={{ p: 3, pb: 6, width: '50em' }}>
+        <StyledGrid container sx={{ p: 3, pb: 6, width: '50em', gap: 4 }}>
           <Grid item xs={12}>
             <Typography variant="h5">Filtros</Typography>
           </Grid>
@@ -175,7 +193,7 @@ const PreviewCard = ({ data }: Props) => {
               Crédito
             </Button>
           </Grid>
-          <Grid item xs={2}>
+          <Grid>
             <FormControl size="small">
               <InputLabel id="demo-simple-select-label">Vendedor</InputLabel>
               <Select
@@ -188,6 +206,24 @@ const PreviewCard = ({ data }: Props) => {
                 {data.vendedores.map((v) => (
                   <MenuItem value={v.codigo} key={v.codigo}>
                     {v.codigo}-{v.nombre}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid>
+            <FormControl size="small">
+              <InputLabel id="client-type-label">Tipo Cliente</InputLabel>
+              <Select
+                labelId="client-type-labell"
+                id="client-type-select"
+                value={customerType || ''}
+                label="customerType"
+                onChange={handleChangecustomerType}
+              >
+                {data.tiposNcf.map((v) => (
+                  <MenuItem value={v.tipoCliente} key={v.id}>
+                    {v.descripcion}
                   </MenuItem>
                 ))}
               </Select>
@@ -216,7 +252,10 @@ const PreviewCard = ({ data }: Props) => {
                       <Typography variant="body2">Distribuidor:</Typography>
                     </MUITableCell>
                     <MUITableCell>
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ fontWeight: 600, color: 'black' }}
+                      >
                         {data.distribuidor.codigo}-{data.distribuidor.nombre}
                       </Typography>
                     </MUITableCell>
@@ -227,13 +266,19 @@ const PreviewCard = ({ data }: Props) => {
                       <Typography variant="body2">Vendedores:</Typography>
                     </MUITableCell>
                     <MUITableCell>
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ fontWeight: 600, color: 'black' }}
+                      >
                         {data.vendedores
                           .filter((f) =>
                             sellerCode ? f.codigo === sellerCode : (f = f),
                           )
                           .map((c) => (
-                            <Typography variant="caption" sx={{ mr: 0.9 }}>
+                            <Typography
+                              variant="caption"
+                              sx={{ mr: 0.9, color: 'black' }}
+                            >
                               {c.codigo.trim()}-{c.nombre.trimEnd()} |
                             </Typography>
                           ))}
@@ -242,10 +287,15 @@ const PreviewCard = ({ data }: Props) => {
                   </TableRow>
                   <TableRow>
                     <MUITableCell>
-                      <Typography variant="body2">Total Documentos:</Typography>
+                      <Typography variant="body2">
+                        Total Documentos:{' '}
+                      </Typography>
                     </MUITableCell>
                     <MUITableCell>
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ fontWeight: 600, color: 'black' }}
+                      >
                         {data.totalDocumentos}
                       </Typography>
                     </MUITableCell>
@@ -257,6 +307,7 @@ const PreviewCard = ({ data }: Props) => {
                   sx={{
                     display: 'flex',
                     justifyContent: { xs: 'flex-start', sm: 'flex-end' },
+                    color: 'black',
                   }}
                 >
                   <Table sx={{ maxWidth: '290px' }}>
@@ -274,8 +325,26 @@ const PreviewCard = ({ data }: Props) => {
                           <Typography variant="body2">Fecha:</Typography>
                         </MUITableCell>
                         <MUITableCell>
-                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                          <Typography
+                            variant="body2"
+                            sx={{ fontWeight: 600, color: 'black' }}
+                          >
                             {formatDate(data.fecha)}
+                          </Typography>
+                        </MUITableCell>
+                      </TableRow>
+                      <TableRow>
+                        <MUITableCell>
+                          <Typography variant="body2">Tipo:</Typography>
+                        </MUITableCell>
+                        <MUITableCell>
+                          <Typography
+                            variant="caption"
+                            sx={{ fontWeight: 600, color: 'black' }}
+                          >
+                            {data.tiposNcf.find(
+                              (d) => d.tipoCliente === customerType,
+                            )?.descripcion || '-'}
                           </Typography>
                         </MUITableCell>
                       </TableRow>
@@ -292,7 +361,7 @@ const PreviewCard = ({ data }: Props) => {
             </Typography>
             <Box sx={{ mb: 2 }}>
               {data.clientes.map((c) => (
-                <Typography variant="caption" sx={{ mr: 0.9 }}>
+                <Typography variant="caption" sx={{ mr: 0.9, color: 'black' }}>
                   {c.codigo.trim()}-{c.nombre.trimEnd()} |
                 </Typography>
               ))}
