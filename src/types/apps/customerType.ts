@@ -2,7 +2,7 @@ import { LocalidadType } from './locationType'
 import { CondicionPagoType } from './paymentTypeTypes'
 import { VendedorType } from './sellerType'
 
-export interface ClienteType {
+export interface CustomerType {
   codigo: string
   nombre: string
   direccion: string

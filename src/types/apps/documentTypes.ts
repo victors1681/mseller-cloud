@@ -1,4 +1,4 @@
-import { ClienteType } from './clientTypes'
+import { CustomerType } from './customerType'
 import { LocalidadType } from './locationType'
 
 export type InvoiceStatus = 'Paid' | string
@@ -51,7 +51,7 @@ export interface DocumentType {
   nuevoCliente: boolean
   fecha: string
   nota: string
-  cliente: ClienteType
+  cliente: CustomerType
   emailVendedor: string
   condicionPago: string
   noContacto: string

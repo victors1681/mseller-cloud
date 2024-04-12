@@ -4,7 +4,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 // ** Axios Imports
 import axios from 'axios'
-import { ClienteType } from 'src/types/apps/clientTypes'
+import { CustomerType } from 'src/types/apps/customerType'
 import { PaginatedResponse } from 'src/types/apps/response'
 import restClient from 'src/configs/restClient'
 
@@ -35,7 +35,7 @@ export const fetchData = createAsyncThunk(
     }
     const response = await restClient.get<
       any,
-      AxiosResponse<PaginatedResponse<ClienteType>>
+      AxiosResponse<PaginatedResponse<CustomerType>>
     >('/api/portal/Cliente', {
       params,
     })
@@ -69,7 +69,7 @@ export const deleteClient = createAsyncThunk(
 export const appClientSlice = createSlice({
   name: 'appClient',
   initialState: {
-    data: [] as ClienteType[],
+    data: [] as CustomerType[],
     params: {},
     allData: [],
     pageNumber: 0,

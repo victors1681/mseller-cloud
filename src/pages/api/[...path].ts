@@ -10,7 +10,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     //restClient.defaults.baseURL = 'https://portal-int-api.mseller.app'
 
     const targetUrl = req.headers['x-url']
-    console.log('targetUrl', targetUrl)
 
     const enableProdEnPoint = false
 
@@ -21,10 +20,17 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
         ? 'http://localhost:5186'
         : 'https://cerveceriavegana.mseller.app:8191'
 
+    console.log('targetUrl', axios.defaults.baseURL)
+
     //URL coming from the user configuration
 
     //console.log(req.headers.authorization)
-    console.log('Call from:', fullPath, 'payload', params)
+    console.log(
+      'Call from:',
+      `${axios.defaults.baseURL}/${fullPath}`,
+      'payload',
+      params,
+    )
     switch (method) {
       case 'GET':
         const response = await axios.get(fullPath, {

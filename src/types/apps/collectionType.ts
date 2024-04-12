@@ -1,4 +1,4 @@
-import { ClienteType } from './clientTypes'
+import { CustomerType } from './customerType'
 import { VendedorType } from './sellerType'
 
 export enum CollectionEnum {
@@ -79,7 +79,7 @@ export interface ReceiptType {
   fechaSincronizado: string
   recibosDetalles: ReceiptDetailType[]
   vendedor: VendedorType
-  cliente: ClienteType
+  cliente: CustomerType
   banco: BankType
 }
 

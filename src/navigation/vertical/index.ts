@@ -64,6 +64,11 @@ const navigation = (): VerticalNavItemsType => {
           path: '/apps/sellers/list',
         },
         {
+          title: 'Facturas',
+          icon: 'lets-icons:order',
+          path: '/apps/invoices/list',
+        },
+        {
           title: 'Distribuidores',
           icon: 'healthicons:truck-driver',
           path: '/apps/drivers/list',

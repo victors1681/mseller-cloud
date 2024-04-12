@@ -23,13 +23,13 @@ import { DataGrid, GridColDef, GridRowId } from '@mui/x-data-grid'
 import { debounce } from '@mui/material'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
-
+import DatePicker from 'react-datepicker'
 // ** Third Party Imports
 import format from 'date-fns/format'
 
 // ** Store & Actions Imports
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchData, deleteClient } from 'src/store/apps/clients'
+import { fetchInvoice } from 'src/store/apps/invoices'
 
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
@@ -42,6 +42,8 @@ import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import formatCurrency from 'src/utils/formatCurrency'
 import { CustomerType } from 'src/types/apps/customerType'
 import { SellerAutocomplete } from 'src/views/ui/sellerAutoComplete'
+import { InvoiceType } from 'src/types/apps/invoicesTypes'
+import formatDate from 'src/utils/formatDate'
 
 interface CustomInputProps {
   dates: Date[]
@@ -52,7 +54,7 @@ interface CustomInputProps {
 }
 
 interface CellType {
-  row: CustomerType
+  row: InvoiceType
 }
 
 // ** Styled component for the link in the dataTable
@@ -68,15 +70,13 @@ const defaultColumns: GridColDef[] = [
     minWidth: 80,
     headerName: 'Código',
     renderCell: ({ row }: CellType) => (
-      <LinkStyled
-        href={`/apps/invoice/preview/${row.codigo}`}
-      >{`${row.codigo}`}</LinkStyled>
+      <LinkStyled href={`#`}>{`${row.no_factura}`}</LinkStyled>
     ),
   },
   {
-    flex: 0.35,
+    flex: 0.25,
     field: 'client',
-    minWidth: 300,
+    minWidth: 250,
     headerName: 'Nombre/Dir',
     renderCell: ({ row }: CellType) => {
       return (
@@ -91,10 +91,10 @@ const defaultColumns: GridColDef[] = [
                 textTransform: 'capitalize',
               }}
             >
-              {row.nombre}
+              {row.cliente.nombre}
             </Typography>
             <Typography noWrap variant="caption">
-              {row.direccion} - {row.ciudad}
+              {row.cliente.direccion} - {row.cliente.ciudad}
             </Typography>
           </Box>
         </Box>
@@ -102,7 +102,7 @@ const defaultColumns: GridColDef[] = [
     },
   },
   {
-    flex: 0.2,
+    flex: 0.15,
     field: 'seller',
     minWidth: 200,
     headerName: 'Vendedor',
@@ -126,21 +126,25 @@ const defaultColumns: GridColDef[] = [
     },
   },
   {
-    flex: 0.15,
-    minWidth: 130,
-    field: 'rnc',
-    headerName: 'RNC',
-    renderCell: ({ row }: CellType) => (
-      <Typography variant="body2">{row.rnc}</Typography>
-    ),
-  },
-  {
     flex: 0.1,
-    minWidth: 90,
-    field: 'total',
-    headerName: 'Tipo',
+    minWidth: 100,
+    field: 'rnc',
+    headerName: 'NCR/Condición',
     renderCell: ({ row }: CellType) => (
-      <Typography variant="body2">{row.tipoCliente}</Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+          <Typography
+            noWrap
+            variant="body2"
+            sx={{ color: 'text.primary', fontWeight: 600 }}
+          >
+            {row.ncf}
+          </Typography>
+          <Typography noWrap variant="caption">
+            {row.condicion_pago}
+          </Typography>
+        </Box>
+      </Box>
     ),
   },
 
@@ -148,21 +152,23 @@ const defaultColumns: GridColDef[] = [
     flex: 0.1,
     minWidth: 120,
     field: 'balance',
-    headerName: 'Balance',
+    headerName: 'Balance/Fecha',
     renderCell: ({ row }: CellType) => (
-      <Typography variant="body2">{formatCurrency(row.balance)}</Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+          <Typography
+            noWrap
+            variant="body2"
+            sx={{ color: 'text.primary', fontWeight: 600 }}
+          >
+            {formatCurrency(row.total)}
+          </Typography>
+          <Typography noWrap variant="caption">
+            {formatDate(row.fecha)}
+          </Typography>
+        </Box>
+      </Box>
     ),
-  },
-  {
-    flex: 0.05,
-    field: 'active',
-    headerName: '',
-    renderCell: ({ row }: CellType) =>
-      row.status == 'A' ? (
-        <Icon icon="lets-icons:check-fill" color="#56ca00" fontSize={20} />
-      ) : (
-        <Icon icon="bxs:x-circle" color="#ff4b51" fontSize={20} />
-      ),
   },
 ]
 
@@ -197,8 +203,10 @@ const InvoiceList = () => {
   const [dates, setDates] = useState<Date[]>([])
   const [value, setValue] = useState<string>('')
   const [statusValue, setStatusValue] = useState<string>('')
+  const [endDateRange, setEndDateRange] = useState<any>(null)
   const [selectedRows, setSelectedRows] = useState<GridRowId[]>([])
   const [selectedSellers, setSelectedSellers] = useState<any>(null)
+  const [startDateRange, setStartDateRange] = useState<any>(null)
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 20,
@@ -206,31 +214,29 @@ const InvoiceList = () => {
   console.log(selectedSellers)
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
-  const store = useSelector((state: RootState) => state.clients)
+  const store = useSelector((state: RootState) => state.invoices)
 
   //Initial Load
   useEffect(() => {
     dispatch(
-      fetchData({
+      fetchInvoice({
         dates,
         query: value,
-        procesado: statusValue,
         pageNumber: paginationModel.page,
-        vendedor: selectedSellers,
+        vendedores: selectedSellers,
       }),
     )
-  }, [selectedSellers])
+  }, [selectedSellers, dates])
 
   const handlePagination = useCallback(
     (values: any) => {
       setPaginationModel(values)
       dispatch(
-        fetchData({
+        fetchInvoice({
           dates,
           query: value,
-          procesado: statusValue,
           pageNumber: values.page,
-          vendedor: selectedSellers,
+          vendedores: selectedSellers,
         }),
       )
     },
@@ -240,12 +246,11 @@ const InvoiceList = () => {
   const performRequest = useCallback(
     (value: string) => {
       dispatch(
-        fetchData({
+        fetchInvoice({
           dates,
           query: value,
-          procesado: statusValue,
           pageNumber: paginationModel.page,
-          vendedor: selectedSellers,
+          vendedores: selectedSellers,
         }),
       )
     },
@@ -254,7 +259,7 @@ const InvoiceList = () => {
 
   const fn = useCallback(
     debounce((val: string) => {
-      setPaginationModel({ page: 1, pageSize: 20 })
+      setPaginationModel({ page: 0, pageSize: 20 })
       performRequest(val)
     }, 900),
     [],
@@ -273,6 +278,15 @@ const InvoiceList = () => {
     setStatusValue(e.target.value)
   }
 
+  const handleOnChangeRange = (dates: any) => {
+    const [start, end] = dates
+    if (start !== null && end !== null) {
+      setDates(dates)
+    }
+    setStartDateRange(start)
+    setEndDateRange(end)
+  }
+
   const columns: GridColDef[] = [
     ...defaultColumns,
     {
@@ -284,11 +298,7 @@ const InvoiceList = () => {
       renderCell: ({ row }: CellType) => (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Tooltip title="Aprobar">
-            <IconButton
-              size="small"
-              disabled
-              onClick={() => dispatch(deleteClient(row.codigo))}
-            >
+            <IconButton size="small" disabled>
               <Icon icon="tabler:edit" fontSize={20} />
             </IconButton>
           </Tooltip>
@@ -297,7 +307,7 @@ const InvoiceList = () => {
               size="small"
               component={Link}
               disabled
-              href={`/apps/invoice/preview/${row.codigo}`}
+              href={`/apps/invoice/preview/${row.no_factura}`}
             >
               <Icon icon="mdi:eye-outline" fontSize={20} />
             </IconButton>
@@ -313,7 +323,7 @@ const InvoiceList = () => {
         <Grid item xs={12}>
           <Card>
             <CardHeader
-              title="Clientes"
+              title="Facturas"
               action={
                 <OptionsMenu
                   options={[
@@ -338,6 +348,30 @@ const InvoiceList = () => {
                 <Grid item xs={12} sm={6}>
                   <SellerAutocomplete callBack={setSelectedSellers} />
                 </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Box sx={{ padding: 3 }}>
+                    <DatePicker
+                      isClearable
+                      selectsRange
+                      monthsShown={2}
+                      endDate={endDateRange}
+                      selected={startDateRange}
+                      startDate={startDateRange}
+                      shouldCloseOnSelect={false}
+                      id="date-range-picker-months"
+                      onChange={handleOnChangeRange}
+                      customInput={
+                        <CustomInput
+                          dates={dates}
+                          setDates={setDates}
+                          label="Fecha"
+                          end={endDateRange as number | Date}
+                          start={startDateRange as number | Date}
+                        />
+                      }
+                    />
+                  </Box>
+                </Grid>
               </Grid>
             </CardContent>
           </Card>
@@ -348,7 +382,7 @@ const InvoiceList = () => {
               value={value}
               selectedRows={selectedRows}
               handleFilter={handleFilter}
-              placeholder="Nombre o código"
+              placeholder="No.Factura ó Cliente"
             />
             <DataGrid
               autoHeight
@@ -359,7 +393,7 @@ const InvoiceList = () => {
               paginationModel={paginationModel}
               onPaginationModelChange={handlePagination}
               onRowSelectionModelChange={(rows) => setSelectedRows(rows)}
-              getRowId={(row) => row.codigo}
+              getRowId={(row) => row.no_factura}
               paginationMode="server"
               loading={store.isLoading}
               rowCount={store.totalResults} //

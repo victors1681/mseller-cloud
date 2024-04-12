@@ -5,7 +5,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import chat from 'src/store/apps/chat'
 import user from 'src/store/apps/user'
 import email from 'src/store/apps/email'
-import invoice from 'src/store/apps/documents'
+import documents from 'src/store/apps/documents'
 import transports from 'src/store/apps/transports'
 import calendar from 'src/store/apps/calendar'
 import permissions from 'src/store/apps/permissions'
@@ -16,13 +16,14 @@ import sellers from 'src/store/apps/seller'
 import drivers from 'src/store/apps/driver'
 import locations from 'src/store/apps/location'
 import collections from 'src/store/apps/collections'
+import invoices from 'src/store/apps/invoices'
 
 export const store = configureStore({
   reducer: {
     user,
     chat,
     email,
-    invoice,
+    documents,
     calendar,
     permissions,
     transports,
@@ -33,6 +34,7 @@ export const store = configureStore({
     drivers,
     locations,
     collections,
+    invoices,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

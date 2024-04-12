@@ -292,7 +292,7 @@ const InvoiceList = () => {
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
-  const store = useSelector((state: RootState) => state.invoice)
+  const store = useSelector((state: RootState) => state.documents)
 
   const handlePagination = useCallback(
     (values: any) => {

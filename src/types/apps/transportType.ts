@@ -1,5 +1,5 @@
 import { TransportStatusEnum } from 'src/utils/transportMappings'
-import { ClienteType } from './clientTypes'
+import { CustomerType } from './customerType'
 import { LocalidadType } from './locationType'
 import { VendedorType } from './sellerType'
 import { DistribuidorType } from './driverType'
@@ -115,7 +115,7 @@ export interface DocumentoEntregaType {
   permitirEditar: boolean
   secuenciaEntrega: number
   detalle: DocumentoEntregaDetalleType[]
-  cliente: ClienteType
+  cliente: CustomerType
   codigoMotivoRechazo: string
   motivoRechazo: MotivoRechazo
   NcfAutoActualizado: boolean
