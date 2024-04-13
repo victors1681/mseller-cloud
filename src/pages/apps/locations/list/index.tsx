@@ -191,7 +191,7 @@ const InvoiceList = () => {
         <Grid item xs={12}>
           <Card>
             <CardHeader
-              title="Condiciones de Pago"
+              title="Localidades"
               action={
                 <OptionsMenu
                   options={[
