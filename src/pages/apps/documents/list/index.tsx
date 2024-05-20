@@ -658,11 +658,27 @@ const InvoiceList = () => {
                   </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={4}>
-                  <PaymentTypeAutocomplete selectedPaymentType={decodeURIComponent(PaymentTypeParam)} multiple callBack={handlePaymentTypeValue} />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <LocationAutocomplete selectedLocation={decodeURIComponent(LocationParam)} multiple callBack={handleLocationValue} />
-                </Grid>
+  <PaymentTypeAutocomplete
+    selectedPaymentType={
+      Array.isArray(PaymentTypeParam)
+        ? PaymentTypeParam.map(param => decodeURIComponent(param)).join(', ')
+        : decodeURIComponent(PaymentTypeParam ?? '')
+    }
+    multiple
+    callBack={handlePaymentTypeValue}
+  />
+</Grid>
+<Grid item xs={12} sm={4}>
+  <LocationAutocomplete
+    selectedLocation={
+      Array.isArray(LocationParam)
+        ? LocationParam.map(param => decodeURIComponent(param)).join(', ')
+        : decodeURIComponent(LocationParam ?? '')
+    }
+    multiple
+    callBack={handleLocationValue}
+  />
+</Grid>
 
                 <Grid item xs={12} sm={4}>
                   <FormControl fullWidth>
@@ -686,7 +702,11 @@ const InvoiceList = () => {
                 </Grid>
 
                 <Grid xs={12} sm={4}>
-                  <SellerAutocomplete selectedSellers={decodeURIComponent(sellersParam)} multiple callBack={handleSellerValue} />
+                  <SellerAutocomplete selectedSellers={
+    Array.isArray(sellersParam)
+      ? sellersParam.map(param => decodeURIComponent(param)).join(', ')
+      : decodeURIComponent(sellersParam ?? '')
+  } multiple callBack={handleSellerValue} />
                 </Grid>
                 <Grid item xs={12} sm={4}>
                   <DatePicker
