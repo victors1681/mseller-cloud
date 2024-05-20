@@ -495,8 +495,6 @@ const InvoiceList = () => {
     }
     setStartDateRange(start)
     setEndDateRange(end)
-console.log('start', start) 
-console.log('end', end) 
     router
     .push({
       pathname: `/apps/documents/list`,
