@@ -345,6 +345,7 @@ const InvoiceList = () => {
       if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
         setStartDateRange(startDate)
         setEndDateRange(endDate)
+        setDates([startDate, endDate])
       }
     }
     if (sellersParam) {
@@ -356,7 +357,7 @@ const InvoiceList = () => {
     if (LocationParam) {
       setSelectedLocation(decodeURIComponent(LocationParam as string))
     }
-  }, [orderstatusParam, documentTypeParam, startDateParam, endDateParam,sellersParam,PaymentTypeParam,LocationParam,startDateParam, endDateParam])
+  }, [orderstatusParam, documentTypeParam, startDateParam, endDateParam,sellersParam,PaymentTypeParam,LocationParam])
 
   useEffect(() => {
     dispatch(
@@ -495,16 +496,14 @@ const InvoiceList = () => {
     }
     setStartDateRange(start)
     setEndDateRange(end)
-    router
-    .push({
+    router.push({
       pathname: `/apps/documents/list`,
       query: {
         ...router.query,
-        startDate: start,
-        endDate: end,
+        startDate: start ? start.toISOString() : '',
+        endDate: end ? end.toISOString() : '',
       },
     })
-    // router.push(`/apps/documents/list/?status=${statusValue}&documentType=${documentTypeValue}&startDate=${start}&endDate=${end}`)
   }
 
   const handleApproval = (noPedidoStr: string, status: DocumentStatus) => {
