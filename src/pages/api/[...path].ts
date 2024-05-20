@@ -11,14 +11,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
 
     const targetUrl = req.headers['x-url']
 
-    const enableProdEnPoint = false
+    const enableProdEnPoint = true
 
     axios.defaults.baseURL =
       process.env.NODE_ENV === 'production'
         ? (targetUrl as string) // 'https://portal-int-api.mseller.app'
         : !enableProdEnPoint
         ? 'http://localhost:5186'
-        : 'https://cerveceriavegana.mseller.app:8191'
+        : 'https://portal-int-api.mseller.app'
 
     console.log('targetUrl', axios.defaults.baseURL)
 

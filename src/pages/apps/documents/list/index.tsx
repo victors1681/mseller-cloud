@@ -59,6 +59,8 @@ import { SellerAutocomplete } from 'src/views/ui/sellerAutoComplete'
 import { LocationAutocomplete } from 'src/views/ui/locationAutoComplete'
 import { PaymentTypeAutocomplete } from 'src/views/ui/paymentTypeAutoComplete'
 
+import { useRouter } from 'next/router'
+
 interface InvoiceStatusObj {
   [key: string]: {
     icon: string
@@ -293,6 +295,7 @@ const InvoiceList = () => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
   const store = useSelector((state: RootState) => state.documents)
+  const router = useRouter()
 
   const handlePagination = useCallback(
     (values: any) => {
@@ -320,6 +323,41 @@ const InvoiceList = () => {
     ],
   )
 
+  const orderstatusParam = router?.query?.status
+  const documentTypeParam = router?.query?.documentType
+  const startDateParam = router?.query?.startDate
+  const endDateParam = router?.query?.endDate
+  const sellersParam = router?.query?.sellers 
+  const PaymentTypeParam = router?.query?.paymentType 
+  const LocationParam = router?.query?.location 
+
+  useEffect(() => {
+    if (orderstatusParam) {
+      setStatusValue(orderstatusParam as string)
+      console.log('orderstatusParam', orderstatusParam)
+    }
+    if (documentTypeParam) {
+      setDocumentTypeValue(documentTypeParam as string)
+    }
+    if (startDateParam && endDateParam) {
+      const startDate = new Date(startDateParam as string)
+      const endDate = new Date(endDateParam as string)
+      if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+        setStartDateRange(startDate)
+        setEndDateRange(endDate)
+      }
+    }
+    if (sellersParam) {
+      setSelectedSellers(decodeURIComponent(sellersParam as string))
+    }
+    if (PaymentTypeParam) {
+      setSelectedPaymentType(decodeURIComponent(PaymentTypeParam as string))
+    }
+    if (LocationParam) {
+      setSelectedLocation(decodeURIComponent(LocationParam as string))
+    }
+  }, [orderstatusParam, documentTypeParam, startDateParam, endDateParam,sellersParam,PaymentTypeParam,LocationParam,startDateParam, endDateParam])
+
   useEffect(() => {
     dispatch(
       fetchData({
@@ -338,8 +376,8 @@ const InvoiceList = () => {
     statusValue,
     dates,
     selectedSellers,
-    selectedLocation,
     selectedPaymentType,
+    selectedLocation,
     documentTypeValue,
   ])
 
@@ -364,8 +402,9 @@ const InvoiceList = () => {
       value,
       dates,
       selectedSellers,
-      paginationModel,
+      selectedPaymentType,
       selectedLocation,
+      paginationModel,
     ],
   )
 
@@ -388,10 +427,65 @@ const InvoiceList = () => {
 
   const handleStatusValue = (e: SelectChangeEvent) => {
     setStatusValue(e.target.value)
+    // router.push(`/apps/documents/list/?status=${e.target.value}`)
+    router
+    .push({
+      pathname: `/apps/documents/list`,
+      query: {
+        ...router.query,
+        status: e.target.value,
+      },
+    })
   }
 
+  const handleSellerValue = (sellers : any) => {
+    setSelectedSellers(sellers);
+    router
+    .push({
+      pathname: `/apps/documents/list`,
+      query: {
+        ...router.query,
+        sellers: sellers,
+      },
+    })
+  }
+
+  const handlePaymentTypeValue = (paymentType : any) => {
+    setSelectedPaymentType(paymentType);
+    router
+    .push({
+      pathname: `/apps/documents/list`,
+      query: {
+        ...router.query,
+        paymentType: paymentType,
+      },
+    })
+  }
+
+  const handleLocationValue = (location: any) => {
+    console.log('locationhandler', location)
+    setSelectedLocation(location)
+    router.push({
+      pathname: `/apps/documents/list`,
+      query: {
+        ...router.query,
+        location: location,
+      },
+    })
+  }
+
+
   const handleDocumentTypeValue = (e: SelectChangeEvent) => {
+
     setDocumentTypeValue(e.target.value)
+  router
+    .push({
+      pathname: `/apps/documents/list`,
+      query: {
+        ...router.query,
+        documentType: e.target.value,
+      },
+    })
   }
 
   const handleOnChangeRange = (dates: any) => {
@@ -401,6 +495,18 @@ const InvoiceList = () => {
     }
     setStartDateRange(start)
     setEndDateRange(end)
+console.log('start', start) 
+console.log('end', end) 
+    router
+    .push({
+      pathname: `/apps/documents/list`,
+      query: {
+        ...router.query,
+        startDate: start,
+        endDate: end,
+      },
+    })
+    // router.push(`/apps/documents/list/?status=${statusValue}&documentType=${documentTypeValue}&startDate=${start}&endDate=${end}`)
   }
 
   const handleApproval = (noPedidoStr: string, status: DocumentStatus) => {
@@ -440,7 +546,8 @@ const InvoiceList = () => {
       await dispatch(changeDocumentStatus(payload))
     }
     setActionValue('-1')
-  }
+
+ }
 
   const columns: GridColDef[] = [
     ...defaultColumns,
@@ -554,10 +661,10 @@ const InvoiceList = () => {
                   </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={4}>
-                  <PaymentTypeAutocomplete callBack={setSelectedPaymentType} />
+                  <PaymentTypeAutocomplete selectedPaymentType={decodeURIComponent(PaymentTypeParam)} multiple callBack={handlePaymentTypeValue} />
                 </Grid>
                 <Grid item xs={12} sm={4}>
-                  <LocationAutocomplete callBack={setSelectedLocation} />
+                  <LocationAutocomplete selectedLocation={decodeURIComponent(LocationParam)} multiple callBack={handleLocationValue} />
                 </Grid>
 
                 <Grid item xs={12} sm={4}>
@@ -582,7 +689,7 @@ const InvoiceList = () => {
                 </Grid>
 
                 <Grid xs={12} sm={4}>
-                  <SellerAutocomplete multiple callBack={setSelectedSellers} />
+                  <SellerAutocomplete selectedSellers={decodeURIComponent(sellersParam)} multiple callBack={handleSellerValue} />
                 </Grid>
                 <Grid item xs={12} sm={4}>
                   <DatePicker
