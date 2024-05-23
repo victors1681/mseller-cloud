@@ -300,6 +300,14 @@ const InvoiceList = () => {
   const handlePagination = useCallback(
     (values: any) => {
       setPaginationModel(values)
+      router.push({
+        pathname: router.pathname,
+        query: {
+          ...router.query,
+          page: values.page,
+          pageSize: values.pageSize,
+        },
+      })
       dispatch(
         fetchData({
           dates,
@@ -330,12 +338,24 @@ const InvoiceList = () => {
   const sellersParam = router?.query?.sellers 
   const PaymentTypeParam = router?.query?.paymentType 
   const LocationParam = router?.query?.location 
+  const { page, pageSize } = router.query;
 
   useEffect(() => {
-    if (orderstatusParam) {
-      setStatusValue(orderstatusParam as string)
-      console.log('orderstatusParam', orderstatusParam)
+
+    setPaginationModel({
+      page: page ? Number(page) : 0,
+      pageSize: pageSize ? Number(pageSize) : 20,
+    });
+
+    if (!orderstatusParam) {
+      router.push({
+        pathname: router.pathname,
+        query: { ...router.query, status: '0' }
+      });
+    } else {
+      setStatusValue(orderstatusParam as string);
     }
+
     if (documentTypeParam) {
       setDocumentTypeValue(documentTypeParam as string)
     }

@@ -25,9 +25,7 @@ export const PaymentTypeAutocomplete = (
   const findConditionLabel = (codigo: string) => {
     return locationStore?.data.find((v) => v.condicionPago === codigo)?.descripcion || ''
   }
-
-  console.log("inside", props.selectedPaymentType)
-
+  
   const selectPaymentTypes = props.selectedPaymentType?.split(",")
     .map((v) => ({ "condicionPago": v, "label": findConditionLabel(v) }))
     .filter((item) => item.condicionPago && item.label) || [];
