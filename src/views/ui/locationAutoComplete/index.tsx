@@ -1,37 +1,41 @@
-import { Autocomplete, AutocompleteValue, TextField } from '@mui/material';
-import { SyntheticEvent, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from 'src/store';
-import { fetchData as fetchLocations } from 'src/store/apps/location';
+import { Autocomplete, AutocompleteValue, TextField } from '@mui/material'
+import { SyntheticEvent, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from 'src/store'
+import { fetchData as fetchLocations } from 'src/store/apps/location'
 
 interface LocationAutocompleteProps {
-  selectedLocation?: string;
-  multiple?: boolean;
-  callBack: (values: AutocompleteValue<LocationOptions, any, any, any>) => void;
+  selectedLocation?: string
+  multiple?: boolean
+  callBack: (values: string) => void
 }
 
 interface LocationOptions {
-  label: string;
-  codigo: string;
+  label: string
+  codigo: string
 }
 
 export const LocationAutocomplete = (props: LocationAutocompleteProps) => {
-  const dispatch = useDispatch<AppDispatch>();
-  const locationStore = useSelector((state: RootState) => state.locations);
+  const dispatch = useDispatch<AppDispatch>()
+  const locationStore = useSelector((state: RootState) => state.locations)
 
   const findLocationLabel = (codigo: string) => {
-    return locationStore?.data.find((v) => v.codigo === codigo)?.descripcion || '';
-  };
+    return (
+      locationStore?.data.find((v) => v.codigo === codigo)?.descripcion || ''
+    )
+  }
 
-  const selectLocation = props.selectedLocation?.split(",")
-    .map((v) => ({ codigo: v, label: findLocationLabel(v) }))
-    .filter((item) => item.codigo && item.label) || [];
+  const selectLocation =
+    props.selectedLocation
+      ?.split(',')
+      .map((v) => ({ codigo: v, label: findLocationLabel(v) }))
+      .filter((item) => item.codigo && item.label) || []
 
   useEffect(() => {
     if (!locationStore?.data?.length) {
-      dispatch(fetchLocations());
+      dispatch(fetchLocations())
     }
-  }, [locationStore.data?.length, dispatch]);
+  }, [locationStore.data?.length, dispatch])
 
   const handleSelection = (
     _: SyntheticEvent<Element, Event>,
@@ -62,7 +66,7 @@ export const LocationAutocomplete = (props: LocationAutocompleteProps) => {
         <TextField {...params} label="Localidades" placeholder="Localidades" />
       )}
     />
-  );
-};
+  )
+}
 
-export default LocationAutocomplete;
+export default LocationAutocomplete

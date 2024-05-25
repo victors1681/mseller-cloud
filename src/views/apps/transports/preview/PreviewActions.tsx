@@ -21,7 +21,7 @@ const PreviewActions = ({
   toggleSendInvoiceDrawer,
   toggleAddPaymentDrawer,
 }: Props) => {
-  const navigation = useGoBack('/apps/documents/list')
+  const navigation = useGoBack('/apps/documents/list', true)
 
   return (
     <Card>

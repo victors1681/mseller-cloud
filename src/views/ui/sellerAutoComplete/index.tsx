@@ -8,7 +8,7 @@ import { fetchData as fetchSellers } from 'src/store/apps/seller'
 interface SellerAutocompleteProps {
   selectedSellers?: string
   multiple?: boolean
-  callBack: (values: AutocompleteValue<SellerOptions, any, any, any>) => void
+  callBack: (values: string) => void
 }
 
 interface SellerOptions {
@@ -22,18 +22,20 @@ export const SellerAutocomplete = (props: SellerAutocompleteProps) => {
   const findSellerLabel = (codigo: string) => {
     return sellerStore?.data.find((v) => v.codigo === codigo)?.nombre || ''
   }
-  const selectSellerValues = props.selectedSellers?.split(",")
-    .map((v) => ({ "codigo": v, "label": findSellerLabel(v) }))
-    .filter((item) => item.codigo && item.label) || [];
+  const selectSellerValues =
+    props.selectedSellers
+      ?.split(',')
+      .map((v) => ({ codigo: v, label: findSellerLabel(v) }))
+      .filter((item) => item.codigo && item.label) || []
   useEffect(() => {
     if (!sellerStore?.data?.length) {
       dispatch(
         fetchSellers({
           pageSize: 100,
         }),
-      );
+      )
     }
-  }, [sellerStore.data?.length, dispatch]);
+  }, [sellerStore.data?.length, dispatch])
 
   const handleSelection = (
     _: SyntheticEvent<Element, Event>,
@@ -41,10 +43,10 @@ export const SellerAutocomplete = (props: SellerAutocompleteProps) => {
   ) => {
     const sellers = Array.isArray(values)
       ? values.map((v) => v.codigo).join(',')
-      : values?.codigo || null;
+      : values?.codigo || null
 
-    props?.callBack && props?.callBack(sellers);
-  };
+    props?.callBack && props?.callBack(sellers)
+  }
 
   return (
     <Autocomplete
@@ -64,5 +66,5 @@ export const SellerAutocomplete = (props: SellerAutocompleteProps) => {
         <TextField {...params} label="Vendedores" placeholder="Vendedores" />
       )}
     />
-  );
+  )
 }

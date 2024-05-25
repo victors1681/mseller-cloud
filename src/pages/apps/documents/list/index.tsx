@@ -1,28 +1,23 @@
 // ** React Imports
 import { useState, useEffect, forwardRef, useCallback } from 'react'
 
-// ** Next Import
-import Link from 'next/link'
-
 // ** MUI Imports
-import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
-import Tooltip from '@mui/material/Tooltip'
-import { styled } from '@mui/material/styles'
+
 import MenuItem from '@mui/material/MenuItem'
 import TextField from '@mui/material/TextField'
 import CardHeader from '@mui/material/CardHeader'
-import IconButton from '@mui/material/IconButton'
+
 import InputLabel from '@mui/material/InputLabel'
-import Typography from '@mui/material/Typography'
 import FormControl from '@mui/material/FormControl'
 import CardContent from '@mui/material/CardContent'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
-import { DataGrid, GridColDef, GridRowParams } from '@mui/x-data-grid'
-
-// ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import { DataGrid, GridRowParams } from '@mui/x-data-grid'
+import {
+  columns,
+  orderStatusLabels,
+} from 'src/views/apps/documents/list/tableColRows'
 
 // ** Third Party Imports
 import format from 'date-fns/format'
@@ -34,39 +29,21 @@ import { fetchData, changeDocumentStatus } from 'src/store/apps/documents'
 
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
-import { ThemeColor } from 'src/@core/layouts/types'
-import {
-  DocumentStatus,
-  DocumentType,
-  StatusParam,
-} from 'src/types/apps/documentTypes'
 
-// ** Utils Import
-import { getInitials } from 'src/@core/utils/get-initials'
+import { DocumentStatus, StatusParam } from 'src/types/apps/documentTypes'
 
 // ** Custom Components Imports
-import CustomChip from 'src/@core/components/mui/chip'
-import CustomAvatar from 'src/@core/components/mui/avatar'
-import OptionsMenu from 'src/@core/components/option-menu'
 import TableHeader from 'src/views/apps/documents/list/TableHeader'
 
 // ** Styled Components
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
-import formatDate from 'src/utils/formatDate'
-import formatCurrency from 'src/utils/formatCurrency'
+
 import { debounce } from '@mui/material'
 import { SellerAutocomplete } from 'src/views/ui/sellerAutoComplete'
 import { LocationAutocomplete } from 'src/views/ui/locationAutoComplete'
 import { PaymentTypeAutocomplete } from 'src/views/ui/paymentTypeAutoComplete'
 
 import { useRouter } from 'next/router'
-
-interface InvoiceStatusObj {
-  [key: string]: {
-    icon: string
-    color: ThemeColor
-  }
-}
 
 interface CustomInputProps {
   dates: Date[]
@@ -75,178 +52,6 @@ interface CustomInputProps {
   start: number | Date
   setDates?: (value: Date[]) => void
 }
-
-interface CellType {
-  row: DocumentType
-}
-
-// ** Styled component for the link in the dataTable
-const LinkStyled = styled(Link)(({ theme }) => ({
-  textDecoration: 'none',
-  color: theme.palette.primary.main,
-}))
-
-// ** Vars
-const invoiceStatusObj: InvoiceStatusObj = {
-  Sent: { color: 'secondary', icon: 'mdi:send' },
-  Paid: { color: 'success', icon: 'mdi:check' },
-  Draft: { color: 'primary', icon: 'mdi:content-save-outline' },
-  'Partial Payment': { color: 'warning', icon: 'mdi:chart-pie' },
-  'Past Due': { color: 'error', icon: 'mdi:information-outline' },
-  Downloaded: { color: 'info', icon: 'mdi:arrow-down' },
-}
-
-const orderStatusLabels: any = {
-  '': 'Ninguno',
-  '0': 'Pendiente',
-  '1': 'Procesado',
-  '3': 'Retenido',
-  '5': 'Pendinete Imprimir',
-  '6': 'Condicion Crédito',
-  '7': 'Backorder',
-  '8': 'Error Integración',
-  '9': 'Listo Para Integrar',
-  '10': 'Enviado al ERP',
-}
-
-const orderStatusObj: any = {
-  '1': 'success',
-  '10': 'success',
-  '0': 'warning',
-  '3': 'info',
-  '9': 'secondary',
-  '5': 'primary',
-  '8': 'error',
-}
-
-// ** renders client column
-const renderClient = (row: DocumentType) => {
-  if (row.avatarUrl) {
-    return (
-      <CustomAvatar
-        src={row.avatarUrl}
-        sx={{ mr: 3, width: '1.875rem', height: '1.875rem' }}
-      />
-    )
-  } else {
-    return (
-      <CustomAvatar
-        skin="light"
-        sx={{ mr: 3, fontSize: '.8rem', width: '1.875rem', height: '1.875rem' }}
-      >
-        {getInitials(row.nombreCliente || '')}
-      </CustomAvatar>
-    )
-  }
-}
-
-const defaultColumns: GridColDef[] = [
-  {
-    flex: 0.2,
-    field: 'id',
-    minWidth: 120,
-    headerName: '#',
-    renderCell: ({ row }: CellType) => (
-      <LinkStyled
-        href={`/apps/documents/preview/${row.noPedidoStr}`}
-      >{`${row.noPedidoStr}`}</LinkStyled>
-    ),
-  },
-  {
-    flex: 0.2,
-    field: 'seller',
-    minWidth: 210,
-    headerName: 'Vendedor',
-    renderCell: ({ row }: CellType) => {
-      return (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          {renderClient(row)}
-          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography
-              noWrap
-              variant="body2"
-              sx={{ color: 'text.primary', fontWeight: 600 }}
-            >
-              {row.vendedor.nombre}
-            </Typography>
-            <Typography noWrap variant="caption">
-              {row.vendedor.codigo}
-            </Typography>
-          </Box>
-        </Box>
-      )
-    },
-  },
-  {
-    flex: 0.25,
-    field: 'client',
-    minWidth: 300,
-    headerName: 'Cliente',
-    renderCell: ({ row }: CellType) => {
-      return (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography
-              noWrap
-              variant="body2"
-              sx={{
-                color: 'text.primary',
-                fontWeight: 600,
-                textTransform: 'capitalize',
-              }}
-            >
-              {row.nombreCliente}
-            </Typography>
-            <Typography noWrap variant="caption">
-              {row.codigoCliente} - {row.condicion.descripcion}
-            </Typography>
-          </Box>
-        </Box>
-      )
-    },
-  },
-  {
-    flex: 0.1,
-    minWidth: 90,
-    field: 'total',
-    headerName: 'Total',
-    renderCell: ({ row }: CellType) => (
-      <Typography variant="body2">{`${
-        formatCurrency(row.total) || 0
-      }`}</Typography>
-    ),
-  },
-  {
-    flex: 0.15,
-    minWidth: 130,
-    field: 'issuedDate',
-    headerName: 'Fecha',
-    renderCell: ({ row }: CellType) => (
-      <Typography variant="body2">{formatDate(row.fecha)}</Typography>
-    ),
-  },
-  {
-    flex: 0.1,
-    minWidth: 120,
-    field: 'status',
-    headerName: 'Status',
-    renderCell: ({ row }: CellType) => {
-      return (
-        <Tooltip title={row.mensajesError}>
-          <div style={{ width: '100px' }}>
-            <CustomChip
-              skin="light"
-              size="small"
-              label={orderStatusLabels[row?.procesado] || ''}
-              color={orderStatusObj[row.procesado]}
-              sx={{ textTransform: 'capitalize' }}
-            />
-          </div>
-        </Tooltip>
-      )
-    },
-  },
-]
 
 /* eslint-disable */
 const CustomInput = forwardRef((props: CustomInputProps, ref) => {
@@ -284,8 +89,12 @@ const InvoiceList = () => {
   const [endDateRange, setEndDateRange] = useState<any>(null)
   const [selectedRows, setSelectedRows] = useState<string[]>([])
   const [startDateRange, setStartDateRange] = useState<any>(null)
-  const [selectedSellers, setSelectedSellers] = useState<any>(null)
-  const [selectedLocation, setSelectedLocation] = useState<any>(null)
+  const [selectedSellers, setSelectedSellers] = useState<string | undefined>(
+    undefined,
+  )
+  const [selectedLocation, setSelectedLocation] = useState<string | undefined>(
+    undefined,
+  )
   const [selectedPaymentType, setSelectedPaymentType] = useState<any>(null)
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -297,63 +106,28 @@ const InvoiceList = () => {
   const store = useSelector((state: RootState) => state.documents)
   const router = useRouter()
 
-  const handlePagination = useCallback(
-    (values: any) => {
-      setPaginationModel(values)
-      router.push({
-        pathname: router.pathname,
-        query: {
-          ...router.query,
-          page: values.page,
-          pageSize: values.pageSize,
-        },
-      })
-      dispatch(
-        fetchData({
-          dates,
-          query: value,
-          procesado: statusValue,
-          pageNumber: values.page,
-          vendedores: selectedSellers,
-          localidad: selectedLocation,
-          condicionPago: selectedPaymentType,
-          tipoDocumento: documentTypeValue,
-        }),
-      )
-    },
-    [
-      paginationModel,
-      value,
-      statusValue,
-      selectedLocation,
-      selectedPaymentType,
-      documentTypeValue,
-    ],
-  )
-
-  const orderstatusParam = router?.query?.status
+  const orderStatusParam = router?.query?.status
   const documentTypeParam = router?.query?.documentType
   const startDateParam = router?.query?.startDate
   const endDateParam = router?.query?.endDate
-  const sellersParam = router?.query?.sellers 
-  const PaymentTypeParam = router?.query?.paymentType 
-  const LocationParam = router?.query?.location 
-  const { page, pageSize } = router.query;
+  const sellersParam = router?.query?.sellers
+  const PaymentTypeParam = router?.query?.paymentType
+  const LocationParam = router?.query?.location
+  const { page, pageSize } = router.query
 
   useEffect(() => {
-
     setPaginationModel({
       page: page ? Number(page) : 0,
       pageSize: pageSize ? Number(pageSize) : 20,
-    });
+    })
 
-    if (!orderstatusParam) {
+    if (!orderStatusParam) {
       router.push({
         pathname: router.pathname,
-        query: { ...router.query, status: '0' }
-      });
+        query: { ...router.query, status: '0' },
+      })
     } else {
-      setStatusValue(orderstatusParam as string);
+      setStatusValue(orderStatusParam as string)
     }
 
     if (documentTypeParam) {
@@ -377,7 +151,15 @@ const InvoiceList = () => {
     if (LocationParam) {
       setSelectedLocation(decodeURIComponent(LocationParam as string))
     }
-  }, [orderstatusParam, documentTypeParam, startDateParam, endDateParam,sellersParam,PaymentTypeParam,LocationParam])
+  }, [
+    orderStatusParam,
+    documentTypeParam,
+    startDateParam,
+    endDateParam,
+    sellersParam,
+    PaymentTypeParam,
+    LocationParam,
+  ])
 
   useEffect(() => {
     dispatch(
@@ -437,6 +219,40 @@ const InvoiceList = () => {
     [],
   )
 
+  const handlePagination = useCallback(
+    (values: any) => {
+      setPaginationModel(values)
+      router.push({
+        pathname: router.pathname,
+        query: {
+          ...router.query,
+          page: values.page,
+          pageSize: values.pageSize,
+        },
+      })
+      dispatch(
+        fetchData({
+          dates,
+          query: value,
+          procesado: statusValue,
+          pageNumber: values.page,
+          vendedores: selectedSellers,
+          localidad: selectedLocation,
+          condicionPago: selectedPaymentType,
+          tipoDocumento: documentTypeValue,
+        }),
+      )
+    },
+    [
+      paginationModel,
+      value,
+      statusValue,
+      selectedLocation,
+      selectedPaymentType,
+      documentTypeValue,
+    ],
+  )
+
   const handleFilter = useCallback(
     (val: string) => {
       fn.clear()
@@ -448,9 +264,7 @@ const InvoiceList = () => {
 
   const handleStatusValue = (e: SelectChangeEvent) => {
     setStatusValue(e.target.value)
-    // router.push(`/apps/documents/list/?status=${e.target.value}`)
-    router
-    .push({
+    router.push({
       pathname: `/apps/documents/list`,
       query: {
         ...router.query,
@@ -459,10 +273,9 @@ const InvoiceList = () => {
     })
   }
 
-  const handleSellerValue = (sellers : any) => {
-    setSelectedSellers(sellers);
-    router
-    .push({
+  const handleSellerValue = (sellers: string) => {
+    setSelectedSellers(sellers)
+    router.push({
       pathname: `/apps/documents/list`,
       query: {
         ...router.query,
@@ -471,10 +284,9 @@ const InvoiceList = () => {
     })
   }
 
-  const handlePaymentTypeValue = (paymentType : any) => {
-    setSelectedPaymentType(paymentType);
-    router
-    .push({
+  const handlePaymentTypeValue = (paymentType: string) => {
+    setSelectedPaymentType(paymentType)
+    router.push({
       pathname: `/apps/documents/list`,
       query: {
         ...router.query,
@@ -483,8 +295,7 @@ const InvoiceList = () => {
     })
   }
 
-  const handleLocationValue = (location: any) => {
-    console.log('locationhandler', location)
+  const handleLocationValue = (location: string) => {
     setSelectedLocation(location)
     router.push({
       pathname: `/apps/documents/list`,
@@ -495,12 +306,9 @@ const InvoiceList = () => {
     })
   }
 
-
   const handleDocumentTypeValue = (e: SelectChangeEvent) => {
-
     setDocumentTypeValue(e.target.value)
-  router
-    .push({
+    router.push({
       pathname: `/apps/documents/list`,
       query: {
         ...router.query,
@@ -526,24 +334,6 @@ const InvoiceList = () => {
     })
   }
 
-  const handleApproval = (noPedidoStr: string, status: DocumentStatus) => {
-    const label =
-      status === DocumentStatus.ReadyForIntegration
-        ? 'Seguro que deseas aprobar este pedido?'
-        : 'Seguro que deseas retener este pedido?'
-
-    const result = window.confirm(label)
-
-    // Check the user's choice
-    if (result) {
-      const payload = {
-        noPedidoStr,
-        status,
-      }
-      dispatch(changeDocumentStatus([payload]))
-    }
-  }
-
   const handleSelectionAction = async (event: SelectChangeEvent<string>) => {
     setActionValue(event.target.value)
 
@@ -563,86 +353,16 @@ const InvoiceList = () => {
       await dispatch(changeDocumentStatus(payload))
     }
     setActionValue('-1')
+  }
 
- }
+  //Params for paymentTypes
+  const selectedPaymentTypeParams = Array.isArray(PaymentTypeParam)
+    ? PaymentTypeParam.map((param) => decodeURIComponent(param)).join(', ')
+    : decodeURIComponent(PaymentTypeParam ?? '')
 
-  const columns: GridColDef[] = [
-    ...defaultColumns,
-    {
-      flex: 0.2,
-      minWidth: 140,
-      sortable: false,
-      field: 'actions',
-      headerName: 'Actions',
-      renderCell: ({ row }: CellType) => (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Tooltip title="Aprobar">
-            <IconButton
-              size="small"
-              color="success"
-              disabled={
-                ![DocumentStatus.Pending, DocumentStatus.Retained].includes(
-                  row.procesado,
-                )
-              }
-              onClick={() =>
-                handleApproval(
-                  row.noPedidoStr,
-                  DocumentStatus.ReadyForIntegration,
-                )
-              }
-            >
-              <Icon icon="material-symbols:order-approve" fontSize={20} />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Retener">
-            <IconButton
-              size="small"
-              color="warning"
-              disabled={![DocumentStatus.Pending].includes(row.procesado)}
-              onClick={() =>
-                handleApproval(row.noPedidoStr, DocumentStatus.Retained)
-              }
-            >
-              <Icon
-                icon="fluent:document-header-dismiss-24-filled"
-                fontSize={20}
-              />
-            </IconButton>
-          </Tooltip>
-          {/* <Tooltip title="View">
-            <IconButton
-              size="small"
-              component={Link}
-              href={`/apps/documents/preview/${row.noPedidoStr}`}
-            >
-              <Icon icon="mdi:eye-outline" fontSize={20} />
-            </IconButton>
-          </Tooltip> */}
-          <OptionsMenu
-            iconProps={{ fontSize: 20 }}
-            iconButtonProps={{ size: 'small' }}
-            menuProps={{ sx: { '& .MuiMenuItem-root svg': { mr: 2 } } }}
-            options={[
-              {
-                text: 'Download',
-                icon: <Icon icon="mdi:download" fontSize={20} />,
-              },
-              {
-                text: 'Edit',
-                href: `/apps/documents/edit/${row.noPedidoStr}`,
-                icon: <Icon icon="mdi:pencil-outline" fontSize={20} />,
-              },
-              {
-                text: 'Duplicate',
-                icon: <Icon icon="mdi:content-copy" fontSize={20} />,
-              },
-            ]}
-          />
-        </Box>
-      ),
-    },
-  ]
+  const selectedSellersParams = Array.isArray(sellersParam)
+    ? sellersParam.map((param) => decodeURIComponent(param)).join(', ')
+    : decodeURIComponent(sellersParam ?? '')
 
   return (
     <DatePickerWrapper>
@@ -678,27 +398,25 @@ const InvoiceList = () => {
                   </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={4}>
-  <PaymentTypeAutocomplete
-    selectedPaymentType={
-      Array.isArray(PaymentTypeParam)
-        ? PaymentTypeParam.map(param => decodeURIComponent(param)).join(', ')
-        : decodeURIComponent(PaymentTypeParam ?? '')
-    }
-    multiple
-    callBack={handlePaymentTypeValue}
-  />
-</Grid>
-<Grid item xs={12} sm={4}>
-  <LocationAutocomplete
-    selectedLocation={
-      Array.isArray(LocationParam)
-        ? LocationParam.map(param => decodeURIComponent(param)).join(', ')
-        : decodeURIComponent(LocationParam ?? '')
-    }
-    multiple
-    callBack={handleLocationValue}
-  />
-</Grid>
+                  <PaymentTypeAutocomplete
+                    selectedPaymentType={selectedPaymentTypeParams}
+                    multiple
+                    callBack={handlePaymentTypeValue}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <LocationAutocomplete
+                    selectedLocation={
+                      Array.isArray(LocationParam)
+                        ? LocationParam.map((param) =>
+                            decodeURIComponent(param),
+                          ).join(', ')
+                        : decodeURIComponent(LocationParam ?? '')
+                    }
+                    multiple
+                    callBack={handleLocationValue}
+                  />
+                </Grid>
 
                 <Grid item xs={12} sm={4}>
                   <FormControl fullWidth>
@@ -722,11 +440,11 @@ const InvoiceList = () => {
                 </Grid>
 
                 <Grid xs={12} sm={4}>
-                  <SellerAutocomplete selectedSellers={
-    Array.isArray(sellersParam)
-      ? sellersParam.map(param => decodeURIComponent(param)).join(', ')
-      : decodeURIComponent(sellersParam ?? '')
-  } multiple callBack={handleSellerValue} />
+                  <SellerAutocomplete
+                    selectedSellers={selectedSellersParams}
+                    multiple
+                    callBack={handleSellerValue}
+                  />
                 </Grid>
                 <Grid item xs={12} sm={4}>
                   <DatePicker
@@ -772,7 +490,7 @@ const InvoiceList = () => {
                 params.row.procesado === DocumentStatus.Pending
               }
               rows={store.data}
-              columns={columns}
+              columns={columns(dispatch)}
               disableRowSelectionOnClick
               paginationModel={paginationModel}
               onPaginationModelChange={handlePagination}
