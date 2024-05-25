@@ -21,7 +21,7 @@ interface Props {
 }
 
 const PreviewActions = ({ data }: Props) => {
-  const navigation = useGoBack('/apps/documents/list')
+  const navigation = useGoBack('/apps/documents/list', true)
   const dispatch = useDispatch<AppDispatch>()
 
   const handleApproval = async (

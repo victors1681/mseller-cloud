@@ -7,9 +7,7 @@ import { fetchData as fetchPaymentTypes } from 'src/store/apps/paymentType'
 interface PaymentTypeAutocompleteProps {
   selectedPaymentType?: string
   multiple?: boolean
-  callBack: (
-    values: AutocompleteValue<PaymentTypeOptions, any, any, any>,
-  ) => void
+  callBack: (values: string) => void
 }
 
 interface PaymentTypeOptions {
@@ -23,12 +21,17 @@ export const PaymentTypeAutocomplete = (
   const locationStore = useSelector((state: RootState) => state.paymentTypes)
 
   const findConditionLabel = (codigo: string) => {
-    return locationStore?.data.find((v) => v.condicionPago === codigo)?.descripcion || ''
+    return (
+      locationStore?.data.find((v) => v.condicionPago === codigo)
+        ?.descripcion || ''
+    )
   }
-  
-  const selectPaymentTypes = props.selectedPaymentType?.split(",")
-    .map((v) => ({ "condicionPago": v, "label": findConditionLabel(v) }))
-    .filter((item) => item.condicionPago && item.label) || [];
+
+  const selectPaymentTypes =
+    props.selectedPaymentType
+      ?.split(',')
+      .map((v) => ({ condicionPago: v, label: findConditionLabel(v) }))
+      .filter((item) => item.condicionPago && item.label) || []
 
   useEffect(() => {
     if (!locationStore?.data?.length) {
