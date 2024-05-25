@@ -12,24 +12,24 @@ interface LocationAutocompleteProps {
 
 interface LocationOptions {
   label: string
-  codigo: string
+  id: string
 }
 
 export const LocationAutocomplete = (props: LocationAutocompleteProps) => {
   const dispatch = useDispatch<AppDispatch>()
   const locationStore = useSelector((state: RootState) => state.locations)
 
-  const findLocationLabel = (codigo: string) => {
+  const findLocationLabel = (id: string) => {
     return (
-      locationStore?.data.find((v) => v.codigo === codigo)?.descripcion || ''
+      locationStore?.data.find((v) => v.id.toString() === id)?.descripcion || ''
     )
   }
 
   const selectLocation =
     props.selectedLocation
       ?.split(',')
-      .map((v) => ({ codigo: v, label: findLocationLabel(v) }))
-      .filter((item) => item.codigo && item.label) || []
+      .map((v) => ({ id: v.toString(), label: findLocationLabel(v) }))
+      .filter((item) => item.id.toString() && item.label) || []
 
   useEffect(() => {
     if (!locationStore?.data?.length) {
@@ -42,8 +42,8 @@ export const LocationAutocomplete = (props: LocationAutocompleteProps) => {
     values: AutocompleteValue<any, any, any, any>,
   ) => {
     const locations = Array.isArray(values)
-      ? values.map((v) => v.codigo).join(',')
-      : values?.codigo || null
+      ? values.map((v) => v.id).join(',')
+      : values?.id || null
 
     props?.callBack && props?.callBack(locations)
   }
@@ -53,13 +53,13 @@ export const LocationAutocomplete = (props: LocationAutocompleteProps) => {
       multiple={!!props.multiple}
       options={locationStore.data.map((v) => ({
         label: v.descripcion,
-        codigo: v.codigo,
+        id: v.id.toString(),
       }))}
       filterSelectedOptions
       value={selectLocation}
-      isOptionEqualToValue={(option, value) => option.codigo === value.codigo}
+      isOptionEqualToValue={(option, value) => option.id === value.id}
       id="locations-dropdown"
-      getOptionLabel={(option) => `${option.codigo}-${option.label}` || ''}
+      getOptionLabel={(option) => `${option.id}-${option.label}` || ''}
       sx={{ mt: 0, ml: 0 }}
       onChange={handleSelection}
       renderInput={(params) => (
