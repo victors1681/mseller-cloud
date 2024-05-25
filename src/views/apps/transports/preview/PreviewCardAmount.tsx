@@ -125,7 +125,7 @@ const PreviewCard = ({ data }: Props) => {
         })
     }
 
-    const handleChangecustomerType = (event: SelectChangeEvent) => {
+    const handleChangeCustomerType = (event: SelectChangeEvent) => {
       router
         .push({
           pathname: `/apps/transports/printDeliveryReportAmount/[id]`,
@@ -219,7 +219,7 @@ const PreviewCard = ({ data }: Props) => {
                 id="client-type-select"
                 value={customerType || ''}
                 label="customerType"
-                onChange={handleChangecustomerType}
+                onChange={handleChangeCustomerType}
               >
                 {data.tiposNcf.map((v) => (
                   <MenuItem value={v.tipoCliente} key={v.id}>

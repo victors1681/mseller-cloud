@@ -1,27 +1,41 @@
 import { Autocomplete, AutocompleteValue, TextField } from '@mui/material'
-import { SyntheticEvent, useEffect, useState } from 'react'
+import { SyntheticEvent, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/store'
 import { fetchData as fetchLocations } from 'src/store/apps/location'
 
 interface LocationAutocompleteProps {
+  selectedLocation?: string
   multiple?: boolean
-  callBack: (values: AutocompleteValue<LocationOptions, any, any, any>) => void
+  callBack: (values: string) => void
 }
 
 interface LocationOptions {
   label: string
-  codigo: string
+  id: string
 }
+
 export const LocationAutocomplete = (props: LocationAutocompleteProps) => {
   const dispatch = useDispatch<AppDispatch>()
   const locationStore = useSelector((state: RootState) => state.locations)
+
+  const findLocationLabel = (id: string) => {
+    return (
+      locationStore?.data.find((v) => v.id.toString() === id)?.descripcion || ''
+    )
+  }
+
+  const selectLocation =
+    props.selectedLocation
+      ?.split(',')
+      .map((v) => ({ id: v.toString(), label: findLocationLabel(v) }))
+      .filter((item) => item.id.toString() && item.label) || []
 
   useEffect(() => {
     if (!locationStore?.data?.length) {
       dispatch(fetchLocations())
     }
-  }, [locationStore.data?.length])
+  }, [locationStore.data?.length, dispatch])
 
   const handleSelection = (
     _: SyntheticEvent<Element, Event>,
@@ -33,15 +47,16 @@ export const LocationAutocomplete = (props: LocationAutocompleteProps) => {
 
     props?.callBack && props?.callBack(locations)
   }
+
   return (
     <Autocomplete
       multiple={!!props.multiple}
       options={locationStore.data.map((v) => ({
         label: v.descripcion,
-        id: v.id,
+        id: v.id.toString(),
       }))}
       filterSelectedOptions
-      // defaultValue={[]}
+      value={selectLocation}
       isOptionEqualToValue={(option, value) => option.id === value.id}
       id="locations-dropdown"
       getOptionLabel={(option) => `${option.id}-${option.label}` || ''}
@@ -53,3 +68,5 @@ export const LocationAutocomplete = (props: LocationAutocompleteProps) => {
     />
   )
 }
+
+export default LocationAutocomplete

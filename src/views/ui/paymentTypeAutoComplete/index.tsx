@@ -5,15 +5,14 @@ import { AppDispatch, RootState } from 'src/store'
 import { fetchData as fetchPaymentTypes } from 'src/store/apps/paymentType'
 
 interface PaymentTypeAutocompleteProps {
+  selectedPaymentType?: string
   multiple?: boolean
-  callBack: (
-    values: AutocompleteValue<PaymentTypeOptions, any, any, any>,
-  ) => void
+  callBack: (values: string) => void
 }
 
 interface PaymentTypeOptions {
   label: string
-  codigo: string
+  condicionPago: string
 }
 export const PaymentTypeAutocomplete = (
   props: PaymentTypeAutocompleteProps,
@@ -21,11 +20,24 @@ export const PaymentTypeAutocomplete = (
   const dispatch = useDispatch<AppDispatch>()
   const locationStore = useSelector((state: RootState) => state.paymentTypes)
 
+  const findConditionLabel = (codigo: string) => {
+    return (
+      locationStore?.data.find((v) => v.condicionPago === codigo)
+        ?.descripcion || ''
+    )
+  }
+
+  const selectPaymentTypes =
+    props.selectedPaymentType
+      ?.split(',')
+      .map((v) => ({ condicionPago: v, label: findConditionLabel(v) }))
+      .filter((item) => item.condicionPago && item.label) || []
+
   useEffect(() => {
     if (!locationStore?.data?.length) {
       dispatch(fetchPaymentTypes())
     }
-  }, [locationStore.data?.length])
+  }, [locationStore.data?.length, dispatch])
 
   const handleSelection = (
     _: SyntheticEvent<Element, Event>,
@@ -37,6 +49,7 @@ export const PaymentTypeAutocomplete = (
 
     props?.callBack && props?.callBack(paymentType)
   }
+
   return (
     <Autocomplete
       multiple={!!props.multiple}
@@ -45,7 +58,7 @@ export const PaymentTypeAutocomplete = (
         condicionPago: v.condicionPago,
       }))}
       filterSelectedOptions
-      // defaultValue={[]}
+      value={selectPaymentTypes}
       isOptionEqualToValue={(option, value) =>
         option.condicionPago === value.condicionPago
       }

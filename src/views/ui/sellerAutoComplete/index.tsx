@@ -1,12 +1,14 @@
 import { Autocomplete, AutocompleteValue, TextField } from '@mui/material'
 import { SyntheticEvent, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import select from 'src/@core/theme/overrides/select'
 import { AppDispatch, RootState } from 'src/store'
 import { fetchData as fetchSellers } from 'src/store/apps/seller'
 
 interface SellerAutocompleteProps {
+  selectedSellers?: string
   multiple?: boolean
-  callBack: (values: AutocompleteValue<SellerOptions, any, any, any>) => void
+  callBack: (values: string) => void
 }
 
 interface SellerOptions {
@@ -17,6 +19,14 @@ export const SellerAutocomplete = (props: SellerAutocompleteProps) => {
   const dispatch = useDispatch<AppDispatch>()
   const sellerStore = useSelector((state: RootState) => state.sellers)
 
+  const findSellerLabel = (codigo: string) => {
+    return sellerStore?.data.find((v) => v.codigo === codigo)?.nombre || ''
+  }
+  const selectSellerValues =
+    props.selectedSellers
+      ?.split(',')
+      .map((v) => ({ codigo: v, label: findSellerLabel(v) }))
+      .filter((item) => item.codigo && item.label) || []
   useEffect(() => {
     if (!sellerStore?.data?.length) {
       dispatch(
@@ -25,7 +35,7 @@ export const SellerAutocomplete = (props: SellerAutocompleteProps) => {
         }),
       )
     }
-  }, [sellerStore.data?.length])
+  }, [sellerStore.data?.length, dispatch])
 
   const handleSelection = (
     _: SyntheticEvent<Element, Event>,
@@ -37,6 +47,7 @@ export const SellerAutocomplete = (props: SellerAutocompleteProps) => {
 
     props?.callBack && props?.callBack(sellers)
   }
+
   return (
     <Autocomplete
       multiple={!!props.multiple}
@@ -45,7 +56,7 @@ export const SellerAutocomplete = (props: SellerAutocompleteProps) => {
         codigo: v.codigo,
       }))}
       filterSelectedOptions
-      // defaultValue={[]}
+      value={selectSellerValues}
       isOptionEqualToValue={(option, value) => option.codigo === value.codigo}
       id="sellers-dropdown"
       getOptionLabel={(option) => `${option.codigo}-${option.label}` || ''}

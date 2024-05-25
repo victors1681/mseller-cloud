@@ -1,36 +1,35 @@
 import axios, { isAxiosError } from 'axios'
 import type { NextApiRequest, NextApiResponse } from 'next/types'
-import restClient from 'src/configs/restClient'
+
 const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
   try {
     const { method, query } = req
     const { path, ...params } = query
     const fullPath = `${Array.isArray(path) ? path?.join('/') : ''}`
 
-    //restClient.defaults.baseURL = 'https://portal-int-api.mseller.app'
-
     const targetUrl = req.headers['x-url']
 
-    const enableProdEnPoint = false
+    if (process.env.NODE_ENV === 'production') {
+      //If production build use the url server from the user account
+      axios.defaults.baseURL = targetUrl as string
+    }
+    if (process.env.NODE_ENV === 'development') {
+      //If development, we can choose to use the user target server, localhost or hardcoded URL
+      if (process.env.TARGET === '') {
+      } else {
+        //Default
+        axios.defaults.baseURL = targetUrl as string
+      }
+      //Console log only on development mode
+      console.log('targetUrl', axios.defaults.baseURL)
+      console.log(
+        'Call from:',
+        `${axios.defaults.baseURL}/${fullPath}`,
+        'payload',
+        params,
+      )
+    }
 
-    axios.defaults.baseURL =
-      process.env.NODE_ENV === 'production'
-        ? (targetUrl as string) // 'https://portal-int-api.mseller.app'
-        : !enableProdEnPoint
-        ? 'http://localhost:5186'
-        : 'https://cerveceriavegana.mseller.app:8191'
-
-    console.log('targetUrl', axios.defaults.baseURL)
-
-    //URL coming from the user configuration
-
-    //console.log(req.headers.authorization)
-    console.log(
-      'Call from:',
-      `${axios.defaults.baseURL}/${fullPath}`,
-      'payload',
-      params,
-    )
     switch (method) {
       case 'GET':
         const response = await axios.get(fullPath, {
