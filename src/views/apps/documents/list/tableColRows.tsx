@@ -72,7 +72,7 @@ const renderClient = (row: DocumentType) => {
   }
 }
 
-export const defaultColumns: GridColDef[] = [
+const defaultColumns: GridColDef[] = [
   {
     flex: 0.2,
     field: 'id',
@@ -80,9 +80,7 @@ export const defaultColumns: GridColDef[] = [
     headerName: '#',
     renderCell: ({ row }: CellType) => (
       <LinkStyled
-        href={{
-          pathname: `/apps/documents/preview/${row.noPedidoStr}`,
-        }}
+        href={`/apps/documents/preview/${row.noPedidoStr}`}
       >{`${row.noPedidoStr}`}</LinkStyled>
     ),
   },

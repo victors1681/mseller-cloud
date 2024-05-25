@@ -14,7 +14,10 @@ import FormControl from '@mui/material/FormControl'
 import CardContent from '@mui/material/CardContent'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 import { DataGrid, GridRowParams } from '@mui/x-data-grid'
-import { columns, orderStatusLabels } from './tableColRows'
+import {
+  columns,
+  orderStatusLabels,
+} from 'src/views/apps/documents/list/tableColRows'
 
 // ** Third Party Imports
 import format from 'date-fns/format'
