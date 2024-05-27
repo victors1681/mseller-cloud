@@ -21,8 +21,10 @@ export interface DataParams {
   query: string
   dates?: Date[]
   status?: string
+  procesado?: string
   pageNumber?: number
   distribuidores?: string
+  localidad?: string
 }
 
 export interface AxiosResponse<T> {
