@@ -383,6 +383,14 @@ const TransportList = () => {
   const handlePagination = useCallback(
     (values: any) => {
       setPaginationModel(values)
+      router.push({
+        pathname: router.pathname,
+        query: {
+          ...router.query,
+          page: values.page,
+          pageSize: values.pageSize,
+        },
+      })
       dispatch(
         fetchData({
           dates,
