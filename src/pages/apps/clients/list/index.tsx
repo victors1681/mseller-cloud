@@ -126,7 +126,7 @@ const defaultColumns: GridColDef[] = [
     },
   },
   {
-    flex: 0.15,
+    flex: 0.12,
     minWidth: 130,
     field: 'rnc',
     headerName: 'RNC',
@@ -138,9 +138,18 @@ const defaultColumns: GridColDef[] = [
     flex: 0.1,
     minWidth: 90,
     field: 'total',
-    headerName: 'Tipo',
+    headerName: 'Tipo/Cond.Pago',
     renderCell: ({ row }: CellType) => (
-      <Typography variant="body2">{row.tipoCliente}</Typography>
+      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+        <Tooltip title="Tipo Comprobante del Cliente">
+          <Typography variant="body2">{row.tipoCliente}</Typography>
+        </Tooltip>
+        <Tooltip title="Condición de pago">
+          <Typography noWrap variant="caption">
+            {row.condicion}
+          </Typography>
+        </Tooltip>
+      </Box>
     ),
   },
 
