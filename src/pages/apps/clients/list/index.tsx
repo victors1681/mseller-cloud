@@ -43,6 +43,8 @@ import formatCurrency from 'src/utils/formatCurrency'
 import { CustomerType } from 'src/types/apps/customerType'
 import { SellerAutocomplete } from 'src/views/ui/sellerAutoComplete'
 
+import { useRouter } from 'next/router'
+
 interface CustomInputProps {
   dates: Date[]
   label: string
@@ -216,6 +218,17 @@ const InvoiceList = () => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
   const store = useSelector((state: RootState) => state.clients)
+  const router = useRouter()
+
+  const sellersParam = router?.query?.sellers
+
+  useEffect(() => {
+    if (sellersParam) {
+      setSelectedSellers(decodeURIComponent(sellersParam as string))
+    }
+  }, [
+    sellersParam,
+  ])
 
   //Initial Load
   useEffect(() => {
@@ -282,6 +295,17 @@ const InvoiceList = () => {
     setStatusValue(e.target.value)
   }
 
+  const handleSellerValue = (sellers: string) => {
+    setSelectedSellers(sellers)
+    router.push({
+      pathname: `/apps/clients/list`,
+      query: {
+        ...router.query,
+        sellers: sellers,
+      },
+    })
+  }
+
   const columns: GridColDef[] = [
     ...defaultColumns,
     {
@@ -316,6 +340,11 @@ const InvoiceList = () => {
     },
   ]
 
+    //Params for paymentTypes
+  const selectedSellersParams = Array.isArray(sellersParam)
+    ? sellersParam.map((param) => decodeURIComponent(param)).join(', ')
+    : decodeURIComponent(sellersParam ?? '')
+
   return (
     <DatePickerWrapper>
       <Grid container spacing={6}>
@@ -345,7 +374,7 @@ const InvoiceList = () => {
             <CardContent>
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
-                  <SellerAutocomplete callBack={setSelectedSellers} />
+                  <SellerAutocomplete selectedSellers={selectedSellersParams} multiple callBack={handleSellerValue} />
                 </Grid>
               </Grid>
             </CardContent>
