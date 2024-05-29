@@ -300,7 +300,6 @@ const TransportList = () => {
         dates,
         query: value,
         status: statusValue,
-        procesado: statusValue,
         pageNumber: paginationModel.page,
         distribuidores: selectedDrivers,
         localidad: selectedLocation,
@@ -314,7 +313,7 @@ const TransportList = () => {
         fetchData({
           dates,
           query: value,
-          procesado: statusValue,
+          status: statusValue,
           pageNumber: paginationModel.page,
           distribuidores: selectedDrivers,
           localidad: selectedLocation,
@@ -395,8 +394,7 @@ const TransportList = () => {
         fetchData({
           dates,
           query: value,
-          // status: statusValue,
-          procesado: statusValue,
+           status: statusValue,
           pageNumber: values.page,
           distribuidores: selectedDrivers,
           localidad: selectedLocation,
