@@ -60,9 +60,13 @@ import {
 } from '../../../../utils/transportMappings'
 import { debounce } from '@mui/material'
 import { DriverAutocomplete } from 'src/views/ui/driverAutoComplete'
+import { LocationAutocomplete } from 'src/views/ui/locationAutoComplete'
 import { useAuth } from 'src/hooks/useAuth'
 import TransportStatusSelect from '../transportStatusSelect'
 import ConfirmTransportStatus from '../confirmStatus'
+
+import { useRouter } from 'next/router'
+import driver from 'src/store/apps/driver'
 
 interface InvoiceStatusObj {
   [key: string]: {
@@ -242,18 +246,65 @@ const TransportList = () => {
   const dispatch = useDispatch<AppDispatch>()
   const store = useSelector((state: RootState) => state.transports)
   const { accessControl, user } = useAuth()
+  const router = useRouter()
+
+  const statusParam = router?.query?.status
+  const driversParam = router?.query?.drivers
+  const startDateParam = router?.query?.startDate
+  const endDateParam = router?.query?.endDate
+  const LocationParam = router?.query?.location
+  const [selectedLocation, setSelectedLocation] = useState<string | undefined>(
+    undefined,
+  )
+  const { page, pageSize } = router.query
 
   useEffect(() => {
-    dispatch(
-      fetchData({
-        dates,
-        query: value,
-        status: statusValue,
-        pageNumber: paginationModel.page,
-        distribuidores: selectedDrivers,
-      }),
-    )
-  }, [statusValue, selectedDrivers, dates])
+    setPaginationModel({
+      page: page ? Number(page) : 0,
+      pageSize: pageSize ? Number(pageSize) : 20,
+    })
+
+    if (!statusParam) {
+      router.push({
+        pathname: router.pathname,
+        query: { ...router.query, status: '' },
+      })
+    } else {
+      setStatusValue(statusParam as string)
+    }
+    if (startDateParam && endDateParam) {
+      const startDate = new Date(startDateParam as string)
+      const endDate = new Date(endDateParam as string)
+      if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+        setStartDateRange(startDate)
+        setEndDateRange(endDate)
+        setDates([startDate, endDate])
+      }
+    }
+    if (driversParam) {
+      setSelectedDrivers(decodeURIComponent(driversParam as string))
+    }
+    if (LocationParam) {
+      setSelectedLocation(decodeURIComponent(LocationParam as string))
+    }
+  }, [
+    statusParam,
+    startDateParam,
+    endDateParam,
+    driversParam,
+  ])
+
+  useEffect(() => {
+    const fetchDataParams: any = {
+      dates,
+      query: value,
+      pageNumber: paginationModel.page,
+      distribuidores: selectedDrivers,
+      status: statusValue,
+      localidad: selectedLocation,
+    }
+    dispatch(fetchData(fetchDataParams))
+  }, [statusValue, selectedDrivers, dates,selectedLocation])
 
   const performRequest = useCallback(
     (value: string) => {
@@ -264,11 +315,24 @@ const TransportList = () => {
           status: statusValue,
           pageNumber: paginationModel.page,
           distribuidores: selectedDrivers,
+          localidad: selectedLocation,
         }),
       )
     },
-    [dispatch, statusValue, value, dates, selectedDrivers, paginationModel],
+    [dispatch, statusValue, value, dates, selectedDrivers,selectedLocation, paginationModel],
   )
+
+      //Params for Drivers
+
+      const selectedDriversParams = Array.isArray(driversParam)
+      ? driversParam.map((param) => decodeURIComponent(param)).join(', ')
+      : decodeURIComponent(driversParam ?? '')
+
+      const selectedLocationParams = Array.isArray(LocationParam)
+      ? LocationParam.map((param) =>
+          decodeURIComponent(param),
+        ).join(', ')
+      : decodeURIComponent(LocationParam ?? '')
 
   const fn = useCallback(
     debounce((val: string) => {
@@ -277,9 +341,6 @@ const TransportList = () => {
     }, 900),
     [],
   )
-  const handleStatusValue = (e: SelectChangeEvent) => {
-    setStatusValue(e.target.value)
-  }
 
   const handleFilter = useCallback(
     (val: string) => {
@@ -289,9 +350,66 @@ const TransportList = () => {
     },
     [fn],
   )
+
+  const handleStatusValue = (e: SelectChangeEvent) => {
+    setStatusValue(e.target.value)
+    router.push({
+      pathname: `/apps/transports/list`,
+      query: {
+        ...router.query,
+        page: 0,
+        status: e.target.value,
+      },
+    })
+    setPaginationModel({
+      ...paginationModel,
+      page: 0,
+    })
+  }
+
+  const handleDriversValue = (drivers: string) => {
+    setSelectedDrivers(drivers)
+    router.push({
+      pathname: `/apps/transports/list`,
+      query: {
+        ...router.query,
+        page: 0,
+        drivers: drivers,
+      },
+    })
+    setPaginationModel({
+      ...paginationModel,
+      page: 0,
+    })
+  }
+
+  const handleLocationValue = (location: string) => {
+    setSelectedLocation(location)
+    router.push({
+      pathname: `/apps/transports/list`,
+      query: {
+        ...router.query,
+        page: 0,
+        location: location,
+      },
+    })
+    setPaginationModel({
+      ...paginationModel,
+      page: 0,
+    })
+  }
+
   const handlePagination = useCallback(
     (values: any) => {
       setPaginationModel(values)
+      router.push({
+        pathname: router.pathname,
+        query: {
+          ...router.query,
+          page: values.page,
+          pageSize: values.pageSize,
+        },
+      })
       dispatch(
         fetchData({
           dates,
@@ -299,10 +417,11 @@ const TransportList = () => {
           status: statusValue,
           pageNumber: values.page,
           distribuidores: selectedDrivers,
+          localidad: selectedLocation,
         }),
       )
     },
-    [paginationModel, value, selectedDrivers, statusValue],
+    [paginationModel, value, selectedDrivers, statusValue,selectedLocation],
   )
 
   const handleCloseTransport = async (transportNo: string) => {
@@ -346,6 +465,19 @@ const TransportList = () => {
     }
     setStartDateRange(start)
     setEndDateRange(end)
+    router.push({
+      pathname: `/apps/documents/list`,
+      query: {
+        ...router.query,
+        page: 0,
+        startDate: start ? start.toISOString() : '',
+        endDate: end ? end.toISOString() : '',
+      },
+    })
+    setPaginationModel({
+      ...paginationModel,
+      page: 0,
+    })
   }
   const columns: GridColDef[] = [
     ...defaultColumns,
@@ -462,7 +594,16 @@ const TransportList = () => {
                 </Grid>
 
                 <Grid xs={12} sm={4}>
-                  <DriverAutocomplete multiple callBack={setSelectedDrivers} />
+                  <DriverAutocomplete selectedDrivers={selectedDriversParams}
+                   multiple 
+                   callBack={handleDriversValue} />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <LocationAutocomplete
+                    selectedLocation={selectedLocationParams}
+                    multiple
+                    callBack={handleLocationValue}
+                  />
                 </Grid>
                 <Grid item xs={12} sm={4}>
                   <DatePicker

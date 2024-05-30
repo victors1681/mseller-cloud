@@ -12,6 +12,7 @@ import {
 } from 'firebase/auth'
 import { axiosSetClientUrl } from 'src/configs/restClient'
 import { UserTypes } from 'src/types/apps/userTypes'
+import user from 'src/store/apps/user'
 
 // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig)
@@ -60,7 +61,7 @@ export const getAllCurrentProfile = async (): Promise<
   const fn = httpsCallable(functions, 'getUserProfileV2')
   const profileDataResponse = await fn()
   const userData = profileDataResponse.data as UserTypes
-  axiosSetClientUrl(userData.business.config)
+  axiosSetClientUrl(userData.business.config,userData.testMode)
   return userData
 }
 

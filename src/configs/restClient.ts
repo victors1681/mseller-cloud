@@ -18,9 +18,9 @@ export const getExceptions = (config: AxiosRequestConfig, baseURL?: string) => {
   return config
 }
 
-export const axiosSetClientUrl = (config?: IConfig) => {
+export const axiosSetClientUrl = (config?: IConfig,userTestMode?: boolean) => {
   if (config?.serverUrl) {
-    if (config.testMode) {
+    if (config.testMode || userTestMode) {
       restClient.defaults.headers[
         'X-URL'
       ] = `${config.portalSandboxUrl}:${config.portalSandboxPort}`

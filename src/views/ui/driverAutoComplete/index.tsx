@@ -5,8 +5,9 @@ import { AppDispatch, RootState } from 'src/store'
 import { fetchData as fetchDrivers } from 'src/store/apps/driver'
 
 interface DriverAutocompleteProps {
+  selectedDrivers?: string
   multiple: boolean
-  callBack: (values: AutocompleteValue<DriverOptions, any, any, any>) => void
+  callBack: (values: string) => void
 }
 
 interface DriverOptions {
@@ -16,6 +17,16 @@ interface DriverOptions {
 export const DriverAutocomplete = (props: DriverAutocompleteProps) => {
   const dispatch = useDispatch<AppDispatch>()
   const driverStore = useSelector((state: RootState) => state.drivers)
+
+  const findDriverLabel = (codigo: string) => {
+    return driverStore?.data.find((v) => v.codigo === codigo)?.nombre || ''
+  }
+
+  const selectDriverValues =
+  props.selectedDrivers
+    ?.split(',')
+    .map((v) => ({ codigo: v, label: findDriverLabel(v) }))
+    .filter((item) => item.codigo && item.label) || []
 
   useEffect(() => {
     if (!driverStore?.data?.length) {
@@ -41,6 +52,7 @@ export const DriverAutocomplete = (props: DriverAutocompleteProps) => {
         codigo: v.codigo,
       }))}
       filterSelectedOptions
+      value={selectDriverValues}
       // defaultValue={[]}
       isOptionEqualToValue={(option, value) => option.codigo === value.codigo}
       id="drivers-dropdown"
