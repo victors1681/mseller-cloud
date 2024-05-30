@@ -228,7 +228,7 @@ const CustomInput = forwardRef((props: CustomInputProps, ref) => {
 const TransportList = () => {
   // ** State
   const [dates, setDates] = useState<Date[]>([])
-  const [value, setValue] = useState<string>('')
+  const [value, setValue] = useState<string>('0')
   const [statusValue, setStatusValue] = useState<string>('0')
   const [endDateRange, setEndDateRange] = useState<any>(null)
   const [selectedRows, setSelectedRows] = useState<GridRowId[]>([])
@@ -295,16 +295,19 @@ const TransportList = () => {
   ])
 
   useEffect(() => {
-    dispatch(
-      fetchData({
-        dates,
-        query: value,
-        status: statusValue,
-        pageNumber: paginationModel.page,
-        distribuidores: selectedDrivers,
-        localidad: selectedLocation,
-      }),
-    )
+    const fetchDataParams: any = {
+      dates,
+      query: value,
+      pageNumber: paginationModel.page,
+      distribuidores: selectedDrivers,
+      localidad: selectedLocation,
+    }
+
+    if (statusValue !== '0') {
+      fetchDataParams.status = statusValue
+    }
+
+    dispatch(fetchData(fetchDataParams))
   }, [statusValue, selectedDrivers, dates,selectedLocation])
 
   const performRequest = useCallback(
