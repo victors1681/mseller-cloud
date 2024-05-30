@@ -228,8 +228,8 @@ const CustomInput = forwardRef((props: CustomInputProps, ref) => {
 const TransportList = () => {
   // ** State
   const [dates, setDates] = useState<Date[]>([])
-  const [value, setValue] = useState<string>('0')
-  const [statusValue, setStatusValue] = useState<string>('0')
+  const [value, setValue] = useState<string>('')
+  const [statusValue, setStatusValue] = useState<string>('')
   const [endDateRange, setEndDateRange] = useState<any>(null)
   const [selectedRows, setSelectedRows] = useState<GridRowId[]>([])
   const [startDateRange, setStartDateRange] = useState<any>(null)
@@ -267,7 +267,7 @@ const TransportList = () => {
     if (!statusParam) {
       router.push({
         pathname: router.pathname,
-        query: { ...router.query, status: '0' },
+        query: { ...router.query, status: '' },
       })
     } else {
       setStatusValue(statusParam as string)
@@ -300,13 +300,9 @@ const TransportList = () => {
       query: value,
       pageNumber: paginationModel.page,
       distribuidores: selectedDrivers,
+      status: statusValue,
       localidad: selectedLocation,
     }
-
-    if (statusValue !== '0') {
-      fetchDataParams.status = statusValue
-    }
-
     dispatch(fetchData(fetchDataParams))
   }, [statusValue, selectedDrivers, dates,selectedLocation])
 
@@ -368,7 +364,7 @@ const TransportList = () => {
   }
 
   const handleDriversValue = (drivers: string) => {
-    setStatusValue(drivers)
+    setSelectedDrivers(drivers)
     router.push({
       pathname: `/apps/transports/list`,
       query: {

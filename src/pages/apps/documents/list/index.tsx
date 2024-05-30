@@ -124,7 +124,7 @@ const InvoiceList = () => {
     if (!orderStatusParam) {
       router.push({
         pathname: router.pathname,
-        query: { ...router.query, status: '0' },
+        query: { ...router.query, status: '' },
       })
     } else {
       setStatusValue(orderStatusParam as string)
