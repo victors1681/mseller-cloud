@@ -361,6 +361,10 @@ const TransportList = () => {
         status: e.target.value,
       },
     })
+    setPaginationModel({
+      ...paginationModel,
+      page: 0,
+    })
   }
 
   const handleDriversValue = (drivers: string) => {
@@ -373,6 +377,10 @@ const TransportList = () => {
         drivers: drivers,
       },
     })
+    setPaginationModel({
+      ...paginationModel,
+      page: 0,
+    })
   }
 
   const handleLocationValue = (location: string) => {
@@ -384,6 +392,10 @@ const TransportList = () => {
         page: 0,
         location: location,
       },
+    })
+    setPaginationModel({
+      ...paginationModel,
+      page: 0,
     })
   }
 
@@ -461,6 +473,10 @@ const TransportList = () => {
         startDate: start ? start.toISOString() : '',
         endDate: end ? end.toISOString() : '',
       },
+    })
+    setPaginationModel({
+      ...paginationModel,
+      page: 0,
     })
   }
   const columns: GridColDef[] = [
