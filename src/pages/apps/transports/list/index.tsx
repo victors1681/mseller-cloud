@@ -329,6 +329,12 @@ const TransportList = () => {
       ? driversParam.map((param) => decodeURIComponent(param)).join(', ')
       : decodeURIComponent(driversParam ?? '')
 
+      const selectedLocationParams = Array.isArray(LocationParam)
+      ? LocationParam.map((param) =>
+          decodeURIComponent(param),
+        ).join(', ')
+      : decodeURIComponent(LocationParam ?? '')
+
   const fn = useCallback(
     debounce((val: string) => {
       setPaginationModel({ page: 0, pageSize: 20 })
@@ -352,6 +358,7 @@ const TransportList = () => {
       pathname: `/apps/transports/list`,
       query: {
         ...router.query,
+        page: 0,
         status: e.target.value,
       },
     })
@@ -363,6 +370,7 @@ const TransportList = () => {
       pathname: `/apps/transports/list`,
       query: {
         ...router.query,
+        page: 0,
         drivers: drivers,
       },
     })
@@ -374,6 +382,7 @@ const TransportList = () => {
       pathname: `/apps/transports/list`,
       query: {
         ...router.query,
+        page: 0,
         location: location,
       },
     })
@@ -394,7 +403,7 @@ const TransportList = () => {
         fetchData({
           dates,
           query: value,
-           status: statusValue,
+          status: statusValue,
           pageNumber: values.page,
           distribuidores: selectedDrivers,
           localidad: selectedLocation,
@@ -449,6 +458,7 @@ const TransportList = () => {
       pathname: `/apps/documents/list`,
       query: {
         ...router.query,
+        page: 0,
         startDate: start ? start.toISOString() : '',
         endDate: end ? end.toISOString() : '',
       },
@@ -569,17 +579,13 @@ const TransportList = () => {
                 </Grid>
 
                 <Grid xs={12} sm={4}>
-                  <DriverAutocomplete selectedDrivers={selectedDriversParams} multiple callBack={handleDriversValue} />
+                  <DriverAutocomplete selectedDrivers={selectedDriversParams}
+                   multiple 
+                   callBack={handleDriversValue} />
                 </Grid>
                 <Grid item xs={12} sm={4}>
                   <LocationAutocomplete
-                    selectedLocation={
-                      Array.isArray(LocationParam)
-                        ? LocationParam.map((param) =>
-                            decodeURIComponent(param),
-                          ).join(', ')
-                        : decodeURIComponent(LocationParam ?? '')
-                    }
+                    selectedLocation={selectedLocationParams}
                     multiple
                     callBack={handleLocationValue}
                   />

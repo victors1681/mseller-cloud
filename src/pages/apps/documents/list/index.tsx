@@ -268,6 +268,7 @@ const InvoiceList = () => {
       pathname: `/apps/documents/list`,
       query: {
         ...router.query,
+        page: 0,
         status: e.target.value,
       },
     })
@@ -279,6 +280,7 @@ const InvoiceList = () => {
       pathname: `/apps/documents/list`,
       query: {
         ...router.query,
+        page: 0,
         sellers: sellers,
       },
     })
@@ -290,6 +292,7 @@ const InvoiceList = () => {
       pathname: `/apps/documents/list`,
       query: {
         ...router.query,
+        page: 0,
         paymentType: paymentType,
       },
     })
@@ -301,6 +304,7 @@ const InvoiceList = () => {
       pathname: `/apps/documents/list`,
       query: {
         ...router.query,
+        page: 0,
         location: location,
       },
     })
@@ -312,6 +316,7 @@ const InvoiceList = () => {
       pathname: `/apps/documents/list`,
       query: {
         ...router.query,
+        page: 0,
         documentType: e.target.value,
       },
     })
@@ -328,6 +333,7 @@ const InvoiceList = () => {
       pathname: `/apps/documents/list`,
       query: {
         ...router.query,
+        page: 0,
         startDate: start ? start.toISOString() : '',
         endDate: end ? end.toISOString() : '',
       },
