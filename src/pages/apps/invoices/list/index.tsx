@@ -45,6 +45,8 @@ import { SellerAutocomplete } from 'src/views/ui/sellerAutoComplete'
 import { InvoiceType } from 'src/types/apps/invoicesTypes'
 import formatDate from 'src/utils/formatDate'
 
+import { useRouter } from 'next/router'
+
 interface CustomInputProps {
   dates: Date[]
   label: string
@@ -215,6 +217,30 @@ const InvoiceList = () => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
   const store = useSelector((state: RootState) => state.invoices)
+  const router = useRouter()
+
+  const sellersParam = router?.query?.sellers
+  const startDateParam = router?.query?.startDate
+  const endDateParam = router?.query?.endDate
+
+  useEffect(() => {
+    if (startDateParam && endDateParam) {
+      const startDate = new Date(startDateParam as string)
+      const endDate = new Date(endDateParam as string)
+      if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+        setStartDateRange(startDate)
+        setEndDateRange(endDate)
+        setDates([startDate, endDate])
+      }
+    }
+    if (sellersParam) {
+      setSelectedSellers(decodeURIComponent(sellersParam as string))
+    }
+  }, [
+    startDateParam,
+    endDateParam,
+    sellersParam,
+  ])
 
   //Initial Load
   useEffect(() => {
@@ -278,6 +304,18 @@ const InvoiceList = () => {
     setStatusValue(e.target.value)
   }
 
+  const handleSellerValue = (sellers: string) => {
+    setSelectedSellers(sellers)
+    router.push({
+      pathname: `/apps/invoices/list`,
+      query: {
+        ...router.query,
+        page: 0,
+        sellers: sellers,
+      },
+    })
+  }
+
   const handleOnChangeRange = (dates: any) => {
     const [start, end] = dates
     if (start !== null && end !== null) {
@@ -285,6 +323,15 @@ const InvoiceList = () => {
     }
     setStartDateRange(start)
     setEndDateRange(end)
+    router.push({
+      pathname: `/apps/invoices/list`,
+      query: {
+        ...router.query,
+        page: 0,
+        startDate: start ? start.toISOString() : '',
+        endDate: end ? end.toISOString() : '',
+      },
+    })
   }
 
   const columns: GridColDef[] = [
@@ -317,6 +364,10 @@ const InvoiceList = () => {
     },
   ]
 
+  const selectedSellersParams = Array.isArray(sellersParam)
+  ? sellersParam.map((param) => decodeURIComponent(param)).join(', ')
+  : decodeURIComponent(sellersParam ?? '')
+
   return (
     <DatePickerWrapper>
       <Grid container spacing={6}>
@@ -346,7 +397,7 @@ const InvoiceList = () => {
             <CardContent>
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
-                  <SellerAutocomplete callBack={setSelectedSellers} />
+                  <SellerAutocomplete selectedSellers={selectedSellersParams} multiple callBack={handleSellerValue} />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Box sx={{ padding: 3 }}>
