@@ -29,7 +29,7 @@ import format from 'date-fns/format'
 
 // ** Store & Actions Imports
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchData, deleteClient } from 'src/store/apps/clients'
+import { fetchData, deleteOffers } from 'src/store/apps/offers'
 
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
@@ -40,10 +40,10 @@ import TableHeader from 'src/views/apps/clients/list/TableHeader'
 // ** Styled Components
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import formatCurrency from 'src/utils/formatCurrency'
-import { CustomerType } from 'src/types/apps/customerType'
 import { SellerAutocomplete } from 'src/views/ui/sellerAutoComplete'
 
 import { useRouter } from 'next/router'
+import { OffersType } from 'src/types/apps/offersType'
 
 interface CustomInputProps {
   dates: Date[]
@@ -54,7 +54,7 @@ interface CustomInputProps {
 }
 
 interface CellType {
-  row: CustomerType
+  row: OffersType
 }
 
 // ** Styled component for the link in the dataTable
@@ -65,91 +65,50 @@ const LinkStyled = styled(Link)(({ theme }) => ({
 
 const defaultColumns: GridColDef[] = [
   {
-    flex: 0.1,
-    field: 'id',
-    minWidth: 80,
-    headerName: 'Código',
+    flex: 0.12,
+    minWidth: 130,
+    field: 'Codigo',
+    headerName: 'Codigo',
     renderCell: ({ row }: CellType) => (
-      <LinkStyled
-        href={`/apps/invoice/preview/${row.codigo}`}
-      >{`${row.codigo}`}</LinkStyled>
+      <Typography variant="body2">{row.idOferta}</Typography>
     ),
-  },
-  {
-    flex: 0.35,
-    field: 'client',
-    minWidth: 300,
-    headerName: 'Nombre/Dir',
-    renderCell: ({ row }: CellType) => {
-      return (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography
-              noWrap
-              variant="body2"
-              sx={{
-                color: 'text.primary',
-                fontWeight: 600,
-                textTransform: 'capitalize',
-              }}
-            >
-              {row.nombre}
-            </Typography>
-            <Typography noWrap variant="caption">
-              {row.direccion} - {row.ciudad}
-            </Typography>
-          </Box>
-        </Box>
-      )
-    },
-  },
-  {
-    flex: 0.2,
-    field: 'seller',
-    minWidth: 200,
-    headerName: 'Vendedor',
-    renderCell: ({ row }: CellType) => {
-      return (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography
-              noWrap
-              variant="body2"
-              sx={{ color: 'text.primary', fontWeight: 600 }}
-            >
-              {row.vendedor.nombre}
-            </Typography>
-            <Typography noWrap variant="caption">
-              {row.vendedor.codigo}
-            </Typography>
-          </Box>
-        </Box>
-      )
-    },
   },
   {
     flex: 0.12,
     minWidth: 130,
-    field: 'rnc',
-    headerName: 'RNC',
+    field: 'cliente',
+    headerName: 'Cliente',
     renderCell: ({ row }: CellType) => (
-      <Typography variant="body2">{row.rnc}</Typography>
+      <Typography variant="body2">{row.cliente}</Typography>
+    ),
+  },
+  {
+    flex: 0.12,
+    minWidth: 130,
+    field: 'producto',
+    headerName: 'producto',
+    renderCell: ({ row }: CellType) => (
+      <Typography variant="body2">{row.codigoProducto}</Typography>
+    ),
+  },
+  {
+    flex: 0.12,
+    minWidth: 130,
+    field: 'idArea',
+    headerName: 'area',
+    renderCell: ({ row }: CellType) => (
+      <Typography variant="body2">{row.idArea}</Typography>
     ),
   },
   {
     flex: 0.1,
     minWidth: 90,
     field: 'total',
-    headerName: 'Tipo/Cond.Pago',
+    headerName: 'Cant min',
     renderCell: ({ row }: CellType) => (
       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
         <Tooltip title="Tipo Comprobante del Cliente">
-          <Typography variant="body2">{row.tipoCliente}</Typography>
-        </Tooltip>
-        <Tooltip title="Condición de pago">
-          <Typography noWrap variant="caption">
-            {row.condicion}
-          </Typography>
+          <Typography variant="body2">{row.cantidadMinima}</Typography>
         </Tooltip>
       </Box>
     ),
@@ -159,22 +118,31 @@ const defaultColumns: GridColDef[] = [
     flex: 0.1,
     minWidth: 120,
     field: 'balance',
-    headerName: 'Balance',
+    headerName: 'Cant Max',
     renderCell: ({ row }: CellType) => (
-      <Typography variant="body2">{formatCurrency(row.balance)}</Typography>
+      <Typography variant="body2">{row.cantidadMaxima}</Typography>
     ),
   },
   {
-    flex: 0.05,
-    field: 'active',
-    headerName: '',
-    renderCell: ({ row }: CellType) =>
-      row.status == 'A' ? (
-        <Icon icon="lets-icons:check-fill" color="#56ca00" fontSize={20} />
-      ) : (
-        <Icon icon="bxs:x-circle" color="#ff4b51" fontSize={20} />
-      ),
+    flex: 0.1,
+    minWidth: 120,
+    field: 'porcentaje',
+    headerName: 'porcentaje',
+    renderCell: ({ row }: CellType) => (
+      <Typography variant="body2">{row.descuento}</Typography>
+    ),
   },
+  // {
+  //   flex: 0.05,
+  //   field: 'active',
+  //   headerName: '',
+  //   renderCell: ({ row }: CellType) =>
+  //     row.status == 'A' ? (
+  //       <Icon icon="lets-icons:check-fill" color="#56ca00" fontSize={20} />
+  //     ) : (
+  //       <Icon icon="bxs:x-circle" color="#ff4b51" fontSize={20} />
+  //     ),
+  // },
 ]
 
 /* eslint-disable */
@@ -217,7 +185,7 @@ const InvoiceList = () => {
   console.log(selectedSellers)
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
-  const store = useSelector((state: RootState) => state.clients)
+  const store = useSelector((state: RootState) => state.offers)
   const router = useRouter()
 
   const sellersParam = router?.query?.sellers
@@ -242,6 +210,11 @@ const InvoiceList = () => {
       }),
     )
   }, [selectedSellers])
+
+  useEffect(() => {
+    console.log("Store data:", store.data);
+    console.log("Is loading:", store.isLoading);
+  }, [store]);
 
   const handlePagination = useCallback(
     (values: any) => {
@@ -320,7 +293,7 @@ const InvoiceList = () => {
             <IconButton
               size="small"
               disabled
-              onClick={() => dispatch(deleteClient(row.codigo))}
+              onClick={() => dispatch(deleteOffers(row.idOferta))}
             >
               <Icon icon="tabler:edit" fontSize={20} />
             </IconButton>
@@ -330,7 +303,7 @@ const InvoiceList = () => {
               size="small"
               component={Link}
               disabled
-              href={`/apps/invoice/preview/${row.codigo}`}
+              href={`/apps/invoice/preview/${row.idOferta}`}
             >
               <Icon icon="mdi:eye-outline" fontSize={20} />
             </IconButton>
@@ -351,7 +324,7 @@ const InvoiceList = () => {
         <Grid item xs={12}>
           <Card>
             <CardHeader
-              title="Clientes"
+              title="Ofertas"
               action={
                 <OptionsMenu
                   options={[
@@ -397,7 +370,7 @@ const InvoiceList = () => {
               paginationModel={paginationModel}
               onPaginationModelChange={handlePagination}
               onRowSelectionModelChange={(rows) => setSelectedRows(rows)}
-              getRowId={(row) => row.codigo}
+              getRowId={(row) => row.idOferta}
               paginationMode="server"
               loading={store.isLoading}
               rowCount={store.totalResults} //
