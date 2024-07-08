@@ -226,9 +226,7 @@ const InvoiceList = () => {
     if (sellersParam) {
       setSelectedSellers(decodeURIComponent(sellersParam as string))
     }
-  }, [
-    sellersParam,
-  ])
+  }, [sellersParam])
 
   //Initial Load
   useEffect(() => {
@@ -306,6 +304,11 @@ const InvoiceList = () => {
     })
   }
 
+  const openGoogleMaps = (latitude?: number, longitude?: number) => {
+    const url = `https://www.google.com/maps?q=${latitude},${longitude}`
+    window.open(url, '_blank')
+  }
+
   const columns: GridColDef[] = [
     ...defaultColumns,
     {
@@ -316,6 +319,24 @@ const InvoiceList = () => {
       headerName: 'Actions',
       renderCell: ({ row }: CellType) => (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Tooltip
+            title={`Geolocalidad Lat:${row.geoLocalizacion?.latitud} Lon: ${row.geoLocalizacion?.longitud}`}
+          >
+            <IconButton
+              size="small"
+              disabled={
+                !row.geoLocalizacion?.latitud || !row.geoLocalizacion?.longitud
+              }
+              onClick={() =>
+                openGoogleMaps(
+                  row.geoLocalizacion?.latitud,
+                  row.geoLocalizacion?.longitud,
+                )
+              }
+            >
+              <Icon icon="ph:map-pin" fontSize={20} />
+            </IconButton>
+          </Tooltip>
           <Tooltip title="Aprobar">
             <IconButton
               size="small"
@@ -340,7 +361,7 @@ const InvoiceList = () => {
     },
   ]
 
-    //Params for paymentTypes
+  //Params for paymentTypes
   const selectedSellersParams = Array.isArray(sellersParam)
     ? sellersParam.map((param) => decodeURIComponent(param)).join(', ')
     : decodeURIComponent(sellersParam ?? '')
@@ -374,7 +395,11 @@ const InvoiceList = () => {
             <CardContent>
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
-                  <SellerAutocomplete selectedSellers={selectedSellersParams} multiple callBack={handleSellerValue} />
+                  <SellerAutocomplete
+                    selectedSellers={selectedSellersParams}
+                    multiple
+                    callBack={handleSellerValue}
+                  />
                 </Grid>
               </Grid>
             </CardContent>
