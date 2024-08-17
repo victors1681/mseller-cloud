@@ -5,17 +5,14 @@ import {
   GetStaticPropsContext,
   InferGetStaticPropsType,
 } from 'next/types'
-import { GetServerSidePropsContext } from 'next';
+import { GetServerSidePropsContext } from 'next/types'
 // ** Third Party Imports
 import axios from 'axios'
 
 // ** Demo Components Imports
 import Print from 'src/views/apps/transports/print/PrintPage'
 
-
-const InvoicePrint = ({
-  id,
-}: InferGetStaticPropsType<any>) => {
+const InvoicePrint = ({ id }: InferGetStaticPropsType<any>) => {
   return <Print id={id} />
 }
 
@@ -44,7 +41,6 @@ const InvoicePrint = ({
 // }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-
   return {
     props: {
       id: context?.params?.id || '',
