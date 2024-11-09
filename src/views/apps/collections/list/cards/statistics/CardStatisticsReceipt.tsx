@@ -28,6 +28,7 @@ import React from 'react'
 import LoadingWrapper from '../../../../../ui/LoadingWrapper'
 import { CollectionType } from 'src/types/apps/collectionType'
 import formatCurrency from 'src/utils/formatCurrency'
+import OptionsMenu from 'src/@core/components/option-menu'
 interface DataType {
   icon: string
   stats: string
@@ -110,6 +111,33 @@ const CardStatisticsReceipt = (props: Props) => {
                 letterSpacing: '0.15px !important',
               },
             }}
+            action={
+              <OptionsMenu
+                options={[
+                  {
+                    icon: (
+                      <Icon
+                        name="material-symbols:print"
+                        icon="tabler:report-money"
+                      ></Icon>
+                    ),
+                    text: 'Imprimit depósito',
+                    menuItemProps: {
+                      onClick: () => {
+                        window.open(
+                          `/apps/collections/print/${props?.collection?.noDepositoStr}/`,
+                          '_blank',
+                        )
+                      },
+                    },
+                  },
+                ]}
+                iconButtonProps={{
+                  size: 'small',
+                  sx: { color: 'text.secondary' },
+                }}
+              />
+            }
           />
           <CardContent>
             <Grid container>

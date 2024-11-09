@@ -37,7 +37,7 @@ interface Props {
   isFailed: boolean
 }
 
-const getStats = (collection: CollectionType) => {
+export const getStats = (collection: CollectionType) => {
   const cashArr =
     collection?.recibos?.filter(
       (f) => f.tipoPago === PaymentTypeEnum.Efectivo,

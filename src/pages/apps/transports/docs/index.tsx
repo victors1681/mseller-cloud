@@ -230,13 +230,6 @@ interface TransportDocsProps {
   noTransporte: string
 }
 const TransportDocs = (props: TransportDocsProps) => {
-  // ** State
-  const [dates, setDates] = useState<Date[]>([])
-  const [value, setValue] = useState<string>('')
-  const [statusValue, setStatusValue] = useState<string>('')
-  const [endDateRange, setEndDateRange] = useState<any>(null)
-  const [selectedRows, setSelectedRows] = useState<GridRowId[]>([])
-  const [startDateRange, setStartDateRange] = useState<any>(null)
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 20,
@@ -245,23 +238,10 @@ const TransportDocs = (props: TransportDocsProps) => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
   const store = useSelector((state: RootState) => state.transports)
-  console.log('storestorestore', store)
+
   useEffect(() => {
     dispatch(fetchTransportDocsData(props.noTransporte))
-  }, [dispatch, statusValue, value, dates])
-
-  const handleFilter = (val: string) => {
-    setValue(val)
-  }
-
-  const handleOnChangeRange = (dates: any) => {
-    const [start, end] = dates
-    if (start !== null && end !== null) {
-      setDates(dates)
-    }
-    setStartDateRange(start)
-    setEndDateRange(end)
-  }
+  }, [dispatch])
 
   const columns: GridColDef[] = [
     ...defaultColumns,
@@ -305,7 +285,6 @@ const TransportDocs = (props: TransportDocsProps) => {
               disableRowSelectionOnClick
               paginationModel={paginationModel}
               onPaginationModelChange={setPaginationModel}
-              onRowSelectionModelChange={(rows) => setSelectedRows(rows)}
               getRowId={(row) => row.noDocEntrega}
               loading={store.isLoading}
             />
