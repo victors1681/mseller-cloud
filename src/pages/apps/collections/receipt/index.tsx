@@ -217,7 +217,7 @@ const TransportDocs = (props: TransportDocsProps) => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
   const store = useSelector((state: RootState) => state.collections)
-  console.log('storestorestore', store)
+  
   useEffect(() => {
     dispatch(fetchSingleCollectionData(props.noDeposito))
   }, [dispatch, statusValue, value, dates])

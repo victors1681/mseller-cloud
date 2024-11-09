@@ -9,7 +9,13 @@ export enum NetworkStatus {
   ERROR = 3,
 }
 
-const restClient = axios.create()
+const restClient = axios.create({
+  headers: {
+    'Cache-Control': 'no-cache',
+    Pragma: 'no-cache',
+    Expires: '0',
+  },
+})
 export const getExceptions = (config: AxiosRequestConfig, baseURL?: string) => {
   if (baseURL) {
     config.baseURL = baseURL
@@ -18,7 +24,7 @@ export const getExceptions = (config: AxiosRequestConfig, baseURL?: string) => {
   return config
 }
 
-export const axiosSetClientUrl = (config?: IConfig,userTestMode?: boolean) => {
+export const axiosSetClientUrl = (config?: IConfig, userTestMode?: boolean) => {
   if (config?.serverUrl) {
     if (config.testMode || userTestMode) {
       restClient.defaults.headers[
