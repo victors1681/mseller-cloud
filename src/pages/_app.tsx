@@ -105,7 +105,6 @@ configureRestClient()
 // ** Configure JSS & ClassName
 const App = (props: ExtendedAppProps) => {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
-
   // Variables
   const contentHeightFixed = Component.contentHeightFixed ?? false
   const getLayout = /print/.test(props.router.route)
@@ -114,7 +113,6 @@ const App = (props: ExtendedAppProps) => {
       ((page) => (
         <UserLayout contentHeightFixed={contentHeightFixed}>{page}</UserLayout>
       ))
-
   const setConfig = Component.setConfig ?? undefined
 
   const authGuard = Component.authGuard ?? true

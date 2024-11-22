@@ -121,7 +121,7 @@ const CardStatisticsReceipt = (props: Props) => {
                         icon="tabler:report-money"
                       ></Icon>
                     ),
-                    text: 'Imprimit depósito',
+                    text: 'Imprimir Cobro',
                     menuItemProps: {
                       onClick: () => {
                         window.open(

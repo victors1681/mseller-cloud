@@ -1,3 +1,4 @@
+import { SignUpRequest, SignUpType } from 'src/firebase'
 import { ICloudModules, UserTypes } from 'src/types/apps/userTypes'
 
 export type ErrCallbackType = (err: { [key: string]: string }) => void
@@ -28,4 +29,7 @@ export type AuthValuesType = {
   login: (params: LoginParams, errorCallback?: ErrCallbackType) => void
   loadingForm: boolean
   accessControl?: ICloudModules
+  signUp: (
+    value: SignUpRequest,
+  ) => Promise<SignUpType | { error: string } | undefined>
 }

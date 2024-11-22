@@ -23,6 +23,9 @@ import {
   getAllCurrentProfile,
   handleSignOut,
   signInByEmail,
+  signUpFirebase,
+  SignUpRequest,
+  SignUpType,
 } from 'src/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 import { UserTypes } from 'src/types/apps/userTypes'
@@ -36,6 +39,7 @@ const defaultProvider: AuthValuesType = {
   login: () => Promise.resolve(),
   logout: () => Promise.resolve(),
   loadingForm: false,
+  signUp: () => Promise.resolve(undefined),
 }
 
 const AuthContext = createContext(defaultProvider)
@@ -102,17 +106,11 @@ const AuthProvider = ({ children }: Props) => {
         params.password,
         params.rememberMe,
       )
-
-      const returnUrl = router.query.returnUrl
-
       if (userData) {
-        //userData.role = 'admin' //TODO: Temporary forcing user role
         setUser(userData)
+        const redirectURL = (router.query.returnUrl as string) || '/'
+        router.replace(redirectURL)
       }
-
-      const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
-
-      router.replace(redirectURL as string)
     } catch (err: any) {
       if (errorCallback) errorCallback(err)
       setLoadingForm(false)
@@ -128,6 +126,11 @@ const AuthProvider = ({ children }: Props) => {
     setLoadingForm(false)
   }
 
+  const handleSignUp = async (
+    data: SignUpRequest,
+  ): Promise<SignUpType | { error: string } | undefined> => {
+    return signUpFirebase(data)
+  }
   const values = {
     user,
     loading,
@@ -137,6 +140,7 @@ const AuthProvider = ({ children }: Props) => {
     logout: handleLogout,
     loadingForm,
     accessControl: user?.cloudAccess,
+    signUp: handleSignUp,
   }
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>
