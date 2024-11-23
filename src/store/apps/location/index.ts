@@ -24,6 +24,20 @@ export interface AxiosResponse<T> {
   data: T
 }
 
+export const addLocation = createAsyncThunk(
+  'appSeller/addLocation',
+  async (locations: LocalidadType[], { dispatch, getState }: Redux) => {
+    const response = await restClient.post('/api/portal/Localidad', locations)
+
+    const state = getState()
+    const params = state.appSeller.params
+
+    await dispatch(fetchData(params))
+
+    return response.data || {}
+  },
+)
+
 // ** Fetch Locations
 export const fetchData = createAsyncThunk(
   'appLocation/fetchData',
@@ -57,7 +71,7 @@ export const deleteLocation = createAsyncThunk(
     })
     await dispatch(fetchData(getState().Location.params))
 
-    return response.data
+    return response.data || {}
   },
 )
 
@@ -97,6 +111,9 @@ export const appLocationSlice = createSlice({
       state.totalPages = action.payload.totalPages
       ;(state.totalResults = action.payload.totalResults),
         (state.isLoading = false)
+    })
+    builder.addCase(addLocation.fulfilled, (state, action) => {
+      state.data = [...state.data, ...action.payload]
     })
   },
 })

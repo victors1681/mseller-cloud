@@ -22,6 +22,23 @@ export interface AxiosResponse<T> {
   data: T
 }
 
+export const addPaymentType = createAsyncThunk(
+  'appSeller/addLocation',
+  async (paymentTypes: CondicionPagoType[], { dispatch, getState }: Redux) => {
+    const response = await restClient.post(
+      '/api/portal/CondicionPago',
+      paymentTypes,
+    )
+
+    const state = getState()
+    const params = state.appSeller.params
+
+    await dispatch(fetchData(params))
+
+    return response.data
+  },
+)
+
 // ** Fetch PaymentTypes
 export const fetchData = createAsyncThunk(
   'appPaymentType/fetchData',
@@ -55,7 +72,7 @@ export const deletePaymentType = createAsyncThunk(
     })
     await dispatch(fetchData(getState().PaymentType.params))
 
-    return response.data
+    return response.data || {}
   },
 )
 
@@ -96,6 +113,10 @@ export const appPaymentTypeSlice = createSlice({
       ;(state.totalResults = action.payload.totalResults),
         (state.isLoading = false)
     })
+
+    // builder.addCase(addPaymentType.fulfilled, (state, action) => {
+    //   state.data = [...state.data, ...action.payload]
+    // })
   },
 })
 

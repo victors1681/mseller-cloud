@@ -33,7 +33,7 @@ export interface CustomerType {
   contacto: any
   localidad?: LocalidadType
   geoLocalizacion?: GeoLocalizacionType
-  vendedor: VendedorType
+  vendedor?: VendedorType
   condicionPago?: CondicionPagoType
 }
 

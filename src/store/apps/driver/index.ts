@@ -26,6 +26,20 @@ export interface AxiosResponse<T> {
   data: T
 }
 
+export const addDrivers = createAsyncThunk(
+  'appSeller/addDrivers',
+  async (drivers: DistribuidorType[], { dispatch, getState }: Redux) => {
+    const response = await restClient.post('/api/portal/Distribuidor', drivers)
+
+    const state = getState()
+    const params = state.appSeller.params
+
+    await dispatch(fetchData(params))
+
+    return response.data
+  },
+)
+
 // ** Fetch PaymentTypes
 export const fetchData = createAsyncThunk(
   'appDriver/fetchData',
@@ -104,6 +118,10 @@ export const appDriverSlice = createSlice({
       state.totalResults = action.payload.totalResults
       state.isLoading = false
       state.isFailed = false
+    })
+
+    builder.addCase(addDrivers.fulfilled, (state, action) => {
+      state.data = [...state.data, ...action.payload]
     })
   },
 })

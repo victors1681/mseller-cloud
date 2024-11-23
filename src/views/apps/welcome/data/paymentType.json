@@ -1,0 +1,23 @@
+[
+    {
+        "id": 1,
+        "condicionPago": "00",
+        "dias": 0,
+        "tipo_condicion": "00",
+        "descripcion": "Efectivo"
+    },
+    {
+        "id": 2,
+        "condicionPago": "15",
+        "dias": 15,
+        "tipo_condicion": "15",
+        "descripcion": "Crédigo 15 Días"
+    },
+    {
+        "id": 3,
+        "condicionPago": "30",
+        "dias": 0,
+        "tipo_condicion": "30",
+        "descripcion": "Crédigo 30 Días"
+    }
+]

@@ -21,7 +21,7 @@ import format from 'date-fns/format'
 
 // ** Store & Actions Imports
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchData } from 'src/store/apps/location'
+import { addLocation, fetchData } from 'src/store/apps/location'
 
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'

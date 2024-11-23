@@ -25,11 +25,23 @@ export interface AxiosResponse<T> {
   data: T
 }
 
+export const addClients = createAsyncThunk(
+  'appSeller/addClients',
+  async (clients: CustomerType[], { dispatch, getState }: Redux) => {
+    const response = await restClient.post('/api/portal/Cliente', clients)
+    const state = getState()
+    const params = state.appSeller.params
+
+    await dispatch(fetchData(params))
+
+    return response.data
+  },
+)
+
 // ** Fetch Clients
 export const fetchData = createAsyncThunk(
   'appClient/fetchData',
   async (params: DataParams) => {
-    console.log('params', params)
     if (params.procesado === '') {
       delete params.procesado
     }
@@ -102,6 +114,10 @@ export const appClientSlice = createSlice({
       state.totalPages = action.payload.totalPages
       ;(state.totalResults = action.payload.totalResults),
         (state.isLoading = false)
+    })
+
+    builder.addCase(addClients.fulfilled, (state, action) => {
+      state.data = [...state.data, ...action.payload]
     })
   },
 })

@@ -3,7 +3,6 @@ import { Dispatch } from 'redux'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 // ** Axios Imports
-import axios from 'axios'
 import { VendedorType } from 'src/types/apps/sellerType'
 import { PaginatedResponse } from 'src/types/apps/response'
 import restClient from 'src/configs/restClient'
@@ -22,6 +21,20 @@ interface Redux {
 export interface AxiosResponse<T> {
   data: T
 }
+
+export const addSellers = createAsyncThunk(
+  'appSeller/addVendedores',
+  async (sellers: VendedorType[], { dispatch, getState }: Redux) => {
+    const response = await restClient.post('/api/portal/Vendedor', sellers)
+
+    const state = getState()
+    const params = state.appSeller.params
+
+    await dispatch(fetchData(params))
+
+    return response.data
+  },
+)
 
 // ** Fetch PaymentTypes
 export const fetchData = createAsyncThunk(
@@ -49,9 +62,9 @@ export const fetchData = createAsyncThunk(
 )
 
 export const deletePaymentType = createAsyncThunk(
-  'appSeller/deleteData',
+  'appSeller/deleteVendedor',
   async (id: number | string, { getState, dispatch }: Redux) => {
-    const response = await restClient.delete('/apps/PaymentType/delete', {
+    const response = await restClient.delete('/apps/Vendedor', {
       data: id,
     })
     await dispatch(fetchData(getState().PaymentType.params))
@@ -96,6 +109,10 @@ export const appSellerSlice = createSlice({
       state.totalPages = action.payload.totalPages
       ;(state.totalResults = action.payload.totalResults),
         (state.isLoading = false)
+    })
+
+    builder.addCase(addSellers.fulfilled, (state, action) => {
+      state.data = [...state.data, ...action.payload]
     })
   },
 })

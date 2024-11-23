@@ -23,6 +23,19 @@ export interface AxiosResponse<T> {
   data: T
 }
 
+export const addProducts = createAsyncThunk(
+  'appSeller/addProducts',
+  async (products: ProductType[], { dispatch, getState }: Redux) => {
+    const response = await restClient.post('/api/portal/Producto', products)
+    const state = getState()
+    const params = state.appSeller.params
+
+    await dispatch(fetchData(params))
+
+    return response.data
+  },
+)
+
 // ** Fetch Products
 export const fetchData = createAsyncThunk(
   'appProduct/fetchData',
@@ -100,6 +113,10 @@ export const appProductSlice = createSlice({
       state.totalPages = action.payload.totalPages
       ;(state.totalResults = action.payload.totalResults),
         (state.isLoading = false)
+    })
+
+    builder.addCase(addProducts.fulfilled, (state, action) => {
+      state.data = [...state.data, ...action.payload]
     })
   },
 })
