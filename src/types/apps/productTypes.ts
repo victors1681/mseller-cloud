@@ -30,5 +30,5 @@ export interface ProductType {
   tipoImpuesto: string
   apartado: number
   promocion: boolean
-  status: 'A' | 'I'
+  status: 'A' | 'I' | string
 }
