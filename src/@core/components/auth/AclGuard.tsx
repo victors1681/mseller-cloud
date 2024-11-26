@@ -43,7 +43,8 @@ const AclGuard = (props: AclGuardProps) => {
   let ability: AppAbility
 
   useEffect(() => {
-    if (auth.user && (router.route === '/' || router.route === '/login')) {
+    // when I add || router.route === '/login' solve the issue sending the user to the right URL but it show a flick of the login page
+    if (auth.user && router.route === '/') {
       const homeRoute = getHomeRoute()
       router.replace(homeRoute)
     }

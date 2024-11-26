@@ -17,6 +17,7 @@ import drivers from 'src/store/apps/driver'
 import locations from 'src/store/apps/location'
 import collections from 'src/store/apps/collections'
 import invoices from 'src/store/apps/invoices'
+import apikeys from './apps/apikeys'
 
 export const store = configureStore({
   reducer: {
@@ -35,6 +36,7 @@ export const store = configureStore({
     locations,
     collections,
     invoices,
+    apikeys,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

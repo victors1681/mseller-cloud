@@ -3,7 +3,7 @@ import { SyntheticEvent, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import select from 'src/@core/theme/overrides/select'
 import { AppDispatch, RootState } from 'src/store'
-import { fetchData as fetchSellers } from 'src/store/apps/seller'
+import { fetchSellers } from 'src/store/apps/seller'
 
 interface SellerAutocompleteProps {
   selectedSellers?: string

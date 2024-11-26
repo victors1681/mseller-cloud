@@ -6,7 +6,6 @@ import {
   DialogActions,
   Button,
   Typography,
-  CircularProgress,
   List,
   ListItem,
   ListItemIcon,
@@ -14,7 +13,7 @@ import {
 } from '@mui/material'
 
 import Icon from 'src/@core/components/icon'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-hot-toast'
 import LoadingButton from '@mui/lab/LoadingButton'
 import { addLocation } from 'src/store/apps/location'
@@ -23,12 +22,13 @@ import paymentTermData from './data/paymentType.json'
 import clientsData from './data/clients.json'
 import productsData from './data/products.json'
 
-import { AppDispatch } from 'src/store'
+import { AppDispatch, RootState } from 'src/store'
 import { useAuth } from 'src/hooks/useAuth'
-import { addSellers } from 'src/store/apps/seller'
+import { addSellers, fetchSellers } from 'src/store/apps/seller'
 import { addPaymentType } from 'src/store/apps/paymentType'
 import { addClients } from 'src/store/apps/clients'
 import { addProducts } from 'src/store/apps/products'
+import { useRouter } from 'next/router'
 
 const FirstSessionDialog = () => {
   const [open, setOpen] = useState(false)
@@ -36,18 +36,24 @@ const FirstSessionDialog = () => {
   const [success, setSuccess] = useState(false)
   const dispatch = useDispatch<AppDispatch>()
   const auth = useAuth()
+  const router = useRouter()
+
+  const sellersStore = useSelector((state: RootState) => state.sellers)
 
   // Check localStorage for first session flag
   useEffect(() => {
     const isFirstSession = localStorage.getItem('firstSession')
-    if (!isFirstSession) {
+    if (!isFirstSession && sellersStore.data.length === 0) {
       setOpen(true)
+    } else if (sellersStore.data.length === 0) {
+      dispatch(fetchSellers())
     }
-  }, [])
+  }, [sellersStore.data])
 
   const handleClose = () => {
     localStorage.setItem('firstSession', 'false') // Save the flag in localStorage
     setOpen(false)
+    router.push('/apps/clients/list/')
   }
 
   const areRequestSuccessful = async () => {
@@ -86,7 +92,6 @@ const FirstSessionDialog = () => {
     if (response) {
       toast.success('Datos creados exitosamente')
       setSuccess(true)
-      handleClose()
     } else {
       toast.error('Hubo un error al crear los datos')
     }
@@ -160,13 +165,19 @@ const FirstSessionDialog = () => {
         <Button onClick={handleClose} disabled={loading}>
           Cancelar
         </Button>
-        <LoadingButton
-          variant="contained"
-          loading={loading}
-          onClick={handleAccept}
-        >
-          Proceder
-        </LoadingButton>
+        {success ? (
+          <Button onClick={handleClose} variant="contained" disabled={loading}>
+            Completado
+          </Button>
+        ) : (
+          <LoadingButton
+            variant="contained"
+            loading={loading}
+            onClick={handleAccept}
+          >
+            Proceder
+          </LoadingButton>
+        )}
       </DialogActions>
     </Dialog>
   )
