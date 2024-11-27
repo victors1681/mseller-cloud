@@ -27,6 +27,12 @@ import { useSettings } from 'src/@core/hooks/useSettings'
 // ** Demo Imports
 import FooterIllustrationsV2 from 'src/views/pages/auth/FooterIllustrationsV2'
 import Image from 'next/image'
+import { useAuth } from 'src/hooks/useAuth'
+import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
+interface FormValues {
+  email: string
+}
 
 // Styled Components
 const ForgotPasswordIllustrationWrapper = styled(Box)<BoxProps>(
@@ -78,13 +84,35 @@ const LinkStyled = styled(Link)(({ theme }) => ({
 }))
 
 const ForgotPassword = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormValues>()
+
   // ** Hooks
   const theme = useTheme()
   const { settings } = useSettings()
+  const { triggerForgotPassword } = useAuth()
 
   // ** Vars
   const { skin } = settings
   const hidden = useMediaQuery(theme.breakpoints.down('md'))
+
+  const onSubmit = async (data: FormValues) => {
+    console.log('Form submitted:', data)
+
+    try {
+      await triggerForgotPassword({ email: data.email })
+
+      toast.success(
+        'Se ha enviado un correo electrónico para actualizar su contraseña',
+      )
+    } catch (err) {
+      toast.error(err?.message)
+    }
+    // Add your restore password logic here
+  }
 
   const imageSource =
     skin === 'bordered'
@@ -162,13 +190,22 @@ const ForgotPassword = () => {
             <form
               noValidate
               autoComplete="off"
-              onSubmit={(e) => e.preventDefault()}
+              onSubmit={handleSubmit(onSubmit)}
             >
               <TextField
                 autoFocus
                 type="email"
                 label="Email"
                 sx={{ display: 'flex', mb: 4 }}
+                {...register('email', {
+                  required: 'Email is required',
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: 'Invalid email address',
+                  },
+                })}
+                error={!!errors.email}
+                helperText={errors.email?.message}
               />
               <Button
                 fullWidth

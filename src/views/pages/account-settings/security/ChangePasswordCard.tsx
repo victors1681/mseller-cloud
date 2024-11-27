@@ -22,8 +22,9 @@ import Icon from 'src/@core/components/icon'
 // ** Third Party Imports
 import * as yup from 'yup'
 import toast from 'react-hot-toast'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm, Controller, SubmitHandler } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { useAuth } from 'src/hooks/useAuth'
 
 interface State {
   showNewPassword: boolean
@@ -34,7 +35,7 @@ interface State {
 const defaultValues = {
   newPassword: '',
   currentPassword: '',
-  confirmNewPassword: ''
+  confirmNewPassword: '',
 }
 
 const schema = yup.object().shape({
@@ -44,13 +45,13 @@ const schema = yup.object().shape({
     .min(8)
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
-      'Must contain 8 characters, 1 uppercase, 1 lowercase, 1 number and 1 special case character'
+      'Must contain 8 characters, 1 uppercase, 1 lowercase, 1 number and 1 special case character',
     )
     .required(),
   confirmNewPassword: yup
     .string()
     .required()
-    .oneOf([yup.ref('newPassword')], 'Passwords must match')
+    .oneOf([yup.ref('newPassword')], 'Passwords must match'),
 })
 
 const ChangePasswordCard = () => {
@@ -58,15 +59,19 @@ const ChangePasswordCard = () => {
   const [values, setValues] = useState<State>({
     showNewPassword: false,
     showCurrentPassword: false,
-    showConfirmNewPassword: false
+    showConfirmNewPassword: false,
   })
 
   // ** Hooks
+
+  const { updatePassword, user } = useAuth()
+  const userId = user?.userId
+
   const {
     reset,
     control,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
   } = useForm({ defaultValues, resolver: yupResolver(schema) })
 
   const handleClickShowCurrentPassword = () => {
@@ -78,45 +83,62 @@ const ChangePasswordCard = () => {
   }
 
   const handleClickShowConfirmNewPassword = () => {
-    setValues({ ...values, showConfirmNewPassword: !values.showConfirmNewPassword })
+    setValues({
+      ...values,
+      showConfirmNewPassword: !values.showConfirmNewPassword,
+    })
   }
 
-  const onPasswordFormSubmit = () => {
-    toast.success('Password Changed Successfully')
+  const onPasswordFormSubmit: SubmitHandler<any> = (data) => {
+    if (!userId) {
+      toast.error(`No es posible actualizar el usuario ${userId}`)
+      return
+    }
+    updatePassword({ userId, password: data.newPassword })
+    toast.success('Contraseña actualizada correctamente!')
     reset(defaultValues)
   }
 
   return (
     <Card>
-      <CardHeader title='Change Password' />
+      <CardHeader title="Cambiar contraseña" />
       <CardContent>
         <form onSubmit={handleSubmit(onPasswordFormSubmit)}>
           <Grid container spacing={5}>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
-                <InputLabel htmlFor='input-current-password' error={Boolean(errors.currentPassword)}>
-                  Current Password
+                <InputLabel
+                  htmlFor="input-current-password"
+                  error={Boolean(errors.currentPassword)}
+                >
+                  Contraseña Actual
                 </InputLabel>
                 <Controller
-                  name='currentPassword'
+                  name="currentPassword"
                   control={control}
                   rules={{ required: true }}
                   render={({ field: { value, onChange } }) => (
                     <OutlinedInput
                       value={value}
-                      label='Current Password'
+                      label="Contraseña Actual"
                       onChange={onChange}
-                      id='input-current-password'
+                      id="input-current-password"
                       error={Boolean(errors.currentPassword)}
                       type={values.showCurrentPassword ? 'text' : 'password'}
                       endAdornment={
-                        <InputAdornment position='end'>
+                        <InputAdornment position="end">
                           <IconButton
-                            edge='end'
-                            onMouseDown={e => e.preventDefault()}
+                            edge="end"
+                            onMouseDown={(e) => e.preventDefault()}
                             onClick={handleClickShowCurrentPassword}
                           >
-                            <Icon icon={values.showCurrentPassword ? 'mdi:eye-outline' : 'mdi:eye-off-outline'} />
+                            <Icon
+                              icon={
+                                values.showCurrentPassword
+                                  ? 'mdi:eye-outline'
+                                  : 'mdi:eye-off-outline'
+                              }
+                            />
                           </IconButton>
                         </InputAdornment>
                       }
@@ -124,7 +146,9 @@ const ChangePasswordCard = () => {
                   )}
                 />
                 {errors.currentPassword && (
-                  <FormHelperText sx={{ color: 'error.main' }}>{errors.currentPassword.message}</FormHelperText>
+                  <FormHelperText sx={{ color: 'error.main' }}>
+                    {errors.currentPassword.message}
+                  </FormHelperText>
                 )}
               </FormControl>
             </Grid>
@@ -132,29 +156,38 @@ const ChangePasswordCard = () => {
           <Grid container spacing={5} sx={{ mt: 0 }}>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
-                <InputLabel htmlFor='input-new-password' error={Boolean(errors.newPassword)}>
-                  New Password
+                <InputLabel
+                  htmlFor="input-new-password"
+                  error={Boolean(errors.newPassword)}
+                >
+                  Nueva Contraseña
                 </InputLabel>
                 <Controller
-                  name='newPassword'
+                  name="newPassword"
                   control={control}
                   rules={{ required: true }}
                   render={({ field: { value, onChange } }) => (
                     <OutlinedInput
                       value={value}
-                      label='New Password'
+                      label="Nueva Contraseña"
                       onChange={onChange}
-                      id='input-new-password'
+                      id="input-new-password"
                       error={Boolean(errors.newPassword)}
                       type={values.showNewPassword ? 'text' : 'password'}
                       endAdornment={
-                        <InputAdornment position='end'>
+                        <InputAdornment position="end">
                           <IconButton
-                            edge='end'
+                            edge="end"
                             onClick={handleClickShowNewPassword}
-                            onMouseDown={e => e.preventDefault()}
+                            onMouseDown={(e) => e.preventDefault()}
                           >
-                            <Icon icon={values.showNewPassword ? 'mdi:eye-outline' : 'mdi:eye-off-outline'} />
+                            <Icon
+                              icon={
+                                values.showNewPassword
+                                  ? 'mdi:eye-outline'
+                                  : 'mdi:eye-off-outline'
+                              }
+                            />
                           </IconButton>
                         </InputAdornment>
                       }
@@ -162,35 +195,46 @@ const ChangePasswordCard = () => {
                   )}
                 />
                 {errors.newPassword && (
-                  <FormHelperText sx={{ color: 'error.main' }}>{errors.newPassword.message}</FormHelperText>
+                  <FormHelperText sx={{ color: 'error.main' }}>
+                    {errors.newPassword.message}
+                  </FormHelperText>
                 )}
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
-                <InputLabel htmlFor='input-confirm-new-password' error={Boolean(errors.confirmNewPassword)}>
-                  Confirm New Password
+                <InputLabel
+                  htmlFor="input-confirm-new-password"
+                  error={Boolean(errors.confirmNewPassword)}
+                >
+                  Confirmar nueva contraseña
                 </InputLabel>
                 <Controller
-                  name='confirmNewPassword'
+                  name="confirmNewPassword"
                   control={control}
                   rules={{ required: true }}
                   render={({ field: { value, onChange } }) => (
                     <OutlinedInput
                       value={value}
-                      label='Confirm New Password'
+                      label="Confirmar contraseña"
                       onChange={onChange}
-                      id='input-confirm-new-password'
+                      id="input-confirm-new-password"
                       error={Boolean(errors.confirmNewPassword)}
                       type={values.showConfirmNewPassword ? 'text' : 'password'}
                       endAdornment={
-                        <InputAdornment position='end'>
+                        <InputAdornment position="end">
                           <IconButton
-                            edge='end'
-                            onMouseDown={e => e.preventDefault()}
+                            edge="end"
+                            onMouseDown={(e) => e.preventDefault()}
                             onClick={handleClickShowConfirmNewPassword}
                           >
-                            <Icon icon={values.showConfirmNewPassword ? 'mdi:eye-outline' : 'mdi:eye-off-outline'} />
+                            <Icon
+                              icon={
+                                values.showConfirmNewPassword
+                                  ? 'mdi:eye-outline'
+                                  : 'mdi:eye-off-outline'
+                              }
+                            />
                           </IconButton>
                         </InputAdornment>
                       }
@@ -198,27 +242,46 @@ const ChangePasswordCard = () => {
                   )}
                 />
                 {errors.confirmNewPassword && (
-                  <FormHelperText sx={{ color: 'error.main' }}>{errors.confirmNewPassword.message}</FormHelperText>
+                  <FormHelperText sx={{ color: 'error.main' }}>
+                    {errors.confirmNewPassword.message}
+                  </FormHelperText>
                 )}
               </FormControl>
             </Grid>
             <Grid item xs={12}>
-              <Typography sx={{ mt: 1, color: 'text.secondary' }}>Password Requirements:</Typography>
+              <Typography sx={{ mt: 1, color: 'text.secondary' }}>
+                Requisitos para la contraseña
+              </Typography>
               <Box
-                component='ul'
-                sx={{ pl: 4, mb: 0, '& li': { mb: 4, color: 'text.secondary', '&::marker': { fontSize: '1.25rem' } } }}
+                component="ul"
+                sx={{
+                  pl: 4,
+                  mb: 0,
+                  '& li': {
+                    mb: 4,
+                    color: 'text.secondary',
+                    '&::marker': { fontSize: '1.25rem' },
+                  },
+                }}
               >
-                <li>Minimum 8 characters long - the more, the better</li>
-                <li>At least one lowercase & one uppercase character</li>
-                <li>At least one number, symbol, or whitespace character</li>
+                <li>Mínimo 8 caracteres de longitud - cuanto más, mejor</li>
+                <li>Al menos una letra minúscula y una mayúscula</li>
+                <li>
+                  Al menos un número, símbolo o carácter de espacio en blanco
+                </li>
               </Box>
             </Grid>
             <Grid item xs={12}>
-              <Button variant='contained' type='submit' sx={{ mr: 3 }}>
-                Save Changes
+              <Button variant="contained" type="submit" sx={{ mr: 3 }}>
+                Grabar cambios
               </Button>
-              <Button type='reset' variant='outlined' color='secondary' onClick={() => reset()}>
-                Reset
+              <Button
+                type="reset"
+                variant="outlined"
+                color="secondary"
+                onClick={() => reset()}
+              >
+                Resetear
               </Button>
             </Grid>
           </Grid>

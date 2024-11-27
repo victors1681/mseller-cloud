@@ -24,10 +24,9 @@ import CustomChip from 'src/@core/components/mui/chip'
 // ** Demo Components
 import CreateApiKey from 'src/views/pages/account-settings/security/CreateApiKey'
 import ChangePasswordCard from 'src/views/pages/account-settings/security/ChangePasswordCard'
-import TwoFactorAuthentication from 'src/views/pages/account-settings/security/TwoFactorAuthentication'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/store'
-import { useAuth } from 'src/hooks/useAuth'
+
 import { fetchApiKeys } from 'src/store/apps/apikeys'
 
 interface ApiKeyListType {
@@ -125,10 +124,8 @@ const recentDeviceData: RecentDeviceDataType[] = [
 
 const TabSecurity = () => {
   const dispatch = useDispatch<AppDispatch>()
-  const { user } = useAuth()
-  console.log(user)
   const store = useSelector((state: RootState) => state.apikeys)
-  console.log('store?.data', store?.data)
+
   const apiKeyList = Array.isArray(store?.data)
     ? store?.data
         .slice() // Create a copy of the array
@@ -148,9 +145,9 @@ const TabSecurity = () => {
       <Grid item xs={12}>
         <ChangePasswordCard />
       </Grid>
-      <Grid item xs={12}>
+      {/* <Grid item xs={12}>
         <TwoFactorAuthentication />
-      </Grid>
+      </Grid> */}
       <Grid item xs={12}>
         <CreateApiKey />
       </Grid>
@@ -218,7 +215,7 @@ const TabSecurity = () => {
       </Grid>
 
       {/* Recent Devices Card*/}
-      <Grid item xs={12}>
+      {/* <Grid item xs={12}>
         <Card>
           <CardHeader title="Recent Devices" />
           <TableContainer>
@@ -265,7 +262,7 @@ const TabSecurity = () => {
             </Table>
           </TableContainer>
         </Card>
-      </Grid>
+      </Grid> */}
     </Grid>
   )
 }

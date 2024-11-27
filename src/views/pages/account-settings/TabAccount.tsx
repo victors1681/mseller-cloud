@@ -30,6 +30,7 @@ import { useForm, Controller } from 'react-hook-form'
 import Icon from 'src/@core/components/icon'
 import { useAuth } from 'src/hooks/useAuth'
 import Avatar from '@mui/material/Avatar'
+import RemoveDataForm from './removeData/RemoveData'
 
 interface Data {
   email: string
@@ -430,6 +431,16 @@ const TabAccount = () => {
               </Grid>
             </CardContent>
           </form>
+        </Card>
+      </Grid>
+
+      {/* Delete Account Card */}
+      <Grid item xs={12}>
+        <Card>
+          <CardHeader title="Eliminar Informaciones" />
+          <CardContent>
+            <RemoveDataForm />
+          </CardContent>
         </Card>
       </Grid>
 

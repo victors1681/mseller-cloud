@@ -141,4 +141,70 @@ export const signUpFirebase = async (
   }
 }
 
+export type UpdatePasswordRequest = {
+  userId: string
+  password: string
+}
+
+export interface UpdatePasswordType {
+  result: string
+}
+
+export const updatePasswordFirebase = async (
+  data: UpdatePasswordRequest,
+): Promise<UpdatePasswordType | { error: string } | undefined> => {
+  try {
+    const fn = httpsCallable<UpdatePasswordRequest, UpdatePasswordType>(
+      functions,
+      'updatePasswordV2',
+    )
+    const response = await fn(data)
+    return response.data
+  } catch (err: any) {
+    return firebaseError(err)
+  }
+}
+
+export type TriggerForgotPasswordProps = {
+  email: string
+}
+
+export interface TriggerForgotPasswordType {
+  result: string
+}
+
+export const triggerForgotPasswordFirebase = async (
+  data: TriggerForgotPasswordProps,
+): Promise<TriggerForgotPasswordType | { error: string } | undefined> => {
+  try {
+    const fn = httpsCallable<
+      TriggerForgotPasswordProps,
+      TriggerForgotPasswordType
+    >(functions, 'triggerForgotPassword')
+    const response = await fn(data)
+    return response.data
+  } catch (err: any) {
+    return firebaseError(err)
+  }
+}
+
+export const firebaseError = (err: any) => {
+  if (err?.code) {
+    switch (err.code) {
+      case 'functions/permission-denied':
+        throw new Error('No tienes permisos para realizar esta operación')
+
+      case 'functions/not-found':
+        throw new Error('Correo electronico no encontrado')
+
+      case 'functions/internal':
+        return {
+          error: 'An internal server error occurred. Please try again later.',
+        }
+      default:
+        return { error: `An unknown error occurred: ${err.code}` }
+    }
+  }
+}
+
 export { db, firebase, functions, auth }

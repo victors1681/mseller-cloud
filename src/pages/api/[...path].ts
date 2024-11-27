@@ -63,8 +63,17 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
         res.status(200).json(putResponse.data)
         break
       case 'DELETE':
+        const deleteResponse = await axios.request({
+          url: fullPath,
+          method: 'DELETE',
+          data: req.body,
+          params: params,
+          headers: {
+            Authorization: req.headers.authorization,
+          },
+        })
         // Handle DELETE request logic
-        res.status(200).json({ method, path: fullPath })
+        res.status(200).json(deleteResponse.data)
         break
       default:
         res.status(405).end(`Method ${method} Not Allowed`)

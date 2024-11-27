@@ -18,6 +18,7 @@ import locations from 'src/store/apps/location'
 import collections from 'src/store/apps/collections'
 import invoices from 'src/store/apps/invoices'
 import apikeys from './apps/apikeys'
+import removeData from './apps/removeData'
 
 export const store = configureStore({
   reducer: {
@@ -37,6 +38,7 @@ export const store = configureStore({
     collections,
     invoices,
     apikeys,
+    removeData,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

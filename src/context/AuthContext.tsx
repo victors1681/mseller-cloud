@@ -26,6 +26,12 @@ import {
   signUpFirebase,
   SignUpRequest,
   SignUpType,
+  triggerForgotPasswordFirebase,
+  TriggerForgotPasswordProps,
+  TriggerForgotPasswordType,
+  updatePasswordFirebase,
+  UpdatePasswordRequest,
+  UpdatePasswordType,
 } from 'src/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 import { UserTypes } from 'src/types/apps/userTypes'
@@ -40,6 +46,8 @@ const defaultProvider: AuthValuesType = {
   logout: () => Promise.resolve(),
   loadingForm: false,
   signUp: () => Promise.resolve(undefined),
+  updatePassword: () => Promise.resolve(undefined),
+  triggerForgotPassword: () => Promise.resolve(undefined),
 }
 
 const AuthContext = createContext(defaultProvider)
@@ -131,6 +139,19 @@ const AuthProvider = ({ children }: Props) => {
   ): Promise<SignUpType | { error: string } | undefined> => {
     return signUpFirebase(data)
   }
+
+  const updatePassword = async (
+    data: UpdatePasswordRequest,
+  ): Promise<UpdatePasswordType | { error: string } | undefined> => {
+    return updatePasswordFirebase(data)
+  }
+
+  const triggerForgotPassword = async (
+    data: TriggerForgotPasswordProps,
+  ): Promise<TriggerForgotPasswordType | { error: string } | undefined> => {
+    return triggerForgotPasswordFirebase(data)
+  }
+
   const values = {
     user,
     loading,
@@ -141,6 +162,8 @@ const AuthProvider = ({ children }: Props) => {
     loadingForm,
     accessControl: user?.cloudAccess,
     signUp: handleSignUp,
+    updatePassword,
+    triggerForgotPassword,
   }
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>
