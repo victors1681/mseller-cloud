@@ -16,9 +16,9 @@ import {
 } from 'firebase/auth'
 import { axiosSetClientUrl } from 'src/configs/restClient'
 import { UserTypes } from 'src/types/apps/userTypes'
-import user from 'src/store/apps/user'
-
+import { StripeProductType } from 'src/types/apps/stripeTypes'
 const LOCAL_HOST = '127.0.0.1'
+
 // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig)
 const auth = getAuth(app)
@@ -183,6 +183,70 @@ export const triggerForgotPasswordFirebase = async (
     >(functions, 'triggerForgotPassword')
     const response = await fn(data)
     return response.data
+  } catch (err: any) {
+    return firebaseError(err)
+  }
+}
+
+export type CreateSubscriptionProps = {
+  price: string
+  quantity: number
+  tier: string
+  token: string
+}
+
+export interface CreateSubscriptionType {
+  subscriptionId: string
+  success: boolean
+}
+
+export const createSubscriptionFirebase = async (
+  data: CreateSubscriptionProps,
+): Promise<CreateSubscriptionType | { error: string } | undefined> => {
+  try {
+    const fn = httpsCallable<CreateSubscriptionProps, CreateSubscriptionType>(
+      functions,
+      'createSubscription',
+    )
+    const response = await fn(data)
+    return response.data
+  } catch (err: any) {
+    return firebaseError(err)
+  }
+}
+
+export interface CancelSubscriptionType {
+  result: string
+}
+export const cancelSubscriptionFirebase = async (): Promise<
+  CancelSubscriptionType | { error: string } | undefined
+> => {
+  try {
+    const fn = httpsCallable<any, CancelSubscriptionType>(
+      functions,
+      'cancelSubscription',
+    )
+    const response = await fn()
+    return response.data
+  } catch (err: any) {
+    return firebaseError(err)
+  }
+}
+
+interface StripeResponse {
+  success: boolean
+  data: StripeProductType[]
+}
+export const fetchStripeProductsFirebase = async (): Promise<
+  StripeProductType | { error: string } | undefined
+> => {
+  try {
+    const fn = httpsCallable<any, StripeResponse>(
+      functions,
+      'fetchStripeProducts',
+    )
+    const response = await fn()
+    return response.data?.data
   } catch (err: any) {
     return firebaseError(err)
   }

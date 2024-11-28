@@ -48,7 +48,7 @@ const FirstSessionDialog = () => {
     } else if (sellersStore.data.length === 0) {
       dispatch(fetchSellers())
     }
-  }, [sellersStore.data])
+  }, [])
 
   const handleClose = () => {
     localStorage.setItem('firstSession', 'false') // Save the flag in localStorage

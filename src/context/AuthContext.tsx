@@ -20,6 +20,12 @@ import authConfig from 'src/configs/auth'
 import { AuthValuesType, LoginParams, ErrCallbackType } from './types'
 import {
   auth,
+  cancelSubscriptionFirebase,
+  CancelSubscriptionType,
+  createSubscriptionFirebase,
+  CreateSubscriptionProps,
+  CreateSubscriptionType,
+  fetchStripeProductsFirebase,
   getAllCurrentProfile,
   handleSignOut,
   signInByEmail,
@@ -35,6 +41,7 @@ import {
 } from 'src/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 import { UserTypes } from 'src/types/apps/userTypes'
+import { StripeProductType } from 'src/types/apps/stripeTypes'
 
 // ** Defaults
 const defaultProvider: AuthValuesType = {
@@ -48,6 +55,9 @@ const defaultProvider: AuthValuesType = {
   signUp: () => Promise.resolve(undefined),
   updatePassword: () => Promise.resolve(undefined),
   triggerForgotPassword: () => Promise.resolve(undefined),
+  createSubscription: () => Promise.resolve(undefined),
+  cancelSubscription: () => Promise.resolve(undefined),
+  fetchStripeProducts: () => Promise.resolve(undefined),
 }
 
 const AuthContext = createContext(defaultProvider)
@@ -152,6 +162,24 @@ const AuthProvider = ({ children }: Props) => {
     return triggerForgotPasswordFirebase(data)
   }
 
+  const createSubscription = async (
+    data: CreateSubscriptionProps,
+  ): Promise<CreateSubscriptionType | { error: string } | undefined> => {
+    return createSubscriptionFirebase(data)
+  }
+
+  const cancelSubscription = async (): Promise<
+    CancelSubscriptionType | { error: string } | undefined
+  > => {
+    return cancelSubscriptionFirebase()
+  }
+
+  const fetchStripeProducts = async (): Promise<
+    StripeProductType | { error: string } | undefined
+  > => {
+    return fetchStripeProductsFirebase()
+  }
+
   const values = {
     user,
     loading,
@@ -164,6 +192,9 @@ const AuthProvider = ({ children }: Props) => {
     signUp: handleSignUp,
     updatePassword,
     triggerForgotPassword,
+    createSubscription,
+    cancelSubscription,
+    fetchStripeProducts,
   }
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>

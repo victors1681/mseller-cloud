@@ -1,4 +1,7 @@
 import {
+  CancelSubscriptionType,
+  CreateSubscriptionProps,
+  CreateSubscriptionType,
   SignUpRequest,
   SignUpType,
   TriggerForgotPasswordProps,
@@ -7,6 +10,7 @@ import {
   UpdatePasswordType,
 } from 'src/firebase'
 import { ICloudModules, UserTypes } from 'src/types/apps/userTypes'
+import { StripeProductType } from 'src/types/apps/stripeTypes'
 
 export type ErrCallbackType = (err: { [key: string]: string }) => void
 
@@ -45,4 +49,14 @@ export type AuthValuesType = {
   triggerForgotPassword: (
     value: TriggerForgotPasswordProps,
   ) => Promise<TriggerForgotPasswordType | { error: string } | undefined>
+
+  createSubscription: (
+    value: CreateSubscriptionProps,
+  ) => Promise<CreateSubscriptionType | { error: string } | undefined>
+  cancelSubscription: () => Promise<
+    CancelSubscriptionType | { error: string } | undefined
+  >
+  fetchStripeProducts: () => Promise<
+    StripeProductType | { error: string } | undefined
+  >
 }

@@ -36,13 +36,18 @@ import CustomChip from 'src/@core/components/mui/chip'
 import CardWrapper from 'src/@core/styles/libs/react-credit-cards'
 
 // ** Util Import
-import { formatCVC, formatExpirationDate, formatCreditCardNumber } from 'src/@core/utils/format'
+import {
+  formatCVC,
+  formatExpirationDate,
+  formatCreditCardNumber,
+} from 'src/@core/utils/format'
 
 // ** Types
 import { ThemeColor } from 'src/@core/layouts/types'
 
 // ** Styles Import
 import 'react-credit-cards/es/styles-compiled.css'
+import AddSubscriptionForm from './AddSubscriptionForm'
 
 interface DataType {
   name: string
@@ -69,16 +74,16 @@ const CreditCardWrapper = styled(Box)<BoxProps>(({ theme }) => ({
   flexDirection: 'column',
   [theme.breakpoints.down('xl')]: {
     '& > div:first-of-type': {
-      marginBottom: theme.spacing(6)
-    }
+      marginBottom: theme.spacing(6),
+    },
   },
   [theme.breakpoints.up('xl')]: {
     alignItems: 'center',
     flexDirection: 'row',
     '& > div:first-of-type': {
-      marginRight: theme.spacing(6)
-    }
-  }
+      marginRight: theme.spacing(6),
+    },
+  },
 }))
 
 const data: DataType[] = [
@@ -90,7 +95,7 @@ const data: DataType[] = [
     badgeColor: 'primary',
     cardStatus: 'Primary',
     cardNumber: '5577 0000 5577 9865',
-    imgSrc: '/images/logos/mastercard.png'
+    imgSrc: '/images/logos/mastercard.png',
   },
   {
     cardCvc: '681',
@@ -98,8 +103,8 @@ const data: DataType[] = [
     expiryDate: '02/24',
     name: 'Mildred Wagner',
     cardNumber: '4532 3616 2070 5678',
-    imgSrc: '/images/logos/visa.png'
-  }
+    imgSrc: '/images/logos/visa.png',
+  },
 ]
 
 const PaymentMethodCard = () => {
@@ -111,7 +116,9 @@ const PaymentMethodCard = () => {
   const [expiry, setExpiry] = useState<string | number>('')
   const [openEditCard, setOpenEditCard] = useState<boolean>(false)
   const [paymentMethod, setPaymentMethod] = useState<string>('card')
-  const [selectedCard, setSelectedCard] = useState<SelectedCardType | null>(null)
+  const [selectedCard, setSelectedCard] = useState<SelectedCardType | null>(
+    null,
+  )
 
   const handleEditCardClickOpen = (id: number) => {
     setSelectedCard({
@@ -120,7 +127,7 @@ const PaymentMethodCard = () => {
       name: data[id].name,
       cvc: data[id].cardCvc,
       expiry: data[id].expiryDate,
-      cardNumber: data[id].cardNumber
+      cardNumber: data[id].cardNumber,
     })
     setOpenEditCard(true)
   }
@@ -148,16 +155,31 @@ const PaymentMethodCard = () => {
     }
   }
 
-  const handleInputChangeDialog = ({ target }: ChangeEvent<HTMLInputElement>) => {
+  const handleInputChangeDialog = ({
+    target,
+  }: ChangeEvent<HTMLInputElement>) => {
     if (target.name === 'cardNumberDialog') {
       target.value = formatCreditCardNumber(target.value, Payment)
-      setSelectedCard({ ...selectedCard, cardNumber: target.value } as SelectedCardType)
+      setSelectedCard({
+        ...selectedCard,
+        cardNumber: target.value,
+      } as SelectedCardType)
     } else if (target.name === 'expiryDialog') {
       target.value = formatExpirationDate(target.value)
-      setSelectedCard({ ...selectedCard, expiry: target.value } as SelectedCardType)
+      setSelectedCard({
+        ...selectedCard,
+        expiry: target.value,
+      } as SelectedCardType)
     } else if (target.name === 'cvcDialog') {
-      target.value = formatCVC(target.value, (selectedCard as SelectedCardType).cardNumber, Payment)
-      setSelectedCard({ ...selectedCard, cvc: target.value } as SelectedCardType)
+      target.value = formatCVC(
+        target.value,
+        (selectedCard as SelectedCardType).cardNumber,
+        Payment,
+      )
+      setSelectedCard({
+        ...selectedCard,
+        cvc: target.value,
+      } as SelectedCardType)
     }
   }
 
@@ -171,94 +193,11 @@ const PaymentMethodCard = () => {
   return (
     <>
       <Card>
-        <CardHeader title='Payment Method' />
+        <CardHeader title="Payment Method" />
         <CardContent>
           <Grid container spacing={6}>
             <Grid item xs={12} md={6}>
-              <Grid container spacing={4}>
-                <Grid item xs={12}>
-                  <FormControl>
-                    <RadioGroup
-                      row
-                      value={paymentMethod}
-                      aria-label='payment method'
-                      name='account-settings-billing-radio'
-                      onChange={e => setPaymentMethod(e.target.value)}
-                    >
-                      <FormControlLabel value='card' control={<Radio />} label='Credit/Debit/ATM Card' />
-                      <FormControlLabel value='cod' label='COD/Cheque' control={<Radio />} />
-                    </RadioGroup>
-                  </FormControl>
-                </Grid>
-                {paymentMethod === 'card' ? (
-                  <>
-                    <Grid item xs={12}>
-                      <CreditCardWrapper>
-                        <CardWrapper>
-                          <Cards cvc={cvc} focused={focus} expiry={expiry} name={name} number={cardNumber} />
-                        </CardWrapper>
-                      </CreditCardWrapper>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <FormControl fullWidth>
-                        <TextField
-                          fullWidth
-                          name='cardNumber'
-                          value={cardNumber}
-                          autoComplete='off'
-                          label='Card Number'
-                          onBlur={handleBlur}
-                          onChange={handleInputChange}
-                          placeholder='0000 0000 0000 0000'
-                          onFocus={e => setFocus(e.target.name as Focused)}
-                        />
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        name='name'
-                        value={name}
-                        autoComplete='off'
-                        onBlur={handleBlur}
-                        label='Name on Card'
-                        placeholder='John Doe'
-                        onChange={e => setName(e.target.value)}
-                        onFocus={e => setFocus(e.target.name as Focused)}
-                      />
-                    </Grid>
-                    <Grid item xs={6} sm={3}>
-                      <TextField
-                        fullWidth
-                        name='expiry'
-                        label='Expiry'
-                        value={expiry}
-                        onBlur={handleBlur}
-                        placeholder='MM/YY'
-                        onChange={handleInputChange}
-                        inputProps={{ maxLength: '5' }}
-                        onFocus={e => setFocus(e.target.name as Focused)}
-                      />
-                    </Grid>
-                    <Grid item xs={6} sm={3}>
-                      <TextField
-                        fullWidth
-                        name='cvc'
-                        label='CVC'
-                        value={cvc}
-                        autoComplete='off'
-                        onBlur={handleBlur}
-                        onChange={handleInputChange}
-                        onFocus={e => setFocus(e.target.name as Focused)}
-                        placeholder={Payment.fns.cardType(cardNumber) === 'amex' ? '1234' : '123'}
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <FormControlLabel control={<Switch defaultChecked />} label='Save Card for future billing?' />
-                    </Grid>
-                  </>
-                ) : null}
-              </Grid>
+              <AddSubscriptionForm />
             </Grid>
 
             <Grid item xs={12} md={6}>
@@ -274,50 +213,55 @@ const PaymentMethodCard = () => {
                     justifyContent: ['space-between'],
                     backgroundColor: 'action.hover',
                     alignItems: ['flex-start', 'center'],
-                    mb: index !== data.length - 1 ? 4 : undefined
+                    mb: index !== data.length - 1 ? 4 : undefined,
                   }}
                 >
                   <div>
-                    <img height='25' alt={item.imgAlt} src={item.imgSrc} />
-                    <Box sx={{ mt: 1, mb: 2.5, display: 'flex', alignItems: 'center' }}>
-                      <Typography sx={{ fontWeight: 600 }}>{item.name}</Typography>
+                    <img height="25" alt={item.imgAlt} src={item.imgSrc} />
+                    <Box
+                      sx={{
+                        mt: 1,
+                        mb: 2.5,
+                        display: 'flex',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Typography sx={{ fontWeight: 600 }}>
+                        {item.name}
+                      </Typography>
                       {item.cardStatus ? (
                         <CustomChip
-                          skin='light'
-                          size='small'
+                          skin="light"
+                          size="small"
                           sx={{ ml: 4 }}
                           label={item.cardStatus}
                           color={item.badgeColor}
                         />
                       ) : null}
                     </Box>
-                    <Typography variant='body2'>
-                      **** **** **** {item.cardNumber.substring(item.cardNumber.length - 4)}
+                    <Typography variant="body2">
+                      **** **** ****{' '}
+                      {item.cardNumber.substring(item.cardNumber.length - 4)}
                     </Typography>
                   </div>
 
                   <Box sx={{ mt: [3, 0], textAlign: ['start', 'end'] }}>
-                    <Button variant='outlined' sx={{ mr: 4 }} onClick={() => handleEditCardClickOpen(index)}>
+                    <Button
+                      variant="outlined"
+                      sx={{ mr: 4 }}
+                      onClick={() => handleEditCardClickOpen(index)}
+                    >
                       Edit
                     </Button>
-                    <Button variant='outlined' color='secondary'>
+                    <Button variant="outlined" color="secondary">
                       Delete
                     </Button>
-                    <Typography variant='body2' sx={{ mt: 4 }}>
+                    <Typography variant="body2" sx={{ mt: 4 }}>
                       Card expires at {item.expiryDate}
                     </Typography>
                   </Box>
                 </Box>
               ))}
-            </Grid>
-
-            <Grid item xs={12}>
-              <Button type='submit' variant='contained' sx={{ mr: 4 }}>
-                Save Changes
-              </Button>
-              <Button type='reset' variant='outlined' color='secondary' onClick={handleResetForm}>
-                Reset
-              </Button>
             </Grid>
           </Grid>
         </CardContent>
@@ -325,30 +269,39 @@ const PaymentMethodCard = () => {
       <Dialog
         open={openEditCard}
         onClose={handleEditCardClose}
-        aria-labelledby='user-view-billing-edit-card'
-        aria-describedby='user-view-billing-edit-card-description'
+        aria-labelledby="user-view-billing-edit-card"
+        aria-describedby="user-view-billing-edit-card-description"
         sx={{ '& .MuiPaper-root': { width: '100%', maxWidth: 650 } }}
       >
         <DialogTitle
-          id='user-view-billing-edit-card'
+          id="user-view-billing-edit-card"
           sx={{
             textAlign: 'center',
             fontSize: '1.5rem !important',
-            px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
-            pt: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
+            px: (theme) => [
+              `${theme.spacing(5)} !important`,
+              `${theme.spacing(15)} !important`,
+            ],
+            pt: (theme) => [
+              `${theme.spacing(8)} !important`,
+              `${theme.spacing(12.5)} !important`,
+            ],
           }}
         >
           Edit Card
         </DialogTitle>
         <DialogContent
           sx={{
-            pb: theme => `${theme.spacing(6)} !important`,
-            px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`]
+            pb: (theme) => `${theme.spacing(6)} !important`,
+            px: (theme) => [
+              `${theme.spacing(5)} !important`,
+              `${theme.spacing(15)} !important`,
+            ],
           }}
         >
           <DialogContentText
-            variant='body2'
-            id='user-view-billing-edit-card-description'
+            variant="body2"
+            id="user-view-billing-edit-card-description"
             sx={{ textAlign: 'center', mb: 7 }}
           >
             Edit your saved card details
@@ -372,77 +325,113 @@ const PaymentMethodCard = () => {
                     <Grid item xs={12}>
                       <TextField
                         fullWidth
-                        autoComplete='off'
-                        label='Card Number'
-                        name='cardNumberDialog'
+                        autoComplete="off"
+                        label="Card Number"
+                        name="cardNumberDialog"
                         onBlur={handleSelectedCardBlur}
                         onChange={handleInputChangeDialog}
-                        placeholder='0000 0000 0000 0000'
+                        placeholder="0000 0000 0000 0000"
                         defaultValue={selectedCard.cardNumber}
-                        onFocus={e => setSelectedCard({ ...selectedCard, focus: e.target.name as Focused })}
+                        onFocus={(e) =>
+                          setSelectedCard({
+                            ...selectedCard,
+                            focus: e.target.name as Focused,
+                          })
+                        }
                       />
                     </Grid>
                     <Grid item xs={12} sm={8}>
                       <TextField
                         fullWidth
-                        name='nameDialog'
-                        autoComplete='off'
-                        label='Name on Card'
-                        placeholder='John Doe'
+                        name="nameDialog"
+                        autoComplete="off"
+                        label="Name on Card"
+                        placeholder="John Doe"
                         onBlur={handleSelectedCardBlur}
                         defaultValue={selectedCard.name}
-                        onChange={e => setSelectedCard({ ...selectedCard, name: e.target.value })}
-                        onFocus={e => setSelectedCard({ ...selectedCard, focus: e.target.name as Focused })}
+                        onChange={(e) =>
+                          setSelectedCard({
+                            ...selectedCard,
+                            name: e.target.value,
+                          })
+                        }
+                        onFocus={(e) =>
+                          setSelectedCard({
+                            ...selectedCard,
+                            focus: e.target.name as Focused,
+                          })
+                        }
                       />
                     </Grid>
                     <Grid item xs={12} sm={4}>
                       <TextField
                         fullWidth
-                        label='Expiry'
-                        placeholder='MM/YY'
-                        name='expiryDialog'
+                        label="Expiry"
+                        placeholder="MM/YY"
+                        name="expiryDialog"
                         defaultValue={expiry}
                         onBlur={handleSelectedCardBlur}
                         inputProps={{ maxLength: '5' }}
                         onChange={handleInputChangeDialog}
-                        onFocus={e => setSelectedCard({ ...selectedCard, focus: e.target.name as Focused })}
+                        onFocus={(e) =>
+                          setSelectedCard({
+                            ...selectedCard,
+                            focus: e.target.name as Focused,
+                          })
+                        }
                       />
                     </Grid>
                     <Grid item xs={12} sm={8}>
                       <FormControl fullWidth>
-                        <InputLabel id='user-view-billing-edit-card-status-label'>Card Status</InputLabel>
+                        <InputLabel id="user-view-billing-edit-card-status-label">
+                          Card Status
+                        </InputLabel>
                         <Select
-                          label='Card Status'
-                          id='user-view-billing-edit-card-status'
-                          labelId='user-view-billing-edit-card-status-label'
+                          label="Card Status"
+                          id="user-view-billing-edit-card-status"
+                          labelId="user-view-billing-edit-card-status-label"
                           defaultValue={
-                            data[selectedCard.cardId].cardStatus ? data[selectedCard.cardId].cardStatus : ''
+                            data[selectedCard.cardId].cardStatus
+                              ? data[selectedCard.cardId].cardStatus
+                              : ''
                           }
                         >
-                          <MenuItem value='Primary'>Primary</MenuItem>
-                          <MenuItem value='Expired'>Expired</MenuItem>
-                          <MenuItem value='Active'>Active</MenuItem>
+                          <MenuItem value="Primary">Primary</MenuItem>
+                          <MenuItem value="Expired">Expired</MenuItem>
+                          <MenuItem value="Active">Active</MenuItem>
                         </Select>
                       </FormControl>
                     </Grid>
                     <Grid item xs={12} sm={4}>
                       <TextField
                         fullWidth
-                        label='CVC'
-                        name='cvcDialog'
+                        label="CVC"
+                        name="cvcDialog"
                         defaultValue={cvc}
-                        autoComplete='off'
+                        autoComplete="off"
                         onBlur={handleSelectedCardBlur}
                         onChange={handleInputChangeDialog}
-                        onFocus={e => setSelectedCard({ ...selectedCard, focus: e.target.name as Focused })}
-                        placeholder={Payment.fns.cardType(selectedCard.cardNumber) === 'amex' ? '1234' : '123'}
+                        onFocus={(e) =>
+                          setSelectedCard({
+                            ...selectedCard,
+                            focus: e.target.name as Focused,
+                          })
+                        }
+                        placeholder={
+                          Payment.fns.cardType(selectedCard.cardNumber) ===
+                          'amex'
+                            ? '1234'
+                            : '123'
+                        }
                       />
                     </Grid>
                     <Grid item xs={12}>
                       <FormControlLabel
                         control={<Switch defaultChecked />}
-                        label='Save Card for future billing?'
-                        sx={{ '& .MuiTypography-root': { color: 'text.secondary' } }}
+                        label="Save Card for future billing?"
+                        sx={{
+                          '& .MuiTypography-root': { color: 'text.secondary' },
+                        }}
                       />
                     </Grid>
                   </Grid>
@@ -454,14 +443,28 @@ const PaymentMethodCard = () => {
         <DialogActions
           sx={{
             justifyContent: 'center',
-            px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
-            pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
+            px: (theme) => [
+              `${theme.spacing(5)} !important`,
+              `${theme.spacing(15)} !important`,
+            ],
+            pb: (theme) => [
+              `${theme.spacing(8)} !important`,
+              `${theme.spacing(12.5)} !important`,
+            ],
           }}
         >
-          <Button variant='contained' sx={{ mr: 2 }} onClick={handleEditCardClose}>
+          <Button
+            variant="contained"
+            sx={{ mr: 2 }}
+            onClick={handleEditCardClose}
+          >
             Submit
           </Button>
-          <Button variant='outlined' color='secondary' onClick={handleEditCardClose}>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={handleEditCardClose}
+          >
             Cancel
           </Button>
         </DialogActions>

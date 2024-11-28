@@ -9,41 +9,8 @@ import {
 } from '@mui/material'
 import { Controller, Control, FieldValues } from 'react-hook-form'
 import { SignUpRequest } from 'src/firebase'
+import { countryList } from 'src/utils/countryList'
 
-const countryList = [
-  // América del Norte
-  'Canadá',
-  'Estados Unidos',
-  'México',
-  'Guatemala',
-  'Belice',
-  'El Salvador',
-  'Honduras',
-  'Nicaragua',
-  'Costa Rica',
-  'Panamá',
-  'Bahamas',
-  'Cuba',
-  'Haití',
-  'República Dominicana',
-  'Jamaica',
-  'Trinidad y Tobago',
-
-  // América del Sur
-  'Argentina',
-  'Bolivia',
-  'Brasil',
-  'Chile',
-  'Colombia',
-  'Ecuador',
-  'Guyana',
-  'Paraguay',
-  'Perú',
-  'Surinam',
-  'Uruguay',
-  'Venezuela',
-  'Otro',
-]
 type CountryDropdownName = 'country'
 
 interface CountryDropdownProps {

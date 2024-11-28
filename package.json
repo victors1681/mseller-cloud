@@ -40,6 +40,8 @@
     "@mui/x-data-grid": "6.0.3",
     "@popperjs/core": "2.11.7",
     "@reduxjs/toolkit": "1.9.5",
+    "@stripe/react-stripe-js": "^3.0.0",
+    "@stripe/stripe-js": "^5.2.0",
     "apexcharts-clevision": "3.28.5",
     "axios": "1.4.0",
     "axios-mock-adapter": "1.21.4",

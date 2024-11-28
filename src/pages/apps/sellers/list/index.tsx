@@ -8,16 +8,12 @@ import Link from 'next/link'
 import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
 import { styled } from '@mui/material/styles'
-import MenuItem from '@mui/material/MenuItem'
 import TextField from '@mui/material/TextField'
 import CardHeader from '@mui/material/CardHeader'
-import InputLabel from '@mui/material/InputLabel'
 import Typography from '@mui/material/Typography'
-import FormControl from '@mui/material/FormControl'
-import CardContent from '@mui/material/CardContent'
-import Select, { SelectChangeEvent } from '@mui/material/Select'
 import { DataGrid, GridColDef, GridRowId } from '@mui/x-data-grid'
 import { debounce } from '@mui/material'
+
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
@@ -26,7 +22,7 @@ import format from 'date-fns/format'
 
 // ** Store & Actions Imports
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchData } from 'src/store/apps/seller'
+import { fetchSellers } from 'src/store/apps/seller'
 
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
@@ -35,7 +31,6 @@ import TableHeader from 'src/views/apps/products/list/TableHeader'
 // ** Styled Components
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import { VendedorType } from 'src/types/apps/sellerType'
-import PriceDisplay from 'src/views/apps/products/list/PriceDisplay'
 import OptionsMenu from 'src/@core/components/option-menu'
 
 interface CustomInputProps {
@@ -140,7 +135,7 @@ const InvoiceList = () => {
   //Initial Load
   useEffect(() => {
     dispatch(
-      fetchData({
+      fetchSellers({
         query: value,
         pageNumber: paginationModel.page,
       }),
@@ -151,7 +146,7 @@ const InvoiceList = () => {
     (values: any) => {
       setPaginationModel(values)
       dispatch(
-        fetchData({
+        fetchSellers({
           query: value,
           pageNumber: values.page,
         }),
@@ -163,7 +158,7 @@ const InvoiceList = () => {
   const performRequest = useCallback(
     (value: string) => {
       dispatch(
-        fetchData({
+        fetchSellers({
           query: value,
           pageNumber: paginationModel.page,
         }),
@@ -188,10 +183,6 @@ const InvoiceList = () => {
     },
     [fn],
   )
-
-  const handleStatusValue = (e: SelectChangeEvent) => {
-    setStatusValue(e.target.value)
-  }
 
   const columns: GridColDef[] = [...defaultColumns]
 
@@ -243,7 +234,7 @@ const InvoiceList = () => {
               getRowId={(row: VendedorType) => row.codigo}
               paginationMode="server"
               loading={store.isLoading}
-              rowCount={store.totalResults} //
+              rowCount={store.totalResults}
             />
           </Card>
         </Grid>

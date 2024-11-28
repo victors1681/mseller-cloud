@@ -31,35 +31,35 @@ import Icon from 'src/@core/components/icon'
 import { useAuth } from 'src/hooks/useAuth'
 import Avatar from '@mui/material/Avatar'
 import RemoveDataForm from './removeData/RemoveData'
+import { countryList } from 'src/utils/countryList'
 
 interface Data {
   email: string
-  state: string
+  city: string
   address: string
   country: string
   lastName: string
-  currency: string
-  language: string
-  timezone: string
+  phone: string
+  // language: string
+  // timezone: string
   firstName: string
   organization: string
-  number: number | string
-  zipCode: number | string
+  rnc: string
+  website: string
+  // zipCode: number | string
 }
 
 const initialData: Data = {
-  state: '',
-  number: '',
+  city: '',
+  phone: '',
   address: '',
-  zipCode: '',
-  lastName: 'Doe',
-  currency: 'usd',
-  firstName: 'John',
-  language: 'arabic',
-  timezone: 'gmt-12',
-  country: 'australia',
-  email: 'john.doe@example.com',
-  organization: 'ThemeSelection',
+  lastName: '',
+  firstName: '',
+  country: '',
+  email: '',
+  organization: '',
+  rnc: '',
+  website: '',
 }
 
 const ImgStyled = styled('img')(({ theme }) => ({
@@ -102,18 +102,16 @@ const TabAccount = () => {
 
   useEffect(() => {
     const initialData: Data = {
-      state: '',
-      number: user?.phone || '',
-      address: '',
-      zipCode: '',
+      phone: user?.phone || '',
+      address: user?.business.address.street || '',
+      city: user?.business.address.city || '',
+      country: user?.business.address.country || '',
       lastName: user?.lastName || '',
-      currency: 'usd',
       firstName: user?.firstName || '',
-      language: 'arabic',
-      timezone: 'gmt-12',
-      country: 'australia',
       email: user?.email || '',
       organization: user?.business.name || '',
+      rnc: user?.business.rnc || '',
+      website: user?.business.website || '',
     }
     setFormData(initialData)
   }, [user])
@@ -180,7 +178,7 @@ const TabAccount = () => {
                     variant="contained"
                     htmlFor="account-settings-upload-image"
                   >
-                    Upload New Photo
+                    Cargar nueva imagen
                     <input
                       hidden
                       type="file"
@@ -195,13 +193,13 @@ const TabAccount = () => {
                     variant="outlined"
                     onClick={handleInputImageReset}
                   >
-                    Reset
+                    Restaurar
                   </ResetButtonStyled>
                   <Typography
                     variant="caption"
                     sx={{ mt: 4, display: 'block', color: 'text.disabled' }}
                   >
-                    Allowed PNG or JPEG. Max size of 800K.
+                    Permitido PNG or JPEG. Max size of 800K.
                   </Typography>
                 </div>
               </Box>
@@ -211,8 +209,8 @@ const TabAccount = () => {
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
-                    label="First Name"
-                    placeholder="John"
+                    label="Nombre"
+                    placeholder=""
                     value={formData.firstName}
                     onChange={(e) =>
                       handleFormChange('firstName', e.target.value)
@@ -222,8 +220,8 @@ const TabAccount = () => {
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
-                    label="Last Name"
-                    placeholder="Doe"
+                    label="Apellido"
+                    placeholder=""
                     value={formData.lastName}
                     onChange={(e) =>
                       handleFormChange('lastName', e.target.value)
@@ -237,15 +235,15 @@ const TabAccount = () => {
                     label="Email"
                     disabled
                     value={formData.email}
-                    placeholder="tu@email.com"
+                    placeholder=""
                     onChange={(e) => handleFormChange('email', e.target.value)}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
-                    label="Organization"
-                    placeholder="ThemeSelection"
+                    label="Organización"
+                    placeholder=""
                     value={formData.organization}
                     onChange={(e) =>
                       handleFormChange('organization', e.target.value)
@@ -255,24 +253,37 @@ const TabAccount = () => {
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
-                    type="number"
-                    label="Phone Number"
-                    value={formData.number}
-                    placeholder="202 555 0111"
-                    onChange={(e) => handleFormChange('number', e.target.value)}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          US (+1)
-                        </InputAdornment>
-                      ),
-                    }}
+                    label="RNC"
+                    placeholder=""
+                    value={formData.rnc}
+                    onChange={(e) => handleFormChange('rnc', e.target.value)}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
-                    label="Address"
+                    label="Página Web"
+                    placeholder=""
+                    value={formData.website}
+                    onChange={(e) =>
+                      handleFormChange('website', e.target.value)
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    type="phone"
+                    label="Teléfono"
+                    value={formData.phone}
+                    placeholder="202 555 0111"
+                    onChange={(e) => handleFormChange('phone', e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Dirección"
                     placeholder="Address"
                     value={formData.address}
                     onChange={(e) =>
@@ -283,13 +294,13 @@ const TabAccount = () => {
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
-                    label="State"
-                    placeholder="California"
-                    value={formData.state}
-                    onChange={(e) => handleFormChange('state', e.target.value)}
+                    label="Ciudad"
+                    placeholder=""
+                    value={formData.city}
+                    onChange={(e) => handleFormChange('city', e.target.value)}
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                {/* <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
                     type="number"
@@ -300,10 +311,10 @@ const TabAccount = () => {
                       handleFormChange('zipCode', e.target.value)
                     }
                   />
-                </Grid>
+                </Grid> */}
                 <Grid item xs={12} sm={6}>
                   <FormControl fullWidth>
-                    <InputLabel>Country</InputLabel>
+                    <InputLabel>País</InputLabel>
                     <Select
                       label="Country"
                       value={formData.country}
@@ -311,15 +322,15 @@ const TabAccount = () => {
                         handleFormChange('country', e.target.value)
                       }
                     >
-                      <MenuItem value="australia">Australia</MenuItem>
-                      <MenuItem value="canada">Canada</MenuItem>
-                      <MenuItem value="france">France</MenuItem>
-                      <MenuItem value="united-kingdom">United Kingdom</MenuItem>
-                      <MenuItem value="united-states">United States</MenuItem>
+                      {countryList.map((c) => (
+                        <MenuItem key={c} value={c}>
+                          {c}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                {/* <Grid item xs={12} sm={6}>
                   <FormControl fullWidth>
                     <InputLabel>Language</InputLabel>
                     <Select
@@ -336,8 +347,8 @@ const TabAccount = () => {
                       <MenuItem value="portuguese">Portuguese</MenuItem>
                     </Select>
                   </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={6}>
+                </Grid> */}
+                {/* <Grid item xs={12} sm={6}>
                   <FormControl fullWidth>
                     <InputLabel>Timezone</InputLabel>
                     <Select
@@ -396,8 +407,8 @@ const TabAccount = () => {
                       </MenuItem>
                     </Select>
                   </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={6}>
+                </Grid> */}
+                {/* <Grid item xs={12} sm={6}>
                   <FormControl fullWidth>
                     <InputLabel>Currency</InputLabel>
                     <Select
@@ -413,11 +424,11 @@ const TabAccount = () => {
                       <MenuItem value="bitcoin">Bitcoin</MenuItem>
                     </Select>
                   </FormControl>
-                </Grid>
+                </Grid> */}
 
                 <Grid item xs={12}>
                   <Button variant="contained" sx={{ mr: 4 }}>
-                    Save Changes
+                    Grardar
                   </Button>
                   <Button
                     type="reset"
@@ -425,7 +436,7 @@ const TabAccount = () => {
                     color="secondary"
                     onClick={() => setFormData(initialData)}
                   >
-                    Reset
+                    Restaurar
                   </Button>
                 </Grid>
               </Grid>

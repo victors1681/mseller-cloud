@@ -10,7 +10,12 @@ import PaymentMethodCard from 'src/views/pages/account-settings/billing/PaymentM
 import BillingAddressCard from 'src/views/pages/account-settings/billing/BillingAddressCard'
 import BillingHistoryTable from 'src/views/pages/account-settings/billing/BillingHistoryTable'
 
-const TabBilling = ({ apiPricingPlanData }: { apiPricingPlanData: PricingPlanType[] }) => {
+
+const TabBilling = ({
+  apiPricingPlanData,
+}: {
+  apiPricingPlanData: PricingPlanType[]
+}) => {
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
@@ -18,7 +23,9 @@ const TabBilling = ({ apiPricingPlanData }: { apiPricingPlanData: PricingPlanTyp
       </Grid>
 
       <Grid item xs={12}>
-        <PaymentMethodCard />
+       
+          <PaymentMethodCard />
+    
       </Grid>
 
       <Grid item xs={12}>

@@ -109,7 +109,7 @@ const AccountSettings = ({
                       }}
                     >
                       <Icon icon="mdi:account-outline" />
-                      {!hideText && 'Account'}
+                      {!hideText && 'Cuenta'}
                     </Box>
                   }
                 />
@@ -124,7 +124,7 @@ const AccountSettings = ({
                       }}
                     >
                       <Icon icon="mdi:lock-open-outline" />
-                      {!hideText && 'Security'}
+                      {!hideText && 'Seguridad'}
                     </Box>
                   }
                 />
@@ -139,11 +139,11 @@ const AccountSettings = ({
                       }}
                     >
                       <Icon icon="mdi:bookmark-outline" />
-                      {!hideText && 'Billing'}
+                      {!hideText && 'Suscripción'}
                     </Box>
                   }
                 />
-                <Tab
+                {/* <Tab
                   value="notifications"
                   label={
                     <Box
@@ -157,8 +157,8 @@ const AccountSettings = ({
                       {!hideText && 'Notifications'}
                     </Box>
                   }
-                />
-                <Tab
+                /> */}
+                {/* <Tab
                   value="connections"
                   label={
                     <Box
@@ -172,7 +172,7 @@ const AccountSettings = ({
                       {!hideText && 'Connections'}
                     </Box>
                   }
-                />
+                /> */}
               </TabList>
             </Grid>
             <Grid
