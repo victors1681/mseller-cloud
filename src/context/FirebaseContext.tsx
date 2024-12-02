@@ -36,6 +36,7 @@ const defaultProvider: FirebaseValuesType = {
   getCustomerPaymentsHistory: () => Promise.resolve(undefined),
   getCustomerPaymentMethods: () => Promise.resolve(undefined),
   updateCustomerCard: () => Promise.resolve(undefined),
+  removeCustomerCard: () => Promise.resolve(undefined),
 }
 
 const FirebaseContext = createContext(defaultProvider)

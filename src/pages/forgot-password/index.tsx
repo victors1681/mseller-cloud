@@ -30,6 +30,7 @@ import Image from 'next/image'
 import { useAuth } from 'src/hooks/useAuth'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import { isValidResponse } from 'src/firebase'
 interface FormValues {
   email: string
 }
@@ -103,12 +104,15 @@ const ForgotPassword = () => {
     console.log('Form submitted:', data)
 
     try {
-      await triggerForgotPassword({ email: data.email })
-
-      toast.success(
-        'Se ha enviado un correo electrónico para actualizar su contraseña',
-      )
-    } catch (err) {
+      const response = await triggerForgotPassword({ email: data.email })
+      if (isValidResponse(response)) {
+        toast.success(
+          'Se ha enviado un correo electrónico para actualizar su contraseña',
+        )
+      } else {
+        toast.error('Error inesperado al recuperar la contraseña')
+      }
+    } catch (err: any) {
       toast.error(err?.message)
     }
     // Add your restore password logic here

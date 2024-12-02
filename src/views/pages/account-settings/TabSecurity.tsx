@@ -205,7 +205,7 @@ const TabSecurity = () => {
                     </Box>
                   </Box>
                   <Typography sx={{ color: 'text.secondary' }}>
-                    Creado {item.created}
+                    Creado {item?.created?.toISOString() || ''}
                   </Typography>
                 </Box>
               )
