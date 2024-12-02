@@ -10,7 +10,6 @@ import PaymentMethodCard from 'src/views/pages/account-settings/billing/PaymentM
 import BillingAddressCard from 'src/views/pages/account-settings/billing/BillingAddressCard'
 import BillingHistoryTable from 'src/views/pages/account-settings/billing/BillingHistoryTable'
 
-
 const TabBilling = ({
   apiPricingPlanData,
 }: {
@@ -23,14 +22,12 @@ const TabBilling = ({
       </Grid>
 
       <Grid item xs={12}>
-       
-          <PaymentMethodCard />
-    
+        <PaymentMethodCard />
       </Grid>
 
-      <Grid item xs={12}>
+      {/* <Grid item xs={12}>
         <BillingAddressCard />
-      </Grid>
+      </Grid> */}
 
       <Grid item xs={12}>
         <BillingHistoryTable />

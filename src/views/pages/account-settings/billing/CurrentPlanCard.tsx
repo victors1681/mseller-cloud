@@ -30,74 +30,77 @@ import CustomChip from 'src/@core/components/mui/chip'
 
 // ** Component Import
 import PricingPlans from 'src/views/pages/pricing/PricingPlans'
+import { useAuth } from 'src/hooks/useAuth'
+import { useFirebase } from 'src/firebase/useFirebase'
+import { isValidResponse } from 'src/firebase'
+import { useRouter } from 'next/router'
 
 const CurrentPlanCard = ({ data }: { data: PricingPlanType[] }) => {
   // ** State
   const [open, setOpen] = useState<boolean>(false)
   const [userInput, setUserInput] = useState<string>('yes')
-  const [plan, setPlan] = useState<'monthly' | 'annually'>('annually')
   const [secondDialogOpen, setSecondDialogOpen] = useState<boolean>(false)
-  const [openPricingDialog, setOpenPricingDialog] = useState<boolean>(false)
 
-  const handleChange = (e: ChangeEvent<{ checked: boolean }>) => {
-    if (e.target.checked) {
-      setPlan('annually')
-    } else {
-      setPlan('monthly')
-    }
-  }
+  const { user } = useAuth()
+  const router = useRouter()
+  const { cancelSubscription } = useFirebase()
+
+  const isPlanActive = user?.business.subscriptionStatus === 'active'
 
   const handleClose = () => setOpen(false)
 
   const handleSecondDialogClose = () => setSecondDialogOpen(false)
 
-  const handleConfirmation = (value: string) => {
+  const handleConfirmation = async (value: string) => {
+    if (value === 'yes') {
+      const response = await cancelSubscription()
+      if (isValidResponse(response)) {
+        setUserInput(value)
+        setSecondDialogOpen(true)
+        router.reload()
+      } else {
+        setUserInput('cancel')
+        setSecondDialogOpen(true)
+      }
+    }
     handleClose()
-    setUserInput(value)
-    setSecondDialogOpen(true)
   }
 
   return (
     <>
       <Card>
-        <CardHeader title="Current Plan" />
+        <CardHeader title="Su plan actual" />
         <CardContent>
           <Grid container spacing={6}>
             <Grid item xs={12} md={6}>
               <Box sx={{ mb: 6 }}>
                 <Typography sx={{ mb: 1, fontWeight: 600 }}>
-                  Your Current Plan is Basic
+                  Su plan actual es: {user?.business?.tier ?? 'Basic'}
                 </Typography>
                 <Typography sx={{ color: 'text.secondary' }}>
-                  A simple start for everyone
+                  Licencias {user?.business?.sellerLicenses ?? 0}
                 </Typography>
               </Box>
-              <Box sx={{ mb: 6 }}>
-                <Typography sx={{ mb: 1, fontWeight: 600 }}>
-                  Active until Dec 09, 2021
-                </Typography>
-                <Typography sx={{ color: 'text.secondary' }}>
-                  We will send you a notification upon Subscription expiration
-                </Typography>
-              </Box>
+
               <div>
                 <Box sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
                   <Typography sx={{ mr: 2, fontWeight: 600 }}>
-                    $199 Per Month
+                    Estado de su plan
                   </Typography>
                   <CustomChip
-                    label="Popular"
+                    label={isPlanActive ? 'Activo' : 'No Activo'}
                     size="small"
-                    color="primary"
-                    skin="light"
+                    color={isPlanActive ? 'success' : 'warning'}
                   />
                 </Box>
                 <Typography sx={{ color: 'text.secondary' }}>
-                  Standard plan for small to medium businesses
+                  {isPlanActive
+                    ? 'Listo para utilizar el sistema'
+                    : 'Inactivo con opciones limitadas'}
                 </Typography>
               </div>
             </Grid>
-            <Grid item xs={12} md={6}>
+            {/* <Grid item xs={12} md={6}>
               <Alert
                 severity="warning"
                 sx={{ mb: 6 }}
@@ -140,21 +143,22 @@ const CurrentPlanCard = ({ data }: { data: PricingPlanType[] }) => {
                   6 days remaining until your plan requires update
                 </Typography>
               </div>
-            </Grid>
+            </Grid> */}
             <Grid item xs={12}>
               <Box sx={{ mt: 3, gap: 4, display: 'flex', flexWrap: 'wrap' }}>
-                <Button
+                {/* <Button
                   variant="contained"
                   onClick={() => setOpenPricingDialog(true)}
                 >
                   Upgrade Plan
-                </Button>
+                </Button> */}
                 <Button
                   variant="outlined"
-                  color="secondary"
+                  color="error"
+                  disabled={!isPlanActive}
                   onClick={() => setOpen(true)}
                 >
-                  Cancel Subscription
+                  Cancelar subscripción
                 </Button>
               </Box>
             </Grid>
@@ -187,9 +191,7 @@ const CurrentPlanCard = ({ data }: { data: PricingPlanType[] }) => {
             }}
           >
             <Icon icon="mdi:alert-circle-outline" fontSize="5.5rem" />
-            <Typography>
-              Are you sure you would like to cancel your subscription?
-            </Typography>
+            <Typography>Seguro que desea cancelar su subcripción?</Typography>
           </Box>
         </DialogContent>
         <DialogActions
@@ -210,20 +212,20 @@ const CurrentPlanCard = ({ data }: { data: PricingPlanType[] }) => {
             sx={{ mr: 2 }}
             onClick={() => handleConfirmation('yes')}
           >
-            Yes
+            Si
           </Button>
           <Button
             variant="outlined"
             color="secondary"
             onClick={() => handleConfirmation('cancel')}
           >
-            Cancel
+            Cancelar
           </Button>
         </DialogActions>
       </Dialog>
       <Dialog
         fullWidth
-        maxWidth="xs"
+        maxWidth="md"
         open={secondDialogOpen}
         onClose={handleSecondDialogClose}
       >
@@ -260,12 +262,14 @@ const CurrentPlanCard = ({ data }: { data: PricingPlanType[] }) => {
               }
             />
             <Typography variant="h4" sx={{ mb: 5 }}>
-              {userInput === 'yes' ? 'Unsubscribed!' : 'Cancelled'}
+              {userInput === 'yes'
+                ? 'Suscripción Cancelada!'
+                : 'Error al cancelar la subscripción'}
             </Typography>
             <Typography>
               {userInput === 'yes'
-                ? 'Your subscription cancelled successfully.'
-                : 'Unsubscription Cancelled!!'}
+                ? 'Su subscripción ha sido cancelada!'
+                : 'No se pudo cancelar la subscripción por favor inténtelo de nuevo o contactese con nuestro equipo de soporte: support@mseller.app'}
             </Typography>
           </Box>
         </DialogContent>
@@ -291,7 +295,7 @@ const CurrentPlanCard = ({ data }: { data: PricingPlanType[] }) => {
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog
+      {/* <Dialog
         fullWidth
         scroll="body"
         maxWidth="lg"
@@ -366,7 +370,7 @@ const CurrentPlanCard = ({ data }: { data: PricingPlanType[] }) => {
           </Box>
           <PricingPlans data={data} plan={plan} />
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
     </>
   )
 }

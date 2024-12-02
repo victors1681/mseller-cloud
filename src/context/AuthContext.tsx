@@ -175,7 +175,7 @@ const AuthProvider = ({ children }: Props) => {
   }
 
   const fetchStripeProducts = async (): Promise<
-    StripeProductType | { error: string } | undefined
+    StripeProductType[] | { error: string } | undefined
   > => {
     return fetchStripeProductsFirebase()
   }

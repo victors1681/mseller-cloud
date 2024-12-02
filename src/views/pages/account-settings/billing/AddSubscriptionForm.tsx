@@ -3,17 +3,11 @@ import {
   Grid,
   FormControl,
   TextField,
-  MenuItem,
-  Select,
-  InputLabel,
-  Button,
   Typography,
-  ButtonGroup,
   ToggleButtonGroup,
   ToggleButton,
   styled,
   Box,
-  FormHelperText,
 } from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
 import {
@@ -27,6 +21,8 @@ import { fontSize } from '@mui/system'
 import { useAuth } from 'src/hooks/useAuth'
 import toast from 'react-hot-toast'
 import LoadingButton from '@mui/lab/LoadingButton'
+import { StripeProductType } from 'src/types/apps/stripeTypes'
+import { isValidResponse } from 'src/firebase'
 
 // Load Stripe
 const stripePromise = loadStripe(
@@ -126,7 +122,7 @@ const PaymentForm = () => {
 
   const fetchStripeProductsHandler = async () => {
     const stipeProducts = await fetchStripeProducts()
-    if (stipeProducts && !stipeProducts?.error) {
+    if (isValidResponse<StripeProductType[]>(stipeProducts)) {
       setStripeProducts(stipeProducts)
       //select the first item by default
       const defaultProduct = stipeProducts?.[0].id
@@ -172,7 +168,6 @@ const PaymentForm = () => {
     if (subscriptionResult && subscriptionResult?.success) {
       toast.success('Subscripción creada correctamente')
     } else {
-      console.error('Failed to create subscription:', subscriptionResult.error)
       toast.error(`Error al crear su subscripción ${subscriptionResult?.error}`)
     }
   }
@@ -207,7 +202,7 @@ const PaymentForm = () => {
                         {p.name +
                           '-' +
                           p.prices?.[0].currency +
-                          ' ' +
+                          ' $' +
                           p.prices?.[0].unit_amount / 100}
                       </ToggleButton>
                     )
@@ -302,7 +297,15 @@ const PaymentForm = () => {
           </LoadingButton>
           <Box sx={{ p: 2 }}>
             <Typography variant="caption">
-              Sin contrato, puede cancelar en cualquier momento su suscripción
+              Sin contrato, puede cancelar en cualquier momento su suscripción.
+            </Typography>
+            <br />
+            <Typography variant="caption">
+              Pagos seguro vía{' '}
+              <a href="https://stripe.com/" target="_black">
+                {' '}
+                Stripe System
+              </a>
             </Typography>
           </Box>
         </Grid>

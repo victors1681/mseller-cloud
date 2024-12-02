@@ -10,7 +10,14 @@ import {
   UpdatePasswordType,
 } from 'src/firebase'
 import { ICloudModules, UserTypes } from 'src/types/apps/userTypes'
-import { StripeProductType } from 'src/types/apps/stripeTypes'
+import {
+  StripeProductType,
+  CustomerPaymentsHistoryResponseType,
+  PaymentMethodsResponseType,
+  UpdateCardRequestType,
+  UpdateCardResponseType,
+  RemoveCustomerCardType,
+} from 'src/types/apps/stripeTypes'
 
 export type ErrCallbackType = (err: { [key: string]: string }) => void
 
@@ -57,6 +64,32 @@ export type AuthValuesType = {
     CancelSubscriptionType | { error: string } | undefined
   >
   fetchStripeProducts: () => Promise<
-    StripeProductType | { error: string } | undefined
+    StripeProductType[] | { error: string } | undefined
   >
+}
+
+export type FirebaseValuesType = {
+  loading: boolean
+  createSubscription: (
+    value: CreateSubscriptionProps,
+  ) => Promise<CreateSubscriptionType | { error: string } | undefined>
+  cancelSubscription: () => Promise<
+    CancelSubscriptionType | { error: string } | undefined
+  >
+  fetchStripeProducts: () => Promise<
+    StripeProductType[] | { error: string } | undefined
+  >
+  getCustomerPaymentsHistory: () => Promise<
+    CustomerPaymentsHistoryResponseType | { error: string } | undefined
+  >
+  getCustomerPaymentMethods: () => Promise<
+    PaymentMethodsResponseType | { error: string } | undefined
+  >
+  updateCustomerCard: (
+    data: UpdateCardRequestType,
+  ) => Promise<UpdateCardResponseType | { error: string } | undefined>
+
+  removeCustomerCard: (
+    cardId: string,
+  ) => Promise<RemoveCustomerCardType | { error: string } | undefined>
 }

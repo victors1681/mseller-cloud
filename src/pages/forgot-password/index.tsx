@@ -170,7 +170,7 @@ const ForgotPassword = () => {
             >
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <Image
-                  src="/images/logo/mseller-logo-dark.png"
+                  src="/images/logos/mseller-logo-dark.png"
                   alt="logo"
                   height="50"
                   width="200"

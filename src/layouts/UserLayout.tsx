@@ -35,7 +35,7 @@ const AppBrand = () => {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
       <img
-        src="/images/logo/mseller-logo-dark.png"
+        src="/images/logos/mseller-logo-dark.png"
         alt="logo"
         height="50"
         style={{ paddingLeft: '10px' }}

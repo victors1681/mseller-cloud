@@ -20,7 +20,7 @@ const FallbackSpinner = ({ sx }: { sx?: BoxProps['sx'] }) => {
     >
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
         <img
-          src="/images/logo/m-mseller.png"
+          src="/images/logos/m-mseller.png"
           alt="logo"
           height="50"
           style={{ paddingLeft: '10px' }}

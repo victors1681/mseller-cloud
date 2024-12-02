@@ -16,7 +16,14 @@ import {
 } from 'firebase/auth'
 import { axiosSetClientUrl } from 'src/configs/restClient'
 import { UserTypes } from 'src/types/apps/userTypes'
-import { StripeProductType } from 'src/types/apps/stripeTypes'
+import {
+  CustomerPaymentsHistoryResponseType,
+  PaymentMethodsResponseType,
+  RemoveCustomerCardType,
+  StripeProductType,
+  UpdateCardRequestType,
+  UpdateCardResponseType,
+} from 'src/types/apps/stripeTypes'
 const LOCAL_HOST = '127.0.0.1'
 
 // Initialize Firebase
@@ -238,7 +245,7 @@ interface StripeResponse {
   data: StripeProductType[]
 }
 export const fetchStripeProductsFirebase = async (): Promise<
-  StripeProductType | { error: string } | undefined
+  StripeProductType[] | { error: string } | undefined
 > => {
   try {
     const fn = httpsCallable<any, StripeResponse>(
@@ -250,6 +257,73 @@ export const fetchStripeProductsFirebase = async (): Promise<
   } catch (err: any) {
     return firebaseError(err)
   }
+}
+
+export const getCustomerPaymentsHistoryFirebase = async (): Promise<
+  CustomerPaymentsHistoryResponseType | { error: string } | undefined
+> => {
+  try {
+    const fn = httpsCallable<any, CustomerPaymentsHistoryResponseType>(
+      functions,
+      'getCustomerPaymentsHistory',
+    )
+    const response = await fn()
+    return response.data
+  } catch (err: any) {
+    return firebaseError(err)
+  }
+}
+
+export const getCustomerPaymentMethodsFirebase = async (): Promise<
+  PaymentMethodsResponseType | { error: string } | undefined
+> => {
+  try {
+    const fn = httpsCallable<any, PaymentMethodsResponseType>(
+      functions,
+      'getCustomerPaymentMethods',
+    )
+    const response = await fn()
+    return response.data
+  } catch (err: any) {
+    return firebaseError(err)
+  }
+}
+
+export const updateCustomerCardFirebase = async (
+  data: UpdateCardRequestType,
+): Promise<UpdateCardResponseType | { error: string } | undefined> => {
+  try {
+    const fn = httpsCallable<UpdateCardRequestType, UpdateCardResponseType>(
+      functions,
+      'updateCustomerCard',
+    )
+    const response = await fn(data)
+    return response.data
+  } catch (err: any) {
+    return firebaseError(err)
+  }
+}
+export const removeCustomerCardFirebase = async (
+  cardId: string,
+): Promise<RemoveCustomerCardType | { error: string } | undefined> => {
+  try {
+    const fn = httpsCallable<{ cardId: string }, UpdateCardResponseType>(
+      functions,
+      'removeCustomerCard',
+    )
+    const response = await fn({ cardId })
+    return response.data
+  } catch (err: any) {
+    return firebaseError(err)
+  }
+}
+
+type ErrorResponse = { error: string }
+
+export const isValidResponse = <T>(
+  response: T | ErrorResponse | undefined,
+): response is T => {
+  return response !== undefined && !(response as ErrorResponse).error
 }
 
 export const firebaseError = (err: any) => {
