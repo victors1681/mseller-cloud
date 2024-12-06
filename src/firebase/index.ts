@@ -24,6 +24,10 @@ import {
   UpdateCardRequestType,
   UpdateCardResponseType,
 } from 'src/types/apps/stripeTypes'
+import {
+  UploadImagesResponseType,
+  UploadImagesType,
+} from '@/types/apps/imageTypes'
 const LOCAL_HOST = '127.0.0.1'
 
 // Initialize Firebase
@@ -312,6 +316,21 @@ export const removeCustomerCardFirebase = async (
       'removeCustomerCard',
     )
     const response = await fn({ cardId })
+    return response.data
+  } catch (err: any) {
+    return firebaseError(err)
+  }
+}
+
+export const uploadImagesFirebase = async (
+  data: UploadImagesType,
+): Promise<UploadImagesResponseType | { error: string } | undefined> => {
+  try {
+    const fn = httpsCallable<UploadImagesType, UploadImagesResponseType>(
+      functions,
+      'uploadImages',
+    )
+    const response = await fn(data)
     return response.data
   } catch (err: any) {
     return firebaseError(err)

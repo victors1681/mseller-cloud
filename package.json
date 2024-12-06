@@ -52,6 +52,7 @@
     "clsx": "1.2.1",
     "date-fns": "2.30.0",
     "draft-js": "0.11.7",
+    "draft-js-export-html": "^1.4.1",
     "firebase": "^10.7.1",
     "i18next": "22.4.15",
     "i18next-browser-languagedetector": "7.0.1",
@@ -79,6 +80,7 @@
     "react-popper": "2.3.0",
     "react-redux": "8.0.5",
     "recharts": "2.5.0",
+    "sass": "^1.82.0",
     "stylis": "4.1.4",
     "stylis-plugin-rtl": "2.1.1",
     "yup": "1.1.1"

@@ -17,6 +17,7 @@ import {
   getCustomerPaymentsHistoryFirebase,
   removeCustomerCardFirebase,
   updateCustomerCardFirebase,
+  uploadImagesFirebase,
 } from 'src/firebase'
 import {
   CustomerPaymentsHistoryResponseType,
@@ -26,6 +27,10 @@ import {
   UpdateCardRequestType,
   UpdateCardResponseType,
 } from 'src/types/apps/stripeTypes'
+import {
+  UploadImagesResponseType,
+  UploadImagesType,
+} from '@/types/apps/imageTypes'
 
 // ** Defaults
 const defaultProvider: FirebaseValuesType = {
@@ -37,6 +42,7 @@ const defaultProvider: FirebaseValuesType = {
   getCustomerPaymentMethods: () => Promise.resolve(undefined),
   updateCustomerCard: () => Promise.resolve(undefined),
   removeCustomerCard: () => Promise.resolve(undefined),
+  uploadImages: () => Promise.resolve(undefined),
 }
 
 const FirebaseContext = createContext(defaultProvider)
@@ -91,6 +97,11 @@ const FirebaseProvider = ({ children }: Props) => {
   ): Promise<RemoveCustomerCardType | { error: string } | undefined> => {
     return removeCustomerCardFirebase(cardId)
   }
+  const uploadImages = async (
+    data: UploadImagesType,
+  ): Promise<UploadImagesResponseType | { error: string } | undefined> => {
+    return uploadImagesFirebase(data)
+  }
 
   const values = {
     loading,
@@ -101,6 +112,7 @@ const FirebaseProvider = ({ children }: Props) => {
     getCustomerPaymentMethods,
     updateCustomerCard,
     removeCustomerCard,
+    uploadImages,
   }
 
   return (

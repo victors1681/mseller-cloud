@@ -99,3 +99,4 @@ export interface RemoveCustomerCardType {
   success: boolean
   message: string
 }
+

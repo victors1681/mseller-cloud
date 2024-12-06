@@ -7,7 +7,7 @@ const path = require('path')
 
 module.exports = {
   trailingSlash: true,
-  reactStrictMode: true,
+  reactStrictMode: false, //fix issue with the wysiwyg editor
   images: {
     domains: ['https://cloud.mseller.app'],
   },
