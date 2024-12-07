@@ -11,19 +11,23 @@ import Typography from '@mui/material/Typography'
 import { EditorState } from 'draft-js'
 import { EditorWrapper } from 'src/@core/styles/libs/react-draft-wysiwyg'
 import ReactDraftWysiwyg from 'src/@core/components/react-draft-wysiwyg'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { stateToHTML } from 'draft-js-export-html'
 import { useFormContext, Controller } from 'react-hook-form'
 import { Autocomplete, Tooltip } from '@mui/material'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
 import LoadingWrapper from '@/views/ui/LoadingWrapper'
+import { stateFromHTML } from 'draft-js-import-html'
 
-const unidadOptions = [{ label: 'UN', value: 'UN' }]
+const unitOptions = [{ label: 'UN', value: 'UN' }]
 
 const ProductInformation = () => {
-  const [value, setStateValue] = useState(EditorState.createEmpty())
-  const { register, setValue, control } = useFormContext()
+  const [descriptionValue, setDescriptionValue] = useState<EditorState>(
+    EditorState.createEmpty(),
+  )
+
+  const { watch, setValue, control } = useFormContext()
 
   const store = useSelector((state: RootState) => state.products)
 
@@ -34,8 +38,30 @@ const ProductInformation = () => {
     }))
   }, [store])
 
+  const descriptionWatch = watch('descripcion')
+  useEffect(() => {
+    if (store.productDetail.descripcion) {
+      try {
+        // Convert HTML string to ContentState
+        const contentState = stateFromHTML(store.productDetail.descripcion)
+
+        // Create EditorState with the converted ContentState
+        const editorState = EditorState.createWithContent(contentState)
+
+        setDescriptionValue(editorState)
+      } catch (error) {
+        console.error('Error converting HTML to EditorState:', error)
+        // Fallback to empty editor state
+        setDescriptionValue(EditorState.createEmpty())
+      }
+    } else {
+      // If no description, set empty editor state
+      setDescriptionValue(EditorState.createEmpty())
+    }
+  }, [descriptionWatch, store])
+
   const handleDescriptionOnChange = (data: any) => {
-    setStateValue(data)
+    setDescriptionValue(data)
     const contentState = data.getCurrentContent()
     const htmlContent = contentState && stateToHTML(contentState)
     setValue('descripcion', htmlContent, {
@@ -101,9 +127,9 @@ const ProductInformation = () => {
                 render={({ field: { onChange, value } }) => (
                   <Autocomplete
                     freeSolo
-                    options={unidadOptions}
+                    options={unitOptions}
                     value={
-                      unidadOptions.find((option) => option.value === value) ||
+                      unitOptions.find((option) => option.value === value) ||
                       null
                     }
                     onChange={(_, newValue) => {
@@ -165,16 +191,16 @@ const ProductInformation = () => {
               />
             </Grid>
             <Grid item xs={12} sm={4}>
-              <Tooltip
-                title="Si el producto es caja, y desea vender artículos detallados, digite cuantas unidades posee la caja: por ejemplo: 1 caja tiene 12 unidades digite 12, y podrá vender al detalle de esa caja de lo contrario digite 1 si no desea vender al detalle"
-                placement="top"
-                arrow
-              >
-                <Controller
-                  name="factor"
-                  control={control}
-                  defaultValue="1"
-                  render={({ field, fieldState: { error } }) => (
+              <Controller
+                name="factor"
+                control={control}
+                defaultValue="1"
+                render={({ field, fieldState: { error } }) => (
+                  <Tooltip
+                    title="Si el producto es caja, y desea vender artículos detallados, digite cuantas unidades posee la caja: por ejemplo: 1 caja tiene 12 unidades digite 12, y podrá vender al detalle de esa caja de lo contrario digite 1 si no desea vender al detalle"
+                    placement="top"
+                    arrow
+                  >
                     <TextField
                       {...field}
                       fullWidth
@@ -183,15 +209,15 @@ const ProductInformation = () => {
                       error={!!error}
                       helperText={error?.message}
                     />
-                  )}
-                />
-              </Tooltip>
+                  </Tooltip>
+                )}
+              />
             </Grid>
             <Grid item xs={12}>
               <Typography variant="body1">Descripción</Typography>
               <EditorWrapper>
                 <ReactDraftWysiwyg
-                  editorState={value}
+                  editorState={descriptionValue}
                   onEditorStateChange={(data) =>
                     handleDescriptionOnChange(data)
                   }

@@ -3,6 +3,7 @@
         "codigo": "PROD001",
         "codigoBarra": "1234567890123",
         "nombre": "Aceite de Oliva",
+        "descripcion": "Aceite de Oliva Extra Virgen 500ml",
         "area": "Alimentos",
         "iDArea": 1,
         "grupoId": "GRP001",
@@ -31,12 +32,29 @@
         "tipoImpuesto": "ITBIS",
         "apartado": 0,
         "status": "A",
-        "promocion": false
+        "promocion": false,
+        "imagenes": [
+            {
+                "id": 1,
+                "idObjeto": "PROD001",
+                "codigoProducto": "PROD001",
+                "ruta": "/storage/products/aceite-oliva-1.jpg",
+                "rutaPublica": "https://enriquetomas.com/cdn/shop/products/aceite-aove-mas-notari-arbequina-250ml-795521.jpg?v=1699388330&width=750",
+                "titulo": "Aceite de Oliva - Vista Principal",
+                "descripcion": "Botella de aceite de oliva extra virgen 500ml",
+                "ordenVisualizacion": 1,
+                "esImagenPredeterminada": true,
+                "tipoImagen": "original",
+                "fechaCreacion": "2024-03-15"
+            }
+        ],
+        "visibleTienda": true
     },
     {
         "codigo": "PROD002",
         "codigoBarra": "9876543210987",
         "nombre": "Arroz Premium",
+        "descripcion": "Arroz Premium 1kg",
         "area": "Alimentos",
         "iDArea": 1,
         "grupoId": "GRP002",
@@ -65,12 +83,29 @@
         "tipoImpuesto": "ITBIS",
         "apartado": 0,
         "status": "A",
-        "promocion": false
+        "promocion": false,
+        "imagenes": [
+            {
+                "id": 1,
+                "idObjeto": "PROD002",
+                "codigoProducto": "PROD002",
+                "ruta": "/storage/products/aceite-oliva-1.jpg",
+                "rutaPublica": "https://m.media-amazon.com/images/I/61T8Cl0pCwL._SX679_.jpg",
+                "titulo": "Aceite de Oliva - Vista Principal",
+                "descripcion": "Botella de aceite de oliva extra virgen 500ml",
+                "ordenVisualizacion": 1,
+                "esImagenPredeterminada": true,
+                "tipoImagen": "original",
+                "fechaCreacion": "2024-03-15"
+            }
+        ],
+        "visibleTienda": true
     },
     {
         "codigo": "PROD003",
         "codigoBarra": "3456789012345",
         "nombre": "Detergente Líquido",
+        "descripcion": "Detergente Líquido 1L",
         "area": "Limpieza",
         "iDArea": 2,
         "grupoId": "GRP003",
@@ -99,12 +134,29 @@
         "tipoImpuesto": "ITBIS",
         "apartado": 0,
         "status": "A",
-        "promocion": false
+        "promocion": false,
+        "imagenes": [
+            {
+                "id": 1,
+                "idObjeto": "PROD003",
+                "codigoProducto": "PROD003",
+                "ruta": "/storage/products/aceite-oliva-1.jpg",
+                "rutaPublica": "https://m.media-amazon.com/images/I/7190l1PESZL._AC_SL1500_.jpg",
+                "titulo": "Aceite de Oliva - Vista Principal",
+                "descripcion": "Botella de aceite de oliva extra virgen 500ml",
+                "ordenVisualizacion": 1,
+                "esImagenPredeterminada": true,
+                "tipoImagen": "original",
+                "fechaCreacion": "2024-03-15"
+            }
+        ],
+        "visibleTienda": true
     },
     {
         "codigo": "PROD004",
         "codigoBarra": "6789012345678",
         "nombre": "Leche Entera",
+        "descripcion": "Leche Entera 1L",
         "area": "Lácteos",
         "iDArea": 3,
         "grupoId": "GRP004",
@@ -133,12 +185,29 @@
         "tipoImpuesto": "ITBIS",
         "apartado": 0,
         "status": "A",
-        "promocion": false
+        "promocion": false,
+        "imagenes": [
+            {
+                "id": 1,
+                "idObjeto": "PROD004",
+                "codigoProducto": "PROD004",
+                "ruta": "/storage/products/aceite-oliva-1.jpg",
+                "rutaPublica": "https://m.media-amazon.com/images/I/81c6VqD5Z-L._AC_UF480,480_SR480,480_.jpg",
+                "titulo": "Aceite de Oliva - Vista Principal",
+                "descripcion": "Botella de aceite de oliva extra virgen 500ml",
+                "ordenVisualizacion": 1,
+                "esImagenPredeterminada": true,
+                "tipoImagen": "original",
+                "fechaCreacion": "2024-03-15"
+            }
+        ],
+        "visibleTienda": true
     },
     {
         "codigo": "PROD005",
         "codigoBarra": "1234509876543",
         "nombre": "Café Molido",
+        "descripcion": "Café Molido 250g",
         "area": "Alimentos",
         "iDArea": 1,
         "grupoId": "GRP005",
@@ -167,12 +236,29 @@
         "tipoImpuesto": "ITBIS",
         "apartado": 0,
         "status": "A",
-        "promocion": false
+        "promocion": false,
+        "imagenes": [
+            {
+                "id": 1,
+                "idObjeto": "PROD005",
+                "codigoProducto": "PROD005",
+                "ruta": "/storage/products/aceite-oliva-1.jpg",
+                "rutaPublica": "https://m.media-amazon.com/images/I/61XoFICFZtL._AC_UL640_FMwebp_QL65_.jpg",
+                "titulo": "Aceite de Oliva - Vista Principal",
+                "descripcion": "Botella de aceite de oliva extra virgen 500ml",
+                "ordenVisualizacion": 1,
+                "esImagenPredeterminada": true,
+                "tipoImagen": "original",
+                "fechaCreacion": "2024-03-15"
+            }
+        ],
+        "visibleTienda": true
     },
     {
         "codigo": "PROD006",
         "codigoBarra": "9876501234567",
         "nombre": "Pasta de Tomate",
+        "descripcion": "Pasta de Tomate 500g",
         "area": "Alimentos",
         "iDArea": 1,
         "grupoId": "GRP006",
@@ -201,12 +287,29 @@
         "tipoImpuesto": "ITBIS",
         "apartado": 0,
         "status": "A",
-        "promocion": false
+        "promocion": false,
+        "imagenes": [
+            {
+                "id": 1,
+                "idObjeto": "PROD006",
+                "codigoProducto": "PROD006",
+                "ruta": "/storage/products/aceite-oliva-1.jpg",
+                "rutaPublica": "https://m.media-amazon.com/images/I/71w5M2I9FNL._AC_UL1080_FMwebp_QL65_.jpg",
+                "titulo": "Aceite de Oliva - Vista Principal",
+                "descripcion": "Botella de aceite de oliva extra virgen 500ml",
+                "ordenVisualizacion": 1,
+                "esImagenPredeterminada": true,
+                "tipoImagen": "original",
+                "fechaCreacion": "2024-03-15"
+            }
+        ],
+        "visibleTienda": true
     },
     {
         "codigo": "PROD007",
         "codigoBarra": "2345678901234",
         "nombre": "Agua Embotellada",
+        "descripcion": "Agua Embotellada 500ml",
         "area": "Bebidas",
         "iDArea": 4,
         "grupoId": "GRP007",
@@ -235,12 +338,29 @@
         "tipoImpuesto": "ITBIS",
         "apartado": 0,
         "status": "A",
-        "promocion": false
+        "promocion": false,
+        "imagenes": [
+            {
+                "id": 1,
+                "idObjeto": "PROD007",
+                "codigoProducto": "PROD007",
+                "ruta": "/storage/products/aceite-oliva-1.jpg",
+                "rutaPublica": "https://m.media-amazon.com/images/I/716zCm0PfzS._AC_UL640_FMwebp_QL65_.jpg",
+                "titulo": "Aceite de Oliva - Vista Principal",
+                "descripcion": "Botella de aceite de oliva extra virgen 500ml",
+                "ordenVisualizacion": 1,
+                "esImagenPredeterminada": true,
+                "tipoImagen": "original",
+                "fechaCreacion": "2024-03-15"
+            }
+        ],
+        "visibleTienda": true
     },
     {
         "codigo": "PROD008",
         "codigoBarra": "5678901234567",
         "nombre": "Galletas Saladas",
+        "descripcion": "Galletas Saladas 500g",
         "area": "Alimentos",
         "iDArea": 1,
         "grupoId": "GRP008",
@@ -269,12 +389,29 @@
         "tipoImpuesto": "ITBIS",
         "apartado": 0,
         "status": "A",
-        "promocion": false
+        "promocion": false,
+        "imagenes": [
+            {
+                "id": 1,
+                "idObjeto": "PROD008",
+                "codigoProducto": "PROD008",
+                "ruta": "/storage/products/aceite-oliva-1.jpg",
+                "rutaPublica": "https://m.media-amazon.com/images/I/81ibiOvfriL._AC_UL640_FMwebp_QL65_.jpg",
+                "titulo": "Aceite de Oliva - Vista Principal",
+                "descripcion": "Botella de aceite de oliva extra virgen 500ml",
+                "ordenVisualizacion": 1,
+                "esImagenPredeterminada": true,
+                "tipoImagen": "original",
+                "fechaCreacion": "2024-03-15"
+            }
+        ],
+        "visibleTienda": true
     },
     {
         "codigo": "PROD009",
         "codigoBarra": "7890123456789",
         "nombre": "Harina de Trigo",
+        "descripcion": "Harina de Trigo 1kg",
         "area": "Alimentos",
         "iDArea": 1,
         "grupoId": "GRP009",
@@ -303,12 +440,29 @@
         "tipoImpuesto": "ITBIS",
         "apartado": 0,
         "status": "A",
-        "promocion": false
+        "promocion": false,
+        "imagenes": [
+            {
+                "id": 1,
+                "idObjeto": "PROD009",
+                "codigoProducto": "PROD009",
+                "ruta": "/storage/products/aceite-oliva-1.jpg",
+                "rutaPublica": "https://m.media-amazon.com/images/I/618t8xk1Z8L._AC_UL640_FMwebp_QL65_.jpg",
+                "titulo": "Aceite de Oliva - Vista Principal",
+                "descripcion": "Botella de aceite de oliva extra virgen 500ml",
+                "ordenVisualizacion": 1,
+                "esImagenPredeterminada": true,
+                "tipoImagen": "original",
+                "fechaCreacion": "2024-03-15"
+            }
+        ],
+        "visibleTienda": true
     },
     {
         "codigo": "PROD010",
         "codigoBarra": "8901234567890",
         "nombre": "Azúcar Refinada",
+        "descripcion": "Azúcar Refinada 1kg",
         "area": "Alimentos",
         "iDArea": 1,
         "grupoId": "GRP010",
@@ -337,6 +491,22 @@
         "tipoImpuesto": "ITBIS",
         "apartado": 0,
         "status": "A",
-        "promocion": false
+        "promocion": false,
+        "imagenes": [
+            {
+                "id": 1,
+                "idObjeto": "PROD010",
+                "codigoProducto": "PROD010",
+                "ruta": "/storage/products/aceite-oliva-1.jpg",
+                "rutaPublica": "https://m.media-amazon.com/images/I/71gZYOVzn7L._AC_UL1280_FMwebp_QL65_.jpg",
+                "titulo": "Aceite de Oliva - Vista Principal",
+                "descripcion": "Botella de aceite de oliva extra virgen 500ml",
+                "ordenVisualizacion": 1,
+                "esImagenPredeterminada": true,
+                "tipoImagen": "original",
+                "fechaCreacion": "2024-03-15"
+            }
+        ],
+        "visibleTienda": true
     }
 ]

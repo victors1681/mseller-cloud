@@ -1,42 +1,109 @@
 // MUI Imports
-import { Grid } from '@mui/material'
+import { RootState } from '@/store'
+import {
+  Alert,
+  Grid,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from '@mui/material'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import { useFormContext } from 'react-hook-form'
+import { useSelector } from 'react-redux'
+import { useRouter } from 'next/router' // Add this import
+import { useState } from 'react'
 
-const ProductAddHeader = () => {
+interface Props {
+  id: string
+}
+
+const ProductAddHeader = ({ id }: Props) => {
+  const router = useRouter() // Add router
+  const store = useSelector((state: RootState) => state.products)
+  const [openDialog, setOpenDialog] = useState(false)
+
+  const isProductExist = store.productDetail
+  const isNewProductWithError = !isProductExist && id !== 'new'
   const {
     reset,
     formState: { isDirty },
   } = useFormContext()
 
-  const handleRestore = () => {
-    reset() // This will reset form to default values
+  const handleRestoreClick = () => {
+    setOpenDialog(true)
+  }
+
+  const handleConfirmRestore = () => {
+    reset()
+    setOpenDialog(false)
+  }
+
+  const handleCancelRestore = () => {
+    setOpenDialog(false)
+  }
+
+  const handleGoBack = () => {
+    router.back()
   }
 
   return (
-    <Grid container spacing={4}>
-      <Grid item sm={6} md={10}>
-        <Typography variant="h4" sx={{ mb: 1 }}>
-          Agregar nuevo producto
-        </Typography>
-        <Typography>Mantenimiento de productos</Typography>
+    <>
+      <Grid container spacing={4}>
+        {isNewProductWithError && (
+          <Grid item sm={12}>
+            <Alert severity="error">No se encontró el producto</Alert>
+          </Grid>
+        )}
+        <Grid item sm={6} md={9}>
+          <Typography variant="h4" sx={{ mb: 1 }}>
+            {!isProductExist
+              ? 'Agregar nuevo producto'
+              : `Actualizar ${store.productDetail?.nombre}`}
+          </Typography>
+          <Typography>Mantenimiento de productos</Typography>
+        </Grid>
+        <Grid item sm={6} md={3}>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={handleGoBack}
+            sx={{ marginRight: 1 }}
+          >
+            Cerrar
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            sx={{ marginRight: 1 }}
+            onClick={handleRestoreClick}
+            disabled={!isDirty}
+          >
+            Restaurar
+          </Button>
+          <Button variant="contained" type="submit" disabled={!isDirty}>
+            Grabar
+          </Button>
+        </Grid>
       </Grid>
-      <Grid item sm={6} md={2}>
-        <Button
-          variant="outlined"
-          color="secondary"
-          sx={{ marginRight: 1 }}
-          onClick={handleRestore}
-          disabled={!isDirty}
-        >
-          Restaurar
-        </Button>
-        <Button variant="contained" type="submit" disabled={!isDirty}>
-          Grabar
-        </Button>
-      </Grid>
-    </Grid>
+
+      <Dialog open={openDialog} onClose={handleCancelRestore}>
+        <DialogTitle>Confirmar restauración</DialogTitle>
+        <DialogContent>
+          ¿Está seguro que desea restaurar los cambios? Se perderán todas las
+          modificaciones.
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelRestore} color="primary">
+            Cancelar
+          </Button>
+          <Button onClick={handleConfirmRestore} color="secondary" autoFocus>
+            Restaurar
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   )
 }
 

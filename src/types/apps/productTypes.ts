@@ -47,7 +47,7 @@ export interface ProductImageType {
   ordenVisualizacion: number
   esImagenPredeterminada: boolean
   tipoImagen?: string
-  fechaCreacion?: Date
+  fechaCreacion?: string
 }
 
 export interface ProductDetailType {
