@@ -280,8 +280,8 @@ const InvoiceList = () => {
           <Tooltip title="Aprobar">
             <IconButton
               size="small"
-              disabled
-              onClick={() => dispatch(deleteProduct(row.codigo))}
+              component={Link}
+              href={`/apps/products/add/${row.codigo}`}
             >
               <Icon icon="tabler:edit" fontSize={20} />
             </IconButton>
@@ -289,9 +289,8 @@ const InvoiceList = () => {
           <Tooltip title="View">
             <IconButton
               size="small"
-              component={Link}
               disabled
-              href={`/apps/invoice/preview/${row.codigo}`}
+              onClick={() => dispatch(deleteProduct(row.codigo))}
             >
               <Icon icon="mdi:eye-outline" fontSize={20} />
             </IconButton>

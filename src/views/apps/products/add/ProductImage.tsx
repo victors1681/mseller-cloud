@@ -1,5 +1,5 @@
 // ** React Imports
-import { Fragment, useState } from 'react'
+import { Fragment, useCallback, useState } from 'react'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
@@ -23,6 +23,11 @@ import Card from '@mui/material/Card'
 import { useFirebase } from '@/firebase/useFirebase'
 import { isValidResponse } from '@/firebase'
 import { fileToBase64 } from '@/utils/fileToBase64'
+import { useFormContext } from 'react-hook-form'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/store'
+import { ProductImageType } from '@/types/apps/productTypes'
+import LoadingWrapper from '@/views/ui/LoadingWrapper'
 
 interface FileProp {
   name: string
@@ -56,20 +61,79 @@ const FileUploaderRestrictions = () => {
   const [files, setFiles] = useState<File[]>([])
   const [dialogOpen, setDialogOpen] = useState(false)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
+  const { setValue, watch } = useFormContext()
+  const [isUploading, setIsUploading] = useState(false)
+
+  const store = useSelector((state: RootState) => state.products)
+
+  const currentImages = watch('imagenes') || []
+  const codigo = watch('codigo')
+  const nombre = watch('nombre')
 
   const { uploadImages } = useFirebase()
 
-  const handleLoadImages = async () => {
-    const base64Images = await Promise.all(
-      files.map((file) => fileToBase64(file)),
-    )
+  const handleLoadImages = useCallback(
+    async (acceptedFiles: File[]) => {
+      setIsUploading(true)
 
-    const response = await uploadImages({ images: base64Images })
-    if (isValidResponse(response)) {
-      toast.success('Response complete')
-      setFiles([])
-    }
-  }
+      //Optional can be removed
+      // setFiles((files) => [
+      //   ...files,
+      //   ...acceptedFiles.map((file: File) => Object.assign(file)),
+      // ])
+      const currentFiles = [
+        ...files,
+        ...acceptedFiles.map((file: File) => Object.assign(file)),
+      ]
+      const base64Images = await Promise.all(
+        currentFiles.map((file) => fileToBase64(file)),
+      )
+
+      const response = await uploadImages({ images: base64Images })
+      if (isValidResponse(response)) {
+        toast.success('Imagen cargada a la librería')
+
+        const images: ProductImageType[] = response.uploads.flatMap(
+          (upload, index) => {
+            const baseImage = {
+              idObjeto: upload.id,
+              codigoProducto: codigo, //BACKEND ASSIGN ONE
+              titulo: nombre,
+              esImagenPredeterminada: false,
+            }
+
+            return [
+              {
+                ...baseImage,
+                rutaPublica: upload.originalUrl,
+                ruta: upload.originalFile,
+                tipoImagen: 'original',
+                ordenVisualizacion: index * 2,
+              },
+              {
+                ...baseImage,
+                rutaPublica: upload.thumbnailUrl,
+                ruta: upload.thumbnailFile,
+                tipoImagen: 'thumbnail',
+                ordenVisualizacion: index * 2 + 1,
+              },
+            ]
+          },
+        )
+
+        setValue('imagenes', [...currentImages, ...images], {
+          shouldDirty: true,
+          shouldTouch: true,
+        })
+
+        setFiles([])
+      } else {
+        toast.error('Error uploading images')
+      }
+      setIsUploading(false)
+    },
+    [files],
+  )
 
   // ** Hooks
   const { getRootProps, getInputProps } = useDropzone({
@@ -78,11 +142,8 @@ const FileUploaderRestrictions = () => {
     accept: {
       'image/*': ['.png', '.jpg', '.jpeg'],
     },
-    onDrop: (acceptedFiles: File[]) => {
-      setFiles((files) => [
-        ...files,
-        ...acceptedFiles.map((file: File) => Object.assign(file)),
-      ])
+    onDrop: async (acceptedFiles: File[]) => {
+      await handleLoadImages(acceptedFiles)
     },
     onDropRejected: () => {
       toast.error('You can only upload 2 files & maximum size of 2 MB.', {
@@ -150,40 +211,41 @@ const FileUploaderRestrictions = () => {
 
   return (
     <Card sx={{ p: 5 }}>
-      <div {...getRootProps({ className: 'dropzone' })}>
-        <input {...getInputProps()} />
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: ['column', 'column', 'row'],
-            alignItems: 'center',
-          }}
-        >
-          <Img alt="Upload img" src="/images/misc/upload.png" />
+      <LoadingWrapper isLoading={isUploading}>
+        <div {...getRootProps({ className: 'dropzone' })}>
+          <input {...getInputProps()} />
           <Box
             sx={{
               display: 'flex',
-              flexDirection: 'column',
-              textAlign: ['center', 'center', 'inherit'],
+              flexDirection: ['column', 'column', 'row'],
+              alignItems: 'center',
             }}
           >
-            <HeadingTypography variant="h5">
-              Suelta los archivos aquí o haz clic para subirlos.
-            </HeadingTypography>
-            <Typography color="textSecondary">
-              Imágenes Permitidas *.jpeg, *.jpg, *.png
-            </Typography>
-            <Typography color="textSecondary">
-              Máximo 10 archivos y tamaño máximo de 2 MB
-            </Typography>
+            <Img alt="Upload img" src="/images/misc/upload.png" />
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                textAlign: ['center', 'center', 'inherit'],
+              }}
+            >
+              <HeadingTypography variant="h5">
+                Suelta los archivos aquí o haz clic para subirlos.
+              </HeadingTypography>
+              <Typography color="textSecondary">
+                Imágenes Permitidas *.jpeg, *.jpg, *.png
+              </Typography>
+              <Typography color="textSecondary">
+                Máximo 10 archivos y tamaño máximo de 2 MB
+              </Typography>
+            </Box>
           </Box>
-        </Box>
-      </div>
-      {files.length ? (
-        <Fragment>
-          <List>{fileList}</List>
-          <div className="buttons">
-            <Button
+        </div>
+        {files.length ? (
+          <Fragment>
+            <List>{fileList}</List>
+            <div className="buttons">
+              {/* <Button
               color="error"
               variant="outlined"
               onClick={handleRemoveAllFiles}
@@ -192,22 +254,23 @@ const FileUploaderRestrictions = () => {
             </Button>
             <Button variant="contained" onClick={handleLoadImages}>
               Cargar Imagenes
-            </Button>
-          </div>
-        </Fragment>
-      ) : null}
-      <Dialog open={dialogOpen} onClose={handleCloseDialog}>
-        <DialogTitle>Vista Previa</DialogTitle>
-        <DialogContent>
-          {selectedImage && (
-            <img
-              src={selectedImage}
-              alt="Vista Previa"
-              style={{ width: '100%', maxHeight: '500px' }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+            </Button> */}
+            </div>
+          </Fragment>
+        ) : null}
+        <Dialog open={dialogOpen} onClose={handleCloseDialog}>
+          <DialogTitle>Vista Previa</DialogTitle>
+          <DialogContent>
+            {selectedImage && (
+              <img
+                src={selectedImage}
+                alt="Vista Previa"
+                style={{ width: '100%', maxHeight: '500px' }}
+              />
+            )}
+          </DialogContent>
+        </Dialog>
+      </LoadingWrapper>
     </Card>
   )
 }

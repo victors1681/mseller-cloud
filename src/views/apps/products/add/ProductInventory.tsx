@@ -10,16 +10,8 @@ import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
 import Button from '@mui/material/Button'
-import Checkbox from '@mui/material/Checkbox'
 import Divider from '@mui/material/Divider'
-import FormControl from '@mui/material/FormControl'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import FormGroup from '@mui/material/FormGroup'
-import InputLabel from '@mui/material/InputLabel'
-import MenuItem from '@mui/material/MenuItem'
-import Radio from '@mui/material/Radio'
-import RadioGroup from '@mui/material/RadioGroup'
-import Select from '@mui/material/Select'
+
 import Tab from '@mui/material/Tab'
 import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
@@ -36,11 +28,14 @@ import CustomTabList from '@core/components/mui/TabList'
 //import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
 import Icon from 'src/@core/components/icon'
 import { Box, Stack } from '@mui/material'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/store'
 
 const ProductInventory = () => {
   // States
   const [activeTab, setActiveTab] = useState('restock')
-  const [date, setDate] = useState<Date | null>(null)
+
+  const store = useSelector((state: RootState) => state.products)
 
   // Hooks
   const theme = useTheme()
@@ -107,16 +102,19 @@ const ProductInventory = () => {
               flexItem
             />
             <Grid item xs={12} md={7}>
+              {/* TODO: Future feature handle stocks */}
               <TabPanel value="restock">
                 <Typography className="font-medium">Cantidades</Typography>
                 <Stack direction="row" spacing={2}>
                   <TextField
+                    disabled
                     fullWidth
                     label="Agregar Cantidad"
                     placeholder="100"
                     size="small"
                   />
                   <Button
+                    disabled
                     variant="contained"
                     startIcon={<Icon icon="ri-check-line" />}
                   >
@@ -125,7 +123,8 @@ const ProductInventory = () => {
                 </Stack>
                 <Box sx={{ m: 2 }}>
                   <Typography color="text.primary">
-                    Inventario actual: 54
+                    Inventario actual:{' '}
+                    {store?.productDetail?.existenciaAlmacen1 || 0}
                   </Typography>
                 </Box>
               </TabPanel>

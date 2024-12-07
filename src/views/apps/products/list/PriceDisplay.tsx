@@ -44,7 +44,7 @@ const PriceDisplay = ({ prices, defaultPrice }: Props) => {
         open={Boolean(anchorEl)}
       >
         {prices.map((p, index) => (
-          <MenuItem onClick={handleClose}>
+          <MenuItem onClick={handleClose} key={index}>
             <Typography variant="subtitle2">
               Precio{index + 2}: {formatCurrency(p)}
             </Typography>
