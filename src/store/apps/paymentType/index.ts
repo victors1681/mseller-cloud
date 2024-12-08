@@ -5,6 +5,8 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { CondicionPagoType } from 'src/types/apps/paymentTypeTypes'
 import { PaginatedResponse } from 'src/types/apps/response'
 import restClient from 'src/configs/restClient'
+import { AppDispatch, RootState } from '@/store'
+import toast from 'react-hot-toast'
 
 interface DataParams {
   query: string
@@ -21,6 +23,53 @@ interface Redux {
 export interface AxiosResponse<T> {
   data: T
 }
+
+export const addUpdatePaymentType = createAsyncThunk<
+  any,
+  CondicionPagoType,
+  {
+    dispatch: AppDispatch
+    state: RootState
+    rejectValue: { message: string }
+  }
+>(
+  'appPaymentTypes/addUpdatePaymentType',
+  async (
+    paymentType: CondicionPagoType,
+    { dispatch, getState, rejectWithValue },
+  ) => {
+    try {
+      const response = await restClient.put<any>(
+        '/api/portal/CondicionPago',
+        paymentType,
+      )
+
+      if (response.status === 200) {
+        toast.success('Condición de pago actualizado exitosamente')
+
+        const state = getState()
+        const params = state.paymentTypes.params
+        await dispatch(fetchPaymentType(params))
+
+        return {
+          success: true,
+          data: response.data.data,
+          message: 'Condicion de pago actualizado exitosamente',
+        }
+      }
+
+      return rejectWithValue({
+        message:
+          response.data.message || 'Error actualizando condicion de pago',
+      })
+    } catch (error) {
+      console.error('Update payment type error:', error)
+      return rejectWithValue({
+        message: 'Error inesperado actualizando la condición de pago',
+      })
+    }
+  },
+)
 
 export const addPaymentType = createAsyncThunk(
   'appSeller/addLocation',
@@ -79,6 +128,8 @@ export const deletePaymentType = createAsyncThunk(
 export const appPaymentTypeSlice = createSlice({
   name: 'appPaymentType',
   initialState: {
+    isAddUpdateDrawerOpen: false,
+    editData: null as CondicionPagoType | null | undefined,
     data: [] as CondicionPagoType[],
     params: {} as any,
     allData: [],
@@ -89,7 +140,12 @@ export const appPaymentTypeSlice = createSlice({
     total: 0,
     isLoading: true,
   },
-  reducers: {},
+  reducers: {
+    togglePaymentTypeAddUpdate: (state, payload) => {
+      state.editData = payload.payload
+      state.isAddUpdateDrawerOpen = !state.isAddUpdateDrawerOpen
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(fetchPaymentType.pending, (state, action) => {
       state.isLoading = true
@@ -120,4 +176,5 @@ export const appPaymentTypeSlice = createSlice({
   },
 })
 
+export const { togglePaymentTypeAddUpdate } = appPaymentTypeSlice.actions
 export default appPaymentTypeSlice.reducer
