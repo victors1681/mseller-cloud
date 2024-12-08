@@ -15,7 +15,7 @@
         "condicionPrecio": 1,
         "codigoVendedor": "1",
         "rutaVenta": 1,
-        "clasificacion": "Gold",
+        "clasificacion": "Farmacia",
         "actualizar": false,
         "descuento": 10.0,
         "impuesto": true,
@@ -26,8 +26,15 @@
         "localidadId": 1,
         "bloqueoPorVencimiento": false,
         "descuentoProntoPago": 5.0,
-        "tipoCliente": "Retail",
-        "contacto": "Maria Lopez"
+        "tipoCliente": "Crédito Fiscal",
+        "contacto": "Maria Lopez",
+        "estado": "Distrito Nacional",
+        "codigoPostal": "10101",
+        "contactoWhatsApp": "1-809-123-4567",
+        "preferenciasDeContacto": "WhatsApp",
+        "idiomaPreferido": "Español",
+        "notas": "Cliente preferencial, requiere entrega antes de las 10 AM",
+        "pais": "República Dominicana"
     },
     {
         "codigo": "CUST002",
@@ -45,7 +52,7 @@
         "condicionPrecio": 1,
         "codigoVendedor": "1",
         "rutaVenta": 2,
-        "clasificacion": "Silver",
+        "clasificacion": "Supermercado",
         "actualizar": true,
         "descuento": 15.0,
         "impuesto": false,
@@ -56,7 +63,7 @@
         "localidadId": 1,
         "bloqueoPorVencimiento": true,
         "descuentoProntoPago": 2.5,
-        "tipoCliente": "Wholesale",
+        "tipoCliente": "Crédito Fiscal",
         "contacto": "Carlos Medina"
     },
     {
@@ -75,7 +82,7 @@
         "condicionPrecio": 1,
         "codigoVendedor": "1",
         "rutaVenta": 3,
-        "clasificacion": "Bronze",
+        "clasificacion": "Restaurant",
         "actualizar": false,
         "descuento": 5.0,
         "impuesto": true,
@@ -86,7 +93,7 @@
         "localidadId": 1,
         "bloqueoPorVencimiento": false,
         "descuentoProntoPago": 0.0,
-        "tipoCliente": "Corporate",
+        "tipoCliente": "Consumidor Final",
         "contacto": "Pedro Jimenez"
     },
     {
@@ -105,7 +112,7 @@
         "condicionPrecio": 1,
         "codigoVendedor": "1",
         "rutaVenta": 3,
-        "clasificacion": "Gold",
+        "clasificacion": "Colmado",
         "actualizar": true,
         "descuento": 12.5,
         "impuesto": false,
@@ -116,7 +123,7 @@
         "localidadId": 1,
         "bloqueoPorVencimiento": true,
         "descuentoProntoPago": 3.0,
-        "tipoCliente": "Retail",
+        "tipoCliente": "Consumidor Final",
         "contacto": "Ana Gomez"
     },
     {
@@ -135,7 +142,7 @@
         "condicionPrecio": 1,
         "codigoVendedor": "1",
         "rutaVenta": 2,
-        "clasificacion": "Silver",
+        "clasificacion": "Hotel",
         "actualizar": false,
         "descuento": 8.0,
         "impuesto": true,
@@ -146,8 +153,15 @@
         "localidadId": 1,
         "bloqueoPorVencimiento": false,
         "descuentoProntoPago": 1.0,
-        "tipoCliente": "Corporate",
-        "contacto": "Luis Martinez"
+        "tipoCliente": "Crédito Fiscal",
+        "contacto": "Luis Martinez",
+        "estado": "Bavaro",
+        "codigoPostal": "57000",
+        "contactoWhatsApp": "1-809-888-9999",
+        "preferenciasDeContacto": "WhatsApp",
+        "idiomaPreferido": "Inglés",
+        "notas": "Cliente de temporada alta",
+        "pais": "República Dominicana"
     },
     {
         "codigo": "CUST006",
@@ -165,7 +179,7 @@
         "condicionPrecio": 1,
         "codigoVendedor": "1",
         "rutaVenta": 3,
-        "clasificacion": "Bronze",
+        "clasificacion": "Cafetería",
         "actualizar": true,
         "descuento": 20.0,
         "impuesto": false,
@@ -176,8 +190,15 @@
         "localidadId": 1,
         "bloqueoPorVencimiento": true,
         "descuentoProntoPago": 0.5,
-        "tipoCliente": "Wholesale",
-        "contacto": "Pedro Castillo"
+        "tipoCliente": "Consumidor Final",
+        "contacto": "Pedro Castillo",
+        "estado": "Higuey",
+        "codigoPostal": "57000",
+        "contactoWhatsApp": "1-809-888-9999",
+        "preferenciasDeContacto": "WhatsApp",
+        "idiomaPreferido": "Inglés",
+        "notas": "Cliente de temporada alta",
+        "pais": "República Dominicana"
     },
     {
         "codigo": "CUST007",
@@ -195,7 +216,7 @@
         "condicionPrecio": 1,
         "codigoVendedor": "1",
         "rutaVenta": 2,
-        "clasificacion": "Gold",
+        "clasificacion": "Tienda",
         "actualizar": false,
         "descuento": 10.0,
         "impuesto": true,
@@ -206,8 +227,15 @@
         "localidadId": 1,
         "bloqueoPorVencimiento": false,
         "descuentoProntoPago": 2.0,
-        "tipoCliente": "Retail",
-        "contacto": "Clara diaz"
+        "tipoCliente": "Consumidor Final",
+        "contacto": "Clara diaz",
+        "estado": "San Pedro",
+        "codigoPostal": "57000",
+        "contactoWhatsApp": "1-809-888-9999",
+        "preferenciasDeContacto": "WhatsApp",
+        "idiomaPreferido": "Inglés",
+        "notas": "Cliente de temporada alta",
+        "pais": "República Dominicana"
     },
     {
         "codigo": "CUST008",
@@ -225,7 +253,7 @@
         "condicionPrecio": 1,
         "codigoVendedor": "1",
         "rutaVenta": 3,
-        "clasificacion": "Silver",
+        "clasificacion": "Farmacia",
         "actualizar": true,
         "descuento": 7.5,
         "impuesto": false,
@@ -236,8 +264,15 @@
         "localidadId": 1,
         "bloqueoPorVencimiento": true,
         "descuentoProntoPago": 1.5,
-        "tipoCliente": "Corporate",
-        "contacto": "Jose Reyes"
+        "tipoCliente": "Crédito Fiscal",
+        "contacto": "Jose Reyes",
+        "estado": "Moca",
+        "codigoPostal": "57000",
+        "contactoWhatsApp": "1-809-888-9999",
+        "preferenciasDeContacto": "WhatsApp",
+        "idiomaPreferido": "Inglés",
+        "notas": "Cliente de temporada alta",
+        "pais": "República Dominicana"
     },
     {
         "codigo": "CUST009",
@@ -255,7 +290,7 @@
         "condicionPrecio": 1,
         "codigoVendedor": "1",
         "rutaVenta": 1,
-        "clasificacion": "Bronze",
+        "clasificacion": "Supermercado",
         "actualizar": false,
         "descuento": 3.0,
         "impuesto": true,
@@ -266,8 +301,15 @@
         "localidadId": 1,
         "bloqueoPorVencimiento": false,
         "descuentoProntoPago": 0.0,
-        "tipoCliente": "Retail",
-        "contacto": "Laura Jimenez"
+        "tipoCliente": "Crédito Fiscal",
+        "contacto": "Laura Jimenez",
+        "estado": "Jarabacoa",
+        "codigoPostal": "57000",
+        "contactoWhatsApp": "1-809-888-9999",
+        "preferenciasDeContacto": "WhatsApp",
+        "idiomaPreferido": "Inglés",
+        "notas": "Cliente de temporada alta",
+        "pais": "República Dominicana"
     },
     {
         "codigo": "CUST010",
@@ -285,7 +327,7 @@
         "condicionPrecio": 1,
         "codigoVendedor": "1",
         "rutaVenta": 1,
-        "clasificacion": "Silver",
+        "clasificacion": "Restaurant",
         "actualizar": true,
         "descuento": 5.0,
         "impuesto": false,
@@ -296,7 +338,14 @@
         "localidadId": 1,
         "bloqueoPorVencimiento": true,
         "descuentoProntoPago": 4.0,
-        "tipoCliente": "Wholesale",
-        "contacto": "Daniela Castro"
+        "tipoCliente": "Consumidor Final",
+        "contacto": "Daniela Castro",
+        "estado": "Duarte",
+        "codigoPostal": "57000",
+        "contactoWhatsApp": "1-809-888-9999",
+        "preferenciasDeContacto": "WhatsApp",
+        "idiomaPreferido": "Inglés",
+        "notas": "Cliente de temporada alta",
+        "pais": "República Dominicana"
     }
 ]
