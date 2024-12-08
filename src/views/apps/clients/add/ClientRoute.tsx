@@ -7,9 +7,8 @@ import CardContent from '@mui/material/CardContent'
 import TextField from '@mui/material/TextField'
 
 // Component Imports
-import { Controller, useForm, useFormContext } from 'react-hook-form'
+import { Controller, useFormContext } from 'react-hook-form'
 import {
-  Autocomplete,
   FormControl,
   FormHelperText,
   Grid,
@@ -17,29 +16,12 @@ import {
   MenuItem,
   Select,
 } from '@mui/material'
-import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
-
-const options = [{ label: 'UN', value: 'UN' }]
 
 const ProductOrganize = () => {
   const { control } = useFormContext()
   const store = useSelector((state: RootState) => state.products)
-
-  const areasTypeOptions = useMemo(() => {
-    return store.areas.map((unit) => ({
-      label: unit,
-      value: unit,
-    }))
-  }, [store])
-
-  const departmentTypeOptions = useMemo(() => {
-    return store.departments.map((unit) => ({
-      label: unit,
-      value: unit,
-    }))
-  }, [store])
 
   const weekDays = [
     { value: 1, label: 'Lunes' },

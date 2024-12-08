@@ -12,6 +12,7 @@ import { Autocomplete, Grid } from '@mui/material'
 import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
+import CustomAutocomplete from '@/views/ui/customAutocomplete'
 
 const options = [{ label: 'UN', value: 'UN' }]
 
@@ -39,76 +40,21 @@ const ProductOrganize = () => {
       <CardContent>
         <Grid container spacing={3}>
           <Grid item xs={12}>
-            <Controller
+            <CustomAutocomplete
               name="area"
               control={control}
-              render={({
-                field: { onChange, value },
-                fieldState: { error },
-              }) => (
-                <Autocomplete
-                  freeSolo
-                  options={areasTypeOptions}
-                  value={
-                    areasTypeOptions.find((option) => option.value === value) ||
-                    null
-                  }
-                  onChange={(_, newValue) => {
-                    onChange(
-                      typeof newValue === 'string' ? newValue : newValue?.value,
-                    )
-                  }}
-                  getOptionLabel={(option) => {
-                    if (typeof option === 'string') return option
-                    return option?.label || ''
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Área"
-                      error={!!error}
-                      helperText={error?.message}
-                    />
-                  )}
-                />
-              )}
+              options={areasTypeOptions}
+              label={'Área'}
+              freeSolo
             />
           </Grid>
           <Grid item xs={12}>
-            <Controller
+            <CustomAutocomplete
               name="departamento"
               control={control}
-              render={({
-                field: { onChange, value },
-                fieldState: { error },
-              }) => (
-                <Autocomplete
-                  freeSolo
-                  options={departmentTypeOptions}
-                  value={
-                    departmentTypeOptions.find(
-                      (option) => option.value === value,
-                    ) || null
-                  }
-                  onChange={(_, newValue) => {
-                    onChange(
-                      typeof newValue === 'string' ? newValue : newValue?.value,
-                    )
-                  }}
-                  getOptionLabel={(option) => {
-                    if (typeof option === 'string') return option
-                    return option?.label || ''
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Departamento"
-                      error={!!error}
-                      helperText={error?.message}
-                    />
-                  )}
-                />
-              )}
+              options={departmentTypeOptions}
+              label={'Departamento'}
+              freeSolo
             />
           </Grid>
           <Grid item xs={12}>

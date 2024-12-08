@@ -2,16 +2,13 @@
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
-import Checkbox from '@mui/material/Checkbox'
 import Divider from '@mui/material/Divider'
-import Typography from '@mui/material/Typography'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/store'
 
 // Component Imports
 
 import {
-  Autocomplete,
   FormControl,
   FormHelperText,
   Grid,
@@ -29,7 +26,7 @@ import InputLabelTooltip from '@/views/ui/inputLabelTooltip'
 import CustomAutocomplete from '@/views/ui/customAutocomplete'
 
 const ProductPricing = () => {
-  const { register, control } = useFormContext()
+  const { control } = useFormContext()
   const dispatch = useDispatch<AppDispatch>()
   const store = useSelector((state: RootState) => state.clients)
   const sellerStore = useSelector((state: RootState) => state.sellers)

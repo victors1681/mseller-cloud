@@ -13,6 +13,7 @@ import { RootState } from 'src/store'
 import { Autocomplete, Grid, TextField } from '@mui/material'
 import { Controller, useFormContext } from 'react-hook-form'
 import { useMemo } from 'react'
+import CustomAutocomplete from '@/views/ui/customAutocomplete'
 
 const ProductPricing = () => {
   const { register, control } = useFormContext()
@@ -154,39 +155,12 @@ const ProductPricing = () => {
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <Controller
+            <CustomAutocomplete
               name="tipoImpuesto"
               control={control}
-              render={({
-                field: { onChange, value },
-                fieldState: { error },
-              }) => (
-                <Autocomplete
-                  freeSolo
-                  options={taxesTypeOptions}
-                  value={
-                    taxesTypeOptions.find((option) => option.value === value) ||
-                    null
-                  }
-                  onChange={(_, newValue) => {
-                    onChange(
-                      typeof newValue === 'string' ? newValue : newValue?.value,
-                    )
-                  }}
-                  getOptionLabel={(option) => {
-                    if (typeof option === 'string') return option
-                    return option?.label || ''
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Tipo de Impuesto"
-                      error={!!error}
-                      helperText={error?.message}
-                    />
-                  )}
-                />
-              )}
+              options={taxesTypeOptions}
+              label={'Tipo de Impuesto'}
+              freeSolo
             />
           </Grid>
         </Grid>

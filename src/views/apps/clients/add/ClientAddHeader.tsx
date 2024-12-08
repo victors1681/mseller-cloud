@@ -24,7 +24,7 @@ const ProductAddHeader = ({ id }: Props) => {
   const store = useSelector((state: RootState) => state.clients)
   const [openDialog, setOpenDialog] = useState(false)
 
-  const isCustomerExist = store.customerDetail
+  const isCustomerExist = store.customerDetail?.client
   const isNewCustomerWithError = !isCustomerExist && id !== 'new'
   const {
     reset,
@@ -60,9 +60,9 @@ const ProductAddHeader = ({ id }: Props) => {
           <Typography variant="h4" sx={{ mb: 1 }}>
             {!isCustomerExist
               ? 'Agregar nuevo cliente'
-              : `Actualizar ${store.customerDetail?.client?.nombre}`}
+              : `Actualizar ${store.customerDetail?.client?.nombre || ''}`}
           </Typography>
-          <Typography>Mantenimiento de productos</Typography>
+          <Typography>Mantenimiento de clientes</Typography>
         </Grid>
         <Grid item sm={6} md={3}>
           <Button

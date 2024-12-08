@@ -19,6 +19,7 @@ import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
 import LoadingWrapper from '@/views/ui/LoadingWrapper'
 import { stateFromHTML } from 'draft-js-import-html'
+import CustomAutocomplete from '@/views/ui/customAutocomplete'
 
 const unitOptions = [{ label: 'UN', value: 'UN' }]
 
@@ -120,74 +121,21 @@ const ProductInformation = () => {
               />
             </Grid>
             <Grid item xs={6} sm={4}>
-              <Controller
+              <CustomAutocomplete
                 name="unidad"
                 control={control}
-                defaultValue="UN"
-                render={({ field: { onChange, value } }) => (
-                  <Autocomplete
-                    freeSolo
-                    options={unitOptions}
-                    value={
-                      unitOptions.find((option) => option.value === value) ||
-                      null
-                    }
-                    onChange={(_, newValue) => {
-                      onChange(
-                        typeof newValue === 'string'
-                          ? newValue
-                          : newValue?.value,
-                      )
-                    }}
-                    getOptionLabel={(option) => {
-                      if (typeof option === 'string') return option
-                      return option?.label || ''
-                    }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Unidad"
-                        variant="outlined"
-                      />
-                    )}
-                  />
-                )}
+                options={unitOptions}
+                label={'Unidad'}
+                freeSolo
               />
             </Grid>
             <Grid item xs={12} sm={4}>
-              <Controller
+              <CustomAutocomplete
                 name="empaque"
                 control={control}
-                defaultValue="UN"
-                render={({ field: { onChange, value } }) => (
-                  <Autocomplete
-                    freeSolo
-                    options={packagingOptions}
-                    value={
-                      packagingOptions.find(
-                        (option) => option.value === value,
-                      ) || null
-                    }
-                    onChange={(_, newValue) => {
-                      onChange(
-                        typeof newValue === 'string'
-                          ? newValue
-                          : newValue?.value,
-                      )
-                    }}
-                    getOptionLabel={(option) => {
-                      if (typeof option === 'string') return option
-                      return option?.label || ''
-                    }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Empaque"
-                        variant="outlined"
-                      />
-                    )}
-                  />
-                )}
+                options={packagingOptions}
+                label={'Empaque'}
+                freeSolo
               />
             </Grid>
             <Grid item xs={12} sm={4}>

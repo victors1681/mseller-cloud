@@ -7,7 +7,7 @@ import ClientInformation from '@/views/apps/clients/add/ClientInformation'
 import ClientConfig from '@/views/apps/clients/add/ClientConfig'
 import ClientRoute from '@/views/apps/clients/add/ClientRoute'
 
-import { useForm, FormProvider } from 'react-hook-form' 
+import { useForm, FormProvider } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/store'
 
@@ -25,8 +25,120 @@ import { useFormNavWarning } from '@/hooks/useFormNavWarning'
 import { CustomerType } from '@/types/apps/customerType'
 
 // Validation schema
-const clientschema = yup.object().shape({
-  // Basic Information
+const clientSchema = yup.object().shape({
+  // Required fields with specific validations
+  codigo: yup
+    .string()
+    .required('El código es requerido')
+    .max(20, 'El código no debe exceder 20 caracteres'),
+
+  nombre: yup
+    .string()
+    .required('El nombre es requerido')
+    .max(100, 'El nombre no debe exceder 100 caracteres'),
+
+  // Optional string fields with length validation
+  direccion: yup.string().nullable().max(200),
+  telefono1: yup.string().nullable(),
+  ciudad: yup.string().nullable(),
+
+  // Number fields with min/max validations
+  balance: yup
+    .number()
+    .typeError('El balance debe ser un número')
+    .min(0, 'El balance no puede ser negativo'),
+
+  limiteFacturas: yup
+    .number()
+    .typeError('El límite de facturas debe ser un número')
+    .integer('Debe ser un número entero')
+    .min(0, 'El límite no puede ser negativo')
+    .optional(),
+
+  limiteCredito: yup
+    .number()
+    .typeError('El límite de crédito debe ser un número')
+    .min(0, 'El límite no puede ser negativo')
+    .optional(),
+
+  // Optional fields with specific validations
+  status: yup.string().nullable().oneOf(['A', 'I'], 'Estado inválido'),
+  rnc: yup.string().nullable(),
+
+  // Boolean fields
+  confirmado: yup.boolean(),
+  actualizar: yup.boolean().default(false),
+  impuesto: yup.boolean(),
+  bloqueoPorVencimiento: yup.boolean().default(false),
+
+  // Email validation
+  email: yup.string().nullable().email('Correo electrónico inválido'),
+
+  // Numbers with specific ranges
+  condicionPrecio: yup
+    .number()
+    .nullable()
+    .integer('Debe ser un número entero')
+    .min(1, 'Mínimo 1')
+    .max(5, 'Máximo 5'),
+
+  rutaVenta: yup
+    .number()
+    .typeError('La ruta de venta debe ser un número')
+    .min(0, 'La ruta no puede ser negativa')
+    .optional(),
+
+  // Geolocation
+  latitud: yup.number().nullable().optional(),
+  longitud: yup.number().nullable().optional(),
+
+  // Discount validations
+  descuentoProntoPago: yup
+    .number()
+    .min(0, 'El descuento no puede ser negativo')
+    .max(100, 'El descuento no puede exceder 100%'),
+
+  codigoVendedor: yup.string().required('El código del vendedor es requerido'),
+  descuento: yup
+    .number()
+    .min(0, 'El descuento no puede ser negativo')
+    .max(100, 'El descuento no puede exceder 100%'),
+
+  // Schedule validations
+  dia: yup
+    .number()
+    .integer('Debe ser un número entero')
+    .min(0, 'Mínimo día 1')
+    .max(31, 'Máximo día 31')
+    .optional(),
+
+  frecuencia: yup
+    .number()
+    .integer('Debe ser un número entero')
+    .min(0, 'Mínimo 1')
+    .optional(),
+
+  secuencia: yup
+    .number()
+    .integer('Debe ser un número entero')
+    .min(0, 'Mínimo 1')
+    .optional(),
+
+  localidadId: yup
+    .number()
+    .required('La localidad es requerida')
+    .integer('Debe ser un número entero')
+    .min(1, 'Seleccione una localidad válida')
+    .required('La localidad es requerida'),
+
+  // Optional new fields
+  estado: yup.string().nullable(),
+  codigoPostal: yup.string().nullable(),
+  contactoWhatsApp: yup.string().nullable().optional(),
+  preferenciasDeContacto: yup.string().nullable(),
+  idiomaPreferido: yup.string().nullable(),
+  notas: yup.string().nullable(),
+  pais: yup.string().nullable(),
 })
 
 interface AddCustomerProps {
@@ -85,7 +197,7 @@ const AddCustomer = ({ id }: AddCustomerProps) => {
       notas: '',
       pais: '',
     },
-    resolver: yupResolver(clientschema),
+    resolver: yupResolver(clientSchema),
     mode: 'onChange',
   })
   const [isSubmitting, setIsformSubmitted] = useState(false)

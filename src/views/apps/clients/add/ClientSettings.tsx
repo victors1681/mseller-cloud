@@ -12,7 +12,6 @@ import InputLabelTooltip from '@/views/ui/inputLabelTooltip'
 
 const ClientSettings = () => {
   const { control } = useFormContext()
-  const store = useSelector((state: RootState) => state.products)
 
   return (
     <Card>
