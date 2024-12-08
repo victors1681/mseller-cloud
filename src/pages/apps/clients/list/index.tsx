@@ -340,8 +340,8 @@ const InvoiceList = () => {
           <Tooltip title="Aprobar">
             <IconButton
               size="small"
-              disabled
-              onClick={() => dispatch(deleteClient(row.codigo))}
+              component={Link}
+              href={`/apps/clients/add/${row.codigo}`}
             >
               <Icon icon="tabler:edit" fontSize={20} />
             </IconButton>

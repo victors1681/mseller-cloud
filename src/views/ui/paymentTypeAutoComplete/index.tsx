@@ -2,7 +2,7 @@ import { Autocomplete, AutocompleteValue, TextField } from '@mui/material'
 import { SyntheticEvent, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/store'
-import { fetchData as fetchPaymentTypes } from 'src/store/apps/paymentType'
+import { fetchPaymentType as fetchPaymentTypes } from 'src/store/apps/paymentType'
 
 interface PaymentTypeAutocompleteProps {
   selectedPaymentType?: string

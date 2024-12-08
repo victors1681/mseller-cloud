@@ -2,7 +2,7 @@ import { Autocomplete, AutocompleteValue, TextField } from '@mui/material'
 import { SyntheticEvent, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/store'
-import { fetchData as fetchLocations } from 'src/store/apps/location'
+import { fetchLocations as fetchLocations } from 'src/store/apps/location'
 
 interface LocationAutocompleteProps {
   selectedLocation?: string

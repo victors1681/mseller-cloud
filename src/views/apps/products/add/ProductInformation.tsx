@@ -40,10 +40,10 @@ const ProductInformation = () => {
 
   const descriptionWatch = watch('descripcion')
   useEffect(() => {
-    if (store.productDetail.descripcion) {
+    if (store.productDetail?.descripcion) {
       try {
         // Convert HTML string to ContentState
-        const contentState = stateFromHTML(store.productDetail.descripcion)
+        const contentState = stateFromHTML(store?.productDetail?.descripcion)
 
         // Create EditorState with the converted ContentState
         const editorState = EditorState.createWithContent(contentState)

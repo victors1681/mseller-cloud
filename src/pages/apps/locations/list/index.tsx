@@ -21,7 +21,7 @@ import format from 'date-fns/format'
 
 // ** Store & Actions Imports
 import { useDispatch, useSelector } from 'react-redux'
-import { addLocation, fetchData } from 'src/store/apps/location'
+import { addLocation, fetchLocations } from 'src/store/apps/location'
 
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
@@ -134,7 +134,7 @@ const InvoiceList = () => {
   //Initial Load
   useEffect(() => {
     dispatch(
-      fetchData({
+      fetchLocations({
         query: value,
         pageNumber: paginationModel.page,
       }),
@@ -145,7 +145,7 @@ const InvoiceList = () => {
     (values: any) => {
       setPaginationModel(values)
       dispatch(
-        fetchData({
+        fetchLocations({
           query: value,
           pageNumber: values.page,
         }),
@@ -157,7 +157,7 @@ const InvoiceList = () => {
   const performRequest = useCallback(
     (value: string) => {
       dispatch(
-        fetchData({
+        fetchLocations({
           query: value,
           pageNumber: paginationModel.page,
         }),

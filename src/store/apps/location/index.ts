@@ -32,14 +32,14 @@ export const addLocation = createAsyncThunk(
     const state = getState()
     const params = state.appSeller.params
 
-    await dispatch(fetchData(params))
+    await dispatch(fetchLocations(params))
 
     return response.data || {}
   },
 )
 
 // ** Fetch Locations
-export const fetchData = createAsyncThunk(
+export const fetchLocations = createAsyncThunk(
   'appLocation/fetchData',
   async (params?: DataParams) => {
     const response = await restClient.get<
@@ -69,7 +69,7 @@ export const deleteLocation = createAsyncThunk(
     const response = await restClient.delete('/apps/Location/delete', {
       data: id,
     })
-    await dispatch(fetchData(getState().Location.params))
+    await dispatch(fetchLocations(getState().Location.params))
 
     return response.data || {}
   },
@@ -90,10 +90,10 @@ export const appLocationSlice = createSlice({
   },
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(fetchData.pending, (state, action) => {
+    builder.addCase(fetchLocations.pending, (state, action) => {
       state.isLoading = true
     })
-    builder.addCase(fetchData.rejected, (state, action) => {
+    builder.addCase(fetchLocations.rejected, (state, action) => {
       state.isLoading = false
       state.data = []
       state.total = 0
@@ -101,7 +101,7 @@ export const appLocationSlice = createSlice({
       state.pageSize = 0
       state.totalPages = 0
     })
-    builder.addCase(fetchData.fulfilled, (state, action) => {
+    builder.addCase(fetchLocations.fulfilled, (state, action) => {
       state.data = action.payload.data
       state.params = action.payload.params
       state.allData = action.payload.allData

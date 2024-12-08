@@ -26,7 +26,7 @@ import format from 'date-fns/format'
 
 // ** Store & Actions Imports
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchData } from 'src/store/apps/paymentType'
+import { fetchPaymentType } from 'src/store/apps/paymentType'
 
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
@@ -140,7 +140,7 @@ const InvoiceList = () => {
   //Initial Load
   useEffect(() => {
     dispatch(
-      fetchData({
+      fetchPaymentType({
         query: value,
         pageNumber: paginationModel.page,
       }),
@@ -151,7 +151,7 @@ const InvoiceList = () => {
     (values: any) => {
       setPaginationModel(values)
       dispatch(
-        fetchData({
+        fetchPaymentType({
           query: value,
           pageNumber: values.page,
         }),
@@ -163,7 +163,7 @@ const InvoiceList = () => {
   const performRequest = useCallback(
     (value: string) => {
       dispatch(
-        fetchData({
+        fetchPaymentType({
           query: value,
           pageNumber: paginationModel.page,
         }),

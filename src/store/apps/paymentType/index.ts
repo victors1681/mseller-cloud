@@ -33,14 +33,14 @@ export const addPaymentType = createAsyncThunk(
     const state = getState()
     const params = state.appSeller.params
 
-    await dispatch(fetchData(params))
+    await dispatch(fetchPaymentType(params))
 
     return response.data
   },
 )
 
 // ** Fetch PaymentTypes
-export const fetchData = createAsyncThunk(
+export const fetchPaymentType = createAsyncThunk(
   'appPaymentType/fetchData',
   async (params?: DataParams) => {
     const response = await restClient.get<
@@ -70,7 +70,7 @@ export const deletePaymentType = createAsyncThunk(
     const response = await restClient.delete('/apps/PaymentType/delete', {
       data: id,
     })
-    await dispatch(fetchData(getState().PaymentType.params))
+    await dispatch(fetchPaymentType(getState().PaymentType.params))
 
     return response.data || {}
   },
@@ -91,10 +91,10 @@ export const appPaymentTypeSlice = createSlice({
   },
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(fetchData.pending, (state, action) => {
+    builder.addCase(fetchPaymentType.pending, (state, action) => {
       state.isLoading = true
     })
-    builder.addCase(fetchData.rejected, (state, action) => {
+    builder.addCase(fetchPaymentType.rejected, (state, action) => {
       state.isLoading = false
       state.data = []
       state.total = 0
@@ -102,7 +102,7 @@ export const appPaymentTypeSlice = createSlice({
       state.pageSize = 0
       state.totalPages = 0
     })
-    builder.addCase(fetchData.fulfilled, (state, action) => {
+    builder.addCase(fetchPaymentType.fulfilled, (state, action) => {
       state.data = action.payload.data
       state.params = action.payload.params
       state.allData = action.payload.allData
