@@ -74,10 +74,10 @@ const clientSchema = yup.object().shape({
   // Email validation
   email: yup.string().nullable().email('Correo electrónico inválido'),
 
+  condicion: yup.string().required('La condición de precio es requerida'),
   // Numbers with specific ranges
   condicionPrecio: yup
     .number()
-    .nullable()
     .integer('Debe ser un número entero')
     .min(1, 'Mínimo 1')
     .max(5, 'Máximo 5'),
