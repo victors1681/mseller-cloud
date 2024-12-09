@@ -48,6 +48,7 @@ import BlankLayout from 'src/@core/layouts/BlankLayout'
 // ** Demo Imports
 import FooterIllustrationsV2 from 'src/views/pages/auth/FooterIllustrationsV2'
 import Image from 'next/image'
+import RandomBg from '@/views/ui/randombg/RandomBg'
 
 // ** Styled Components
 const LoginIllustrationWrapper = styled(Box)<BoxProps>(({ theme }) => ({
@@ -144,7 +145,7 @@ const LoginPage = () => {
     formState: { errors },
   } = useForm({
     defaultValues,
-    mode: 'onBlur',
+    // mode: 'onBlur',
     resolver: yupResolver(schema),
   })
 
@@ -165,22 +166,7 @@ const LoginPage = () => {
 
   return (
     <Box className="content-right">
-      {!hidden ? (
-        <Box
-          sx={{
-            flex: 1,
-            display: 'flex',
-            position: 'relative',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundImage:
-              'url(https://source.unsplash.com/collection/962362/desktop-and-tech)',
-            backgroundRepeat: 'no-repeat',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        ></Box>
-      ) : null}
+      {!hidden ? <RandomBg /> : null}
       <RightWrapper
         sx={
           skin === 'bordered' && !hidden

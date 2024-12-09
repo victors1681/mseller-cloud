@@ -91,7 +91,11 @@ const TypographyStyled = styled(Typography)<TypographyProps>(({ theme }) => ({
 }))
 
 const LinkStyled = styled(Link)(({ theme }) => ({
+  display: 'flex',
+  fontSize: '0.875rem',
+  alignItems: 'center',
   textDecoration: 'none',
+  justifyContent: 'center',
   color: theme.palette.primary.main,
 }))
 
@@ -506,6 +510,19 @@ const Register = () => {
               >
                 Crear nueva cuenta
               </LoadingButton>
+              <Typography
+                variant="body2"
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <LinkStyled href="/login">
+                  <Icon icon="mdi:chevron-left" />
+                  <span>Regresar al inicio de sesión</span>
+                </LinkStyled>
+              </Typography>
             </form>
           </BoxWrapper>
         </Box>
