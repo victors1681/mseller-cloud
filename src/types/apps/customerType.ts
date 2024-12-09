@@ -1,7 +1,7 @@
-import { LocalidadType } from './locationType'
+import { LocationType } from './locationType'
 import { NcfType } from './ncfTypes'
 import { CondicionPagoType } from './paymentTypeTypes'
-import { VendedorType } from './sellerType'
+import { SellerType } from './sellerType'
 
 export interface CustomerType {
   codigo: string
@@ -42,9 +42,9 @@ export interface CustomerType {
   notas?: string
   pais?: string
 
-  localidad?: LocalidadType
+  localidad?: LocationType
   geoLocalizacion?: GeoLocalizacionType
-  vendedor?: VendedorType
+  vendedor?: SellerType
   condicionPago?: CondicionPagoType
 }
 

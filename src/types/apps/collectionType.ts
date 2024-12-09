@@ -1,5 +1,5 @@
 import { CustomerType } from './customerType'
-import { VendedorType } from './sellerType'
+import { SellerType } from './sellerType'
 
 export enum CollectionEnum {
   pendiente = 0,
@@ -15,7 +15,7 @@ export enum PaymentTypeEnum {
   Transferencia = 'T',
 }
 export interface CollectionType {
-  vendedor: VendedorType
+  vendedor: SellerType
   banco?: BankType
   totalRecibos: number
   noDepositoStr: string
@@ -78,7 +78,7 @@ export interface ReceiptType {
   procesado: CollectionEnum
   fechaSincronizado: string
   recibosDetalles: ReceiptDetailType[]
-  vendedor: VendedorType
+  vendedor: SellerType
   cliente: CustomerType
   banco: BankType
 }

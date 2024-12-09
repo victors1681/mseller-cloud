@@ -54,7 +54,7 @@ const navigation = (): VerticalNavItemsType => {
           path: '/apps/paymentTypes/list',
         },
         {
-          title: 'Localidades',
+          title: 'Sucursales',
           icon: 'mdi:location',
           path: '/apps/locations/list',
         },

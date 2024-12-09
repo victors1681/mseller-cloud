@@ -12,7 +12,7 @@ import TextField from '@mui/material/TextField'
 import CardHeader from '@mui/material/CardHeader'
 import Typography from '@mui/material/Typography'
 import { DataGrid, GridColDef, GridRowId } from '@mui/x-data-grid'
-import { debounce } from '@mui/material'
+import { Box, debounce, IconButton, Tooltip } from '@mui/material'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -22,15 +22,15 @@ import format from 'date-fns/format'
 
 // ** Store & Actions Imports
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchSellers } from 'src/store/apps/seller'
+import { fetchSellers, toggleSellerAddUpdate } from 'src/store/apps/seller'
 
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
-import TableHeader from 'src/views/apps/products/list/TableHeader'
+import TableHeader from 'src/views/apps/sellers/list/TableHeader'
 
 // ** Styled Components
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
-import { VendedorType } from 'src/types/apps/sellerType'
+import { SellerType } from 'src/types/apps/sellerType'
 import OptionsMenu from 'src/@core/components/option-menu'
 
 interface CustomInputProps {
@@ -42,7 +42,7 @@ interface CustomInputProps {
 }
 
 interface CellType {
-  row: VendedorType
+  row: SellerType
 }
 
 // ** Styled component for the link in the dataTable
@@ -64,7 +64,7 @@ const defaultColumns: GridColDef[] = [
   {
     flex: 0.2,
     minWidth: 130,
-    field: 'day',
+    field: 'nombre',
     headerName: 'Nombre',
     renderCell: ({ row }: CellType) => (
       <Typography
@@ -77,6 +77,24 @@ const defaultColumns: GridColDef[] = [
         }}
       >
         {row.nombre}
+      </Typography>
+    ),
+  },
+  {
+    flex: 0.2,
+    minWidth: 130,
+    field: 'email',
+    headerName: 'Email',
+    renderCell: ({ row }: CellType) => (
+      <Typography
+        noWrap
+        variant="body2"
+        sx={{
+          color: 'text.primary',
+          textTransform: 'lowercase',
+        }}
+      >
+        {row.email}
       </Typography>
     ),
   },
@@ -184,7 +202,29 @@ const InvoiceList = () => {
     [fn],
   )
 
-  const columns: GridColDef[] = [...defaultColumns]
+  const handleEdit = (row: SellerType) => {
+    dispatch(toggleSellerAddUpdate(row))
+  }
+
+  const columns: GridColDef[] = [
+    ...defaultColumns,
+    {
+      flex: 0.1,
+      minWidth: 130,
+      sortable: false,
+      field: 'actions',
+      headerName: 'Actions',
+      renderCell: ({ row }: CellType) => (
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Tooltip title="Editar">
+            <IconButton size="small" onClick={() => handleEdit(row)}>
+              <Icon icon="tabler:edit" fontSize={20} />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      ),
+    },
+  ]
 
   return (
     <DatePickerWrapper>
@@ -231,7 +271,7 @@ const InvoiceList = () => {
               paginationModel={paginationModel}
               onPaginationModelChange={handlePagination}
               onRowSelectionModelChange={(rows) => setSelectedRows(rows)}
-              getRowId={(row: VendedorType) => row.codigo}
+              getRowId={(row: SellerType) => row.codigo}
               paginationMode="server"
               loading={store.isLoading}
               rowCount={store.totalResults}

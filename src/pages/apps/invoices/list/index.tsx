@@ -10,15 +10,12 @@ import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
 import Tooltip from '@mui/material/Tooltip'
 import { styled } from '@mui/material/styles'
-import MenuItem from '@mui/material/MenuItem'
 import TextField from '@mui/material/TextField'
 import CardHeader from '@mui/material/CardHeader'
 import IconButton from '@mui/material/IconButton'
-import InputLabel from '@mui/material/InputLabel'
 import Typography from '@mui/material/Typography'
-import FormControl from '@mui/material/FormControl'
 import CardContent from '@mui/material/CardContent'
-import Select, { SelectChangeEvent } from '@mui/material/Select'
+import { SelectChangeEvent } from '@mui/material/Select'
 import { DataGrid, GridColDef, GridRowId } from '@mui/x-data-grid'
 import { debounce } from '@mui/material'
 // ** Icon Imports
@@ -33,14 +30,12 @@ import { fetchInvoice } from 'src/store/apps/invoices'
 
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
-import { ThemeColor } from 'src/@core/layouts/types'
 import OptionsMenu from 'src/@core/components/option-menu'
-import TableHeader from 'src/views/apps/clients/list/TableHeader'
+import TableHeader from 'src/views/apps/invoices/list/TableHeader'
 
 // ** Styled Components
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import formatCurrency from 'src/utils/formatCurrency'
-import { CustomerType } from 'src/types/apps/customerType'
 import { SellerAutocomplete } from 'src/views/ui/sellerAutoComplete'
 import { InvoiceType } from 'src/types/apps/invoicesTypes'
 import formatDate from 'src/utils/formatDate'
@@ -236,11 +231,7 @@ const InvoiceList = () => {
     if (sellersParam) {
       setSelectedSellers(decodeURIComponent(sellersParam as string))
     }
-  }, [
-    startDateParam,
-    endDateParam,
-    sellersParam,
-  ])
+  }, [startDateParam, endDateParam, sellersParam])
 
   //Initial Load
   useEffect(() => {
@@ -365,8 +356,8 @@ const InvoiceList = () => {
   ]
 
   const selectedSellersParams = Array.isArray(sellersParam)
-  ? sellersParam.map((param) => decodeURIComponent(param)).join(', ')
-  : decodeURIComponent(sellersParam ?? '')
+    ? sellersParam.map((param) => decodeURIComponent(param)).join(', ')
+    : decodeURIComponent(sellersParam ?? '')
 
   return (
     <DatePickerWrapper>
@@ -397,7 +388,11 @@ const InvoiceList = () => {
             <CardContent>
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
-                  <SellerAutocomplete selectedSellers={selectedSellersParams} multiple callBack={handleSellerValue} />
+                  <SellerAutocomplete
+                    selectedSellers={selectedSellersParams}
+                    multiple
+                    callBack={handleSellerValue}
+                  />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Box sx={{ padding: 3 }}>

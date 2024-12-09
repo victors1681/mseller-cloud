@@ -28,6 +28,9 @@ import WelcomeModal from 'src/views/apps/welcome'
 import AddPaymentTypeDrawer from '@/views/apps/paymentTypes/AddPaymentTypeDrawer'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
+import AddSellerDrawer from '@/views/apps/sellers/AddSellerDrawer'
+import AddLocationDrawer from '@/views/apps/locations/AddLocationDrawer'
+import AddDriverDrawer from '@/views/apps/drivers/AddDriverDrawer'
 
 interface Props {
   children: ReactNode
@@ -64,9 +67,11 @@ const UserLayout = ({ children, contentHeightFixed }: Props) => {
    */
   const hidden = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'))
 
-  const isDrawerOpen = useSelector(
-    (state: RootState) => state.paymentTypes.isAddUpdateDrawerOpen,
-  )
+  const store = useSelector((state: RootState) => state)
+  const isPaymentTypeDrawerOpen = store.paymentTypes.isAddUpdateDrawerOpen
+  const isLocationDrawerOpen = store.locations.isAddUpdateDrawerOpen
+  const isSellerDrawerOpen = store.sellers.isAddUpdateDrawerOpen
+  const isDriverDrawerOpen = store.drivers.isAddUpdateDrawerOpen
 
   if (hidden && settings.layout === 'horizontal') {
     settings.layout = 'vertical'
@@ -116,7 +121,10 @@ const UserLayout = ({ children, contentHeightFixed }: Props) => {
       })}
     >
       <WelcomeModal />
-      <AddPaymentTypeDrawer open={isDrawerOpen} />
+      <AddPaymentTypeDrawer open={isPaymentTypeDrawerOpen} />
+      <AddSellerDrawer open={isSellerDrawerOpen} />
+      <AddLocationDrawer open={isLocationDrawerOpen} />
+      <AddDriverDrawer open={isDriverDrawerOpen} />
       {children}
     </Layout>
   )

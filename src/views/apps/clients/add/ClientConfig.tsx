@@ -56,7 +56,7 @@ const ProductPricing = () => {
   const locationOptions = useMemo(() => {
     return locationStore.data.map((unit) => ({
       label: unit.descripcion,
-      value: unit.id,
+      value: unit.id || 0,
     }))
   }, [locationStore])
 

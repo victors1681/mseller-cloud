@@ -8,6 +8,7 @@ import { DistribuidorType } from 'src/types/apps/driverType'
 import { PaginatedResponse } from 'src/types/apps/response'
 import restClient from 'src/configs/restClient'
 import toast from 'react-hot-toast'
+import { AppDispatch, RootState } from '@/store'
 
 interface DataParams {
   query?: string
@@ -25,6 +26,49 @@ interface Redux {
 export interface AxiosResponse<T> {
   data: T
 }
+
+export const addUpdateDriver = createAsyncThunk<
+  any,
+  DistribuidorType,
+  {
+    dispatch: AppDispatch
+    state: RootState
+    rejectValue: { message: string }
+  }
+>(
+  'appSeller/addUpdateDriver',
+  async (data: DistribuidorType, { dispatch, getState, rejectWithValue }) => {
+    try {
+      const response = await restClient.put<any>(
+        '/api/portal/Distribuidor',
+        data,
+      )
+
+      if (response.status === 200) {
+        toast.success('Distribuidor actualizado exitosamente')
+
+        const state = getState()
+        const params = state.paymentTypes.params
+        await dispatch(fetchData(params))
+
+        return {
+          success: true,
+          data: response.data.data,
+          message: 'Distribuidor actualizado exitosamente',
+        }
+      }
+
+      return rejectWithValue({
+        message: response.data.message || 'Error actualizando vendedor',
+      })
+    } catch (error) {
+      console.error('Distribuidor type error:', error)
+      return rejectWithValue({
+        message: 'Error inesperado actualizando la vendedor',
+      })
+    }
+  },
+)
 
 export const addDrivers = createAsyncThunk(
   'appSeller/addDrivers',
@@ -80,6 +124,8 @@ export const deletePaymentType = createAsyncThunk(
 export const appDriverSlice = createSlice({
   name: 'appDriver',
   initialState: {
+    isAddUpdateDrawerOpen: false,
+    editData: null as DistribuidorType | null | undefined,
     data: [] as DistribuidorType[],
     params: {} as any,
     allData: [],
@@ -91,7 +137,12 @@ export const appDriverSlice = createSlice({
     isLoading: true,
     isFailed: false,
   },
-  reducers: {},
+  reducers: {
+    toggleDriverAddUpdate: (state, payload) => {
+      state.editData = payload.payload
+      state.isAddUpdateDrawerOpen = !state.isAddUpdateDrawerOpen
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(fetchData.pending, (state, action) => {
       state.isLoading = true
@@ -127,3 +178,4 @@ export const appDriverSlice = createSlice({
 })
 
 export default appDriverSlice.reducer
+export const { toggleDriverAddUpdate } = appDriverSlice.actions
