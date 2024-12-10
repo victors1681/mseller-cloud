@@ -88,7 +88,7 @@ export const changeTransportStatus = createAsyncThunk(
         dispatch(apptransportslice.actions.updateTransportStatus(payload))
         toast.success(response.data)
       } else {
-        throw new Error(response.data.message)
+        throw new Error(response?.data?.message)
       }
     } catch (err) {
       toast.error(
@@ -125,9 +125,9 @@ export const forceCloseTransport = createAsyncThunk(
 
       if (response.status === 200) {
         dispatch(apptransportslice.actions.updateTransportStatus(payload))
-        toast.success(response.data.message)
+        toast.success(response?.data?.message)
       } else {
-        throw new Error(response.data.message)
+        throw new Error(response?.data?.message)
       }
 
       return response.data

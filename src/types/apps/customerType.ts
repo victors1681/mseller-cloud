@@ -1,6 +1,7 @@
-import { LocalidadType } from './locationType'
+import { LocationType } from './locationType'
+import { NcfType } from './ncfTypes'
 import { CondicionPagoType } from './paymentTypeTypes'
-import { VendedorType } from './sellerType'
+import { SellerType } from './sellerType'
 
 export interface CustomerType {
   codigo: string
@@ -31,9 +32,19 @@ export interface CustomerType {
   descuentoProntoPago: number
   tipoCliente: string
   contacto: any
-  localidad?: LocalidadType
+
+  // New fields
+  estado?: string
+  codigoPostal?: string
+  contactoWhatsApp?: string
+  preferenciasDeContacto?: string
+  idiomaPreferido?: string
+  notas?: string
+  pais?: string
+
+  localidad?: LocationType
   geoLocalizacion?: GeoLocalizacionType
-  vendedor: VendedorType
+  vendedor?: SellerType
   condicionPago?: CondicionPagoType
 }
 
@@ -41,4 +52,27 @@ export interface GeoLocalizacionType {
   codigo_cliente: string
   longitud: number
   latitud: number
+}
+
+//Temporary I can fetch, sellers, locations, payment types
+export interface ClientDetailType {
+  cliente?: CustomerType
+  ciudades: string[]
+  tipoClientes: string[]
+  estados: string[]
+  codigoPostales: string[]
+  paises: string[]
+  clasificaciones: string[]
+  ncfs: NcfType[]
+}
+
+export interface CustomerDetailState {
+  client?: CustomerType
+  cities: string[]
+  customerType: string[]
+  states: string[]
+  postalCodes: string[]
+  countries: string[]
+  classifications: string[]
+  ncfs: NcfType[]
 }

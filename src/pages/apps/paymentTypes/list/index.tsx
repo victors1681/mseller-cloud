@@ -17,7 +17,7 @@ import FormControl from '@mui/material/FormControl'
 import CardContent from '@mui/material/CardContent'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 import { DataGrid, GridColDef, GridRowId } from '@mui/x-data-grid'
-import { debounce } from '@mui/material'
+import { Box, debounce, IconButton, Tooltip } from '@mui/material'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
@@ -26,11 +26,14 @@ import format from 'date-fns/format'
 
 // ** Store & Actions Imports
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchData } from 'src/store/apps/paymentType'
+import {
+  fetchPaymentType,
+  togglePaymentTypeAddUpdate,
+} from 'src/store/apps/paymentType'
 
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
-import TableHeader from 'src/views/apps/products/list/TableHeader'
+import TableHeader from 'src/views/apps/paymentTypes/list/TableHeader'
 
 // ** Styled Components
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
@@ -67,16 +70,16 @@ const defaultColumns: GridColDef[] = [
     ),
   },
   {
-    flex: 0.05,
+    flex: 0.2,
     minWidth: 90,
     field: 'day',
-    headerName: 'Días',
+    headerName: 'Días de crédito',
     renderCell: ({ row }: CellType) => (
       <Typography variant="body2">{row.dias}</Typography>
     ),
   },
   {
-    flex: 0.2,
+    flex: 1,
     minWidth: 130,
     field: 'description',
     headerName: 'Descripción',
@@ -140,7 +143,7 @@ const InvoiceList = () => {
   //Initial Load
   useEffect(() => {
     dispatch(
-      fetchData({
+      fetchPaymentType({
         query: value,
         pageNumber: paginationModel.page,
       }),
@@ -151,7 +154,7 @@ const InvoiceList = () => {
     (values: any) => {
       setPaginationModel(values)
       dispatch(
-        fetchData({
+        fetchPaymentType({
           query: value,
           pageNumber: values.page,
         }),
@@ -163,7 +166,7 @@ const InvoiceList = () => {
   const performRequest = useCallback(
     (value: string) => {
       dispatch(
-        fetchData({
+        fetchPaymentType({
           query: value,
           pageNumber: paginationModel.page,
         }),
@@ -189,11 +192,29 @@ const InvoiceList = () => {
     [fn],
   )
 
-  const handleStatusValue = (e: SelectChangeEvent) => {
-    setStatusValue(e.target.value)
+  const handleEdit = (row: CondicionPagoType) => {
+    dispatch(togglePaymentTypeAddUpdate(row))
   }
 
-  const columns: GridColDef[] = [...defaultColumns]
+  const columns: GridColDef[] = [
+    ...defaultColumns,
+    {
+      flex: 0.1,
+      minWidth: 130,
+      sortable: false,
+      field: 'actions',
+      headerName: 'Actions',
+      renderCell: ({ row }: CellType) => (
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Tooltip title="Editar">
+            <IconButton size="small" onClick={() => handleEdit(row)}>
+              <Icon icon="tabler:edit" fontSize={20} />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      ),
+    },
+  ]
 
   return (
     <DatePickerWrapper>

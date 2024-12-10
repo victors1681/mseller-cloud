@@ -54,7 +54,7 @@ const navigation = (): VerticalNavItemsType => {
           path: '/apps/paymentTypes/list',
         },
         {
-          title: 'Localidades',
+          title: 'Sucursales',
           icon: 'mdi:location',
           path: '/apps/locations/list',
         },
@@ -78,12 +78,7 @@ const navigation = (): VerticalNavItemsType => {
     {
       title: 'Configuración',
       icon: 'uil:setting',
-      children: [
-        {
-          title: 'Usuarios',
-          path: '/apps/users/list',
-        },
-      ],
+      path: '/account-settings/account',
     },
     // {
     //   title: 'Second Page',

@@ -1,5 +1,6 @@
 // ** Types
 import { ThemeColor } from 'src/@core/layouts/types'
+export type Tiers = 'basic' | 'standard' | 'enterprise'
 
 export interface UserTypes {
   userId: string
@@ -105,7 +106,13 @@ export interface IBusiness {
   status: boolean
   website: string
   logoUrl: string
+  startDate?: string
   sellingPackaging: false
+  fromPortal?: boolean
+  stripeCustomerId?: string
+  subscriptionId?: string
+  subscriptionStatus?: string
+  tier?: Tiers
 }
 
 export interface IConfig {

@@ -12,7 +12,7 @@ import TextField from '@mui/material/TextField'
 import CardHeader from '@mui/material/CardHeader'
 import Typography from '@mui/material/Typography'
 import { DataGrid, GridColDef, GridRowId } from '@mui/x-data-grid'
-import { debounce } from '@mui/material'
+import { Box, debounce, IconButton, Tooltip } from '@mui/material'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
@@ -21,16 +21,19 @@ import format from 'date-fns/format'
 
 // ** Store & Actions Imports
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchData } from 'src/store/apps/location'
+import {
+  fetchLocations,
+  toggleLocationAddUpdate,
+} from 'src/store/apps/location'
 
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
-import TableHeader from 'src/views/apps/products/list/TableHeader'
+import TableHeader from 'src/views/apps/locations/list/TableHeader'
 
 // ** Styled Components
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import OptionsMenu from 'src/@core/components/option-menu'
-import { LocalidadType } from 'src/types/apps/locationType'
+import { LocationType } from 'src/types/apps/locationType'
 
 interface CustomInputProps {
   dates: Date[]
@@ -41,7 +44,7 @@ interface CustomInputProps {
 }
 
 interface CellType {
-  row: LocalidadType
+  row: LocationType
 }
 
 // ** Styled component for the link in the dataTable
@@ -120,7 +123,6 @@ const InvoiceList = () => {
   // ** State
   const [dates, setDates] = useState<Date[]>([])
   const [value, setValue] = useState<string>('')
-  const [statusValue, setStatusValue] = useState<string>('')
   const [selectedRows, setSelectedRows] = useState<GridRowId[]>([])
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -134,36 +136,36 @@ const InvoiceList = () => {
   //Initial Load
   useEffect(() => {
     dispatch(
-      fetchData({
+      fetchLocations({
         query: value,
         pageNumber: paginationModel.page,
       }),
     )
-  }, [statusValue])
+  }, [])
 
   const handlePagination = useCallback(
     (values: any) => {
       setPaginationModel(values)
       dispatch(
-        fetchData({
+        fetchLocations({
           query: value,
           pageNumber: values.page,
         }),
       )
     },
-    [paginationModel, value, statusValue],
+    [paginationModel, value],
   )
 
   const performRequest = useCallback(
     (value: string) => {
       dispatch(
-        fetchData({
+        fetchLocations({
           query: value,
           pageNumber: paginationModel.page,
         }),
       )
     },
-    [dispatch, statusValue, value, dates, paginationModel],
+    [dispatch, value, dates, paginationModel],
   )
 
   const fn = useCallback(
@@ -183,7 +185,29 @@ const InvoiceList = () => {
     [fn],
   )
 
-  const columns: GridColDef[] = [...defaultColumns]
+  const handleEdit = (row: LocationType) => {
+    dispatch(toggleLocationAddUpdate(row))
+  }
+
+  const columns: GridColDef[] = [
+    ...defaultColumns,
+    {
+      flex: 0.1,
+      minWidth: 130,
+      sortable: false,
+      field: 'actions',
+      headerName: 'Actions',
+      renderCell: ({ row }: CellType) => (
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Tooltip title="Editar">
+            <IconButton size="small" onClick={() => handleEdit(row)}>
+              <Icon icon="tabler:edit" fontSize={20} />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      ),
+    },
+  ]
 
   return (
     <DatePickerWrapper>
@@ -230,7 +254,7 @@ const InvoiceList = () => {
               paginationModel={paginationModel}
               onPaginationModelChange={handlePagination}
               onRowSelectionModelChange={(rows) => setSelectedRows(rows)}
-              getRowId={(row: LocalidadType) => row.id}
+              getRowId={(row: LocationType) => row?.id || 0}
               paginationMode="server"
               loading={store.isLoading}
               rowCount={store.totalResults} //

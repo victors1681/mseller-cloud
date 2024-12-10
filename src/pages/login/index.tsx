@@ -47,6 +47,8 @@ import BlankLayout from 'src/@core/layouts/BlankLayout'
 
 // ** Demo Imports
 import FooterIllustrationsV2 from 'src/views/pages/auth/FooterIllustrationsV2'
+import Image from 'next/image'
+import RandomBg from '@/views/ui/randombg/RandomBg'
 
 // ** Styled Components
 const LoginIllustrationWrapper = styled(Box)<BoxProps>(({ theme }) => ({
@@ -143,7 +145,7 @@ const LoginPage = () => {
     formState: { errors },
   } = useForm({
     defaultValues,
-    mode: 'onBlur',
+    // mode: 'onBlur',
     resolver: yupResolver(schema),
   })
 
@@ -152,7 +154,7 @@ const LoginPage = () => {
     auth.login({ email, password, rememberMe }, () => {
       setError('email', {
         type: 'manual',
-        message: 'Email or Password is invalid',
+        message: 'Email o contraseña inválida',
       })
     })
   }
@@ -164,22 +166,7 @@ const LoginPage = () => {
 
   return (
     <Box className="content-right">
-      {!hidden ? (
-        <Box
-          sx={{
-            flex: 1,
-            display: 'flex',
-            position: 'relative',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundImage:
-              'url(https://source.unsplash.com/collection/962362/desktop-and-tech)',
-            backgroundRepeat: 'no-repeat',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        ></Box>
-      ) : null}
+      {!hidden ? <RandomBg /> : null}
       <RightWrapper
         sx={
           skin === 'bordered' && !hidden
@@ -209,10 +196,11 @@ const LoginPage = () => {
               }}
             >
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <img
-                  src="/images/logo/mseller-logo-dark.png"
+                <Image
+                  src="/images/logos/mseller-logo-dark.png"
                   alt="logo"
                   height="50"
+                  width="200"
                   style={{ paddingLeft: '10px' }}
                 />
               </Box>
@@ -260,7 +248,7 @@ const LoginPage = () => {
                   error={Boolean(errors.password)}
                   disabled={auth.loadingForm}
                 >
-                  Clave
+                  Contraseña
                 </InputLabel>
                 <Controller
                   name="password"
@@ -270,7 +258,7 @@ const LoginPage = () => {
                     <OutlinedInput
                       value={value}
                       onBlur={onBlur}
-                      label="Clave"
+                      label="Contraseña"
                       onChange={onChange}
                       id="auth-login-v2-password"
                       error={Boolean(errors.password)}
@@ -321,7 +309,7 @@ const LoginPage = () => {
                   }
                 />
                 <LinkStyled href="/forgot-password">
-                  Olvidó su clave?
+                  Olvidó su contraseña?
                 </LinkStyled>
               </Box>
               <LoadingButton

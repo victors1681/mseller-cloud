@@ -2,6 +2,7 @@ export interface ProductType {
   codigo: string
   codigoBarra: string
   nombre: string
+  descripcion: string
   area: string
   iDArea: number
   grupoId: string
@@ -30,5 +31,29 @@ export interface ProductType {
   tipoImpuesto: string
   apartado: number
   promocion: boolean
-  status: 'A' | 'I'
+  status: 'A' | 'I' | string
+  imagenes: ProductImageType[]
+  visibleTienda: boolean
+}
+
+export interface ProductImageType {
+  id?: number
+  idObjeto: string
+  codigoProducto: string
+  ruta: string
+  rutaPublica: string
+  titulo?: string
+  descripcion?: string
+  ordenVisualizacion: number
+  esImagenPredeterminada: boolean
+  tipoImagen?: string
+  fechaCreacion?: string
+}
+
+export interface ProductDetailType {
+  producto: ProductType
+  areas: string[]
+  departamentos: string[]
+  impuestos: string[]
+  empaques: string[]
 }

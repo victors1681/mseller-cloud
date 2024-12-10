@@ -1,5 +1,5 @@
 import { CustomerType } from './customerType'
-import { LocalidadType } from './locationType'
+import { LocationType } from './locationType'
 
 export type InvoiceStatus = 'Paid' | string
 
@@ -45,7 +45,7 @@ export interface DocumentType {
   tipoDocumento: TipoDocumentoEnum
   confirmado: boolean
   tipoPedido: string
-  localidad: LocalidadType
+  localidad: LocationType
   codigoCliente: string
   nombreCliente: string
   nuevoCliente: boolean

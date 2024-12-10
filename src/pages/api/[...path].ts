@@ -16,9 +16,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     if (process.env.NODE_ENV === 'development') {
       //If development, we can choose to use the user target server, localhost or hardcoded URL
       if (process.env.TARGET === '') {
-      } else {
         //Default
         axios.defaults.baseURL = targetUrl as string
+      } else {
+        //Default
+        axios.defaults.baseURL = process.env.TARGET as string
       }
       //Console log only on development mode
       console.log('targetUrl', axios.defaults.baseURL)
@@ -61,8 +63,17 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
         res.status(200).json(putResponse.data)
         break
       case 'DELETE':
+        const deleteResponse = await axios.request({
+          url: fullPath,
+          method: 'DELETE',
+          data: req.body,
+          params: params,
+          headers: {
+            Authorization: req.headers.authorization,
+          },
+        })
         // Handle DELETE request logic
-        res.status(200).json({ method, path: fullPath })
+        res.status(200).json(deleteResponse.data)
         break
       default:
         res.status(405).end(`Method ${method} Not Allowed`)

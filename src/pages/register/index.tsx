@@ -1,11 +1,11 @@
 // ** React Imports
-import { ReactNode, useState } from 'react'
+import { ReactNode, useRef, useState } from 'react'
 
 // ** Next Import
 import Link from 'next/link'
+import ReCAPTCHAV2 from 'react-google-recaptcha'
+import LoadingButton from '@mui/lab/LoadingButton'
 
-// ** MUI Components
-import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
 import Checkbox from '@mui/material/Checkbox'
 import TextField from '@mui/material/TextField'
@@ -19,7 +19,8 @@ import { styled, useTheme } from '@mui/material/styles'
 import InputAdornment from '@mui/material/InputAdornment'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Typography, { TypographyProps } from '@mui/material/Typography'
-
+import { useForm, Controller, SubmitHandler } from 'react-hook-form'
+import toast from 'react-hot-toast'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
@@ -34,6 +35,13 @@ import { useSettings } from 'src/@core/hooks/useSettings'
 
 // ** Demo Imports
 import FooterIllustrationsV2 from 'src/views/pages/auth/FooterIllustrationsV2'
+import Image from 'next/image'
+import CountryDropdown from './CountryDropdown'
+import TermsDialog from './TermModal'
+import Grid from '@mui/material/Grid'
+import FormHelperText from '@mui/material/FormHelperText'
+import { useAuth } from 'src/hooks/useAuth'
+import { SignUpRequest } from 'src/firebase'
 
 // ** Styled Components
 const RegisterIllustrationWrapper = styled(Box)<BoxProps>(({ theme }) => ({
@@ -83,19 +91,71 @@ const TypographyStyled = styled(Typography)<TypographyProps>(({ theme }) => ({
 }))
 
 const LinkStyled = styled(Link)(({ theme }) => ({
+  display: 'flex',
+  fontSize: '0.875rem',
+  alignItems: 'center',
   textDecoration: 'none',
+  justifyContent: 'center',
   color: theme.palette.primary.main,
 }))
+
+const SITE_KEY = '6LcL4oMqAAAAANTcIMhAgqjATlFR9gy4lgh33IQJ'
 
 const Register = () => {
   // ** States
   const [showPassword, setShowPassword] = useState<boolean>(false)
-
+  const [isResponseError, setResponseError] = useState<boolean>(false)
   // ** Hooks
   const theme = useTheme()
   const { settings } = useSettings()
   const hidden = useMediaQuery(theme.breakpoints.down('md'))
+  const [captchaValid, setCaptchaValid] = useState(false)
+  const auth = useAuth()
+  const {
+    handleSubmit,
+    control,
+    formState: { errors, isSubmitting, isLoading },
+    setValue,
+    register,
+    watch,
+  } = useForm<SignUpRequest>({ mode: 'onChange' })
 
+  const recaptchaRef = useRef<ReCAPTCHAV2 | null>(null)
+
+  const formValues = watch()
+  const isFormFilled =
+    Object.values(formValues).every((value) => value !== '') &&
+    Object.keys(errors).length == 0
+
+  const onSubmit: SubmitHandler<SignUpRequest> = async (data) => {
+    try {
+      if (!captchaValid) {
+        toast.error('Por favor, complete el captcha.')
+        return
+      }
+
+      const response = await auth.signUp(data)
+      if (response && 'error' in response) {
+        toast.error(response.error)
+        recaptchaRef?.current?.reset()
+      } else if (response) {
+        //Success
+        toast.success(`Business ${response.result.businessId} created`)
+        //Auto login
+        auth.login({
+          email: data.user_email,
+          password: data.user_password,
+        })
+      }
+    } catch (error) {
+      toast.error('Error intentando crear una nueva cuenta')
+      recaptchaRef?.current?.reset()
+    }
+  }
+  const handleCaptchaChange = (value: string | null) => {
+    setCaptchaValid(!!value)
+    value && setValue('reCaptchaToken', value)
+  }
   // ** Vars
   const { skin } = settings
 
@@ -157,222 +217,312 @@ const Register = () => {
                 justifyContent: 'center',
               }}
             >
-              <svg
-                width={35}
-                height={29}
-                version="1.1"
-                viewBox="0 0 30 23"
-                xmlns="http://www.w3.org/2000/svg"
-                xmlnsXlink="http://www.w3.org/1999/xlink"
-              >
-                <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-                  <g
-                    id="Artboard"
-                    transform="translate(-95.000000, -51.000000)"
-                  >
-                    <g id="logo" transform="translate(95.000000, 50.000000)">
-                      <path
-                        id="Combined-Shape"
-                        fill={theme.palette.primary.main}
-                        d="M30,21.3918362 C30,21.7535219 29.9019196,22.1084381 29.7162004,22.4188007 C29.1490236,23.366632 27.9208668,23.6752135 26.9730355,23.1080366 L26.9730355,23.1080366 L23.714971,21.1584295 C23.1114106,20.7972624 22.7419355,20.1455972 22.7419355,19.4422291 L22.7419355,19.4422291 L22.741,12.7425689 L15,17.1774194 L7.258,12.7425689 L7.25806452,19.4422291 C7.25806452,20.1455972 6.88858935,20.7972624 6.28502902,21.1584295 L3.0269645,23.1080366 C2.07913318,23.6752135 0.850976404,23.366632 0.283799571,22.4188007 C0.0980803893,22.1084381 2.0190442e-15,21.7535219 0,21.3918362 L0,3.58469444 L0.00548573643,3.43543209 L0.00548573643,3.43543209 L0,3.5715689 C3.0881846e-16,2.4669994 0.8954305,1.5715689 2,1.5715689 C2.36889529,1.5715689 2.73060353,1.67359571 3.04512412,1.86636639 L15,9.19354839 L26.9548759,1.86636639 C27.2693965,1.67359571 27.6311047,1.5715689 28,1.5715689 C29.1045695,1.5715689 30,2.4669994 30,3.5715689 L30,3.5715689 Z"
-                      />
-                      <polygon
-                        id="Rectangle"
-                        opacity="0.077704"
-                        fill={theme.palette.common.black}
-                        points="0 8.58870968 7.25806452 12.7505183 7.25806452 16.8305646"
-                      />
-                      <polygon
-                        id="Rectangle"
-                        opacity="0.077704"
-                        fill={theme.palette.common.black}
-                        points="0 8.58870968 7.25806452 12.6445567 7.25806452 15.1370162"
-                      />
-                      <polygon
-                        id="Rectangle"
-                        opacity="0.077704"
-                        fill={theme.palette.common.black}
-                        points="22.7419355 8.58870968 30 12.7417372 30 16.9537453"
-                        transform="translate(26.370968, 12.771227) scale(-1, 1) translate(-26.370968, -12.771227) "
-                      />
-                      <polygon
-                        id="Rectangle"
-                        opacity="0.077704"
-                        fill={theme.palette.common.black}
-                        points="22.7419355 8.58870968 30 12.6409734 30 15.2601969"
-                        transform="translate(26.370968, 11.924453) scale(-1, 1) translate(-26.370968, -11.924453) "
-                      />
-                      <path
-                        id="Rectangle"
-                        fillOpacity="0.15"
-                        fill={theme.palette.common.white}
-                        d="M3.04512412,1.86636639 L15,9.19354839 L15,9.19354839 L15,17.1774194 L0,8.58649679 L0,3.5715689 C3.0881846e-16,2.4669994 0.8954305,1.5715689 2,1.5715689 C2.36889529,1.5715689 2.73060353,1.67359571 3.04512412,1.86636639 Z"
-                      />
-                      <path
-                        id="Rectangle"
-                        fillOpacity="0.35"
-                        fill={theme.palette.common.white}
-                        transform="translate(22.500000, 8.588710) scale(-1, 1) translate(-22.500000, -8.588710) "
-                        d="M18.0451241,1.86636639 L30,9.19354839 L30,9.19354839 L30,17.1774194 L15,8.58649679 L15,3.5715689 C15,2.4669994 15.8954305,1.5715689 17,1.5715689 C17.3688953,1.5715689 17.7306035,1.67359571 18.0451241,1.86636639 Z"
-                      />
-                    </g>
-                  </g>
-                </g>
-              </svg>
-              <Typography
-                variant="h6"
-                sx={{
-                  ml: 3,
-                  lineHeight: 1,
-                  fontWeight: 600,
-                  textTransform: 'uppercase',
-                  fontSize: '1.5rem !important',
-                }}
-              >
-                {themeConfig.templateName}
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Image
+                  src="/images/logos/mseller-logo-dark.png"
+                  alt="logo"
+                  height="50"
+                  width="200"
+                  style={{ paddingLeft: '10px' }}
+                />
+              </Box>
             </Box>
             <Box sx={{ mb: 6 }}>
               <TypographyStyled variant="h5">
-                Adventure starts here 🚀
+                Crear una nueva cuenta 🚀
               </TypographyStyled>
               <Typography variant="body2">
-                Make your app management easy and fun!
+                Conecta tu fuerza de ventas con tu negocio
               </Typography>
             </Box>
             <form
               noValidate
               autoComplete="off"
-              onSubmit={(e) => e.preventDefault()}
+              onSubmit={handleSubmit(onSubmit)}
             >
-              <TextField
-                autoFocus
-                fullWidth
-                sx={{ mb: 4 }}
-                label="Username"
-                placeholder="johndoe"
+              <Controller
+                name="business_name"
+                control={control}
+                defaultValue=""
+                rules={{ required: 'Nombre de negocio es obligatorio' }}
+                render={({ field }) => (
+                  <TextField
+                    fullWidth
+                    label="Nombre de su negocio"
+                    placeholder="Mi negocio SRL"
+                    {...field}
+                    error={!!errors.business_name}
+                    disabled={isSubmitting}
+                    helperText={
+                      errors.business_name
+                        ? (errors.business_name.message as string)
+                        : ''
+                    }
+                    sx={{ mb: 4 }}
+                  />
+                )}
               />
-              <TextField
-                fullWidth
-                label="Email"
-                sx={{ mb: 4 }}
-                placeholder="user@email.com"
+
+              <Controller
+                name="phone"
+                control={control}
+                defaultValue=""
+                rules={{ required: 'Teléfono es obligatorio' }}
+                render={({ field }) => (
+                  <TextField
+                    fullWidth
+                    label="Teléfono"
+                    placeholder="809-000-0000"
+                    disabled={isSubmitting}
+                    {...register('phone', {
+                      required: 'Phone number is required',
+                      pattern: {
+                        value: /^\d{3}-?\d{3}-?\d{4}$/,
+                        message: 'El número telefónico debe ser: 000-000-0000',
+                      },
+                    })}
+                    {...field}
+                    error={!!errors.phone}
+                    helperText={
+                      errors.phone ? (errors.phone.message as string) : ''
+                    }
+                    sx={{ mb: 4 }}
+                  />
+                )}
               />
-              <FormControl fullWidth>
-                <InputLabel htmlFor="auth-login-v2-password">
-                  Password
-                </InputLabel>
-                <OutlinedInput
-                  label="Password"
-                  id="auth-login-v2-password"
-                  type={showPassword ? 'text' : 'password'}
-                  endAdornment={
-                    <InputAdornment position="end">
-                      <IconButton
-                        edge="end"
-                        onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        <Icon
-                          icon={
-                            showPassword
-                              ? 'mdi:eye-outline'
-                              : 'mdi:eye-off-outline'
-                          }
-                        />
-                      </IconButton>
-                    </InputAdornment>
-                  }
-                />
-              </FormControl>
-              <FormControlLabel
-                control={<Checkbox />}
-                sx={{
-                  mb: 4,
-                  mt: 1.5,
-                  '& .MuiFormControlLabel-label': { fontSize: '0.875rem' },
-                }}
-                label={
-                  <>
-                    <Typography variant="body2" component="span">
-                      I agree to{' '}
-                    </Typography>
-                    <LinkStyled href="/" onClick={(e) => e.preventDefault()}>
-                      privacy policy & terms
-                    </LinkStyled>
-                  </>
+
+              <Controller
+                name="address"
+                control={control}
+                defaultValue=""
+                rules={{ required: 'Dirección es obligatoria' }}
+                render={({ field }) => (
+                  <TextField
+                    fullWidth
+                    disabled={isSubmitting}
+                    label="Dirección"
+                    {...field}
+                    error={!!errors.address}
+                    helperText={
+                      errors.address ? (errors.address.message as string) : ''
+                    }
+                    sx={{ mb: 4 }}
+                  />
+                )}
+              />
+
+              <CountryDropdown
+                name="country"
+                control={control}
+                disabled={isSubmitting}
+                error={
+                  errors?.country ? (errors.country.message as string) : ''
                 }
               />
-              <Button
+
+              <Divider sx={{ my: 5 }}>Datos del usuario</Divider>
+
+              <Grid container spacing={2}>
+                <Grid item xs={6}>
+                  <Controller
+                    name="user_first_name"
+                    control={control}
+                    defaultValue=""
+                    rules={{ required: 'Nombre es obligatorio' }}
+                    render={({ field }) => (
+                      <TextField
+                        fullWidth
+                        disabled={isSubmitting}
+                        label="Nombre"
+                        {...field}
+                        error={!!errors.user_first_name}
+                        helperText={
+                          errors.user_first_name
+                            ? (errors.user_first_name.message as string)
+                            : ''
+                        }
+                        sx={{ mb: 4 }}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <Controller
+                    name="user_last_name"
+                    control={control}
+                    defaultValue=""
+                    rules={{ required: 'Apellido es obligatorio' }}
+                    render={({ field }) => (
+                      <TextField
+                        fullWidth
+                        disabled={isSubmitting}
+                        label="Apellido"
+                        {...field}
+                        error={!!errors.user_last_name}
+                        helperText={
+                          errors.user_last_name
+                            ? (errors.user_last_name.message as string)
+                            : ''
+                        }
+                        sx={{ mb: 4 }}
+                      />
+                    )}
+                  />
+                </Grid>
+              </Grid>
+
+              <Controller
+                name="user_email"
+                control={control}
+                defaultValue=""
+                rules={{
+                  required: 'Correo electrónico es obligatorio',
+                  pattern: {
+                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                    message: 'Correo electrónico no válido',
+                  },
+                }}
+                render={({ field }) => (
+                  <TextField
+                    fullWidth
+                    disabled={isSubmitting}
+                    label="Correo electrónico"
+                    {...field}
+                    error={!!errors.user_email}
+                    helperText={
+                      errors.user_email
+                        ? (errors.user_email.message as string)
+                        : ''
+                    }
+                    sx={{ mb: 4 }}
+                  />
+                )}
+              />
+
+              <FormControl fullWidth sx={{ mb: 4 }}>
+                <InputLabel htmlFor="user_password">Contraseña</InputLabel>
+                <Controller
+                  name="user_password"
+                  control={control}
+                  defaultValue=""
+                  rules={{
+                    required: 'Contraseña es obligatoria',
+                    minLength: {
+                      value: 6,
+                      message: 'La contraseña debe tener al menos 6 caracteres',
+                    },
+                    pattern: {
+                      value: /[!@#$%^&*(),.?":{}|<>]/,
+                      message:
+                        'La contraseña debe contener al menos un carácter especial',
+                    },
+                  }}
+                  render={({ field }) => (
+                    <OutlinedInput
+                      {...field}
+                      disabled={isSubmitting}
+                      id="user_password"
+                      type={showPassword ? 'text' : 'password'}
+                      label="Contraseña" // label here for accessibility
+                      error={!!errors.user_password}
+                      endAdornment={
+                        <InputAdornment position="end">
+                          <IconButton
+                            edge="end"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            <Icon
+                              icon={
+                                showPassword
+                                  ? 'mdi:eye-outline'
+                                  : 'mdi:eye-off-outline'
+                              }
+                            />
+                          </IconButton>
+                        </InputAdornment>
+                      }
+                    />
+                  )}
+                />
+                <FormHelperText
+                  sx={{
+                    color: errors.user_password
+                      ? theme.palette.error.main
+                      : 'inherit',
+                  }}
+                >
+                  {errors.user_password
+                    ? (errors.user_password?.message as string)
+                    : ''}
+                </FormHelperText>
+              </FormControl>
+
+              <Controller
+                name="terms"
+                control={control}
+                defaultValue={false}
+                rules={{
+                  validate: (value) =>
+                    value || 'Debe aceptar los términos y condiciones',
+                }}
+                render={({ field }) => (
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        {...field}
+                        disabled={isSubmitting}
+                        checked={field.value}
+                        onChange={(e) => field.onChange(e.target.checked)}
+                      />
+                    }
+                    label={<TermsDialog />}
+                  />
+                )}
+              />
+              {errors.terms && (
+                <FormHelperText error>
+                  {errors?.terms ? (errors.terms?.message as string) : ''}
+                </FormHelperText>
+              )}
+
+              {/* Google reCAPTCHA */}
+              <Box sx={{ mt: 3, pb: 3, textAlign: 'center' }}>
+                <ReCAPTCHAV2
+                  ref={recaptchaRef}
+                  sitekey={SITE_KEY}
+                  onChange={handleCaptchaChange}
+                />
+                {!captchaValid && (
+                  <FormHelperText error>
+                    Por favor, complete el captcha.
+                  </FormHelperText>
+                )}
+              </Box>
+
+              <LoadingButton
                 fullWidth
                 size="large"
                 type="submit"
                 variant="contained"
                 sx={{ mb: 7 }}
+                loading={isLoading}
+                disabled={!isFormFilled || !captchaValid}
               >
-                Sign up
-              </Button>
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  flexWrap: 'wrap',
-                  justifyContent: 'center',
-                }}
-              >
-                <Typography variant="body2" sx={{ mr: 2 }}>
-                  Already have an account?
-                </Typography>
-                <Typography variant="body2">
-                  <LinkStyled href="/login">Sign in instead</LinkStyled>
-                </Typography>
-              </Box>
-              <Divider sx={{ my: (theme) => `${theme.spacing(5)} !important` }}>
-                or
-              </Divider>
-              <Box
+                Crear nueva cuenta
+              </LoadingButton>
+              <Typography
+                variant="body2"
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
-                <IconButton
-                  href="/"
-                  component={Link}
-                  sx={{ color: '#497ce2' }}
-                  onClick={(e) => e.preventDefault()}
-                >
-                  <Icon icon="mdi:facebook" />
-                </IconButton>
-                <IconButton
-                  href="/"
-                  component={Link}
-                  sx={{ color: '#1da1f2' }}
-                  onClick={(e) => e.preventDefault()}
-                >
-                  <Icon icon="mdi:twitter" />
-                </IconButton>
-                <IconButton
-                  href="/"
-                  component={Link}
-                  onClick={(e) => e.preventDefault()}
-                  sx={{
-                    color: (theme) =>
-                      theme.palette.mode === 'light' ? '#272727' : 'grey.300',
-                  }}
-                >
-                  <Icon icon="mdi:github" />
-                </IconButton>
-                <IconButton
-                  href="/"
-                  component={Link}
-                  sx={{ color: '#db4437' }}
-                  onClick={(e) => e.preventDefault()}
-                >
-                  <Icon icon="mdi:google" />
-                </IconButton>
-              </Box>
+                <LinkStyled href="/login">
+                  <Icon icon="mdi:chevron-left" />
+                  <span>Regresar al inicio de sesión</span>
+                </LinkStyled>
+              </Typography>
             </form>
           </BoxWrapper>
         </Box>

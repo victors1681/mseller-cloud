@@ -1,4 +1,27 @@
+import {
+  CancelSubscriptionType,
+  CreateSubscriptionProps,
+  CreateSubscriptionType,
+  SignUpRequest,
+  SignUpType,
+  TriggerForgotPasswordProps,
+  TriggerForgotPasswordType,
+  UpdatePasswordRequest,
+  UpdatePasswordType,
+} from 'src/firebase'
 import { ICloudModules, UserTypes } from 'src/types/apps/userTypes'
+import {
+  StripeProductType,
+  CustomerPaymentsHistoryResponseType,
+  PaymentMethodsResponseType,
+  UpdateCardRequestType,
+  UpdateCardResponseType,
+  RemoveCustomerCardType,
+} from 'src/types/apps/stripeTypes'
+import {
+  UploadImagesResponseType,
+  UploadImagesType,
+} from '@/types/apps/imageTypes'
 
 export type ErrCallbackType = (err: { [key: string]: string }) => void
 
@@ -28,4 +51,53 @@ export type AuthValuesType = {
   login: (params: LoginParams, errorCallback?: ErrCallbackType) => void
   loadingForm: boolean
   accessControl?: ICloudModules
+  signUp: (
+    value: SignUpRequest,
+  ) => Promise<SignUpType | { error: string } | undefined>
+  updatePassword: (
+    value: UpdatePasswordRequest,
+  ) => Promise<UpdatePasswordType | { error: string } | undefined>
+  triggerForgotPassword: (
+    value: TriggerForgotPasswordProps,
+  ) => Promise<TriggerForgotPasswordType | { error: string } | undefined>
+
+  createSubscription: (
+    value: CreateSubscriptionProps,
+  ) => Promise<CreateSubscriptionType | { error: string } | undefined>
+  cancelSubscription: () => Promise<
+    CancelSubscriptionType | { error: string } | undefined
+  >
+  fetchStripeProducts: () => Promise<
+    StripeProductType[] | { error: string } | undefined
+  >
+}
+
+export type FirebaseValuesType = {
+  loading: boolean
+  createSubscription: (
+    value: CreateSubscriptionProps,
+  ) => Promise<CreateSubscriptionType | { error: string } | undefined>
+  cancelSubscription: () => Promise<
+    CancelSubscriptionType | { error: string } | undefined
+  >
+  fetchStripeProducts: () => Promise<
+    StripeProductType[] | { error: string } | undefined
+  >
+  getCustomerPaymentsHistory: () => Promise<
+    CustomerPaymentsHistoryResponseType | { error: string } | undefined
+  >
+  getCustomerPaymentMethods: () => Promise<
+    PaymentMethodsResponseType | { error: string } | undefined
+  >
+  updateCustomerCard: (
+    data: UpdateCardRequestType,
+  ) => Promise<UpdateCardResponseType | { error: string } | undefined>
+
+  removeCustomerCard: (
+    cardId: string,
+  ) => Promise<RemoveCustomerCardType | { error: string } | undefined>
+
+  uploadImages: (
+    data: UploadImagesType,
+  ) => Promise<UploadImagesResponseType | { error: string } | undefined>
 }

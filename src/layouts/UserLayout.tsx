@@ -24,6 +24,13 @@ import HorizontalAppBarContent from './components/horizontal/AppBarContent'
 
 // ** Hook Import
 import { useSettings } from 'src/@core/hooks/useSettings'
+import WelcomeModal from 'src/views/apps/welcome'
+import AddPaymentTypeDrawer from '@/views/apps/paymentTypes/AddPaymentTypeDrawer'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/store'
+import AddSellerDrawer from '@/views/apps/sellers/AddSellerDrawer'
+import AddLocationDrawer from '@/views/apps/locations/AddLocationDrawer'
+import AddDriverDrawer from '@/views/apps/drivers/AddDriverDrawer'
 
 interface Props {
   children: ReactNode
@@ -34,7 +41,7 @@ const AppBrand = () => {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
       <img
-        src="/images/logo/mseller-logo-dark.png"
+        src="/images/logos/mseller-logo-dark.png"
         alt="logo"
         height="50"
         style={{ paddingLeft: '10px' }}
@@ -46,7 +53,6 @@ const AppBrand = () => {
 const UserLayout = ({ children, contentHeightFixed }: Props) => {
   // ** Hooks
   const { settings, saveSettings } = useSettings()
-
   // ** Vars for server side navigation
   // const { menuItems: verticalMenuItems } = ServerSideVerticalNavItems()
   // const { menuItems: horizontalMenuItems } = ServerSideHorizontalNavItems()
@@ -60,6 +66,12 @@ const UserLayout = ({ children, contentHeightFixed }: Props) => {
    *  ! Do not change this value unless you know what you are doing. It can break the template.
    */
   const hidden = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'))
+
+  const store = useSelector((state: RootState) => state)
+  const isPaymentTypeDrawerOpen = store.paymentTypes.isAddUpdateDrawerOpen
+  const isLocationDrawerOpen = store.locations.isAddUpdateDrawerOpen
+  const isSellerDrawerOpen = store.sellers.isAddUpdateDrawerOpen
+  const isDriverDrawerOpen = store.drivers.isAddUpdateDrawerOpen
 
   if (hidden && settings.layout === 'horizontal') {
     settings.layout = 'vertical'
@@ -108,6 +120,11 @@ const UserLayout = ({ children, contentHeightFixed }: Props) => {
         },
       })}
     >
+      <WelcomeModal />
+      <AddPaymentTypeDrawer open={isPaymentTypeDrawerOpen} />
+      <AddSellerDrawer open={isSellerDrawerOpen} />
+      <AddLocationDrawer open={isLocationDrawerOpen} />
+      <AddDriverDrawer open={isDriverDrawerOpen} />
       {children}
     </Layout>
   )

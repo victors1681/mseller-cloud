@@ -1,7 +1,7 @@
 import { TransportStatusEnum } from 'src/utils/transportMappings'
 import { CustomerType } from './customerType'
-import { LocalidadType } from './locationType'
-import { VendedorType } from './sellerType'
+import { LocationType } from './locationType'
+import { SellerType } from './sellerType'
 import { DistribuidorType } from './driverType'
 import { NcfType } from './ncfTypes'
 
@@ -23,7 +23,7 @@ export interface TransporteListType {
   distribuidor: DistribuidorType
   procesado: boolean
   status: TransportStatusEnum
-  localidad: LocalidadType
+  localidad: LocationType
   noTransporte: string
   localidadId: number
   codigoDistribuidor: string
@@ -36,7 +36,7 @@ export interface TransporteType {
   distribuidor: DistribuidorType
   procesado: boolean
   status: number
-  localidad: LocalidadType
+  localidad: LocationType
   noTransporte: string
   localidadId: number
   codigoDistribuidor: string
@@ -96,7 +96,7 @@ export interface DocumentoEntregaType {
   fechaEntrega: string
   modificada: boolean
   recibida: boolean
-  vendedor: VendedorType
+  vendedor: SellerType
   noDocEntrega: string
   codigoCliente: string
   fecha: string
@@ -223,7 +223,7 @@ export interface ReporteEntregaMonto {
   noTransporte: string
   distribuidor: DistribuidorType
   totalDocumentos: number
-  vendedores: VendedorType[]
+  vendedores: SellerType[]
   clientes: ClienteReport[]
   efectivo: number
   cheque: number

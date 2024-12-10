@@ -43,10 +43,9 @@ const TableHeader = (props: TableHeaderProps) => {
         />
         <Button
           sx={{ mb: 2 }}
-          disabled
           component={Link}
           variant="contained"
-          href="/apps/invoice/add"
+          href="/apps/products/add/new"
         >
           Crear Producto
         </Button>

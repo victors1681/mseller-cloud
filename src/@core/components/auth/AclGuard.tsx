@@ -43,6 +43,7 @@ const AclGuard = (props: AclGuardProps) => {
   let ability: AppAbility
 
   useEffect(() => {
+    // when I add || router.route === '/login' solve the issue sending the user to the right URL but it show a flick of the login page
     if (auth.user && router.route === '/') {
       const homeRoute = getHomeRoute()
       router.replace(homeRoute)
@@ -52,6 +53,7 @@ const AclGuard = (props: AclGuardProps) => {
   // User is logged in, build ability for the user based on his role
   if (auth.user && !ability) {
     ability = buildAbilityFor('admin', aclAbilities.subject) //TODO: Access control list to unauthorize user
+
     if (router.route === '/') {
       return <Spinner />
     }

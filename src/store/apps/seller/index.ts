@@ -3,10 +3,11 @@ import { Dispatch } from 'redux'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 // ** Axios Imports
-import axios from 'axios'
-import { VendedorType } from 'src/types/apps/sellerType'
+import { SellerType } from 'src/types/apps/sellerType'
 import { PaginatedResponse } from 'src/types/apps/response'
 import restClient from 'src/configs/restClient'
+import { AppDispatch, RootState } from '@/store'
+import toast from 'react-hot-toast'
 
 interface DataParams {
   query?: string
@@ -23,13 +24,67 @@ export interface AxiosResponse<T> {
   data: T
 }
 
+export const addUpdateSellerType = createAsyncThunk<
+  any,
+  SellerType,
+  {
+    dispatch: AppDispatch
+    state: RootState
+    rejectValue: { message: string }
+  }
+>(
+  'appSeller/addUpdateSellerType',
+  async (data: SellerType, { dispatch, getState, rejectWithValue }) => {
+    try {
+      const response = await restClient.put<any>('/api/portal/Vendedor', data)
+
+      if (response.status === 200) {
+        toast.success('Vendedor actualizado exitosamente')
+
+        const state = getState()
+        const params = state.paymentTypes.params
+        await dispatch(fetchSellers(params))
+
+        return {
+          success: true,
+          data: response.data.data,
+          message: 'Vendedor actualizado exitosamente',
+        }
+      }
+
+      return rejectWithValue({
+        message: response?.data?.message || 'Error actualizando vendedor',
+      })
+    } catch (error) {
+      console.error('Vendedor type error:', error)
+      return rejectWithValue({
+        message: 'Error inesperado actualizando la vendedor',
+      })
+    }
+  },
+)
+
+export const addSellers = createAsyncThunk(
+  'appSeller/addVendedores',
+  async (sellers: SellerType[], { dispatch, getState }: Redux) => {
+    const response = await restClient.post('/api/portal/Vendedor', sellers)
+
+    const state = getState()
+    const params = state.appSeller.params
+
+    await dispatch(fetchSellers(params))
+
+    return response.data
+  },
+)
+
 // ** Fetch PaymentTypes
-export const fetchData = createAsyncThunk(
-  'appSeller/fetchData',
+export const fetchSellers = createAsyncThunk(
+  'appSeller/fetchSellers',
   async (params?: DataParams) => {
     const response = await restClient.get<
       any,
-      AxiosResponse<PaginatedResponse<VendedorType>>
+      AxiosResponse<PaginatedResponse<SellerType>>
     >('/api/portal/Vendedor', {
       params,
     })
@@ -49,12 +104,12 @@ export const fetchData = createAsyncThunk(
 )
 
 export const deletePaymentType = createAsyncThunk(
-  'appSeller/deleteData',
+  'appSeller/deleteVendedor',
   async (id: number | string, { getState, dispatch }: Redux) => {
-    const response = await restClient.delete('/apps/PaymentType/delete', {
+    const response = await restClient.delete('/apps/Vendedor', {
       data: id,
     })
-    await dispatch(fetchData(getState().PaymentType.params))
+    await dispatch(fetchSellers(getState().PaymentType.params))
 
     return response.data
   },
@@ -63,7 +118,9 @@ export const deletePaymentType = createAsyncThunk(
 export const appSellerSlice = createSlice({
   name: 'appSeller',
   initialState: {
-    data: [] as VendedorType[],
+    isAddUpdateDrawerOpen: false,
+    editData: null as SellerType | null | undefined,
+    data: [] as SellerType[],
     params: {} as any,
     allData: [],
     pageNumber: 0,
@@ -73,12 +130,17 @@ export const appSellerSlice = createSlice({
     total: 0,
     isLoading: true,
   },
-  reducers: {},
+  reducers: {
+    toggleSellerAddUpdate: (state, payload) => {
+      state.editData = payload.payload
+      state.isAddUpdateDrawerOpen = !state.isAddUpdateDrawerOpen
+    },
+  },
   extraReducers: (builder) => {
-    builder.addCase(fetchData.pending, (state, action) => {
+    builder.addCase(fetchSellers.pending, (state, action) => {
       state.isLoading = true
     })
-    builder.addCase(fetchData.rejected, (state, action) => {
+    builder.addCase(fetchSellers.rejected, (state, action) => {
       state.isLoading = false
       state.data = []
       state.total = 0
@@ -86,7 +148,7 @@ export const appSellerSlice = createSlice({
       state.pageSize = 0
       state.totalPages = 0
     })
-    builder.addCase(fetchData.fulfilled, (state, action) => {
+    builder.addCase(fetchSellers.fulfilled, (state, action) => {
       state.data = action.payload.data
       state.params = action.payload.params
       state.allData = action.payload.allData
@@ -97,7 +159,12 @@ export const appSellerSlice = createSlice({
       ;(state.totalResults = action.payload.totalResults),
         (state.isLoading = false)
     })
+
+    builder.addCase(addSellers.fulfilled, (state, action) => {
+      state.data = [...state.data, ...action.payload]
+    })
   },
 })
 
 export default appSellerSlice.reducer
+export const { toggleSellerAddUpdate } = appSellerSlice.actions

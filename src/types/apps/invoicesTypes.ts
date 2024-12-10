@@ -1,5 +1,5 @@
 import { CustomerType } from './customerType'
-import { VendedorType } from './sellerType'
+import { SellerType } from './sellerType'
 
 export interface InvoiceListType {
   data: InvoiceType[]
@@ -30,5 +30,5 @@ export interface InvoiceType {
   saldo_restante: number
   cliente: CustomerType
   businessId: string
-  vendedor: VendedorType
+  vendedor: SellerType
 }

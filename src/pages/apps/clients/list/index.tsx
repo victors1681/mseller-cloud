@@ -117,10 +117,10 @@ const defaultColumns: GridColDef[] = [
               variant="body2"
               sx={{ color: 'text.primary', fontWeight: 600 }}
             >
-              {row.vendedor.nombre}
+              {row?.vendedor?.nombre}
             </Typography>
             <Typography noWrap variant="caption">
-              {row.vendedor.codigo}
+              {row?.vendedor?.codigo}
             </Typography>
           </Box>
         </Box>
@@ -340,8 +340,8 @@ const InvoiceList = () => {
           <Tooltip title="Aprobar">
             <IconButton
               size="small"
-              disabled
-              onClick={() => dispatch(deleteClient(row.codigo))}
+              component={Link}
+              href={`/apps/clients/add/${row.codigo}`}
             >
               <Icon icon="tabler:edit" fontSize={20} />
             </IconButton>
