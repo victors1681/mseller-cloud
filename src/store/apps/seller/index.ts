@@ -53,7 +53,7 @@ export const addUpdateSellerType = createAsyncThunk<
       }
 
       return rejectWithValue({
-        message: response.data.message || 'Error actualizando vendedor',
+        message: response?.data?.message || 'Error actualizando vendedor',
       })
     } catch (error) {
       console.error('Vendedor type error:', error)

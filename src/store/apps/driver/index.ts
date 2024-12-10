@@ -59,7 +59,7 @@ export const addUpdateDriver = createAsyncThunk<
       }
 
       return rejectWithValue({
-        message: response.data.message || 'Error actualizando vendedor',
+        message: response?.data?.message || 'Error actualizando vendedor',
       })
     } catch (error) {
       console.error('Distribuidor type error:', error)

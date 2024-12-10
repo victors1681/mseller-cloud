@@ -60,7 +60,7 @@ export const addUpdatePaymentType = createAsyncThunk<
 
       return rejectWithValue({
         message:
-          response.data.message || 'Error actualizando condicion de pago',
+          response?.data?.message || 'Error actualizando condicion de pago',
       })
     } catch (error) {
       console.error('Update payment type error:', error)

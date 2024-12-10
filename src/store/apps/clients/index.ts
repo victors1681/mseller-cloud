@@ -71,7 +71,7 @@ export const addOrUpdateCustomer = createAsyncThunk<
       }
 
       return rejectWithValue({
-        message: response.data.message || 'Error actualizando producto',
+        message: response?.data?.message || 'Error actualizando producto',
       })
     } catch (error) {
       console.error('Update product error:', error)

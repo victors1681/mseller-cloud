@@ -34,7 +34,7 @@ const productSchema = yup.object().shape({
   codigo: yup.string().required('Código es requerido'),
   codigoBarra: yup.string().optional(),
   nombre: yup.string().required('Nombre es requerido'),
-  descripcion: yup.string().optional(),
+  descripcion: yup.string().optional().nullable(),
 
   // Organization
   area: yup.string(),
@@ -138,13 +138,13 @@ const AddProduct = ({ id }: AddProductProps) => {
   const [isSubmitting, setIsformSubmitted] = useState(false)
 
   const router = useRouter()
- 
-  useFormNavWarning({
-    form: methods, 
-    isSubmitting,
-    warningText: '¿Seguro que deseas salir? Los cambios no guardados se perderán'
-  })
 
+  useFormNavWarning({
+    form: methods,
+    isSubmitting,
+    warningText:
+      '¿Seguro que deseas salir? Los cambios no guardados se perderán',
+  })
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()

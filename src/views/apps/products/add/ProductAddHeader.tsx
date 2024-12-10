@@ -60,7 +60,7 @@ const ProductAddHeader = ({ id }: Props) => {
           <Typography variant="h4" sx={{ mb: 1 }}>
             {!isProductExist
               ? 'Agregar nuevo producto'
-              : `Actualizar ${store.productDetail?.nombre}`}
+              : `Actualizar ${store.productDetail?.nombre || ''}`}
           </Typography>
           <Typography>Mantenimiento de productos</Typography>
         </Grid>

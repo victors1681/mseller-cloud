@@ -56,7 +56,7 @@ export const addUpdateLocationType = createAsyncThunk<
 
       return rejectWithValue({
         message:
-          response.data.message || 'Error actualizanda sucursal o ya existe',
+          response?.data?.message || 'Error actualizanda sucursal o ya existe',
       })
     } catch (error) {
       console.error('Localidad type error:', error)

@@ -39,7 +39,6 @@ const ProductInformation = () => {
     }))
   }, [store])
 
-  const descriptionWatch = watch('descripcion')
   useEffect(() => {
     if (store.productDetail?.descripcion) {
       try {
@@ -59,7 +58,7 @@ const ProductInformation = () => {
       // If no description, set empty editor state
       setDescriptionValue(EditorState.createEmpty())
     }
-  }, [descriptionWatch, store])
+  }, [])
 
   const handleDescriptionOnChange = (data: any) => {
     setDescriptionValue(data)
