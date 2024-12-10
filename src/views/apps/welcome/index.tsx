@@ -43,12 +43,10 @@ const FirstSessionDialog = () => {
   // Check localStorage for first session flag
   useEffect(() => {
     const isFirstSession = localStorage.getItem('firstSession')
-    if (!isFirstSession && sellersStore.data.length === 0) {
+    if (!isFirstSession && auth.user?.business?.fromPortal) {
       setOpen(true)
-    } else if (sellersStore.data.length === 0) {
-      dispatch(fetchSellers())
     }
-  }, [])
+  }, [auth])
 
   const handleClose = () => {
     localStorage.setItem('firstSession', 'false') // Save the flag in localStorage
