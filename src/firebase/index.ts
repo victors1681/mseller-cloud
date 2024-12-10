@@ -36,7 +36,7 @@ const auth = getAuth(app)
 
 const db = getFirestore(app)
 const functions = getFunctions(app, 'us-east1')
-connectFunctionsEmulator(functions, LOCAL_HOST, 9999)
+//connectFunctionsEmulator(functions, LOCAL_HOST, 9999)
 
 if (
   process.env.NODE_ENV === 'development' &&
