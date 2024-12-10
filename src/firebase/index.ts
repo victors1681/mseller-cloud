@@ -30,30 +30,44 @@ import {
 } from '@/types/apps/imageTypes'
 const LOCAL_HOST = '127.0.0.1'
 
-// Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig)
-const auth = getAuth(app)
+let app
+if (!firebase.getApps().length) {
+  app = firebase.initializeApp(firebaseConfig)
+} else {
+  app = firebase.getApps()[0]
+}
 
+// Initialize Firebase
+
+const auth = getAuth(app)
 const db = getFirestore(app)
 const functions = getFunctions(app, 'us-east1')
-//connectFunctionsEmulator(functions, LOCAL_HOST, 9999)
 
-if (
+// Check both environment variables and explicit flag
+const isEmulator =
   process.env.NODE_ENV === 'development' &&
-  process.env.EMULATOR_ENABLED == 'true'
-) {
-  console.log('EMULATOR RUNNING 🚀🚀 🚀 🚀  ')
+  process.env.NEXT_PUBLIC_EMULATOR_ENABLED === 'true'
 
-  connectFirestoreEmulator(db, LOCAL_HOST, 8081)
+if (isEmulator) {
+  try {
+    console.log('🚀 Initializing Firebase Emulators...')
 
-  //Usar emmulador
-  // connectFunctionsEmulator(functions, LOCAL_HOST, 9199)
+    // Initialize emulators before any Firebase operations
+    //connectAuthEmulator(auth, `http://${LOCAL_HOST}:9099`)
+    connectFunctionsEmulator(functions, LOCAL_HOST, 9999)
+    connectFirestoreEmulator(db, LOCAL_HOST, 8081)
+    // connectFirestoreEmulator(storage, LOCAL_HOST, 9199)
 
-  console.error(
-    'FIREBASE MODE: ',
-    process.env.NODE_ENV,
-    ` Functions: ${LOCAL_HOST}:9999`,
-  )
+    console.log('✅ Firebase Emulators Connected:', {
+      auth: '9099',
+      functions: '9999',
+      firestore: '8081',
+      // storage: '9199',
+    })
+  } catch (error) {
+    console.error('❌ Firebase Emulator Error:', error)
+    throw new Error('Failed to connect to Firebase emulators')
+  }
 }
 
 export const getUserByAccessToken = async (
