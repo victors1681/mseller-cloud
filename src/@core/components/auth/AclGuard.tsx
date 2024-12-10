@@ -53,6 +53,7 @@ const AclGuard = (props: AclGuardProps) => {
   // User is logged in, build ability for the user based on his role
   if (auth.user && !ability) {
     ability = buildAbilityFor('admin', aclAbilities.subject) //TODO: Access control list to unauthorize user
+
     if (router.route === '/') {
       return <Spinner />
     }

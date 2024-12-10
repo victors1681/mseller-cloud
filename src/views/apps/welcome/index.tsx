@@ -38,8 +38,6 @@ const FirstSessionDialog = () => {
   const auth = useAuth()
   const router = useRouter()
 
-  const sellersStore = useSelector((state: RootState) => state.sellers)
-
   // Check localStorage for first session flag
   useEffect(() => {
     const isFirstSession = localStorage.getItem('firstSession')

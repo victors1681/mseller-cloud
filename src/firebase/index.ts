@@ -9,6 +9,7 @@ import {
 import {
   browserLocalPersistence,
   browserSessionPersistence,
+  connectAuthEmulator,
   getAuth,
   setPersistence,
   signInWithEmailAndPassword,

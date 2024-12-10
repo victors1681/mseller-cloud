@@ -1,4 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios'
+import Router from 'next/router'
+import toast from 'react-hot-toast'
 import authConfig from 'src/configs/auth'
 import { IConfig } from 'src/types/apps/userTypes'
 
@@ -65,7 +67,9 @@ restClient.interceptors.response.use(
         error.response.statusText,
       )
       if (typeof window !== 'undefined') {
-        window?.location.reload()
+        toast.error('Sesión expirada o no se pudo autenticar con el servidor')
+        //window?.location.reload()
+        Router.push('/login')
       }
     }
     return error
