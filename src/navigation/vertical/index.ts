@@ -18,6 +18,11 @@ const navigation = (): VerticalNavItemsType => {
           path: '/apps/documents/list',
         },
         {
+          title: 'POS',
+          icon: 'lets-icons:order',
+          path: '/apps/pos',
+        },
+        {
           title: 'Transportes',
           icon: 'mdi:truck',
           path: '/apps/transports/list',
