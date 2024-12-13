@@ -9,12 +9,12 @@
         "grupoId": "GRP001",
         "departamento": "Aceites y Grasas",
         "ultCompra": "2024-11-01",
-        "precio1": 250.00,
-        "precio2": 245.00,
-        "precio3": 240.00,
-        "precio4": 235.00,
-        "precio5": 230.00,
-        "costo": 200.00,
+        "precio1": 250,
+        "precio2": 245,
+        "precio3": 240,
+        "precio4": 235,
+        "precio5": 230,
+        "costo": 200,
         "existenciaAlmacen1": 50,
         "existenciaAlmacen2": 30,
         "existenciaAlmacen3": 20,
@@ -28,14 +28,13 @@
         "factor": 1,
         "iSC": 0,
         "aDV": 0,
-        "descuento": 5.0,
+        "descuento": 5,
         "tipoImpuesto": "ITBIS",
         "apartado": 0,
         "status": "A",
         "promocion": false,
         "imagenes": [
             {
-                "id": 1,
                 "idObjeto": "PROD001",
                 "codigoProducto": "PROD001",
                 "ruta": "/storage/products/aceite-oliva-1.jpg",
@@ -44,8 +43,7 @@
                 "descripcion": "Botella de aceite de oliva extra virgen 500ml",
                 "ordenVisualizacion": 1,
                 "esImagenPredeterminada": true,
-                "tipoImagen": "original",
-                "fechaCreacion": "2024-03-15"
+                "tipoImagen": "original"
             }
         ],
         "visibleTienda": true
@@ -60,12 +58,12 @@
         "grupoId": "GRP002",
         "departamento": "Granos",
         "ultCompra": "2024-10-25",
-        "precio1": 50.00,
-        "precio2": 48.00,
-        "precio3": 47.00,
-        "precio4": 46.00,
-        "precio5": 45.00,
-        "costo": 35.00,
+        "precio1": 50,
+        "precio2": 48,
+        "precio3": 47,
+        "precio4": 46,
+        "precio5": 45,
+        "costo": 35,
         "existenciaAlmacen1": 100,
         "existenciaAlmacen2": 80,
         "existenciaAlmacen3": 60,
@@ -86,7 +84,6 @@
         "promocion": false,
         "imagenes": [
             {
-                "id": 1,
                 "idObjeto": "PROD002",
                 "codigoProducto": "PROD002",
                 "ruta": "/storage/products/aceite-oliva-1.jpg",
@@ -95,8 +92,7 @@
                 "descripcion": "Botella de aceite de oliva extra virgen 500ml",
                 "ordenVisualizacion": 1,
                 "esImagenPredeterminada": true,
-                "tipoImagen": "original",
-                "fechaCreacion": "2024-03-15"
+                "tipoImagen": "original"
             }
         ],
         "visibleTienda": true
@@ -111,12 +107,12 @@
         "grupoId": "GRP003",
         "departamento": "Productos de Limpieza",
         "ultCompra": "2024-11-05",
-        "precio1": 120.00,
-        "precio2": 115.00,
-        "precio3": 110.00,
-        "precio4": 105.00,
-        "precio5": 100.00,
-        "costo": 90.00,
+        "precio1": 120,
+        "precio2": 115,
+        "precio3": 110,
+        "precio4": 105,
+        "precio5": 100,
+        "costo": 90,
         "existenciaAlmacen1": 60,
         "existenciaAlmacen2": 40,
         "existenciaAlmacen3": 20,
@@ -130,14 +126,13 @@
         "factor": 1,
         "iSC": 0,
         "aDV": 0,
-        "descuento": 10.0,
+        "descuento": 10,
         "tipoImpuesto": "ITBIS",
         "apartado": 0,
         "status": "A",
         "promocion": false,
         "imagenes": [
             {
-                "id": 1,
                 "idObjeto": "PROD003",
                 "codigoProducto": "PROD003",
                 "ruta": "/storage/products/aceite-oliva-1.jpg",
@@ -146,8 +141,7 @@
                 "descripcion": "Botella de aceite de oliva extra virgen 500ml",
                 "ordenVisualizacion": 1,
                 "esImagenPredeterminada": true,
-                "tipoImagen": "original",
-                "fechaCreacion": "2024-03-15"
+                "tipoImagen": "original"
             }
         ],
         "visibleTienda": true
@@ -162,12 +156,12 @@
         "grupoId": "GRP004",
         "departamento": "Bebidas Lácteas",
         "ultCompra": "2024-10-15",
-        "precio1": 35.00,
-        "precio2": 34.00,
-        "precio3": 33.00,
-        "precio4": 32.00,
-        "precio5": 31.00,
-        "costo": 25.00,
+        "precio1": 35,
+        "precio2": 34,
+        "precio3": 33,
+        "precio4": 32,
+        "precio5": 31,
+        "costo": 25,
         "existenciaAlmacen1": 150,
         "existenciaAlmacen2": 100,
         "existenciaAlmacen3": 50,
@@ -188,7 +182,6 @@
         "promocion": false,
         "imagenes": [
             {
-                "id": 1,
                 "idObjeto": "PROD004",
                 "codigoProducto": "PROD004",
                 "ruta": "/storage/products/aceite-oliva-1.jpg",
@@ -197,8 +190,7 @@
                 "descripcion": "Botella de aceite de oliva extra virgen 500ml",
                 "ordenVisualizacion": 1,
                 "esImagenPredeterminada": true,
-                "tipoImagen": "original",
-                "fechaCreacion": "2024-03-15"
+                "tipoImagen": "original"
             }
         ],
         "visibleTienda": true
@@ -213,12 +205,12 @@
         "grupoId": "GRP005",
         "departamento": "Bebidas Calientes",
         "ultCompra": "2024-11-10",
-        "precio1": 180.00,
-        "precio2": 175.00,
-        "precio3": 170.00,
-        "precio4": 165.00,
-        "precio5": 160.00,
-        "costo": 150.00,
+        "precio1": 180,
+        "precio2": 175,
+        "precio3": 170,
+        "precio4": 165,
+        "precio5": 160,
+        "costo": 150,
         "existenciaAlmacen1": 80,
         "existenciaAlmacen2": 60,
         "existenciaAlmacen3": 40,
@@ -232,14 +224,13 @@
         "factor": 1,
         "iSC": 0,
         "aDV": 0,
-        "descuento": 5.0,
+        "descuento": 5,
         "tipoImpuesto": "ITBIS",
         "apartado": 0,
         "status": "A",
         "promocion": false,
         "imagenes": [
             {
-                "id": 1,
                 "idObjeto": "PROD005",
                 "codigoProducto": "PROD005",
                 "ruta": "/storage/products/aceite-oliva-1.jpg",
@@ -248,8 +239,7 @@
                 "descripcion": "Botella de aceite de oliva extra virgen 500ml",
                 "ordenVisualizacion": 1,
                 "esImagenPredeterminada": true,
-                "tipoImagen": "original",
-                "fechaCreacion": "2024-03-15"
+                "tipoImagen": "original"
             }
         ],
         "visibleTienda": true
@@ -264,12 +254,12 @@
         "grupoId": "GRP006",
         "departamento": "Enlatados",
         "ultCompra": "2024-11-15",
-        "precio1": 25.00,
-        "precio2": 24.00,
-        "precio3": 23.00,
-        "precio4": 22.00,
-        "precio5": 21.00,
-        "costo": 15.00,
+        "precio1": 25,
+        "precio2": 24,
+        "precio3": 23,
+        "precio4": 22,
+        "precio5": 21,
+        "costo": 15,
         "existenciaAlmacen1": 200,
         "existenciaAlmacen2": 150,
         "existenciaAlmacen3": 100,
@@ -283,14 +273,13 @@
         "factor": 1,
         "iSC": 0,
         "aDV": 0,
-        "descuento": 2.0,
+        "descuento": 2,
         "tipoImpuesto": "ITBIS",
         "apartado": 0,
         "status": "A",
         "promocion": false,
         "imagenes": [
             {
-                "id": 1,
                 "idObjeto": "PROD006",
                 "codigoProducto": "PROD006",
                 "ruta": "/storage/products/aceite-oliva-1.jpg",
@@ -299,8 +288,7 @@
                 "descripcion": "Botella de aceite de oliva extra virgen 500ml",
                 "ordenVisualizacion": 1,
                 "esImagenPredeterminada": true,
-                "tipoImagen": "original",
-                "fechaCreacion": "2024-03-15"
+                "tipoImagen": "original"
             }
         ],
         "visibleTienda": true
@@ -315,12 +303,12 @@
         "grupoId": "GRP007",
         "departamento": "Bebidas No Alcohólicas",
         "ultCompra": "2024-11-18",
-        "precio1": 20.00,
-        "precio2": 19.50,
-        "precio3": 19.00,
-        "precio4": 18.50,
-        "precio5": 18.00,
-        "costo": 15.00,
+        "precio1": 20,
+        "precio2": 19.5,
+        "precio3": 19,
+        "precio4": 18.5,
+        "precio5": 18,
+        "costo": 15,
         "existenciaAlmacen1": 500,
         "existenciaAlmacen2": 400,
         "existenciaAlmacen3": 300,
@@ -341,7 +329,6 @@
         "promocion": false,
         "imagenes": [
             {
-                "id": 1,
                 "idObjeto": "PROD007",
                 "codigoProducto": "PROD007",
                 "ruta": "/storage/products/aceite-oliva-1.jpg",
@@ -350,8 +337,7 @@
                 "descripcion": "Botella de aceite de oliva extra virgen 500ml",
                 "ordenVisualizacion": 1,
                 "esImagenPredeterminada": true,
-                "tipoImagen": "original",
-                "fechaCreacion": "2024-03-15"
+                "tipoImagen": "original"
             }
         ],
         "visibleTienda": true
@@ -366,12 +352,12 @@
         "grupoId": "GRP008",
         "departamento": "Snacks",
         "ultCompra": "2024-10-20",
-        "precio1": 40.00,
-        "precio2": 39.00,
-        "precio3": 38.00,
-        "precio4": 37.00,
-        "precio5": 36.00,
-        "costo": 30.00,
+        "precio1": 40,
+        "precio2": 39,
+        "precio3": 38,
+        "precio4": 37,
+        "precio5": 36,
+        "costo": 30,
         "existenciaAlmacen1": 300,
         "existenciaAlmacen2": 250,
         "existenciaAlmacen3": 200,
@@ -392,7 +378,6 @@
         "promocion": false,
         "imagenes": [
             {
-                "id": 1,
                 "idObjeto": "PROD008",
                 "codigoProducto": "PROD008",
                 "ruta": "/storage/products/aceite-oliva-1.jpg",
@@ -401,8 +386,7 @@
                 "descripcion": "Botella de aceite de oliva extra virgen 500ml",
                 "ordenVisualizacion": 1,
                 "esImagenPredeterminada": true,
-                "tipoImagen": "original",
-                "fechaCreacion": "2024-03-15"
+                "tipoImagen": "original"
             }
         ],
         "visibleTienda": true
@@ -417,12 +401,12 @@
         "grupoId": "GRP009",
         "departamento": "Granos y Harinas",
         "ultCompra": "2024-10-30",
-        "precio1": 65.00,
-        "precio2": 63.50,
-        "precio3": 62.00,
-        "precio4": 60.50,
-        "precio5": 59.00,
-        "costo": 50.00,
+        "precio1": 65,
+        "precio2": 63.5,
+        "precio3": 62,
+        "precio4": 60.5,
+        "precio5": 59,
+        "costo": 50,
         "existenciaAlmacen1": 400,
         "existenciaAlmacen2": 300,
         "existenciaAlmacen3": 200,
@@ -436,14 +420,13 @@
         "factor": 1,
         "iSC": 0,
         "aDV": 0,
-        "descuento": 5.0,
+        "descuento": 5,
         "tipoImpuesto": "ITBIS",
         "apartado": 0,
         "status": "A",
         "promocion": false,
         "imagenes": [
             {
-                "id": 1,
                 "idObjeto": "PROD009",
                 "codigoProducto": "PROD009",
                 "ruta": "/storage/products/aceite-oliva-1.jpg",
@@ -452,8 +435,7 @@
                 "descripcion": "Botella de aceite de oliva extra virgen 500ml",
                 "ordenVisualizacion": 1,
                 "esImagenPredeterminada": true,
-                "tipoImagen": "original",
-                "fechaCreacion": "2024-03-15"
+                "tipoImagen": "original"
             }
         ],
         "visibleTienda": true
@@ -468,12 +450,12 @@
         "grupoId": "GRP010",
         "departamento": "Granos y Azúcar",
         "ultCompra": "2024-11-05",
-        "precio1": 45.00,
-        "precio2": 44.00,
-        "precio3": 43.00,
-        "precio4": 42.00,
-        "precio5": 41.00,
-        "costo": 35.00,
+        "precio1": 45,
+        "precio2": 44,
+        "precio3": 43,
+        "precio4": 42,
+        "precio5": 41,
+        "costo": 35,
         "existenciaAlmacen1": 250,
         "existenciaAlmacen2": 200,
         "existenciaAlmacen3": 150,
@@ -494,7 +476,6 @@
         "promocion": false,
         "imagenes": [
             {
-                "id": 1,
                 "idObjeto": "PROD010",
                 "codigoProducto": "PROD010",
                 "ruta": "/storage/products/aceite-oliva-1.jpg",
@@ -503,8 +484,7 @@
                 "descripcion": "Botella de aceite de oliva extra virgen 500ml",
                 "ordenVisualizacion": 1,
                 "esImagenPredeterminada": true,
-                "tipoImagen": "original",
-                "fechaCreacion": "2024-03-15"
+                "tipoImagen": "original"
             }
         ],
         "visibleTienda": true
