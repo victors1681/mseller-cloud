@@ -20,6 +20,7 @@ import formatCurrency from 'src/utils/formatCurrency'
 import { TableFooter } from '@mui/material'
 import { CollectionType } from 'src/types/apps/collectionType'
 import { getStats } from '../list/cards/widgets/CardWidgetsReceiptOverview'
+import { useCallback, useMemo } from 'react'
 
 interface Props {
   collection: CollectionType
@@ -117,6 +118,33 @@ const PreviewCard = ({ collection }: Props) => {
       CK: 'Cheque',
     }[type]
   }
+
+  const getTotals = useCallback(() => {
+    const totals = collection?.recibos?.reduce(
+      (acc, current) => {
+        const details = current.recibosDetalles?.reduce(
+          (dAcc, dCurrent) => {
+            dAcc.tax += dCurrent.itbisDocumento
+            dAcc.discount += dCurrent.descuentoMonto
+            dAcc.subTotal += dCurrent.subTotalDocumento
+
+            return dAcc
+          },
+          { tax: 0, discount: 0, subTotal: 0 },
+        )
+
+        acc.tax += details.tax
+        acc.discount += details.discount
+        acc.subTotal += details.subTotal
+
+        return acc
+      },
+      { tax: 0, discount: 0, subTotal: 0 },
+    )
+    return totals
+  }, [collection])
+
+  const totals = useMemo(() => getTotals(), [getTotals])
 
   const stats = getStats(collection)
 
@@ -375,6 +403,24 @@ const PreviewCard = ({ collection }: Props) => {
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                   <Table style={{ width: '40%' }}>
+                    <CustomTableRow>
+                      <CustomTableCell>Sub Total:</CustomTableCell>
+                      <CustomTableCell>
+                        {formatCurrency(totals.subTotal)}
+                      </CustomTableCell>
+                    </CustomTableRow>
+                    <CustomTableRow>
+                      <CustomTableCell>Descuento:</CustomTableCell>
+                      <CustomTableCell>
+                        {formatCurrency(totals.discount)}
+                      </CustomTableCell>
+                    </CustomTableRow>
+                    <CustomTableRow>
+                      <CustomTableCell>Itbis:</CustomTableCell>
+                      <CustomTableCell>
+                        {formatCurrency(totals.tax)}
+                      </CustomTableCell>
+                    </CustomTableRow>
                     <CustomTableRow>
                       <CustomTableCell>Total General:</CustomTableCell>
                       <CustomTableCell>
