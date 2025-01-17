@@ -66,9 +66,7 @@ const defaultColumns: GridColDef[] = [
     minWidth: 80,
     headerName: 'Código',
     renderCell: ({ row }: CellType) => (
-      <LinkStyled
-        href={`/apps/invoice/preview/${row.codigo}`}
-      >{`${row.codigo}`}</LinkStyled>
+      <Typography variant="body2">{row.codigo}</Typography>
     ),
   },
   {
@@ -207,7 +205,6 @@ const InvoiceList = () => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
   const store = useSelector((state: RootState) => state.products)
-  
 
   //Initial Load
   useEffect(() => {

@@ -70,9 +70,7 @@ const defaultColumns: GridColDef[] = [
     minWidth: 80,
     headerName: 'Código',
     renderCell: ({ row }: CellType) => (
-      <LinkStyled
-        href={`/apps/invoice/preview/${row.codigo}`}
-      >{`${row.codigo}`}</LinkStyled>
+      <Typography variant="body2">{row.codigo}</Typography>
     ),
   },
   {
