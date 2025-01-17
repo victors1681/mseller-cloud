@@ -118,29 +118,31 @@ const PreviewCard = ({ collection }: Props) => {
       CK: 'Cheque',
     }[type]
   }
-
+  console.log(collection)
   const getTotals = useCallback(() => {
-    const totals = collection?.recibos?.reduce(
-      (acc, current) => {
-        const details = current.recibosDetalles?.reduce(
-          (dAcc, dCurrent) => {
-            dAcc.tax += dCurrent.itbisDocumento
-            dAcc.discount += dCurrent.descuentoMonto
-            dAcc.subTotal += dCurrent.subTotalDocumento
+    const totals = collection?.recibos
+      ?.filter((f) => f.anulado === 0)
+      .reduce(
+        (acc, current) => {
+          const details = current.recibosDetalles?.reduce(
+            (dAcc, dCurrent) => {
+              dAcc.tax += dCurrent.itbisDocumento
+              dAcc.discount += dCurrent.descuentoMonto
+              dAcc.subTotal += dCurrent.subTotalDocumento
 
-            return dAcc
-          },
-          { tax: 0, discount: 0, subTotal: 0 },
-        )
+              return dAcc
+            },
+            { tax: 0, discount: 0, subTotal: 0 },
+          )
 
-        acc.tax += details.tax
-        acc.discount += details.discount
-        acc.subTotal += details.subTotal
+          acc.tax += details.tax
+          acc.discount += details.discount
+          acc.subTotal += details.subTotal
 
-        return acc
-      },
-      { tax: 0, discount: 0, subTotal: 0 },
-    )
+          return acc
+        },
+        { tax: 0, discount: 0, subTotal: 0 },
+      )
     return totals
   }, [collection])
 

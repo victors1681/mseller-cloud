@@ -4,7 +4,7 @@ export interface ApiKeyType {
   businessId: string
   active: boolean
   description: string | null
-  created?: Date
+  created?: Date | string
   updated?: Date
   user: null | string
 }
