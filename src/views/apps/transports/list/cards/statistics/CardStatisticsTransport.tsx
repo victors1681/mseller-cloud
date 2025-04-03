@@ -134,7 +134,7 @@ const CardStatisticsTransport = (props: Props) => {
                     menuItemProps: {
                       onClick: () => {
                         window.open(
-                          `/apps/transports/print?noTransporte=${props.docsData?.noTransporte}/`,
+                          `/apps/transports/print?noTransporte=${props.docsData?.noTransporte}`,
                           '_blank',
                         )
                       },
