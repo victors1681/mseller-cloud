@@ -113,7 +113,7 @@ const CardStatisticsTransport = (props: Props) => {
                         icon="tabler:report-money"
                       ></Icon>
                     ),
-                    text: 'Resumen de entrega',
+                    text: 'Resumen de Entrega',
                     menuItemProps: {
                       onClick: () => {
                         window.open(
@@ -130,11 +130,28 @@ const CardStatisticsTransport = (props: Props) => {
                         icon="material-symbols:print"
                       ></Icon>
                     ),
-                    text: 'Entrega productos',
+                    text: 'Entrega Productos',
                     menuItemProps: {
                       onClick: () => {
                         window.open(
-                          `/apps/transports/print/${props.docsData?.noTransporte}/`,
+                          `/apps/transports/print?noTransporte=${props.docsData?.noTransporte}/`,
+                          '_blank',
+                        )
+                      },
+                    },
+                  },
+                  {
+                    icon: (
+                      <Icon
+                        name="material-symbols:print"
+                        icon="material-symbols:print"
+                      ></Icon>
+                    ),
+                    text: 'Entrega Promociones',
+                    menuItemProps: {
+                      onClick: () => {
+                        window.open(
+                          `/apps/transports/print?noTransporte=${props.docsData?.noTransporte}&promocionesOnly=true`,
                           '_blank',
                         )
                       },

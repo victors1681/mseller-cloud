@@ -33,31 +33,51 @@ import { RootState } from 'src/store'
 import { useSelector } from 'react-redux'
 
 interface DocumentPreviewProps {
-  id: string
+  noTransporte?: string
+  codigoVendedor?: string
+  localidades?: string
+  distribuidores?: string
+  fechaRango?: string
+  promocionesOnly?: boolean
 }
 
-const InvoicePreview = ({ id }: DocumentPreviewProps) => {
+const DeliveryReportPrint = ({
+  noTransporte,
+  codigoVendedor,
+  localidades,
+  distribuidores,
+  fechaRango,
+  promocionesOnly,
+}: DocumentPreviewProps) => {
   // ** State
   const [error, setError] = useState<boolean>(false)
   const [data, setData] = useState<null | ReporteEntrega>(null)
-  const [addPaymentOpen, setAddPaymentOpen] = useState<boolean>(false)
-  const [sendInvoiceOpen, setSendInvoiceOpen] = useState<boolean>(false)
 
   const initRequest = async () => {
     try {
-      let responseInfo = await deliveryReport(id)
+      // Pass all parameters to the deliveryReport function
+      let responseInfo = await deliveryReport(
+        noTransporte,
+        codigoVendedor,
+        localidades,
+        distribuidores,
+        fechaRango,
+        promocionesOnly !== undefined ? Boolean(promocionesOnly) : undefined,
+      )
+
       setData(responseInfo)
       setTimeout(() => {
         window.print()
       }, 500)
     } catch (err) {
       console.error(err)
+      setError(true)
     }
   }
 
   useEffect(() => {
     initRequest()
-  }, [id])
+  }, [noTransporte])
 
   if (data) {
     return (
@@ -70,8 +90,9 @@ const InvoicePreview = ({ id }: DocumentPreviewProps) => {
       <Grid container spacing={6}>
         <Grid item xs={12}>
           <Alert severity="error">
-            Transporte: {id} no existe. Por favor diríjase al listado de
-            transportes: <Link href="/apps/transports/list">Transportes</Link>
+            Transporte: {noTransporte} no existe. Por favor diríjase al listado
+            de transportes:{' '}
+            <Link href="/apps/transports/list">Transportes</Link>
           </Alert>
         </Grid>
       </Grid>
@@ -81,4 +102,4 @@ const InvoicePreview = ({ id }: DocumentPreviewProps) => {
   }
 }
 
-export default InvoicePreview
+export default DeliveryReportPrint

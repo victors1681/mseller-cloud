@@ -137,14 +137,26 @@ export const forceCloseTransport = createAsyncThunk(
   },
 )
 
-export const deliveryReport = async (noTransporte: string) => {
+export const deliveryReport = async (
+  noTransporte?: string,
+  codigoVendedor?: string,
+  localidades?: string,
+  distribuidores?: string,
+  fechaRango?: string,
+  promocionesOnly?: boolean,
+) => {
+  const params: Record<string, any> = {}
+
+  if (noTransporte) params.noTransporte = noTransporte
+  if (codigoVendedor) params.codigoVendedor = codigoVendedor
+  if (localidades) params.localidades = localidades
+  if (distribuidores) params.distribuidores = distribuidores
+  if (fechaRango) params.fechaRango = fechaRango
+  if (promocionesOnly !== undefined) params.promocionesOnly = promocionesOnly
+
   const response = await restClient.get(
     '/api/portal/Transporte/ReporteEntrega',
-    {
-      params: {
-        noTransporte,
-      },
-    },
+    { params },
   )
   return response.data
 }

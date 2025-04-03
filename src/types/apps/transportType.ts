@@ -189,9 +189,9 @@ interface DetalleEntrega {
 
 export interface ReporteEntrega {
   fecha: string
-  noTransporte: string
-  distribuidorNombre: string
-  distribuidorCodigo: string
+  noTransporte: string[]
+  distribuidores: DistribuidorType[]
+  documentosEntregas: string[]
   detalle: DetalleEntrega[]
 }
 

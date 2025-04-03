@@ -61,7 +61,7 @@ const PreviewCard = ({ data }: Props) => {
   if (data) {
     return (
       <Card sx={{ width: '50em' }}>
-        <CardContent>
+        <CardContent sx={{ pt: 0, pb: 2 }}>
           <Grid container>
             <Grid item sm={6} xs={6} sx={{ mb: { sm: 0, xs: 4 } }}>
               <Typography
@@ -79,12 +79,14 @@ const PreviewCard = ({ data }: Props) => {
                 <TableRow></TableRow>
                 <TableRow>
                   <MUITableCell>
-                    <Typography variant="body2">Distribuidor:</Typography>
+                    <Typography variant="body2">Distribuidores:</Typography>
                   </MUITableCell>
                   <MUITableCell>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      {data.distribuidorCodigo}-{data.distribuidorNombre}
-                    </Typography>
+                    {data.distribuidores.map((distribuidor) => (
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        {distribuidor.codigo}-{distribuidor.nombre}
+                      </Typography>
+                    ))}
                   </MUITableCell>
                 </TableRow>
               </TableBody>
@@ -103,7 +105,11 @@ const PreviewCard = ({ data }: Props) => {
                         <Typography variant="h6">Transporte</Typography>
                       </MUITableCell>
                       <MUITableCell>
-                        <Typography variant="h6">{`#${data.noTransporte}`}</Typography>
+                        <Typography variant="h6">
+                          {Array.isArray(data.noTransporte)
+                            ? `#${data.noTransporte.join(', #')}`
+                            : `#${data.noTransporte}`}
+                        </Typography>
                       </MUITableCell>
                     </TableRow>
                     <TableRow>
@@ -123,6 +129,20 @@ const PreviewCard = ({ data }: Props) => {
           </Grid>
         </CardContent>
 
+        <CardContent sx={{ pt: 0, pb: 1 }}>
+          <Typography variant="body2" sx={{ fontWeight: 600, mb: 0 }}>
+            Documentos Entregas:
+          </Typography>
+          <Typography variant="body2">
+            {data.documentosEntregas.map((doc, index) => (
+              <span key={index}>
+                {doc}
+                {index < data.documentosEntregas.length - 1 && ', '}
+              </span>
+            ))}
+          </Typography>
+        </CardContent>
+
         <Divider />
 
         <Divider />
@@ -137,6 +157,7 @@ const PreviewCard = ({ data }: Props) => {
                 <CustomHeaderTableCell>Recibida</CustomHeaderTableCell>
                 <CustomHeaderTableCell>Vendidas</CustomHeaderTableCell>
                 <CustomHeaderTableCell>Devolver</CustomHeaderTableCell>
+                <CustomHeaderTableCell>Promoción</CustomHeaderTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -152,6 +173,9 @@ const PreviewCard = ({ data }: Props) => {
                   <CustomTableCell>{detalle.recibidas}</CustomTableCell>
                   <CustomTableCell>{detalle.vendidas}</CustomTableCell>
                   <CustomTableCell>{detalle.devolver}</CustomTableCell>
+                  <CustomTableCell>
+                    {detalle.promocion ? 'Si' : 'No'}
+                  </CustomTableCell>
                 </TableRow>
               ))}
             </TableBody>

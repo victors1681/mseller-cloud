@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "dev:local": "next dev TARGET=http://localhost:5186",
+    "dev:local": "TARGET=http://localhost:5186 next dev ",
     "dev:mseller": "next dev TARGET=https://portal-int-api.mseller.app",
     "dev:firebase": "NEXT_PUBLIC_EMULATOR_ENABLED=true next dev",
     "dev:firebase-local": "NEXT_PUBLIC_EMULATOR_ENABLED=true TARGET=http://localhost:5186 next dev",
