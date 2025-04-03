@@ -84,7 +84,6 @@ export const addDrivers = createAsyncThunk(
   },
 )
 
-// ** Fetch PaymentTypes
 export const fetchData = createAsyncThunk(
   'appDriver/fetchData',
   async (params?: DataParams) => {

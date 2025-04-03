@@ -1,4 +1,10 @@
-import { Autocomplete, AutocompleteValue, TextField } from '@mui/material'
+import {
+  Autocomplete,
+  AutocompleteValue,
+  TextField,
+  SxProps,
+  Theme,
+} from '@mui/material'
 import { SyntheticEvent, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/store'
@@ -8,6 +14,7 @@ interface LocationAutocompleteProps {
   selectedLocation?: string
   multiple?: boolean
   callBack: (values: string) => void
+  sx?: SxProps<Theme>
 }
 
 interface LocationOptions {
@@ -60,7 +67,7 @@ export const LocationAutocomplete = (props: LocationAutocompleteProps) => {
       isOptionEqualToValue={(option, value) => option.id === value.id}
       id="locations-dropdown"
       getOptionLabel={(option) => `${option.id}-${option.label}` || ''}
-      sx={{ mt: 0, ml: 0 }}
+      sx={{ mt: 0, ml: 0, ...props.sx }}
       onChange={handleSelection}
       renderInput={(params) => (
         <TextField {...params} label="Localidades" placeholder="Localidades" />

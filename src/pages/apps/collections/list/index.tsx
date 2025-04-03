@@ -25,7 +25,7 @@ import CustomAvatar from 'src/@core/components/mui/avatar'
 import Icon from 'src/@core/components/icon'
 
 // ** Third Party Imports
-import format from 'date-fns/format'
+
 import DatePicker from 'react-datepicker'
 
 // ** Store & Actions Imports
@@ -38,28 +38,19 @@ import { CollectionType } from 'src/types/apps/collectionType'
 
 // ** Custom Components Imports
 import CustomChip from 'src/@core/components/mui/chip'
-import OptionsMenu from 'src/@core/components/option-menu'
 import TableHeader from 'src/views/apps/transports/list/TableHeader'
 
 // ** Styled Components
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import formatDate from 'src/utils/formatDate'
 import formatCurrency from 'src/utils/formatCurrency'
-import Autocomplete from '@mui/material/Autocomplete'
 import {
   collectionStatusLabels,
   collectionStatusObj,
 } from '../../../../utils/collectionMappings'
 import { debounce } from '@mui/material'
 import { SellerAutocomplete } from 'src/views/ui/sellerAutoComplete'
-
-interface CustomInputProps {
-  dates: Date[]
-  label: string
-  end: number | Date
-  start: number | Date
-  setDates?: (value: Date[]) => void
-}
+import { CustomInput } from '@/views/ui/customInput'
 
 interface CellType {
   row: CollectionType
@@ -180,31 +171,7 @@ const defaultColumns: GridColDef[] = [
   },
 ]
 
-/* eslint-disable */
-const CustomInput = forwardRef((props: CustomInputProps, ref) => {
-  const startDate =
-    props.start !== null ? format(props.start, 'MM/dd/yyyy') : ''
-  const endDate =
-    props.end !== null ? ` - ${format(props.end, 'MM/dd/yyyy')}` : null
 
-  const value = `${startDate}${endDate !== null ? endDate : ''}`
-  props.start === null && props.dates.length && props.setDates
-    ? props.setDates([])
-    : null
-  const updatedProps = { ...props }
-  delete updatedProps.setDates
-
-  return (
-    <TextField
-      fullWidth
-      inputRef={ref}
-      {...updatedProps}
-      label={props.label || ''}
-      value={value}
-    />
-  )
-})
-/* eslint-enable */
 
 const TransportList = () => {
   // ** State

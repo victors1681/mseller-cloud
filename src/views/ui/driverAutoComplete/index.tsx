@@ -1,5 +1,11 @@
-import { Autocomplete, AutocompleteValue, TextField } from '@mui/material'
-import { SyntheticEvent, useEffect, useState } from 'react'
+import {
+  Autocomplete,
+  AutocompleteValue,
+  TextField,
+  SxProps,
+  Theme,
+} from '@mui/material'
+import { SyntheticEvent, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/store'
 import { fetchData as fetchDrivers } from 'src/store/apps/driver'
@@ -8,6 +14,7 @@ interface DriverAutocompleteProps {
   selectedDrivers?: string
   multiple: boolean
   callBack: (values: string) => void
+  sx?: SxProps<Theme>
 }
 
 interface DriverOptions {
@@ -23,10 +30,10 @@ export const DriverAutocomplete = (props: DriverAutocompleteProps) => {
   }
 
   const selectDriverValues =
-  props.selectedDrivers
-    ?.split(',')
-    .map((v) => ({ codigo: v, label: findDriverLabel(v) }))
-    .filter((item) => item.codigo && item.label) || []
+    props.selectedDrivers
+      ?.split(',')
+      .map((v) => ({ codigo: v, label: findDriverLabel(v) }))
+      .filter((item) => item.codigo && item.label) || []
 
   useEffect(() => {
     if (!driverStore?.data?.length) {
@@ -53,11 +60,10 @@ export const DriverAutocomplete = (props: DriverAutocompleteProps) => {
       }))}
       filterSelectedOptions
       value={selectDriverValues}
-      // defaultValue={[]}
       isOptionEqualToValue={(option, value) => option.codigo === value.codigo}
       id="drivers-dropdown"
       getOptionLabel={(option) => `${option.codigo}-${option.label}` || ''}
-      sx={{ mt: 3, ml: 3 }}
+      sx={{ mt: 3, ml: 3, ...props.sx }}
       onChange={handleSelection}
       renderInput={(params) => (
         <TextField
