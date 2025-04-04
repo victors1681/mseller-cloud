@@ -190,6 +190,50 @@ export const deliveryReportAmount = async (
   return response.data
 }
 
+export const deliveryReportAmountV2 = async (
+  noTransporte: string,
+  paymentType?: string,
+  sellerCode?: string,
+  customerType?: string,
+  localidades?: string,
+  distribuidores?: string,
+  fechaRango?: string,
+) => {
+  let filter: Record<string, any> = {}
+
+  if (noTransporte) {
+    filter.noTransporte = noTransporte
+  }
+  if (paymentType) {
+    filter.TipoPago = paymentType
+  }
+  if (sellerCode) {
+    filter.CodigoVendedor = sellerCode
+  }
+  if (customerType) {
+    filter.TipoCliente = customerType
+  }
+  if (localidades) {
+    filter.localidades = localidades
+  }
+  if (distribuidores) {
+    filter.distribuidores = distribuidores
+  }
+  if (fechaRango) {
+    filter.fechaRango = fechaRango
+  }
+
+  const response = await restClient.get(
+    `/api/portal/Transporte/v2/ReporteEntregaMontos`,
+    {
+      params: {
+        ...filter,
+      },
+    },
+  )
+  return response.data
+}
+
 export const fetchTransportDocsData = createAsyncThunk(
   'appTransport/docs',
   async (noTransporte: number | string, { getState, dispatch }: Redux) => {

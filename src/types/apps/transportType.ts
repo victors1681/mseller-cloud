@@ -233,3 +233,20 @@ export interface ReporteEntregaMonto {
   detalle: Detalle[]
   tiposNcf: NcfType[]
 }
+
+export interface ReporteEntregaMontoV2 {
+  fecha: string
+  noTransportes: string[]
+  distribuidores: DistribuidorType[]
+  totalDocumentos: number
+  vendedores: SellerType[]
+  clientes: ClienteReport[]
+  efectivo: number
+  cheque: number
+  transferencia: number
+  credito: number
+  neto: number
+  detalle: Detalle[]
+  tiposNcf: NcfType[]
+  documentosEntregas: string[] // Este campo es para mantener la compatibilidad con la vista previa de impresión
+}

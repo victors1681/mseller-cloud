@@ -157,7 +157,7 @@ const PreviewCard = ({ data }: Props) => {
       ) {
         router
           .push({
-            pathname: `/apps/transports/print`,
+            pathname: `/apps/transports/printDeliveryReportAmountV2`,
             query: {
               ...router.query,
               fechaRango: formattedDates,

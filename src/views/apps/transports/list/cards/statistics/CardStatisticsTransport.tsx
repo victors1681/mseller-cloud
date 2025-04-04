@@ -127,6 +127,23 @@ const CardStatisticsTransport = (props: Props) => {
                     icon: (
                       <Icon
                         name="material-symbols:print"
+                        icon="tabler:report-money"
+                      ></Icon>
+                    ),
+                    text: 'Resumen de Entrega v2',
+                    menuItemProps: {
+                      onClick: () => {
+                        window.open(
+                          `/apps/transports/printDeliveryReportAmountV2?noTransporte=${props.docsData?.noTransporte}`,
+                          '_blank',
+                        )
+                      },
+                    },
+                  },
+                  {
+                    icon: (
+                      <Icon
+                        name="material-symbols:print"
                         icon="material-symbols:print"
                       ></Icon>
                     ),
