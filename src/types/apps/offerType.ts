@@ -19,7 +19,7 @@ export interface LegacyProductType {
 
 export interface LegacyOfferDetailType {
   id?: number
-  idOferta: number
+  idOferta?: number | string
   codigoProducto: string
   producto?: LegacyProductType
   precio: number
@@ -31,7 +31,7 @@ export interface LegacyOfferDetailType {
 
 export interface LegacyOfferDetailInputType {
   id?: number
-  idOferta: number
+  idOferta: number | string
   codigoProducto: string
   producto?: LegacyProductType
   precio: number | string
@@ -42,7 +42,7 @@ export interface LegacyOfferDetailInputType {
 }
 
 export interface LegacyOfferType {
-  idOferta: number
+  idOferta?: number | string
   nombre: string
   descripcion: string
   tipoOferta: string

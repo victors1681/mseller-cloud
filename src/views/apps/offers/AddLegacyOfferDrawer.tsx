@@ -96,7 +96,7 @@ const schema = yup.object().shape({
 })
 
 const defaultValues: LegacyOfferType = {
-  idOferta: 0,
+  idOferta: '',
   nombre: '',
   descripcion: '',
   tipoOferta: '0',
@@ -140,7 +140,7 @@ const AddLegacyOfferDialog = (props: AddLegacyOfferDialogType) => {
 
   // Default values for detail form
   const defaultDetailValues: LegacyOfferDetailType = {
-    id: 0,
+    id: undefined,
     idOferta: 0,
     codigoProducto: '',
     precio: 0,
@@ -290,23 +290,7 @@ const AddLegacyOfferDialog = (props: AddLegacyOfferDialogType) => {
       <Box sx={{ p: 3, overflow: 'auto' }}>
         <form onSubmit={handleSubmit(onSubmit)} id="offer-form">
           <Grid container spacing={3} maxWidth="lg" sx={{ mx: 'auto' }}>
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="idOferta"
-                control={control}
-                render={({ field, fieldState: { error } }) => (
-                  <TextField
-                    {...field}
-                    fullWidth
-                    type="number"
-                    label="ID Oferta"
-                    error={!!error}
-                    helperText={error?.message}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={10}>
               <Controller
                 name="nombre"
                 control={control}
@@ -321,6 +305,23 @@ const AddLegacyOfferDialog = (props: AddLegacyOfferDialogType) => {
                 )}
               />
             </Grid>
+            <Grid item xs={12} sm={2}>
+              <Controller
+                name="idOferta"
+                control={control}
+                render={({ field, fieldState: { error } }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label="ID Oferta"
+                    disabled={true}
+                    error={!!error}
+                    helperText={error?.message}
+                  />
+                )}
+              />
+            </Grid>
+
             <Grid item xs={12}>
               <Controller
                 name="descripcion"
