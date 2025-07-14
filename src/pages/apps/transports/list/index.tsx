@@ -66,7 +66,6 @@ import TransportStatusSelect from '../transportStatusSelect'
 import ConfirmTransportStatus from '../confirmStatus'
 
 import { useRouter } from 'next/router'
-import driver from 'src/store/apps/driver'
 
 interface InvoiceStatusObj {
   [key: string]: {

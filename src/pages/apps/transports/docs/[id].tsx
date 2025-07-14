@@ -1,46 +1,65 @@
-// ** Next Import
+// ** Demo Components Imports
+import Docs from './index'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 import {
   GetStaticPaths,
   GetStaticProps,
   GetStaticPropsContext,
-  InferGetStaticPropsType,
 } from 'next/types'
 
-// ** Types
-
-// ** Demo Components Imports
-import Docs from './index'
-import { useRouter } from 'next/router'
-
-const InvoicePreview = ({ id }: InferGetStaticPropsType<any>) => {
+/**
+ * Transport document preview component
+ * Renders a specific transport document based on the ID in the URL
+ */
+const InvoicePreview = ({ id }: { id: string }) => {
   const router = useRouter()
-  const query = router.query
-  console.log(query)
-  return <Docs noTransporte={(query.id as string) || ''} />
+
+  // If the page is still generating via fallback
+  if (router.isFallback) {
+    return <div>Loading...</div>
+  }
+
+  // Use the ID from props (provided by getStaticProps)
+  const transportId = id || (router.query.id as string)
+
+  if (!transportId) {
+    return <div>Loading...</div>
+  }
+
+  return <Docs noTransporte={transportId} />
 }
 
-// export const getStaticPaths: GetStaticPaths = async () => {
-//   //const res = await axios.get('/api/transport/transports')
-//   const data = [] as any //: InvoiceType[] = await res.data.allData
+// Tell Next.js this is a dynamic route
+export const getStaticPaths: GetStaticPaths = async () => {
+  // No pre-rendered paths, all will be generated on-demand
+  return {
+    paths: [],
+    fallback: 'blocking', // Wait until the page is generated server-side
+  }
+}
 
-//   const paths = data.map((item: any) => ({
-//     params: { id: `${item.id}` },
-//   }))
+// Get the ID from the URL params
+export const getStaticProps: GetStaticProps = ({
+  params,
+}: GetStaticPropsContext) => {
+  // Get the ID from URL parameters
+  const id = params?.id
 
-//   return {
-//     paths,
-//     fallback: true,
-//   }
-// }
+  // If there's no ID, return 404
+  if (!id) {
+    return {
+      notFound: true,
+    }
+  }
 
-// export const getStaticProps: GetStaticProps = ({
-//   params,
-// }: GetStaticPropsContext) => {
-//   return {
-//     props: {
-//       id: params?.id,
-//     },
-//   }
-// }
+  return {
+    props: {
+      id: id as string,
+    },
+    // Revalidate the page every hour (3600 seconds)
+    revalidate: 3600,
+  }
+}
 
 export default InvoicePreview

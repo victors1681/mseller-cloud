@@ -73,6 +73,7 @@ export interface DocumentoEntregaResponse {
   transferencia: number
   credito: number
   neto: number
+  codigoAutorizacion?: string
 }
 
 export interface DocumentoEntregaType {
@@ -118,8 +119,11 @@ export interface DocumentoEntregaType {
   cliente: CustomerType
   codigoMotivoRechazo: string
   motivoRechazo: MotivoRechazo
-  NcfAutoActualizado: boolean
-  NcfFechaAutoActualizado: string
+  ncfAutoActualizado: boolean
+  ncfFechaAutoActualizado: string
+  qrUrl?: string
+  signedDate?: string
+  statusEcf?: string
 }
 
 export interface DocumentoEntregaDetalleType {
