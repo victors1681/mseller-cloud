@@ -1,11 +1,15 @@
 // ** MUI Imports
-import Drawer from '@mui/material/Drawer'
+import Dialog from '@mui/material/Dialog'
 import Button from '@mui/material/Button'
 import { styled } from '@mui/material/styles'
 import TextField from '@mui/material/TextField'
 import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import Box, { BoxProps } from '@mui/material/Box'
+import AppBar from '@mui/material/AppBar'
+import Toolbar from '@mui/material/Toolbar'
+import Slide from '@mui/material/Slide'
+import { TransitionProps } from '@mui/material/transitions'
 
 // ** Third Party Imports
 import * as yup from 'yup'
@@ -28,18 +32,36 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  IconButton as MuiIconButton,
 } from '@mui/material'
 import toast from 'react-hot-toast'
-import { use, useEffect, useMemo } from 'react'
+import { use, useEffect, useMemo, useState, forwardRef } from 'react'
 import {
   addUpdateLegacyOffer,
   toggleAddUpdateLegacyOffer,
 } from '@/store/apps/offers'
-import { LegacyOfferType } from '@/types/apps/offerType'
+import { LegacyOfferType, LegacyOfferDetailType } from '@/types/apps/offerType'
 
-interface AddLegacyOfferDrawerType {
+interface AddLegacyOfferDialogType {
   open: boolean
 }
+
+const Transition = forwardRef(function Transition(
+  props: TransitionProps & {
+    children: React.ReactElement
+  },
+  ref: React.Ref<unknown>,
+) {
+  return <Slide direction="up" ref={ref} {...props} />
+})
 
 const Header = styled(Box)<BoxProps>(({ theme }) => ({
   display: 'flex',
@@ -94,7 +116,7 @@ const defaultValues: LegacyOfferType = {
   detalle: [],
 }
 
-const AddLegacyOfferDrawer = (props: AddLegacyOfferDrawerType) => {
+const AddLegacyOfferDialog = (props: AddLegacyOfferDialogType) => {
   // ** Props
   const { open } = props
 
@@ -104,6 +126,12 @@ const AddLegacyOfferDrawer = (props: AddLegacyOfferDrawerType) => {
   const store = useSelector((state: RootState) => state.offers)
   const toggle = () => dispatch(toggleAddUpdateLegacyOffer(null))
 
+  // Modal state for adding details
+  const [detailModalOpen, setDetailModalOpen] = useState(false)
+  const [editingDetailIndex, setEditingDetailIndex] = useState<number | null>(
+    null,
+  )
+
   useEffect(() => {
     if (store.legacyOfferEditData) {
       reset(store.legacyOfferEditData)
@@ -112,11 +140,130 @@ const AddLegacyOfferDrawer = (props: AddLegacyOfferDrawerType) => {
     }
   }, [store.legacyOfferEditData])
 
-  const { reset, control, handleSubmit } = useForm({
+  const { reset, control, handleSubmit, watch, setValue } = useForm({
     defaultValues,
     mode: 'onChange',
     resolver: yupResolver(schema),
   })
+
+  // Default values for detail form
+  const defaultDetailValues: LegacyOfferDetailType = {
+    id: 0,
+    idOferta: 0,
+    codigoProducto: '',
+    producto: {
+      codigo: '',
+      codigoBarra: '',
+      nombre: '',
+      area: '',
+      iDArea: null,
+      grupoId: null,
+      departamento: null,
+      unidad: '',
+      empaque: '',
+      impuesto: 0,
+      factor: 0,
+      iSC: 0,
+      aDV: 0,
+      descuento: 0,
+      tipoImpuesto: null,
+      apartado: 0,
+    },
+    precio: 0,
+    rangoInicial: 0,
+    rangoFinal: 0,
+    cantidadPromocion: 0,
+    principal: false,
+  }
+
+  const detailSchema = yup.object().shape({
+    codigoProducto: yup.string().required('Código de producto es requerido'),
+    precio: yup
+      .number()
+      .min(0, 'El precio debe ser mayor o igual a 0')
+      .required('Precio es requerido'),
+    rangoInicial: yup
+      .number()
+      .min(0, 'El rango inicial debe ser mayor o igual a 0')
+      .required('Rango inicial es requerido'),
+    rangoFinal: yup
+      .number()
+      .min(0, 'El rango final debe ser mayor o igual a 0')
+      .required('Rango final es requerido'),
+    cantidadPromocion: yup
+      .number()
+      .min(0, 'La cantidad promoción debe ser mayor o igual a 0')
+      .required('Cantidad promoción es requerida'),
+    principal: yup.boolean(),
+  })
+
+  const {
+    reset: resetDetail,
+    control: controlDetail,
+    handleSubmit: handleSubmitDetail,
+  } = useForm({
+    defaultValues: defaultDetailValues,
+    mode: 'onChange',
+    resolver: yupResolver(detailSchema),
+  })
+
+  // Watch the current details array
+  const currentDetails = watch('detalle')
+
+  const handleOpenDetailModal = () => {
+    const isFirstDetail = currentDetails.length === 0
+    const detailValues = {
+      ...defaultDetailValues,
+      principal: isFirstDetail, // Set principal to true if it's the first detail
+    }
+    resetDetail(detailValues)
+    setEditingDetailIndex(null)
+    setDetailModalOpen(true)
+  }
+
+  const handleEditDetail = (index: number) => {
+    const detail = currentDetails[index]
+    resetDetail(detail)
+    setEditingDetailIndex(index)
+    setDetailModalOpen(true)
+  }
+
+  const handleDeleteDetail = (index: number) => {
+    const updatedDetails = currentDetails.filter((_, i) => i !== index)
+    setValue('detalle', updatedDetails)
+  }
+
+  const handleCloseDetailModal = () => {
+    setDetailModalOpen(false)
+    setEditingDetailIndex(null)
+    resetDetail(defaultDetailValues)
+  }
+
+  const onSubmitDetail = (data: LegacyOfferDetailType) => {
+    const updatedDetails = [...currentDetails]
+
+    if (editingDetailIndex !== null) {
+      // Editing existing detail
+      updatedDetails[editingDetailIndex] = {
+        ...data,
+        id: currentDetails[editingDetailIndex].id,
+        idOferta: watch('idOferta'),
+      }
+    } else {
+      // Adding new detail
+      const newDetail: LegacyOfferDetailType = {
+        ...data,
+        id: Date.now(), // Temporary ID
+        idOferta: watch('idOferta'),
+        // Set as principal if it's the first item, otherwise use the provided value
+        principal: currentDetails.length === 0 ? true : data.principal,
+      }
+      updatedDetails.push(newDetail)
+    }
+
+    setValue('detalle', updatedDetails)
+    handleCloseDetailModal()
+  }
   const onSubmit = async (data: LegacyOfferType) => {
     try {
       const response = await dispatch(addUpdateLegacyOffer(data)).unwrap()
@@ -139,30 +286,38 @@ const AddLegacyOfferDrawer = (props: AddLegacyOfferDrawerType) => {
   }
 
   return (
-    <Drawer
+    <Dialog
+      fullScreen
       open={open}
-      anchor="right"
-      variant="temporary"
       onClose={handleClose}
-      ModalProps={{ keepMounted: true }}
-      sx={{
-        '& .MuiDrawer-paper': { width: { xs: 300, sm: 400 } },
-      }}
+      TransitionComponent={Transition}
     >
-      <Header>
-        <Typography variant="h6">Agregar Oferta</Typography>
-        <IconButton
-          size="small"
-          onClick={handleClose}
-          sx={{ color: 'text.primary' }}
-        >
-          <Icon icon="mdi:close" fontSize={20} />
-        </IconButton>
-      </Header>
-      <Box sx={{ p: 5 }}>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Grid container spacing={5}>
-            <Grid item xs={12}>
+      <AppBar sx={{ position: 'relative' }}>
+        <Toolbar>
+          <IconButton
+            edge="start"
+            color="inherit"
+            onClick={handleClose}
+            aria-label="close"
+          >
+            <Icon icon="mdi:close" />
+          </IconButton>
+          <Typography
+            sx={{ ml: 2, flex: 1, color: 'white' }}
+            variant="h6"
+            component="div"
+          >
+            Agregar Oferta
+          </Typography>
+          <Button autoFocus color="inherit" type="submit" form="offer-form">
+            Grabar
+          </Button>
+        </Toolbar>
+      </AppBar>
+      <Box sx={{ p: 3, overflow: 'auto' }}>
+        <form onSubmit={handleSubmit(onSubmit)} id="offer-form">
+          <Grid container spacing={3} maxWidth="lg" sx={{ mx: 'auto' }}>
+            <Grid item xs={12} sm={6}>
               <Controller
                 name="idOferta"
                 control={control}
@@ -178,7 +333,7 @@ const AddLegacyOfferDrawer = (props: AddLegacyOfferDrawerType) => {
                 )}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={6}>
               <Controller
                 name="nombre"
                 control={control}
@@ -210,7 +365,7 @@ const AddLegacyOfferDrawer = (props: AddLegacyOfferDrawerType) => {
                 )}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={6}>
               <Controller
                 name="tipoOferta"
                 control={control}
@@ -241,7 +396,7 @@ const AddLegacyOfferDrawer = (props: AddLegacyOfferDrawerType) => {
                 )}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={6}>
               <Controller
                 name="condicionPago"
                 control={control}
@@ -256,7 +411,7 @@ const AddLegacyOfferDrawer = (props: AddLegacyOfferDrawerType) => {
                 )}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={6}>
               <Controller
                 name="fechaInicio"
                 control={control}
@@ -273,7 +428,7 @@ const AddLegacyOfferDrawer = (props: AddLegacyOfferDrawerType) => {
                 )}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={6}>
               <Controller
                 name="fechaFin"
                 control={control}
@@ -290,7 +445,7 @@ const AddLegacyOfferDrawer = (props: AddLegacyOfferDrawerType) => {
                 )}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={6}>
               <Controller
                 name="clasificacion"
                 control={control}
@@ -305,7 +460,7 @@ const AddLegacyOfferDrawer = (props: AddLegacyOfferDrawerType) => {
                 )}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={6}>
               <Controller
                 name="status"
                 control={control}
@@ -325,30 +480,207 @@ const AddLegacyOfferDrawer = (props: AddLegacyOfferDrawerType) => {
               />
             </Grid>
             <Grid item xs={12}>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  mb: 2,
+                }}
+              >
+                <Typography variant="h6">Detalles de la Oferta</Typography>
                 <Button
-                  size="large"
-                  type="submit"
                   variant="contained"
-                  sx={{ mr: 3 }}
+                  size="small"
+                  onClick={handleOpenDetailModal}
+                  startIcon={<Icon icon="mdi:plus" />}
                 >
-                  Grabar
-                </Button>
-                <Button
-                  size="large"
-                  variant="outlined"
-                  color="secondary"
-                  onClick={handleClose}
-                >
-                  Cancelar
+                  Agregar Detalle
                 </Button>
               </Box>
+
+              {currentDetails.length > 0 ? (
+                <Table
+                  size="small"
+                  sx={{ border: '1px solid', borderColor: 'divider' }}
+                >
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Código Producto</TableCell>
+                      <TableCell>Precio</TableCell>
+                      <TableCell>Rango Inicial</TableCell>
+                      <TableCell>Rango Final</TableCell>
+                      <TableCell>Cantidad Promoción</TableCell>
+                      <TableCell>Principal</TableCell>
+                      <TableCell>Acciones</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {currentDetails.map((detail, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{detail.codigoProducto}</TableCell>
+                        <TableCell>{detail.precio}</TableCell>
+                        <TableCell>{detail.rangoInicial}</TableCell>
+                        <TableCell>{detail.rangoFinal}</TableCell>
+                        <TableCell>{detail.cantidadPromocion}</TableCell>
+                        <TableCell>{detail.principal ? 'Sí' : 'No'}</TableCell>
+                        <TableCell>
+                          <MuiIconButton
+                            size="small"
+                            onClick={() => handleEditDetail(index)}
+                            sx={{ mr: 1 }}
+                          >
+                            <Icon icon="mdi:pencil" fontSize={16} />
+                          </MuiIconButton>
+                          <MuiIconButton
+                            size="small"
+                            color="error"
+                            onClick={() => handleDeleteDetail(index)}
+                          >
+                            <Icon icon="mdi:delete" fontSize={16} />
+                          </MuiIconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ textAlign: 'center', py: 2 }}
+                >
+                  No hay detalles agregados
+                </Typography>
+              )}
             </Grid>
           </Grid>
         </form>
       </Box>
-    </Drawer>
+
+      {/* Detail Modal */}
+      <Dialog
+        open={detailModalOpen}
+        onClose={handleCloseDetailModal}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          {editingDetailIndex !== null ? 'Editar Detalle' : 'Agregar Detalle'}
+        </DialogTitle>
+        <DialogContent>
+          <form onSubmit={handleSubmitDetail(onSubmitDetail)} id="detail-form">
+            <Grid container spacing={3} sx={{ mt: 1 }}>
+              <Grid item xs={12} sm={6}>
+                <Controller
+                  name="codigoProducto"
+                  control={controlDetail}
+                  render={({ field, fieldState: { error } }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Código Producto"
+                      error={!!error}
+                      helperText={error?.message}
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Controller
+                  name="precio"
+                  control={controlDetail}
+                  render={({ field, fieldState: { error } }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      type="number"
+                      label="Precio"
+                      error={!!error}
+                      helperText={error?.message}
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Controller
+                  name="rangoInicial"
+                  control={controlDetail}
+                  render={({ field, fieldState: { error } }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      type="number"
+                      label="Rango Inicial"
+                      error={!!error}
+                      helperText={error?.message}
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Controller
+                  name="rangoFinal"
+                  control={controlDetail}
+                  render={({ field, fieldState: { error } }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      type="number"
+                      label="Rango Final"
+                      error={!!error}
+                      helperText={error?.message}
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Controller
+                  name="cantidadPromocion"
+                  control={controlDetail}
+                  render={({ field, fieldState: { error } }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      type="number"
+                      label="Cantidad Promoción"
+                      error={!!error}
+                      helperText={error?.message}
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Controller
+                  name="principal"
+                  control={controlDetail}
+                  render={({ field: { onChange, value } }) => (
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={value}
+                          onChange={(e) => onChange(e.target.checked)}
+                        />
+                      }
+                      label="Principal"
+                    />
+                  )}
+                />
+              </Grid>
+            </Grid>
+          </form>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDetailModal} color="secondary">
+            Cancelar
+          </Button>
+          <Button type="submit" form="detail-form" variant="contained">
+            {editingDetailIndex !== null ? 'Actualizar' : 'Agregar'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Dialog>
   )
 }
 
-export default AddLegacyOfferDrawer
+export default AddLegacyOfferDialog
