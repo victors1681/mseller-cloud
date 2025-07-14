@@ -43,12 +43,13 @@ import {
   IconButton as MuiIconButton,
 } from '@mui/material'
 import toast from 'react-hot-toast'
-import { use, useEffect, useMemo, useState, forwardRef } from 'react'
+import { useEffect, useState, forwardRef } from 'react'
 import {
   addUpdateLegacyOffer,
   toggleAddUpdateLegacyOffer,
 } from '@/store/apps/offers'
 import { LegacyOfferType, LegacyOfferDetailType } from '@/types/apps/offerType'
+import { ProductAutoComplete } from '@/views/ui/productsAutoComplete'
 
 interface AddLegacyOfferDialogType {
   open: boolean
@@ -62,14 +63,6 @@ const Transition = forwardRef(function Transition(
 ) {
   return <Slide direction="up" ref={ref} {...props} />
 })
-
-const Header = styled(Box)<BoxProps>(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  padding: theme.spacing(3, 4),
-  justifyContent: 'space-between',
-  backgroundColor: theme.palette.background.default,
-}))
 
 const schema = yup.object().shape({
   idOferta: yup.number().min(0, 'ID debe ser mayor o igual a 0'),
@@ -97,8 +90,7 @@ const schema = yup.object().shape({
 
   clasificacion: yup
     .string()
-    .max(50, 'La clasificación no debe exceder 50 caracteres')
-    .required('Clasificación es requerida'),
+    .max(50, 'La clasificación no debe exceder 50 caracteres'),
 
   status: yup.boolean().required('Status es requerido'),
 })
@@ -151,24 +143,6 @@ const AddLegacyOfferDialog = (props: AddLegacyOfferDialogType) => {
     id: 0,
     idOferta: 0,
     codigoProducto: '',
-    producto: {
-      codigo: '',
-      codigoBarra: '',
-      nombre: '',
-      area: '',
-      iDArea: null,
-      grupoId: null,
-      departamento: null,
-      unidad: '',
-      empaque: '',
-      impuesto: 0,
-      factor: 0,
-      iSC: 0,
-      aDV: 0,
-      descuento: 0,
-      tipoImpuesto: null,
-      apartado: 0,
-    },
     precio: 0,
     rangoInicial: 0,
     rangoFinal: 0,
@@ -253,7 +227,6 @@ const AddLegacyOfferDialog = (props: AddLegacyOfferDialogType) => {
       // Adding new detail
       const newDetail: LegacyOfferDetailType = {
         ...data,
-        id: Date.now(), // Temporary ID
         idOferta: watch('idOferta'),
         // Set as principal if it's the first item, otherwise use the provided value
         principal: currentDetails.length === 0 ? true : data.principal,
@@ -572,18 +545,11 @@ const AddLegacyOfferDialog = (props: AddLegacyOfferDialogType) => {
           <form onSubmit={handleSubmitDetail(onSubmitDetail)} id="detail-form">
             <Grid container spacing={3} sx={{ mt: 1 }}>
               <Grid item xs={12} sm={6}>
-                <Controller
+                <ProductAutoComplete
                   name="codigoProducto"
                   control={controlDetail}
-                  render={({ field, fieldState: { error } }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Código Producto"
-                      error={!!error}
-                      helperText={error?.message}
-                    />
-                  )}
+                  label="Seleccionar Producto"
+                  placeholder="Seleccionar un producto..."
                 />
               </Grid>
               <Grid item xs={12} sm={6}>

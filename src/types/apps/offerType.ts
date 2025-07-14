@@ -18,14 +18,26 @@ export interface LegacyProductType {
 }
 
 export interface LegacyOfferDetailType {
-  id: number
+  id?: number
   idOferta: number
   codigoProducto: string
-  producto: LegacyProductType
+  producto?: LegacyProductType
   precio: number
   rangoInicial: number
   rangoFinal: number
   cantidadPromocion: number
+  principal: boolean
+}
+
+export interface LegacyOfferDetailInputType {
+  id?: number
+  idOferta: number
+  codigoProducto: string
+  producto?: LegacyProductType
+  precio: number | string
+  rangoInicial: number | string
+  rangoFinal: number | string
+  cantidadPromocion: number | string
   principal: boolean
 }
 

@@ -36,7 +36,7 @@ export const addUpdateLegacyOffer = createAsyncThunk<
   'appOffers/addUpdateLegacyOffer',
   async (data: LegacyOfferType, { dispatch, getState, rejectWithValue }) => {
     try {
-      const response = await restClient.put<any>('/api/portal/Legacy Offer', data)
+      const response = await restClient.put<any>('/api/portal/OfertaLegada', data)
 
       if (response.status === 200) {
         toast.success('Legacy Offer actualizado exitosamente')

@@ -139,20 +139,17 @@ const defaultColumns: GridColDef[] = [
       </Box>
     ),
   },
+
   {
     flex: 0.05,
-    minWidth: 50,
-    field: 'status',
-    headerName: 'Status',
-    renderCell: ({ row }: CellType) => (
-      <Box>
-        <Chip
-          label={row.status ? 'Activo' : 'Inactivo'}
-          color={row.status ? 'success' : 'default'}
-          size="small"
-        />
-      </Box>
-    ),
+    field: 'active',
+    headerName: '',
+    renderCell: ({ row }: CellType) =>
+      row.status ? (
+        <Icon icon="lets-icons:check-fill" color="#56ca00" fontSize={20} />
+      ) : (
+        <Icon icon="bxs:x-circle" color="#ff4b51" fontSize={20} />
+      ),
   },
 ]
 
