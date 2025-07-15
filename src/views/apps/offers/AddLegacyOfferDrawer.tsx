@@ -233,7 +233,24 @@ const AddLegacyOfferDialog = (props: AddLegacyOfferDialogType) => {
   const currentDetails = watch('detalle')
   const tipoOferta = watch('tipoOferta')
 
+  // Handle tipoOferta changes - limit details for tipo "1" (Promoción)
+  useEffect(() => {
+    if (tipoOferta === '1' && currentDetails.length > 1) {
+      // Keep only the first detail when switching to Promoción type
+      const firstDetail = currentDetails[0]
+      setValue('detalle', [firstDetail])
+      toast.error(
+        'Solo se permite un detalle para ofertas de tipo Promoción. Se mantuvo el primer detalle.',
+      )
+    }
+  }, [tipoOferta, currentDetails.length, setValue])
+
   const handleOpenDetailModal = () => {
+    // Check if tipoOferta is "1" (Promoción) and already has a detail
+    if (tipoOferta === '1' && currentDetails.length >= 1) {
+      toast.error('Solo se permite un detalle para ofertas de tipo Promoción')
+      return
+    }
     openDetailModal(currentDetails)
   }
 
@@ -255,11 +272,12 @@ const AddLegacyOfferDialog = (props: AddLegacyOfferDialogType) => {
     )
   }
   const onSubmit = async (data: LegacyOfferType) => {
-    // Validate that we have at least 2 details: one principal and one non-principal
+    // Validate details based on tipoOferta
     const principalDetails = data.detalle.filter((detail) => detail.principal)
     const nonPrincipalDetails = data.detalle.filter(
       (detail) => !detail.principal,
     )
+
     if (data.idOferta === '') {
       data.idOferta = undefined
     }
@@ -273,14 +291,25 @@ const AddLegacyOfferDialog = (props: AddLegacyOfferDialogType) => {
       data.fechaFin = endDate.toISOString()
     }
 
-    if (principalDetails.length !== 1) {
-      toast.error('Debe tener exactamente un detalle principal')
-      return
-    }
+    // Special validation for tipoOferta "1" (Promoción)
+    if (data.tipoOferta === '1') {
+      if (data.detalle.length !== 1) {
+        toast.error(
+          'Las ofertas de tipo Promoción deben tener exactamente un detalle',
+        )
+        return
+      }
+    } else {
+      // Validation for other types (0 - Escala, 3 - Mixta)
+      if (principalDetails.length !== 1) {
+        toast.error('Debe tener exactamente un detalle principal')
+        return
+      }
 
-    if (nonPrincipalDetails.length === 0) {
-      toast.error('Debe tener al menos un detalle no principal')
-      return
+      if (nonPrincipalDetails.length === 0) {
+        toast.error('Debe tener al menos un detalle no principal')
+        return
+      }
     }
 
     try {
@@ -506,6 +535,7 @@ const AddLegacyOfferDialog = (props: AddLegacyOfferDialogType) => {
                     variant="contained"
                     size="small"
                     onClick={handleOpenDetailModal}
+                    disabled={tipoOferta === '1' && currentDetails.length >= 1}
                     startIcon={<Icon icon="mdi:plus" />}
                   >
                     Agregar Detalle

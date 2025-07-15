@@ -105,7 +105,12 @@ const DetailModal = ({
           const { principal } = this.parent
           const currentTipoOferta = tipoOferta
 
-          // If tipoOferta is '0' and principal is false, field is not required
+          // If tipoOferta is not "0", field is not required (disabled)
+          if (currentTipoOferta !== '0') {
+            return true
+          }
+
+          // If tipoOferta is "0" and principal is false, field is not required
           if (currentTipoOferta === '0' && !principal) {
             return true
           }
@@ -127,7 +132,14 @@ const DetailModal = ({
 
   // Effect to clear disabled fields when they become disabled
   useEffect(() => {
-    if (tipoOferta === '0' && !detailPrincipal) {
+    // Clear cantidadPromocion if tipoOferta is not "0"
+    if (tipoOferta !== '0') {
+      setValue('cantidadPromocion', 0, { shouldValidate: false })
+      // Set principal to true by default for non-Escala types since the switch is disabled
+      setValue('principal', true, { shouldValidate: false })
+    }
+    // Clear fields for tipoOferta "0" when principal is false
+    else if (tipoOferta === '0' && !detailPrincipal) {
       setValue('rangoInicial', 0, { shouldValidate: false })
       setValue('rangoFinal', 0, { shouldValidate: false })
       setValue('cantidadPromocion', 0, { shouldValidate: false })
@@ -147,7 +159,16 @@ const DetailModal = ({
   }
 
   const onSubmitDetail = (data: LegacyOfferDetailType) => {
-    // Validate detail requirements
+    // Special validation for tipoOferta "1" (Promoción)
+    if (tipoOferta === '1') {
+      // For Promoción type, we don't need complex validation as only one detail is allowed
+      // The validation is already handled in the parent component
+      onSubmit(data)
+      handleCloseModal()
+      return
+    }
+
+    // Validate detail requirements for other types (0 - Escala, 3 - Mixta)
     const principalCount = currentDetails.filter(
       (detail) => detail.principal,
     ).length
@@ -185,8 +206,13 @@ const DetailModal = ({
   const isEditingPrincipal =
     editingDetailIndex !== null && currentDetails[editingDetailIndex]?.principal
 
-  // Disable if there's already a principal and we're not editing the principal detail
-  const isPrincipalDisabled = hasPrincipal && !isEditingPrincipal
+  // Disable principal switch if:
+  // 1. tipoOferta is not "0" (Escala)
+  // 2. tipoOferta is "1" (Promoción) since only one detail is allowed
+  // 3. For tipoOferta "0", disable if there's already a principal and we're not editing the principal detail
+  const isPrincipalDisabled =
+    tipoOferta !== '0' ||
+    (tipoOferta === '0' && hasPrincipal && !isEditingPrincipal)
 
   return (
     <Dialog open={open} onClose={handleCloseModal} maxWidth="md" fullWidth>
@@ -285,7 +311,10 @@ const DetailModal = ({
                 name="cantidadPromocion"
                 control={control}
                 render={({ field, fieldState: { error } }) => {
-                  const isDisabled = tipoOferta === '0' && !detailPrincipal
+                  // Disable if tipoOferta is not "0", or if tipoOferta is "0" and principal is false
+                  const isDisabled =
+                    tipoOferta !== '0' ||
+                    (tipoOferta === '0' && !detailPrincipal)
                   return (
                     <TextField
                       {...field}
@@ -296,7 +325,9 @@ const DetailModal = ({
                       error={!!error}
                       helperText={
                         isDisabled
-                          ? 'Campo deshabilitado para tipo Escala sin principal'
+                          ? tipoOferta !== '0'
+                            ? 'Campo deshabilitado para ofertas que no son de tipo Escala'
+                            : 'Campo deshabilitado para tipo Escala sin principal'
                           : error?.message
                       }
                       value={isDisabled ? 0 : field.value}
@@ -324,7 +355,9 @@ const DetailModal = ({
                       />
                     }
                     label={
-                      isPrincipalDisabled
+                      tipoOferta !== '0'
+                        ? 'Principal (Deshabilitado para ofertas que no son de tipo Escala)'
+                        : isPrincipalDisabled
                         ? 'Principal (Ya existe uno principal)'
                         : 'Principal'
                     }
