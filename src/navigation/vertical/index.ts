@@ -49,6 +49,11 @@ const navigation = (): VerticalNavItemsType => {
           path: '/apps/products/list',
         },
         {
+          title: 'Ofertas',
+          icon: 'hugeicons-sale-tag-02',
+          path: '/apps/offers/list',
+        },
+        {
           title: 'Condiciones Pago',
           icon: 'mdi:account-payment',
           path: '/apps/paymentTypes/list',

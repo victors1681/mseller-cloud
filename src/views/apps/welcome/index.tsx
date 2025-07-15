@@ -155,6 +155,16 @@ const FirstSessionDialog = () => {
             </ListItemIcon>
             <ListItemText primary="Productos" />
           </ListItem>
+          <ListItem>
+            <ListItemIcon>
+              <Icon
+                icon="ri:barcode-box-line"
+                fontSize={20}
+                color={getIconColor()}
+              />
+            </ListItemIcon>
+            <ListItemText primary="Ofertas" />
+          </ListItem>
         </List>
       </DialogContent>
       <DialogActions>

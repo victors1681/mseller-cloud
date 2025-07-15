@@ -279,7 +279,7 @@ const LegacyOfferList = () => {
         <Grid item xs={12}>
           <Card>
             <CardHeader
-              title="Legacy Offers"
+              title="Ofertas Legadas"
               action={
                 <OptionsMenu
                   options={[
