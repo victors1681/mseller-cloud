@@ -36,7 +36,6 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm, Controller, useFieldArray } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { useEffect, forwardRef, useState } from 'react'
-import DatePicker from 'react-datepicker'
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 
 // ** Icon Imports
@@ -66,6 +65,9 @@ import CustomerSearchDialog from 'src/views/ui/customerSearchDialog'
 import { useCustomerSearchDialog } from 'src/views/ui/customerSearchDialog/useCustomerSearchDialog'
 import { SellerAutocomplete } from 'src/views/ui/sellerAutoComplete'
 import { PaymentTypeAutocomplete } from 'src/views/ui/paymentTypeAutoComplete'
+
+// ** Custom Hooks
+import { useOrderCalculations } from 'src/hooks/useOrderCalculations'
 
 // ** Types
 import type { DocumentTypeDetail } from 'src/types/apps/documentTypes'
@@ -169,6 +171,24 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
       localidad?: number
     }
   } | null>(null)
+
+  // ** Order Calculations Hook
+  const orderCalculations = useOrderCalculations({
+    details: detailsData,
+  })
+
+  // ** Effect to log calculation changes (for debugging)
+  useEffect(() => {
+    if (detailsData.length > 0) {
+      console.log('Order calculations updated:', {
+        items: orderCalculations.cantidadItems,
+        subtotal: orderCalculations.subtotal,
+        discount: orderCalculations.descuentoTotal,
+        tax: orderCalculations.impuestoTotal,
+        total: orderCalculations.total,
+      })
+    }
+  }, [orderCalculations, detailsData.length])
 
   // ** Product Search Dialog
   const productSearchDialog = useProductSearchDialog({
@@ -1255,7 +1275,7 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
                     />
                     <CardContent>
                       <Grid container spacing={3}>
-                        <Grid item xs={12} sm={4}>
+                        <Grid item xs={12} sm={6}>
                           <Controller
                             name="codigoProducto"
                             control={detailControl}
@@ -1361,8 +1381,12 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
                               Descripción del Producto
                             </Typography>
                             <Typography
-                              variant="body2"
-                              sx={{ fontSize: '0.85rem', minHeight: '1.2rem' }}
+                              variant="caption"
+                              sx={{
+                                fontSize: '0.85rem',
+                                minHeight: '1.2rem',
+                                fontWeight: '500',
+                              }}
                             >
                               {newDetailForm.descripcion ||
                                 (newDetailForm.codigoProducto
@@ -1371,60 +1395,171 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
                             </Typography>
                           </Box>
                         </Grid>
+                      </Grid>
+                    </CardContent>
+                  </Card>
+                </Grid>
 
-                        {/* Instructions */}
-                        <Grid item xs={12}>
-                          <Box
-                            sx={{
-                              p: 1.5,
-                              backgroundColor:
-                                isEditingDetail !== null
-                                  ? 'warning.light'
-                                  : 'info.light',
-                              borderRadius: 1,
-                              border: '1px solid',
-                              borderColor:
-                                isEditingDetail !== null
-                                  ? 'warning.main'
-                                  : 'info.light',
-                            }}
-                          >
+                {/* Order Totals Section */}
+                <Grid item xs={12}>
+                  <Card>
+                    <CardHeader title="Resumen del Pedido" />
+                    <CardContent>
+                      <Grid container spacing={3}>
+                        <Grid item xs={12} sm={6} md={3}>
+                          <Box sx={{ textAlign: 'center', p: 2 }}>
                             <Typography
-                              variant="body2"
-                              sx={{ fontSize: '0.8rem' }}
+                              variant="caption"
+                              color="textSecondary"
+                              sx={{ mb: 1, display: 'block' }}
+                            >
+                              Artículos
+                            </Typography>
+                            <Typography
+                              variant="h6"
+                              fontWeight="bold"
+                              color="primary"
+                            >
+                              {orderCalculations.cantidadItems.toLocaleString()}
+                            </Typography>
+                          </Box>
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={3}>
+                          <Box sx={{ textAlign: 'center', p: 2 }}>
+                            <Typography
+                              variant="caption"
+                              color="textSecondary"
+                              sx={{ mb: 1, display: 'block' }}
+                            >
+                              Subtotal
+                            </Typography>
+                            <Typography variant="h6" fontWeight="bold">
+                              {formatCurrency(orderCalculations.subtotal)}
+                            </Typography>
+                          </Box>
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={3}>
+                          <Box sx={{ textAlign: 'center', p: 2 }}>
+                            <Typography
+                              variant="caption"
+                              color="textSecondary"
+                              sx={{ mb: 1, display: 'block' }}
+                            >
+                              Descuento
+                            </Typography>
+                            <Typography
+                              variant="h6"
+                              fontWeight="bold"
                               color={
-                                isEditingDetail !== null
-                                  ? 'warning.dark'
-                                  : 'dark'
+                                orderCalculations.descuentoTotal > 0
+                                  ? 'success.main'
+                                  : 'text.primary'
                               }
                             >
-                              <strong>
-                                {isEditingDetail !== null
-                                  ? 'Editando línea:'
-                                  : 'Instrucciones:'}
-                              </strong>
-                              <br />
-                              {isEditingDetail !== null ? (
-                                <>
-                                  • Modifique los campos necesarios y haga clic
-                                  en "Actualizar" para guardar los cambios
-                                  <br />• Haga clic en "Cancelar" para descartar
-                                  los cambios
-                                </>
-                              ) : (
-                                <>
-                                  • Ingrese el código del producto, cantidad y
-                                  precio para agregar una nueva línea
-                                  <br />• Los campos de descripción, unidad e
-                                  impuestos se completarán automáticamente
-                                  <br />• Para editar una línea existente, haga
-                                  clic en el ícono de edición en la tabla
-                                  superior
-                                  <br />• El subtotal se calculará
-                                  automáticamente
-                                </>
-                              )}
+                              -
+                              {formatCurrency(orderCalculations.descuentoTotal)}
                             </Typography>
+                          </Box>
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={3}>
+                          <Box sx={{ textAlign: 'center', p: 2 }}>
+                            <Typography
+                              variant="caption"
+                              color="textSecondary"
+                              sx={{ mb: 1, display: 'block' }}
+                            >
+                              Impuestos
+                            </Typography>
+                            <Typography
+                              variant="h6"
+                              fontWeight="bold"
+                              color="warning.main"
+                            >
+                              {formatCurrency(orderCalculations.impuestoTotal)}
+                            </Typography>
+                          </Box>
+                        </Grid>
+                        {(orderCalculations.iscTotal > 0 ||
+                          orderCalculations.advTotal > 0) && (
+                          <>
+                            <Grid item xs={12} sm={6} md={2}>
+                              <Box sx={{ textAlign: 'center', p: 2 }}>
+                                <Typography
+                                  variant="caption"
+                                  color="textSecondary"
+                                  sx={{ mb: 1, display: 'block' }}
+                                >
+                                  ISC
+                                </Typography>
+                                <Typography
+                                  variant="h6"
+                                  fontWeight="bold"
+                                  color="info.main"
+                                >
+                                  {formatCurrency(orderCalculations.iscTotal)}
+                                </Typography>
+                              </Box>
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={2}>
+                              <Box sx={{ textAlign: 'center', p: 2 }}>
+                                <Typography
+                                  variant="caption"
+                                  color="textSecondary"
+                                  sx={{ mb: 1, display: 'block' }}
+                                >
+                                  ADV
+                                </Typography>
+                                <Typography
+                                  variant="h6"
+                                  fontWeight="bold"
+                                  color="info.main"
+                                >
+                                  {formatCurrency(orderCalculations.advTotal)}
+                                </Typography>
+                              </Box>
+                            </Grid>
+                          </>
+                        )}
+                        <Grid item xs={12}>
+                          <Divider sx={{ my: 2 }} />
+                          <Box sx={{ textAlign: 'center', p: 2 }}>
+                            <Typography
+                              variant="subtitle1"
+                              color="textSecondary"
+                              sx={{ mb: 1 }}
+                            >
+                              Total del Pedido
+                            </Typography>
+                            <Typography
+                              variant="h4"
+                              fontWeight="bold"
+                              color="primary.main"
+                              sx={{
+                                textShadow: '0 1px 2px rgba(0,0,0,0.1)',
+                                fontSize: { xs: '1.75rem', sm: '2.125rem' },
+                              }}
+                            >
+                              {formatCurrency(orderCalculations.total)}
+                            </Typography>
+                            {Math.abs(
+                              orderCalculations.total -
+                                (store.documentEditData?.total || 0),
+                            ) > 0.01 && (
+                              <Typography
+                                variant="caption"
+                                color="warning.main"
+                                sx={{ mt: 1, display: 'block' }}
+                              >
+                                * Los totales calculados pueden diferir de los
+                                valores originales del servidor
+                                <br />
+                                (Original:{' '}
+                                {formatCurrency(
+                                  store.documentEditData?.total || 0,
+                                )}
+                                )
+                              </Typography>
+                            )}
                           </Box>
                         </Grid>
                       </Grid>
