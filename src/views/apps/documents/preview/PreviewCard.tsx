@@ -135,18 +135,18 @@ const PreviewCard = ({ data }: Props) => {
                 Cliente
               </Typography>
               <Typography variant="body2" sx={{ mb: 0 }}>
-                {data.cliente.nombre}
+                {data.cliente?.nombre}
               </Typography>
               <Typography variant="body2" sx={{ mb: 0 }}>
-                RNC: {data.cliente.rnc}
+                RNC: {data.cliente?.rnc}
               </Typography>
               <Typography variant="body2" sx={{ mb: 0 }}>
-                {data.cliente.direccion} {data.cliente.ciudad}
+                {data.cliente?.direccion} {data.cliente?.ciudad}
               </Typography>
             </Grid>
             <Grid item xs={12} sm={6} sx={{ mb: { lg: 0, xs: 4 } }}>
               <Typography variant="body2" sx={{ mb: 0 }}>
-                <strong>Tel:</strong> {data.cliente.telefono1}
+                <strong>Tel:</strong> {data.cliente?.telefono1}
               </Typography>
               <Typography variant="body2" sx={{ mb: 0 }}>
                 <strong>Condición:</strong> {data.condicion.descripcion}
@@ -199,7 +199,7 @@ const PreviewCard = ({ data }: Props) => {
                   Vendedor:
                 </Typography>
                 <Typography variant="body2">
-                  {data.vendedor.codigo}-{data.vendedor.nombre}
+                  {data.vendedor?.codigo}-{data.vendedor?.nombre}
                 </Typography>
               </Box>
             </Grid>

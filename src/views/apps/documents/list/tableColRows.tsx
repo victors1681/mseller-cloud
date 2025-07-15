@@ -102,10 +102,10 @@ const defaultColumns: GridColDef[] = [
               variant="body2"
               sx={{ color: 'text.primary', fontWeight: 600 }}
             >
-              {row.vendedor.nombre}
+              {row.vendedor?.nombre}
             </Typography>
             <Typography noWrap variant="caption">
-              {row.vendedor.codigo}
+              {row.vendedor?.codigo}
             </Typography>
           </Box>
         </Box>

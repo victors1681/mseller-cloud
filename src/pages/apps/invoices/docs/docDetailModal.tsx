@@ -255,7 +255,7 @@ const Header = ({ data }: HeaderProps) => {
             variant="body2"
             sx={{ fontWeight: 600, color: 'text.primary' }}
           >
-            {data.NcfAutoActualizado ? 'SI' : 'NO'}
+            {data.ncfAutoActualizado ? 'SI' : 'NO'}
           </Typography>
         </Box>
 
