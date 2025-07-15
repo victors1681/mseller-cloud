@@ -35,7 +35,7 @@ import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm, Controller, useFieldArray } from 'react-hook-form'
 import toast from 'react-hot-toast'
-import { useEffect, forwardRef, useState } from 'react'
+import { useEffect, forwardRef, useState, useRef } from 'react'
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 
 // ** Icon Imports
@@ -46,7 +46,12 @@ import { useDispatch, useSelector } from 'react-redux'
 
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
-import { DocumentType, TipoDocumentoEnum } from 'src/types/apps/documentTypes'
+import {
+  DocumentType,
+  TipoDocumentoEnum,
+  DocumentUpdateType,
+  DocumentUpdateDetail,
+} from 'src/types/apps/documentTypes'
 import { ProductType } from 'src/types/apps/productTypes'
 import { CustomerType } from 'src/types/apps/customerType'
 import {
@@ -68,6 +73,9 @@ import { PaymentTypeAutocomplete } from 'src/views/ui/paymentTypeAutoComplete'
 
 // ** Custom Hooks
 import { useOrderCalculations } from 'src/hooks/useOrderCalculations'
+
+// ** Utils
+import { convertToDocumentUpdate } from 'src/utils/documentUtils'
 
 // ** Types
 import type { DocumentTypeDetail } from 'src/types/apps/documentTypes'
@@ -150,6 +158,7 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
   const store = useSelector((state: RootState) => state.documents)
   const productStore = useSelector((state: RootState) => state.products)
   const toggle = () => dispatch(toggleEditDocument(null))
+  const cantidadInputRef = useRef<HTMLInputElement>(null)
 
   // ** Local State for Detail Management
   const [detailsData, setDetailsData] = useState<DocumentTypeDetail[]>([])
@@ -215,6 +224,14 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
 
       // Set the price in the form
       setDetailValue('precio', selectedPrice)
+
+      // Focus cantidad field after a short delay to ensure dialog is closed
+      setTimeout(() => {
+        if (cantidadInputRef.current) {
+          cantidadInputRef.current.focus()
+          cantidadInputRef.current.select()
+        }
+      }, 200)
     },
     autoClose: true,
   })
@@ -265,6 +282,28 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
     setDetailValue('cantidad', detail.cantidad)
     setDetailValue('precio', detail.precio)
     setIsEditingDetail(index)
+
+    // Scroll to the detail form section and focus cantidad field
+    setTimeout(() => {
+      // Find the detail form section and scroll to it
+      const detailFormSection = document.querySelector(
+        '[data-section="detail-form"]',
+      )
+      if (detailFormSection) {
+        detailFormSection.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        })
+      }
+
+      // Focus and select the cantidad field after a small delay
+      setTimeout(() => {
+        if (cantidadInputRef.current) {
+          cantidadInputRef.current.focus()
+          cantidadInputRef.current.select()
+        }
+      }, 300)
+    }, 100)
   }
 
   const handleDeleteDetail = (index: number) => {
@@ -310,8 +349,14 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
       return
     }
 
+    // Use original ID when editing, generate new ID when adding
+    const detailId =
+      isEditingDetail !== null
+        ? detailsData[isEditingDetail]?.id || Date.now().toString()
+        : undefined
+
     const newDetail: DocumentTypeDetail = {
-      id: Date.now().toString(),
+      id: detailId,
       noPedidoStr: store.documentEditData?.noPedidoStr || '',
       noPedido: store.documentEditData?.noPedido || 0,
       codigoVendedor: store.documentEditData?.codigoVendedor || '',
@@ -448,23 +493,6 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
     newDetailForm.precio,
   ])
 
-  // Custom Input Component for DatePicker
-  const CustomDateInput = ({ value, onClick, label, ...props }: any) => {
-    return (
-      <TextField
-        {...props}
-        fullWidth
-        label={label}
-        value={value}
-        onClick={onClick}
-        InputLabelProps={{ shrink: true }}
-        InputProps={{
-          readOnly: true,
-        }}
-      />
-    )
-  }
-
   useEffect(() => {
     if (open && store.documentEditData && store.documentEditData.noPedidoStr) {
       // Fetch complete document details when dialog opens
@@ -502,21 +530,25 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
       return
     }
 
-    const updatedDocument: DocumentType = {
-      ...store.documentEditData,
-      ...data,
-      detalle: detailsData, // Include the locally managed details
-    }
+    // Create DocumentUpdateType for API submission using utility function
+    const documentUpdate: DocumentUpdateType = convertToDocumentUpdate(
+      { ...store.documentEditData, ...data },
+      detailsData,
+      orderCalculations,
+    )
 
     // Convert date back to ISO format if needed
     if (data.fecha) {
       const dateObj = new Date(data.fecha + 'T00:00:00')
-      updatedDocument.fecha = dateObj.toISOString()
+      documentUpdate.fecha = dateObj.toISOString()
     }
 
+    console.log('Full updated document (for reference):', documentUpdate)
+
     try {
+      // You can use either documentUpdate or updatedDocument depending on your API requirements
       const response = await dispatch(
-        addUpdateDocument(updatedDocument),
+        addUpdateDocument(documentUpdate), // Change to documentUpdate when API is ready
       ).unwrap()
 
       if (response.success) {
@@ -576,7 +608,7 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
       TransitionComponent={Transition}
     >
       <DatePickerWrapper>
-        <AppBar sx={{ position: 'relative' }}>
+        <AppBar sx={{ position: 'sticky', top: 0, zIndex: 1300 }}>
           <Toolbar>
             <IconButton
               edge="start"
@@ -1011,6 +1043,7 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
                             {detailsData?.map((detail, index) => (
                               <TableRow
                                 key={detail.id || index}
+                                onClick={() => handleEditDetail(detail, index)}
                                 sx={{
                                   '&:last-child td, &:last-child th': {
                                     border: 0,
@@ -1019,6 +1052,10 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
                                     isEditingDetail === index
                                       ? 'action.hover'
                                       : 'inherit',
+                                  cursor: 'pointer',
+                                  '&:hover': {
+                                    backgroundColor: 'action.hover',
+                                  },
                                 }}
                               >
                                 <TableCell
@@ -1127,9 +1164,10 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
                                     <IconButton
                                       size="small"
                                       color="primary"
-                                      onClick={() =>
+                                      onClick={(e) => {
+                                        e.stopPropagation()
                                         handleEditDetail(detail, index)
-                                      }
+                                      }}
                                       title="Editar línea"
                                       sx={{ p: 0.5 }}
                                     >
@@ -1141,7 +1179,10 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
                                     <IconButton
                                       size="small"
                                       color="error"
-                                      onClick={() => handleDeleteDetail(index)}
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+                                        handleDeleteDetail(index)
+                                      }}
                                       title="Eliminar línea"
                                       sx={{ p: 0.5 }}
                                     >
@@ -1175,7 +1216,7 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
 
                 {/* Add/Edit Detail Lines Section */}
                 <Grid item xs={12}>
-                  <Card>
+                  <Card data-section="detail-form">
                     <CardHeader
                       title={
                         isEditingDetail !== null
@@ -1197,6 +1238,7 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
                           <Button
                             variant="contained"
                             color="primary"
+                            disabled={!newDetailForm.codigoProducto.trim()}
                             startIcon={
                               <Icon
                                 icon={
@@ -1262,6 +1304,7 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
                             render={({ field, fieldState: { error } }) => (
                               <TextField
                                 {...field}
+                                inputRef={cantidadInputRef}
                                 fullWidth
                                 size="small"
                                 type="number"
@@ -1271,6 +1314,12 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
                                 helperText={error?.message}
                                 inputProps={{ min: 1 }}
                                 autoComplete="off"
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    e.preventDefault()
+                                    cantidadInputRef.current?.select()
+                                  }
+                                }}
                                 onChange={(e) => {
                                   const newValue = parseInt(e.target.value) || 1
                                   field.onChange(newValue)

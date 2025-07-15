@@ -7,7 +7,11 @@ import axios from 'axios'
 import { PaginatedResponse } from 'src/types/apps/response'
 import { getDateParam } from 'src/utils/getDateParam'
 import restClient from 'src/configs/restClient'
-import { DocumentStatus, StatusParam } from 'src/types/apps/documentTypes'
+import {
+  DocumentStatus,
+  DocumentUpdateType,
+  StatusParam,
+} from 'src/types/apps/documentTypes'
 import toast from 'react-hot-toast'
 import { DocumentType } from 'src/types/apps/documentTypes'
 import { AppDispatch, RootState } from '@/store'
@@ -105,7 +109,7 @@ export const fetchDocumentDetails = createAsyncThunk(
 
 export const addUpdateDocument = createAsyncThunk<
   any,
-  DocumentType,
+  DocumentUpdateType,
   {
     dispatch: AppDispatch
     state: RootState
@@ -113,9 +117,12 @@ export const addUpdateDocument = createAsyncThunk<
   }
 >(
   'appDocuments/addUpdateDocument',
-  async (data: DocumentType, { dispatch, getState, rejectWithValue }) => {
+  async (data: DocumentUpdateType, { dispatch, getState, rejectWithValue }) => {
     try {
-      const response = await restClient.put<any>('/api/portal/Pedido', data)
+      const response = await restClient.put<any>(
+        '/api/portal/Pedido/ActualizarCompleto',
+        data,
+      )
 
       if (response.status === 200) {
         toast.success('Documento actualizado exitosamente')

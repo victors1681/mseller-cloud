@@ -23,7 +23,7 @@ import {
   FormControl,
   Typography,
 } from '@mui/material'
-import { useEffect, useState, useMemo, useCallback } from 'react'
+import { useEffect, useState, useMemo, useCallback, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/store'
 import { fetchData as fetchProducts } from 'src/store/apps/products'
@@ -54,6 +54,7 @@ export const ProductSearchDialog = (props: ProductSearchDialogProps) => {
 
   const dispatch = useDispatch<AppDispatch>()
   const productStore = useSelector((state: RootState) => state.products)
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
   const [searchValue, setSearchValue] = useState('')
   const [loading, setLoading] = useState(false)
@@ -149,6 +150,19 @@ export const ProductSearchDialog = (props: ProductSearchDialogProps) => {
       }
     }
   }, [open, debouncedSearchValue, page, searchProducts])
+
+  useEffect(() => {
+    setSearchValue('')
+    setPage(0)
+    setSelectedPrices({})
+
+    if (open && searchInputRef.current) {
+      // Focus the search input after a small delay to ensure dialog is fully rendered
+      setTimeout(() => {
+        searchInputRef.current?.focus()
+      }, 100)
+    }
+  }, [open])
 
   // Handle search input change
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -260,6 +274,7 @@ export const ProductSearchDialog = (props: ProductSearchDialogProps) => {
         <Box mb={3}>
           <TextField
             fullWidth
+            inputRef={searchInputRef}
             value={searchValue}
             onChange={handleSearchChange}
             placeholder="Buscar por código, nombre o descripción. Use código# para búsqueda directa"

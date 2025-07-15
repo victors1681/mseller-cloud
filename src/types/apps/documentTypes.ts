@@ -51,7 +51,7 @@ export interface DocumentType {
   nuevoCliente: boolean
   fecha: string
   nota: string
-  cliente: CustomerType
+  cliente?: CustomerType
   emailVendedor: string
   condicionPago: string
   noContacto: string
@@ -89,13 +89,13 @@ export interface DocumentType {
   mensajesError: string
   reintentar: number
   condicion: Condicion
-  vendedor: Vendedor
+  vendedor?: Vendedor
   clienteNuevo: any
   detalle: DocumentTypeDetail[]
 }
 
 export interface DocumentTypeDetail {
-  id: string
+  id?: string
   noPedidoStr: string
   noPedido: number
   codigoVendedor: string
@@ -121,6 +121,48 @@ export interface DocumentTypeDetail {
   tipoImpuesto: string
   cantidadOriginal: number
   promocion: boolean
+}
+
+// New types for document updates and creation
+export interface DocumentUpdateDetail {
+  id: number | undefined
+  codigoProducto: string
+  cantidad: number
+  descripcion: string
+  precio: number
+  impuesto: number
+  porcientoImpuesto: number
+  descuento: number
+  porcientoDescuento: number
+  factor: number
+  factorOriginal: number
+  isc: number
+  adv: number
+  subTotal: number
+  productoRef: string
+  grupoId: string
+  area: string
+  unidad: string
+  tipoImpuesto: string
+  cantidadOriginal: number
+  existencia: number
+  apartado: number
+  precioCondicion: number
+  promocion: boolean
+}
+
+export interface DocumentUpdateType {
+  noPedidoStr: string
+  nota: string
+  condicionPago: string
+  fecha: string // ISO date string
+  descuento: number
+  porcientoDescuento: number
+  subTotal: number
+  impuesto: number
+  total: number
+  fechaVencimiento: string
+  detalle: DocumentUpdateDetail[]
 }
 
 export interface Condicion {
