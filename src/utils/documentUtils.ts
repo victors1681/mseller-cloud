@@ -30,6 +30,15 @@ export const convertToDocumentUpdate = (
     total: orderCalculations.total,
     fechaVencimiento: document.fechaVencimiento || new Date().toISOString(),
     detalle: convertDetailsToUpdateDetails(detailsData),
+    // New required fields
+    tipoDocumento: document.tipoDocumento || '',
+    codigoCliente: document.codigoCliente || '',
+    nombreCliente: document.nombreCliente,
+    firebaseUserId: document.firebaseUserId,
+    localidadId: document.localidadId || 0,
+    noOrden: document.noOrden,
+    avatarUrl: document.avatarUrl,
+    confirmado: document.confirmado || false,
   }
 }
 
@@ -63,7 +72,6 @@ export const convertDetailsToUpdateDetails = (
       cantidadOriginal: detail.cantidadOriginal || detail.cantidad,
       existencia: 0, // This would need to come from product data
       apartado: 0, // This would need to come from product data
-      precioCondicion: 0, // This would need to come from product data
       promocion: detail.promocion || false,
     }),
   )
@@ -78,6 +86,14 @@ export const createNewDocumentUpdate = (
     nota?: string
     condicionPago?: string
     fechaVencimiento?: string
+    tipoDocumento?: string
+    codigoCliente?: string
+    nombreCliente?: string
+    firebaseUserId?: string
+    localidadId?: number
+    noOrden?: string
+    avatarUrl?: string
+    confirmado?: boolean
   },
   detailsData: DocumentTypeDetail[],
   orderCalculations: {
@@ -99,5 +115,14 @@ export const createNewDocumentUpdate = (
     total: orderCalculations.total,
     fechaVencimiento: basicData.fechaVencimiento || new Date().toISOString(),
     detalle: convertDetailsToUpdateDetails(detailsData),
+    // New required fields
+    tipoDocumento: basicData.tipoDocumento || '',
+    codigoCliente: basicData.codigoCliente || '',
+    nombreCliente: basicData.nombreCliente,
+    firebaseUserId: basicData.firebaseUserId,
+    localidadId: basicData.localidadId || 0,
+    noOrden: basicData.noOrden,
+    avatarUrl: basicData.avatarUrl,
+    confirmado: basicData.confirmado || false,
   }
 }

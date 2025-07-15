@@ -147,7 +147,6 @@ export interface DocumentUpdateDetail {
   cantidadOriginal: number
   existencia: number
   apartado: number
-  precioCondicion: number
   promocion: boolean
 }
 
@@ -163,6 +162,15 @@ export interface DocumentUpdateType {
   total: number
   fechaVencimiento: string
   detalle: DocumentUpdateDetail[]
+  // New required fields
+  tipoDocumento: string
+  codigoCliente: string
+  nombreCliente?: string
+  firebaseUserId?: string
+  localidadId: number
+  noOrden?: string
+  avatarUrl?: string
+  confirmado: boolean
 }
 
 export interface Condicion {
