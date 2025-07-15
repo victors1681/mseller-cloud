@@ -183,7 +183,7 @@ const LegacyOfferList = () => {
   // ** State
   const [dates, setDates] = useState<Date[]>([])
   const [value, setValue] = useState<string>('')
-  const [statusValue, setStatusValue] = useState<string>('')
+  const [offerType, setOfferType] = useState<string>('')
   const [selectedRows, setSelectedRows] = useState<GridRowId[]>([])
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -199,10 +199,11 @@ const LegacyOfferList = () => {
     dispatch(
       fetchLegacyOffer({
         query: value,
+        tipoOferta: offerType,
         pageNumber: paginationModel.page,
       }),
     )
-  }, [statusValue])
+  }, [offerType])
 
   const handlePagination = useCallback(
     (values: any) => {
@@ -210,11 +211,12 @@ const LegacyOfferList = () => {
       dispatch(
         fetchLegacyOffer({
           query: value,
+          tipoOferta: offerType,
           pageNumber: values.page,
         }),
       )
     },
-    [paginationModel, value, statusValue],
+    [paginationModel, value, offerType],
   )
 
   const performRequest = useCallback(
@@ -222,11 +224,12 @@ const LegacyOfferList = () => {
       dispatch(
         fetchLegacyOffer({
           query: value,
+          tipoOferta: offerType,
           pageNumber: paginationModel.page,
         }),
       )
     },
-    [dispatch, statusValue, value, dates, paginationModel],
+    [paginationModel, value, offerType],
   )
 
   const fn = useCallback(
@@ -304,6 +307,7 @@ const LegacyOfferList = () => {
               value={value}
               selectedRows={selectedRows}
               handleFilter={handleFilter}
+              handleSelectFilter={(val) => setOfferType(val)}
               placeholder="Nombre o código"
             />
             <DataGrid
@@ -315,7 +319,7 @@ const LegacyOfferList = () => {
               paginationModel={paginationModel}
               onPaginationModelChange={handlePagination}
               onRowSelectionModelChange={(rows) => setSelectedRows(rows)}
-              getRowId={(row: LegacyOfferType) => row.idOferta}
+              getRowId={(row: LegacyOfferType) => row.idOferta || 0}
               paginationMode="server"
               loading={store.isLoading}
               rowCount={store.totalResults}

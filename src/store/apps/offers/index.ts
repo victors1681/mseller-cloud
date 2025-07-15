@@ -11,6 +11,7 @@ import toast from 'react-hot-toast'
 
 interface DataParams {
   query?: string
+  tipoOferta?: string
   pageSize?: number
   pageNumber?: number
 }
