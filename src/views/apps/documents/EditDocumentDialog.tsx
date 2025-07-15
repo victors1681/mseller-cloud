@@ -342,11 +342,14 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
 
     let updatedDetails: DocumentTypeDetail[]
 
+    console.log('newDetail:', newDetailForm)
+
     if (isEditingDetail !== null) {
       // Update existing detail
       updatedDetails = detailsData.map((detail, index) =>
         index === isEditingDetail ? newDetail : detail,
       )
+
       toast.success('Línea de detalle actualizada')
       setIsEditingDetail(null)
     } else {
@@ -415,15 +418,35 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
   const watchedDetailValues = watchDetail()
 
   // Sync detail form with newDetailForm state
-  //   useEffect(() => { infinite loop
-  //     setNewDetailForm({
-  //       codigoProducto: watchedDetailValues.codigoProducto || '',
-  //       cantidad: watchedDetailValues.cantidad || 1,
-  //       precio: watchedDetailValues.precio || 0,
-  //       descripcion: newDetailForm.descripcion, // Keep existing description
-  //       unidad: newDetailForm.unidad || '', // Keep existing unit
-  //     })
-  //   }, [watchedDetailValues])
+  useEffect(() => {
+    // Only update if the watched values are different from current newDetailForm
+    // This prevents infinite loops by checking if an update is actually needed
+    const currentFormValues = {
+      codigoProducto: watchedDetailValues.codigoProducto || '',
+      cantidad: watchedDetailValues.cantidad || 1,
+      precio: watchedDetailValues.precio || 0,
+    }
+
+    if (
+      currentFormValues.codigoProducto !== newDetailForm.codigoProducto ||
+      currentFormValues.cantidad !== newDetailForm.cantidad ||
+      currentFormValues.precio !== newDetailForm.precio
+    ) {
+      setNewDetailForm((prev) => ({
+        ...prev,
+        codigoProducto: currentFormValues.codigoProducto,
+        cantidad: currentFormValues.cantidad,
+        precio: currentFormValues.precio,
+      }))
+    }
+  }, [
+    watchedDetailValues.codigoProducto,
+    watchedDetailValues.cantidad,
+    watchedDetailValues.precio,
+    newDetailForm.codigoProducto,
+    newDetailForm.cantidad,
+    newDetailForm.precio,
+  ])
 
   // Custom Input Component for DatePicker
   const CustomDateInput = ({ value, onClick, label, ...props }: any) => {
@@ -599,7 +622,7 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
                 {/* Read-only Information Section */}
                 <Grid item xs={12}>
                   <Card>
-                    <CardHeader title="Información de Solo Lectura" />
+                    <CardHeader title="Documento" />
                     <CardContent>
                       <Grid container spacing={3}>
                         <Grid item xs={12} sm={3}>
@@ -616,89 +639,8 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
                             </Typography>
                           </Box>
                         </Grid>
+
                         <Grid item xs={12} sm={3}>
-                          <Box>
-                            <Typography
-                              variant="caption"
-                              color="textSecondary"
-                              sx={{ mb: 0.5, display: 'block' }}
-                            >
-                              Descuento
-                            </Typography>
-                            <Typography variant="body1" fontWeight="medium">
-                              {formatCurrency(
-                                store.documentEditData?.descuento || 0,
-                              )}
-                            </Typography>
-                          </Box>
-                        </Grid>
-                        <Grid item xs={12} sm={3}>
-                          <Box>
-                            <Typography
-                              variant="caption"
-                              color="textSecondary"
-                              sx={{ mb: 0.5, display: 'block' }}
-                            >
-                              % Descuento
-                            </Typography>
-                            <Typography variant="body1" fontWeight="medium">
-                              {store.documentEditData?.porcientoDescuento || 0}%
-                            </Typography>
-                          </Box>
-                        </Grid>
-                        <Grid item xs={12} sm={3}>
-                          <Box>
-                            <Typography
-                              variant="caption"
-                              color="textSecondary"
-                              sx={{ mb: 0.5, display: 'block' }}
-                            >
-                              Impuesto
-                            </Typography>
-                            <Typography variant="body1" fontWeight="medium">
-                              {formatCurrency(
-                                store.documentEditData?.impuesto || 0,
-                              )}
-                            </Typography>
-                          </Box>
-                        </Grid>
-                        <Grid item xs={12} sm={3}>
-                          <Box>
-                            <Typography
-                              variant="caption"
-                              color="textSecondary"
-                              sx={{ mb: 0.5, display: 'block' }}
-                            >
-                              Sub Total
-                            </Typography>
-                            <Typography variant="body1" fontWeight="medium">
-                              {formatCurrency(
-                                store.documentEditData?.subTotal || 0,
-                              )}
-                            </Typography>
-                          </Box>
-                        </Grid>
-                        <Grid item xs={12} sm={3}>
-                          <Box>
-                            <Typography
-                              variant="caption"
-                              color="textSecondary"
-                              sx={{ mb: 0.5, display: 'block' }}
-                            >
-                              Total
-                            </Typography>
-                            <Typography
-                              variant="h6"
-                              color="primary"
-                              fontWeight="bold"
-                            >
-                              {formatCurrency(
-                                store.documentEditData?.total || 0,
-                              )}
-                            </Typography>
-                          </Box>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
                           <Box>
                             <Typography
                               variant="caption"
@@ -712,7 +654,7 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
                             </Typography>
                           </Box>
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid item xs={12} sm={4}>
                           <Box>
                             <Typography
                               variant="caption"
@@ -726,7 +668,7 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
                             </Typography>
                           </Box>
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid item xs={12} sm={2}>
                           <Box>
                             <Typography
                               variant="caption"
@@ -1329,9 +1271,15 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
                                 helperText={error?.message}
                                 inputProps={{ min: 1 }}
                                 autoComplete="off"
-                                onChange={(e) =>
-                                  field.onChange(parseInt(e.target.value) || 1)
-                                }
+                                onChange={(e) => {
+                                  const newValue = parseInt(e.target.value) || 1
+                                  field.onChange(newValue)
+                                  // Also update newDetailForm immediately
+                                  setNewDetailForm((prev) => ({
+                                    ...prev,
+                                    cantidad: newValue,
+                                  }))
+                                }}
                               />
                             )}
                           />
@@ -1352,11 +1300,16 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
                                 helperText={error?.message}
                                 inputProps={{ min: 0, step: 0.01 }}
                                 autoComplete="off"
-                                onChange={(e) =>
-                                  field.onChange(
-                                    parseFloat(e.target.value) || 0,
-                                  )
-                                }
+                                onChange={(e) => {
+                                  const newValue =
+                                    parseFloat(e.target.value) || 0
+                                  field.onChange(newValue)
+                                  // Also update newDetailForm immediately
+                                  setNewDetailForm((prev) => ({
+                                    ...prev,
+                                    precio: newValue,
+                                  }))
+                                }}
                               />
                             )}
                           />
