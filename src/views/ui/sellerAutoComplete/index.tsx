@@ -1,5 +1,11 @@
-import { Autocomplete, AutocompleteValue, TextField } from '@mui/material'
-import { SyntheticEvent, useEffect, useState } from 'react'
+import {
+  Autocomplete,
+  AutocompleteValue,
+  TextField,
+  SxProps,
+  Theme,
+} from '@mui/material'
+import { SyntheticEvent, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import select from 'src/@core/theme/overrides/select'
 import { AppDispatch, RootState } from 'src/store'
@@ -9,6 +15,8 @@ interface SellerAutocompleteProps {
   selectedSellers?: string
   multiple?: boolean
   callBack: (values: string) => void
+  sx?: SxProps<Theme>
+  size?: 'small' | 'medium'
 }
 
 interface SellerOptions {
@@ -20,13 +28,30 @@ export const SellerAutocomplete = (props: SellerAutocompleteProps) => {
   const sellerStore = useSelector((state: RootState) => state.sellers)
 
   const findSellerLabel = (codigo: string) => {
-    return sellerStore?.data.find((v) => v.codigo === codigo)?.nombre || ''
+    return (
+      sellerStore?.data.find((v) => v.codigo === codigo)?.nombre.trim() || ''
+    )
   }
-  const selectSellerValues =
-    props.selectedSellers
-      ?.split(',')
-      .map((v) => ({ codigo: v, label: findSellerLabel(v) }))
-      .filter((item) => item.codigo && item.label) || []
+  const selectSellerValues = useMemo(() => {
+    if (props.multiple) {
+      return (
+        props.selectedSellers
+          ?.split(',')
+          .map((v) => ({ codigo: v, label: findSellerLabel(v) }))
+          .filter((item) => item.codigo && item.label) || []
+      )
+    } else {
+      return props.selectedSellers
+        ? [
+            {
+              codigo: props.selectedSellers,
+              label: findSellerLabel(props.selectedSellers),
+            },
+          ][0]
+        : []
+    }
+  }, [props.selectedSellers, props.multiple]) // Recompute only when selectedSellers or multiple changes
+
   useEffect(() => {
     if (!sellerStore?.data?.length) {
       dispatch(
@@ -57,10 +82,11 @@ export const SellerAutocomplete = (props: SellerAutocompleteProps) => {
       }))}
       filterSelectedOptions
       value={selectSellerValues}
+      size={props.size || 'medium'}
       isOptionEqualToValue={(option, value) => option.codigo === value.codigo}
       id="sellers-dropdown"
       getOptionLabel={(option) => `${option.codigo}-${option.label}` || ''}
-      sx={{ mt: 3, ml: 3 }}
+      sx={props.sx || { mt: 3, ml: 3 }}
       onChange={handleSelection}
       renderInput={(params) => (
         <TextField {...params} label="Vendedores" placeholder="Vendedores" />

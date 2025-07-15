@@ -1,5 +1,5 @@
 import { Autocomplete, AutocompleteValue, TextField } from '@mui/material'
-import { SyntheticEvent, useEffect, useState } from 'react'
+import { SyntheticEvent, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/store'
 import { fetchPaymentType as fetchPaymentTypes } from 'src/store/apps/paymentType'
@@ -8,6 +8,7 @@ interface PaymentTypeAutocompleteProps {
   selectedPaymentType?: string
   multiple?: boolean
   callBack: (values: string) => void
+  size?: 'small' | 'medium'
 }
 
 interface PaymentTypeOptions {
@@ -27,11 +28,25 @@ export const PaymentTypeAutocomplete = (
     )
   }
 
-  const selectPaymentTypes =
-    props.selectedPaymentType
-      ?.split(',')
-      .map((v) => ({ condicionPago: v, label: findConditionLabel(v) }))
-      .filter((item) => item.condicionPago && item.label) || []
+  const selectPaymentTypes = useMemo(() => {
+    if (props.multiple) {
+      return (
+        props.selectedPaymentType
+          ?.split(',')
+          .map((v) => ({ condicionPago: v, label: findConditionLabel(v) }))
+          .filter((item) => item.condicionPago && item.label) || []
+      )
+    } else {
+      return props.selectedPaymentType
+        ? [
+            {
+              condicionPago: props.selectedPaymentType,
+              label: findConditionLabel(props.selectedPaymentType),
+            },
+          ][0]
+        : []
+    }
+  }, [props.selectedPaymentType, props.multiple]) // Recompute only when selectedPayment
 
   useEffect(() => {
     if (!locationStore?.data?.length) {
@@ -57,6 +72,7 @@ export const PaymentTypeAutocomplete = (
         label: v.descripcion,
         condicionPago: v.condicionPago,
       }))}
+      size={props.size}
       filterSelectedOptions
       value={selectPaymentTypes}
       isOptionEqualToValue={(option, value) =>

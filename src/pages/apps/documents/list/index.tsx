@@ -34,6 +34,7 @@ import { DocumentStatus, StatusParam } from 'src/types/apps/documentTypes'
 
 // ** Custom Components Imports
 import TableHeader from 'src/views/apps/documents/list/TableHeader'
+import EditDocumentDialog from 'src/views/apps/documents/EditDocumentDialog'
 
 // ** Styled Components
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
@@ -511,6 +512,7 @@ const InvoiceList = () => {
           </Card>
         </Grid>
       </Grid>
+      <EditDocumentDialog open={store.isEditDialogOpen} />
     </DatePickerWrapper>
   )
 }

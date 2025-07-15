@@ -16,7 +16,10 @@ import { DocumentStatus } from 'src/types/apps/documentTypes'
 import OptionsMenu from 'src/@core/components/option-menu'
 import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit'
 import { AppDispatch } from 'src/store'
-import { changeDocumentStatus } from 'src/store/apps/documents'
+import {
+  changeDocumentStatus,
+  toggleEditDocument,
+} from 'src/store/apps/documents'
 
 const orderStatusObj: any = {
   '1': 'success',
@@ -204,81 +207,119 @@ const handleApproval = (
 
 export const columns = (
   dispatch: ThunkDispatch<AppDispatch, undefined, AnyAction>,
-): GridColDef[] => [
-  ...defaultColumns,
-  {
-    flex: 0.2,
-    minWidth: 140,
-    sortable: false,
-    field: 'actions',
-    headerName: 'Actions',
-    renderCell: ({ row }: CellType) => (
-      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <Tooltip title="Aprobar">
-          <IconButton
-            size="small"
-            color="success"
-            disabled={
-              ![DocumentStatus.Pending, DocumentStatus.Retained].includes(
-                row.procesado,
-              )
-            }
-            onClick={() =>
-              handleApproval(
-                row.noPedidoStr,
-                DocumentStatus.ReadyForIntegration,
-                dispatch,
-              )
-            }
-          >
-            <Icon icon="material-symbols:order-approve" fontSize={20} />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Retener">
-          <IconButton
-            size="small"
-            color="warning"
-            disabled={![DocumentStatus.Pending].includes(row.procesado)}
-            onClick={() =>
-              handleApproval(row.noPedidoStr, DocumentStatus.Retained, dispatch)
-            }
-          >
-            <Icon
-              icon="fluent:document-header-dismiss-24-filled"
-              fontSize={20}
-            />
-          </IconButton>
-        </Tooltip>
-        {/* <Tooltip title="View">
-          <IconButton
-            size="small"
-            component={Link}
-            href={`/apps/documents/preview/${row.noPedidoStr}`}
-          >
-            <Icon icon="mdi:eye-outline" fontSize={20} />
-          </IconButton>
-        </Tooltip> */}
-        <OptionsMenu
-          iconProps={{ fontSize: 20 }}
-          iconButtonProps={{ size: 'small' }}
-          menuProps={{ sx: { '& .MuiMenuItem-root svg': { mr: 2 } } }}
-          options={[
-            {
-              text: 'Download',
-              icon: <Icon icon="mdi:download" fontSize={20} />,
-            },
-            {
-              text: 'Edit',
-              href: `/apps/documents/edit/${row.noPedidoStr}`,
-              icon: <Icon icon="mdi:pencil-outline" fontSize={20} />,
-            },
-            {
-              text: 'Duplicate',
-              icon: <Icon icon="mdi:content-copy" fontSize={20} />,
-            },
-          ]}
-        />
-      </Box>
-    ),
-  },
-]
+): GridColDef[] => {
+  const handleEditDocument = (row: DocumentType) => {
+    dispatch(toggleEditDocument(row))
+  }
+
+  const columnsWithHandlers: GridColDef[] = [
+    {
+      flex: 0.2,
+      field: 'id',
+      minWidth: 120,
+      headerName: '#',
+      renderCell: ({ row }: CellType) => (
+        <Typography
+          sx={{
+            color: 'primary.main',
+            cursor: 'pointer',
+            textDecoration: 'none',
+            '&:hover': { textDecoration: 'underline' },
+          }}
+          onClick={(e) => {
+            e.preventDefault()
+            handleEditDocument(row)
+          }}
+        >
+          {`${row.noPedidoStr}`}
+        </Typography>
+      ),
+    },
+    ...defaultColumns.slice(1), // Skip the first column since we're replacing it
+  ]
+
+  return [
+    ...columnsWithHandlers,
+    {
+      flex: 0.2,
+      minWidth: 140,
+      sortable: false,
+      field: 'actions',
+      headerName: 'Actions',
+      renderCell: ({ row }: CellType) => (
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Tooltip title="Aprobar">
+            <IconButton
+              size="small"
+              color="success"
+              disabled={
+                ![DocumentStatus.Pending, DocumentStatus.Retained].includes(
+                  row.procesado,
+                )
+              }
+              onClick={() =>
+                handleApproval(
+                  row.noPedidoStr,
+                  DocumentStatus.ReadyForIntegration,
+                  dispatch,
+                )
+              }
+            >
+              <Icon icon="material-symbols:order-approve" fontSize={20} />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Retener">
+            <IconButton
+              size="small"
+              color="warning"
+              disabled={![DocumentStatus.Pending].includes(row.procesado)}
+              onClick={() =>
+                handleApproval(
+                  row.noPedidoStr,
+                  DocumentStatus.Retained,
+                  dispatch,
+                )
+              }
+            >
+              <Icon
+                icon="fluent:document-header-dismiss-24-filled"
+                fontSize={20}
+              />
+            </IconButton>
+          </Tooltip>
+          {/* <Tooltip title="View">
+            <IconButton
+              size="small"
+              component={Link}
+              href={`/apps/documents/preview/${row.noPedidoStr}`}
+            >
+              <Icon icon="mdi:eye-outline" fontSize={20} />
+            </IconButton>
+          </Tooltip> */}
+          <OptionsMenu
+            iconProps={{ fontSize: 20 }}
+            iconButtonProps={{ size: 'small' }}
+            menuProps={{ sx: { '& .MuiMenuItem-root svg': { mr: 2 } } }}
+            options={[
+              {
+                text: 'Download',
+                icon: <Icon icon="mdi:download" fontSize={20} />,
+              },
+              {
+                text: 'Edit',
+                icon: <Icon icon="mdi:pencil-outline" fontSize={20} />,
+                menuItemProps: {
+                  onClick: () => handleEditDocument(row),
+                },
+              },
+              {
+                text: 'Duplicate',
+                icon: <Icon icon="mdi:content-copy" fontSize={20} />,
+              },
+            ]}
+          />
+        </Box>
+      ),
+    },
+  ]
+}
