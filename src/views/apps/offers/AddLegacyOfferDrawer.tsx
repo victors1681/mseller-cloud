@@ -15,6 +15,8 @@ import { TransitionProps } from '@mui/material/transitions'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm, Controller } from 'react-hook-form'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -50,6 +52,9 @@ import {
 } from '@/store/apps/offers'
 import { LegacyOfferType, LegacyOfferDetailType } from '@/types/apps/offerType'
 import { ProductAutoComplete } from '@/views/ui/productsAutoComplete'
+import DatePickerWrapper from '@/@core/styles/libs/react-datepicker'
+import DetailModal from './DetailModal'
+import { useLegacyOfferDetailModal } from '@/hooks/useLegacyOfferDetailModal'
 
 interface AddLegacyOfferDialogType {
   open: boolean
@@ -65,8 +70,6 @@ const Transition = forwardRef(function Transition(
 })
 
 const schema = yup.object().shape({
-  idOferta: yup.number().min(0, 'ID debe ser mayor o igual a 0'),
-
   nombre: yup
     .string()
     .max(100, 'El nombre no debe exceder 100 caracteres')
@@ -114,23 +117,111 @@ const AddLegacyOfferDialog = (props: AddLegacyOfferDialogType) => {
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
-
   const store = useSelector((state: RootState) => state.offers)
   const toggle = () => dispatch(toggleAddUpdateLegacyOffer(null))
 
-  // Modal state for adding details
-  const [detailModalOpen, setDetailModalOpen] = useState(false)
-  const [editingDetailIndex, setEditingDetailIndex] = useState<number | null>(
-    null,
-  )
+  // Detail modal hook
+  const {
+    detailModalOpen,
+    editingDetailIndex,
+    detailInitialData,
+    openDetailModal,
+    editDetail,
+    deleteDetail,
+    closeDetailModal,
+    submitDetail,
+  } = useLegacyOfferDetailModal()
+
+  // Date range state
+  const [startDateRange, setStartDateRange] = useState<Date | null>(null)
+  const [endDateRange, setEndDateRange] = useState<Date | null>(null)
+  const [dates, setDates] = useState('')
 
   useEffect(() => {
     if (store.legacyOfferEditData) {
-      reset(store.legacyOfferEditData)
+      const editData = { ...store.legacyOfferEditData }
+
+      // // Convert datetime to date format for DatePicker
+      if (editData.fechaInicio) {
+        const startDate = new Date(editData.fechaInicio)
+        setStartDateRange(startDate)
+        editData.fechaInicio = startDate.toISOString().split('T')[0]
+      }
+      if (editData.fechaFin) {
+        const endDate = new Date(editData.fechaFin)
+        setEndDateRange(endDate)
+        editData.fechaFin = endDate.toISOString().split('T')[0]
+      }
+
+      // Update the dates string for the CustomInput display
+      if (editData.fechaInicio && editData.fechaFin) {
+        const startDate = new Date(editData.fechaInicio)
+        const endDate = new Date(editData.fechaFin)
+        setDates(
+          `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`,
+        )
+      } else if (editData.fechaInicio) {
+        const startDate = new Date(editData.fechaInicio)
+        setDates(startDate.toLocaleDateString())
+      }
+
+      reset(editData)
     } else {
       reset(defaultValues)
+      setStartDateRange(null)
+      setEndDateRange(null)
+      setDates('')
     }
   }, [store.legacyOfferEditData])
+
+  // Handle date range change
+  const handleOnChangeRange = (dates: [Date | null, Date | null]) => {
+    const [start, end] = dates
+    setStartDateRange(start)
+    setEndDateRange(end)
+
+    if (start) {
+      setValue('fechaInicio', start.toISOString().split('T')[0])
+    } else {
+      setValue('fechaInicio', '')
+    }
+
+    if (end) {
+      setValue('fechaFin', end.toISOString().split('T')[0])
+    } else {
+      setValue('fechaFin', '')
+    }
+
+    // Update the dates string for display
+    if (start && end) {
+      setDates(`${start.toLocaleDateString()} - ${end.toLocaleDateString()}`)
+    } else if (start) {
+      setDates(start.toLocaleDateString())
+    } else {
+      setDates('')
+    }
+  }
+
+  // Custom Input Component for DatePicker
+  const CustomInput = ({
+    dates,
+    setDates,
+    label,
+    start,
+    end,
+    ...props
+  }: any) => {
+    return (
+      <TextField
+        {...props}
+        fullWidth
+        label={label}
+        value={dates}
+        onChange={(e) => setDates(e.target.value)}
+        InputLabelProps={{ shrink: true }}
+      />
+    )
+  }
 
   const { reset, control, handleSubmit, watch, setValue } = useForm({
     defaultValues,
@@ -138,106 +229,60 @@ const AddLegacyOfferDialog = (props: AddLegacyOfferDialogType) => {
     resolver: yupResolver(schema),
   })
 
-  // Default values for detail form
-  const defaultDetailValues: LegacyOfferDetailType = {
-    id: undefined,
-    idOferta: 0,
-    codigoProducto: '',
-    precio: 0,
-    rangoInicial: 0,
-    rangoFinal: 0,
-    cantidadPromocion: 0,
-    principal: false,
-  }
-
-  const detailSchema = yup.object().shape({
-    codigoProducto: yup.string().required('Código de producto es requerido'),
-    precio: yup
-      .number()
-      .min(0, 'El precio debe ser mayor o igual a 0')
-      .required('Precio es requerido'),
-    rangoInicial: yup
-      .number()
-      .min(0, 'El rango inicial debe ser mayor o igual a 0')
-      .required('Rango inicial es requerido'),
-    rangoFinal: yup
-      .number()
-      .min(0, 'El rango final debe ser mayor o igual a 0')
-      .required('Rango final es requerido'),
-    cantidadPromocion: yup
-      .number()
-      .min(0, 'La cantidad promoción debe ser mayor o igual a 0')
-      .required('Cantidad promoción es requerida'),
-    principal: yup.boolean(),
-  })
-
-  const {
-    reset: resetDetail,
-    control: controlDetail,
-    handleSubmit: handleSubmitDetail,
-  } = useForm({
-    defaultValues: defaultDetailValues,
-    mode: 'onChange',
-    resolver: yupResolver(detailSchema),
-  })
-
   // Watch the current details array
   const currentDetails = watch('detalle')
+  const tipoOferta = watch('tipoOferta')
 
   const handleOpenDetailModal = () => {
-    const isFirstDetail = currentDetails.length === 0
-    const detailValues = {
-      ...defaultDetailValues,
-      principal: isFirstDetail, // Set principal to true if it's the first detail
-    }
-    resetDetail(detailValues)
-    setEditingDetailIndex(null)
-    setDetailModalOpen(true)
+    openDetailModal(currentDetails)
   }
 
   const handleEditDetail = (index: number) => {
-    const detail = currentDetails[index]
-    resetDetail(detail)
-    setEditingDetailIndex(index)
-    setDetailModalOpen(true)
+    editDetail(index, currentDetails)
   }
 
   const handleDeleteDetail = (index: number) => {
-    const updatedDetails = currentDetails.filter((_, i) => i !== index)
-    setValue('detalle', updatedDetails)
+    deleteDetail(index, currentDetails, setValue)
   }
 
   const handleCloseDetailModal = () => {
-    setDetailModalOpen(false)
-    setEditingDetailIndex(null)
-    resetDetail(defaultDetailValues)
+    closeDetailModal()
   }
 
   const onSubmitDetail = (data: LegacyOfferDetailType) => {
-    const updatedDetails = [...currentDetails]
-
-    if (editingDetailIndex !== null) {
-      // Editing existing detail
-      updatedDetails[editingDetailIndex] = {
-        ...data,
-        id: currentDetails[editingDetailIndex].id,
-        idOferta: watch('idOferta'),
-      }
-    } else {
-      // Adding new detail
-      const newDetail: LegacyOfferDetailType = {
-        ...data,
-        idOferta: watch('idOferta'),
-        // Set as principal if it's the first item, otherwise use the provided value
-        principal: currentDetails.length === 0 ? true : data.principal,
-      }
-      updatedDetails.push(newDetail)
-    }
-
-    setValue('detalle', updatedDetails)
-    handleCloseDetailModal()
+    submitDetail(data, currentDetails, setValue, () =>
+      String(watch('idOferta') || ''),
+    )
   }
   const onSubmit = async (data: LegacyOfferType) => {
+    // Validate that we have at least 2 details: one principal and one non-principal
+    const principalDetails = data.detalle.filter((detail) => detail.principal)
+    const nonPrincipalDetails = data.detalle.filter(
+      (detail) => !detail.principal,
+    )
+    if (data.idOferta === '') {
+      data.idOferta = undefined
+    }
+
+    if (data.fechaInicio) {
+      const startDate = new Date(data.fechaInicio + 'T00:00:00')
+      data.fechaInicio = startDate.toISOString()
+    }
+    if (data.fechaFin) {
+      const endDate = new Date(data.fechaFin + 'T00:50:50')
+      data.fechaFin = endDate.toISOString()
+    }
+
+    if (principalDetails.length !== 1) {
+      toast.error('Debe tener exactamente un detalle principal')
+      return
+    }
+
+    if (nonPrincipalDetails.length === 0) {
+      toast.error('Debe tener al menos un detalle no principal')
+      return
+    }
+
     try {
       const response = await dispatch(addUpdateLegacyOffer(data)).unwrap()
 
@@ -265,387 +310,279 @@ const AddLegacyOfferDialog = (props: AddLegacyOfferDialogType) => {
       onClose={handleClose}
       TransitionComponent={Transition}
     >
-      <AppBar sx={{ position: 'relative' }}>
-        <Toolbar>
-          <IconButton
-            edge="start"
-            color="inherit"
-            onClick={handleClose}
-            aria-label="close"
-          >
-            <Icon icon="mdi:close" />
-          </IconButton>
-          <Typography
-            sx={{ ml: 2, flex: 1, color: 'white' }}
-            variant="h6"
-            component="div"
-          >
-            Agregar Oferta
-          </Typography>
-          <Button autoFocus color="inherit" type="submit" form="offer-form">
-            Grabar
-          </Button>
-        </Toolbar>
-      </AppBar>
-      <Box sx={{ p: 3, overflow: 'auto' }}>
-        <form onSubmit={handleSubmit(onSubmit)} id="offer-form">
-          <Grid container spacing={3} maxWidth="lg" sx={{ mx: 'auto' }}>
-            <Grid item xs={12} sm={10}>
-              <Controller
-                name="nombre"
-                control={control}
-                render={({ field, fieldState: { error } }) => (
-                  <TextField
-                    {...field}
-                    fullWidth
-                    label="Nombre"
-                    error={!!error}
-                    helperText={error?.message}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={2}>
-              <Controller
-                name="idOferta"
-                control={control}
-                render={({ field, fieldState: { error } }) => (
-                  <TextField
-                    {...field}
-                    fullWidth
-                    label="ID Oferta"
-                    disabled={true}
-                    error={!!error}
-                    helperText={error?.message}
-                  />
-                )}
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <Controller
-                name="descripcion"
-                control={control}
-                render={({ field, fieldState: { error } }) => (
-                  <TextField
-                    {...field}
-                    fullWidth
-                    multiline
-                    rows={3}
-                    label="Descripción"
-                    error={!!error}
-                    helperText={error?.message}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="tipoOferta"
-                control={control}
-                render={({ field, fieldState: { error } }) => (
-                  <FormControl fullWidth error={!!error}>
-                    <InputLabel id="tipo-oferta-label">
-                      Tipo de Oferta
-                    </InputLabel>
-                    <Select
+      <DatePickerWrapper>
+        <AppBar sx={{ position: 'relative' }}>
+          <Toolbar>
+            <IconButton
+              edge="start"
+              color="inherit"
+              onClick={handleClose}
+              aria-label="close"
+            >
+              <Icon icon="mdi:close" />
+            </IconButton>
+            <Typography
+              sx={{ ml: 2, flex: 1, color: 'white' }}
+              variant="h6"
+              component="div"
+            >
+              Agregar Oferta
+            </Typography>
+            <Button autoFocus color="inherit" type="submit" form="offer-form">
+              Grabar
+            </Button>
+          </Toolbar>
+        </AppBar>
+        <Box sx={{ p: 3, overflow: 'auto' }}>
+          <form onSubmit={handleSubmit(onSubmit)} id="offer-form">
+            <Grid container spacing={3} maxWidth="lg" sx={{ mx: 'auto' }}>
+              <Grid item xs={12} sm={10}>
+                <Controller
+                  name="nombre"
+                  control={control}
+                  render={({ field, fieldState: { error } }) => (
+                    <TextField
                       {...field}
-                      labelId="tipo-oferta-label"
-                      label="Tipo de Oferta"
-                    >
-                      <MenuItem value="0">0 - Escala</MenuItem>
-                      <MenuItem value="1">1 - Promoción</MenuItem>
-                      <MenuItem value="3">3 - Mixta</MenuItem>
-                    </Select>
-                    {error && (
-                      <Typography
-                        variant="caption"
-                        color="error"
-                        sx={{ ml: 2, mt: 0.5 }}
+                      fullWidth
+                      label="Nombre"
+                      error={!!error}
+                      helperText={error?.message}
+                      autoComplete="off"
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} sm={2}>
+                <Controller
+                  name="idOferta"
+                  control={control}
+                  render={({ field, fieldState: { error } }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="ID Oferta"
+                      disabled={true}
+                      error={!!error}
+                      helperText={error?.message}
+                      autoComplete="off"
+                    />
+                  )}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <Controller
+                  name="descripcion"
+                  control={control}
+                  render={({ field, fieldState: { error } }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      multiline
+                      rows={3}
+                      label="Descripción"
+                      error={!!error}
+                      helperText={error?.message}
+                      autoComplete="off"
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Controller
+                  name="tipoOferta"
+                  control={control}
+                  render={({ field, fieldState: { error } }) => (
+                    <FormControl fullWidth error={!!error}>
+                      <InputLabel id="tipo-oferta-label">
+                        Tipo de Oferta
+                      </InputLabel>
+                      <Select
+                        {...field}
+                        labelId="tipo-oferta-label"
+                        label="Tipo de Oferta"
                       >
-                        {error.message}
-                      </Typography>
-                    )}
-                  </FormControl>
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="condicionPago"
-                control={control}
-                render={({ field, fieldState: { error } }) => (
-                  <TextField
-                    {...field}
-                    fullWidth
-                    label="Condición de Pago"
-                    error={!!error}
-                    helperText={error?.message}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="fechaInicio"
-                control={control}
-                render={({ field, fieldState: { error } }) => (
-                  <TextField
-                    {...field}
-                    fullWidth
-                    type="date"
-                    label="Fecha de Inicio"
-                    InputLabelProps={{ shrink: true }}
-                    error={!!error}
-                    helperText={error?.message}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="fechaFin"
-                control={control}
-                render={({ field, fieldState: { error } }) => (
-                  <TextField
-                    {...field}
-                    fullWidth
-                    type="date"
-                    label="Fecha de Fin"
-                    InputLabelProps={{ shrink: true }}
-                    error={!!error}
-                    helperText={error?.message}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="clasificacion"
-                control={control}
-                render={({ field, fieldState: { error } }) => (
-                  <TextField
-                    {...field}
-                    fullWidth
-                    label="Clasificación"
-                    error={!!error}
-                    helperText={error?.message}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="status"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={value}
-                        onChange={(e) => {
-                          onChange(e.target.checked)
-                        }}
-                      />
-                    }
-                    label="Status (Activo/Inactivo)"
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  mb: 2,
-                }}
-              >
-                <Typography variant="h6">Detalles de la Oferta</Typography>
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={handleOpenDetailModal}
-                  startIcon={<Icon icon="mdi:plus" />}
-                >
-                  Agregar Detalle
-                </Button>
-              </Box>
-
-              {currentDetails.length > 0 ? (
-                <Table
-                  size="small"
-                  sx={{ border: '1px solid', borderColor: 'divider' }}
-                >
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Código Producto</TableCell>
-                      <TableCell>Precio</TableCell>
-                      <TableCell>Rango Inicial</TableCell>
-                      <TableCell>Rango Final</TableCell>
-                      <TableCell>Cantidad Promoción</TableCell>
-                      <TableCell>Principal</TableCell>
-                      <TableCell>Acciones</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {currentDetails.map((detail, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{detail.codigoProducto}</TableCell>
-                        <TableCell>{detail.precio}</TableCell>
-                        <TableCell>{detail.rangoInicial}</TableCell>
-                        <TableCell>{detail.rangoFinal}</TableCell>
-                        <TableCell>{detail.cantidadPromocion}</TableCell>
-                        <TableCell>{detail.principal ? 'Sí' : 'No'}</TableCell>
-                        <TableCell>
-                          <MuiIconButton
-                            size="small"
-                            onClick={() => handleEditDetail(index)}
-                            sx={{ mr: 1 }}
-                          >
-                            <Icon icon="mdi:pencil" fontSize={16} />
-                          </MuiIconButton>
-                          <MuiIconButton
-                            size="small"
-                            color="error"
-                            onClick={() => handleDeleteDetail(index)}
-                          >
-                            <Icon icon="mdi:delete" fontSize={16} />
-                          </MuiIconButton>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              ) : (
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ textAlign: 'center', py: 2 }}
-                >
-                  No hay detalles agregados
-                </Typography>
-              )}
-            </Grid>
-          </Grid>
-        </form>
-      </Box>
-
-      {/* Detail Modal */}
-      <Dialog
-        open={detailModalOpen}
-        onClose={handleCloseDetailModal}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle>
-          {editingDetailIndex !== null ? 'Editar Detalle' : 'Agregar Detalle'}
-        </DialogTitle>
-        <DialogContent>
-          <form onSubmit={handleSubmitDetail(onSubmitDetail)} id="detail-form">
-            <Grid container spacing={3} sx={{ mt: 1 }}>
-              <Grid item xs={12} sm={6}>
-                <ProductAutoComplete
-                  name="codigoProducto"
-                  control={controlDetail}
-                  label="Seleccionar Producto"
-                  placeholder="Seleccionar un producto..."
+                        <MenuItem value="0">0 - Escala</MenuItem>
+                        <MenuItem value="1">1 - Promoción</MenuItem>
+                        <MenuItem value="3">3 - Mixta</MenuItem>
+                      </Select>
+                      {error && (
+                        <Typography
+                          variant="caption"
+                          color="error"
+                          sx={{ ml: 2, mt: 0.5 }}
+                        >
+                          {error.message}
+                        </Typography>
+                      )}
+                    </FormControl>
+                  )}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <Controller
-                  name="precio"
-                  control={controlDetail}
+                  name="condicionPago"
+                  control={control}
                   render={({ field, fieldState: { error } }) => (
                     <TextField
                       {...field}
                       fullWidth
-                      type="number"
-                      label="Precio"
+                      label="Condición de Pago"
                       error={!!error}
                       helperText={error?.message}
+                      autoComplete="off"
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <DatePicker
+                  isClearable
+                  selectsRange
+                  monthsShown={2}
+                  endDate={endDateRange}
+                  selected={startDateRange}
+                  startDate={startDateRange}
+                  shouldCloseOnSelect={false}
+                  id="date-range-picker-months"
+                  onChange={handleOnChangeRange}
+                  customInput={
+                    <CustomInput
+                      dates={dates}
+                      setDates={setDates}
+                      label="Rango de Fechas"
+                      end={endDateRange as number | Date}
+                      start={startDateRange as number | Date}
+                    />
+                  }
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Controller
+                  name="clasificacion"
+                  control={control}
+                  render={({ field, fieldState: { error } }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Clasificación"
+                      error={!!error}
+                      helperText={error?.message}
+                      autoComplete="off"
                     />
                   )}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <Controller
-                  name="rangoInicial"
-                  control={controlDetail}
-                  render={({ field, fieldState: { error } }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      type="number"
-                      label="Rango Inicial"
-                      error={!!error}
-                      helperText={error?.message}
-                    />
-                  )}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Controller
-                  name="rangoFinal"
-                  control={controlDetail}
-                  render={({ field, fieldState: { error } }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      type="number"
-                      label="Rango Final"
-                      error={!!error}
-                      helperText={error?.message}
-                    />
-                  )}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Controller
-                  name="cantidadPromocion"
-                  control={controlDetail}
-                  render={({ field, fieldState: { error } }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      type="number"
-                      label="Cantidad Promoción"
-                      error={!!error}
-                      helperText={error?.message}
-                    />
-                  )}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Controller
-                  name="principal"
-                  control={controlDetail}
+                  name="status"
+                  control={control}
                   render={({ field: { onChange, value } }) => (
                     <FormControlLabel
                       control={
                         <Switch
                           checked={value}
-                          onChange={(e) => onChange(e.target.checked)}
+                          onChange={(e) => {
+                            onChange(e.target.checked)
+                          }}
                         />
                       }
-                      label="Principal"
+                      label="Status (Activo/Inactivo)"
                     />
                   )}
                 />
               </Grid>
+              <Grid item xs={12}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    mb: 2,
+                  }}
+                >
+                  <Typography variant="h6">Detalles de la Oferta</Typography>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    onClick={handleOpenDetailModal}
+                    startIcon={<Icon icon="mdi:plus" />}
+                  >
+                    Agregar Detalle
+                  </Button>
+                </Box>
+
+                {currentDetails.length > 0 ? (
+                  <Table
+                    size="small"
+                    sx={{ border: '1px solid', borderColor: 'divider' }}
+                  >
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Código Producto</TableCell>
+                        <TableCell>Precio</TableCell>
+                        <TableCell>Rango Inicial</TableCell>
+                        <TableCell>Rango Final</TableCell>
+                        <TableCell>Cantidad Promoción</TableCell>
+                        <TableCell>Principal</TableCell>
+                        <TableCell>Acciones</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {currentDetails.map((detail, index) => (
+                        <TableRow key={index}>
+                          <TableCell>{detail.codigoProducto}</TableCell>
+                          <TableCell>{detail.precio}</TableCell>
+                          <TableCell>{detail.rangoInicial}</TableCell>
+                          <TableCell>{detail.rangoFinal}</TableCell>
+                          <TableCell>{detail.cantidadPromocion}</TableCell>
+                          <TableCell>
+                            {detail.principal ? 'Sí' : 'No'}
+                          </TableCell>
+                          <TableCell>
+                            <MuiIconButton
+                              size="small"
+                              onClick={() => handleEditDetail(index)}
+                              sx={{ mr: 1 }}
+                            >
+                              <Icon icon="mdi:pencil" fontSize={16} />
+                            </MuiIconButton>
+                            <MuiIconButton
+                              size="small"
+                              color="error"
+                              onClick={() => handleDeleteDetail(index)}
+                            >
+                              <Icon icon="mdi:delete" fontSize={16} />
+                            </MuiIconButton>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ textAlign: 'center', py: 2 }}
+                  >
+                    No hay detalles agregados
+                  </Typography>
+                )}
+              </Grid>
             </Grid>
           </form>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDetailModal} color="secondary">
-            Cancelar
-          </Button>
-          <Button type="submit" form="detail-form" variant="contained">
-            {editingDetailIndex !== null ? 'Actualizar' : 'Agregar'}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+
+        <DetailModal
+          open={detailModalOpen}
+          onClose={handleCloseDetailModal}
+          onSubmit={onSubmitDetail}
+          editingDetailIndex={editingDetailIndex}
+          currentDetails={currentDetails}
+          tipoOferta={tipoOferta}
+          initialData={detailInitialData}
+        />
+      </DatePickerWrapper>
     </Dialog>
   )
 }
