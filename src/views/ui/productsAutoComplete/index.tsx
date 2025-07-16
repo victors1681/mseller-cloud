@@ -196,7 +196,9 @@ export const ProductAutoComplete = (props: ProductAutoCompleteProps) => {
             inputValue={inputValue}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             id="products-dropdown"
-            getOptionLabel={(option) => `${option.id}-${option.label}` || ''}
+            getOptionLabel={(option) =>
+              (option.id && `${option.id}-${option.label}`) || ''
+            }
             sx={{ mt: 0, ml: 0, ...props.sx }}
             onChange={handleSelection}
             onInputChange={async (_, newInputValue) => {

@@ -19,6 +19,7 @@ export type InvoiceClientType = {
 export enum TipoDocumentoEnum {
   ORDER = 'order',
   QUOTE = 'quote',
+  INVOICE = 'invoice',
 }
 
 export interface StatusParam {
@@ -162,6 +163,8 @@ export interface DocumentUpdateType {
   total: number
   fechaVencimiento: string
   detalle: DocumentUpdateDetail[]
+  tipoPedido?: string
+  nuevoCliente?: boolean
   // New required fields
   tipoDocumento: string
   codigoCliente: string
@@ -171,6 +174,7 @@ export interface DocumentUpdateType {
   noOrden?: string
   avatarUrl?: string
   confirmado: boolean
+  codigoVendedor?: string
 }
 
 export interface Condicion {

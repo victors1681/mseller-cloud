@@ -56,6 +56,7 @@ import { ProductType } from 'src/types/apps/productTypes'
 import { CustomerType } from 'src/types/apps/customerType'
 import {
   addUpdateDocument,
+  addNewDocument,
   toggleEditDocument,
   fetchDocumentDetails,
 } from 'src/store/apps/documents'
@@ -70,6 +71,7 @@ import CustomerSearchDialog from 'src/views/ui/customerSearchDialog'
 import { useCustomerSearchDialog } from 'src/views/ui/customerSearchDialog/useCustomerSearchDialog'
 import { SellerAutocomplete } from 'src/views/ui/sellerAutoComplete'
 import { PaymentTypeAutocomplete } from 'src/views/ui/paymentTypeAutoComplete'
+import { LocationAutocomplete } from 'src/views/ui/locationAutoComplete'
 
 // ** Custom Hooks
 import { useOrderCalculations } from 'src/hooks/useOrderCalculations'
@@ -79,6 +81,7 @@ import { convertToDocumentUpdate } from 'src/utils/documentUtils'
 
 // ** Types
 import type { DocumentTypeDetail } from 'src/types/apps/documentTypes'
+import { useAuth } from '@/hooks/useAuth'
 
 interface EditDocumentDialogProps {
   open: boolean
@@ -132,6 +135,11 @@ const schema = yup.object().shape({
     )
     .required('Tipo de documento es requerido'),
 
+  localidadId: yup
+    .number()
+    .positive('Debe seleccionar una localidad válida')
+    .required('La localidad es requerida'),
+
   confirmado: yup.boolean(),
 
   nuevoCliente: yup.boolean(),
@@ -143,8 +151,9 @@ const defaultValues: Partial<DocumentType> = {
   nota: '',
   condicionPago: '',
   tipoPedido: '',
-  fecha: '',
+  fecha: new Date().toISOString().split('T')[0], // Set default to today's date
   tipoDocumento: TipoDocumentoEnum.ORDER,
+  localidadId: 0,
   confirmado: false,
   nuevoCliente: false,
 }
@@ -159,6 +168,7 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
   const productStore = useSelector((state: RootState) => state.products)
   const toggle = () => dispatch(toggleEditDocument(null))
   const cantidadInputRef = useRef<HTMLInputElement>(null)
+  const auth = useAuth()
 
   // ** Local State for Detail Management
   const [detailsData, setDetailsData] = useState<DocumentTypeDetail[]>([])
@@ -494,20 +504,35 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
   ])
 
   useEffect(() => {
-    if (open && store.documentEditData && store.documentEditData.noPedidoStr) {
-      // Fetch complete document details when dialog opens
+    if (
+      open &&
+      store.documentEditData &&
+      store.documentEditData.noPedidoStr &&
+      !store.isCreateMode
+    ) {
+      // Fetch complete document details when dialog opens in edit mode
       dispatch(fetchDocumentDetails(store.documentEditData.noPedidoStr))
     }
-  }, [open, store.documentEditData?.noPedidoStr, dispatch])
+  }, [open, store.documentEditData?.noPedidoStr, store.isCreateMode, dispatch])
 
   useEffect(() => {
-    if (store.documentEditData && !store.isLoadingDetails) {
+    if (store.isCreateMode) {
+      // Reset to default values for create mode
+      reset(defaultValues)
+      setDetailsData([])
+      setSelectedCustomerData(null)
+    } else if (store.documentEditData && !store.isLoadingDetails) {
       const editData = { ...store.documentEditData }
 
       // Format date for DatePicker
       if (editData.fecha) {
         const dateValue = new Date(editData.fecha).toISOString().split('T')[0]
         editData.fecha = dateValue
+      }
+
+      // Ensure localidadId is set from localidad object if available
+      if (editData.localidad && !editData.localidadId) {
+        editData.localidadId = editData.localidad.id || 0
       }
 
       // Sync details data
@@ -517,70 +542,129 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
       setSelectedCustomerData(null)
 
       reset(editData)
-    } else {
+    } else if (!store.isCreateMode) {
       reset(defaultValues)
       setDetailsData([])
       setSelectedCustomerData(null)
     }
-  }, [store.documentEditData, store.isLoadingDetails, reset])
+  }, [
+    store.documentEditData,
+    store.isLoadingDetails,
+    store.isCreateMode,
+    reset,
+  ])
 
   const onSubmit = async (data: Partial<DocumentType>) => {
-    if (!store.documentEditData) {
+    if (!store.isCreateMode && !store.documentEditData) {
       toast.error('No hay datos de documento para editar')
       return
     }
 
-    // Create DocumentUpdateType for API submission using utility function
-    const documentUpdate: DocumentUpdateType = convertToDocumentUpdate(
-      { ...store.documentEditData, ...data },
-      detailsData,
-      orderCalculations,
-    )
-
-    // Convert date back to ISO format if needed
-    if (data.fecha) {
-      const dateObj = new Date(data.fecha + 'T00:00:00')
-      documentUpdate.fecha = dateObj.toISOString()
-    }
-
-    console.log('Full updated document (for reference):', documentUpdate)
-
-    try {
-      // You can use either documentUpdate or updatedDocument depending on your API requirements
-      const response = await dispatch(
-        addUpdateDocument(documentUpdate), // Change to documentUpdate when API is ready
-      ).unwrap()
-
-      if (response.success) {
-        toggle()
-        reset()
-        setDetailsData([])
-        setNewDetailForm({
-          codigoProducto: '',
-          cantidad: 1,
-          precio: 0,
-          descripcion: '',
-          unidad: '',
-        })
-        resetDetailForm({
-          codigoProducto: '',
-          cantidad: 1,
-          precio: 0,
-        })
-        setIsEditingDetail(null)
-        toast.success('Documento actualizado exitosamente')
-      } else {
-        toast.error(response.message || 'Error actualizando el documento')
+    if (store.isCreateMode) {
+      // Create new document
+      const newDocumentUpdate: DocumentUpdateType = {
+        noPedidoStr: '', // Server will generate
+        nota: data.nota || '',
+        condicionPago: data.condicionPago || '',
+        descuento: orderCalculations.descuentoTotal,
+        fecha: data.fecha
+          ? new Date(data.fecha + 'T00:00:00').toISOString()
+          : new Date().toISOString(),
+        porcientoDescuento: 0,
+        subTotal: orderCalculations.subtotal,
+        impuesto: orderCalculations.impuestoTotal,
+        total: orderCalculations.total,
+        fechaVencimiento: new Date().toISOString(), // You might want to calculate this based on payment terms
+        detalle: detailsData.map((detail, index) => ({
+          id: undefined, // Server will generate
+          codigoProducto: detail.codigoProducto,
+          cantidad: detail.cantidad,
+          descripcion: detail.descripcion,
+          precio: detail.precio,
+          impuesto: detail.impuesto || 0,
+          porcientoImpuesto: detail.porcientoImpuesto || 0,
+          descuento: detail.descuento || 0,
+          porcientoDescuento: detail.porcientoDescuento || 0,
+          factor: detail.factor || 1,
+          factorOriginal: detail.factorOriginal || 1,
+          isc: detail.isc || 0,
+          adv: detail.adv || 0,
+          subTotal: detail.subTotal,
+          productoRef: detail.productoRef || '',
+          grupoId: detail.grupoId || '',
+          area: detail.area || '',
+          unidad: detail.unidad || '',
+          tipoImpuesto: detail.tipoImpuesto || '',
+          cantidadOriginal: detail.cantidadOriginal || detail.cantidad,
+          existencia: 0,
+          apartado: 0,
+          promocion: detail.promocion || false,
+        })),
+        tipoDocumento: data.tipoDocumento || TipoDocumentoEnum.ORDER,
+        codigoCliente: data.codigoCliente || '',
+        codigoVendedor: data.codigoVendedor || '',
+        tipoPedido: data.tipoPedido || '',
+        nuevoCliente: data.nuevoCliente || false,
+        nombreCliente: selectedCustomerData?.nombreCliente || '',
+        firebaseUserId: '', //will be set by the backend
+        localidadId: data.localidadId || 0,
+        noOrden: '',
+        avatarUrl: auth.user?.photoURL,
+        confirmado: data.confirmado || false,
       }
-    } catch (error) {
-      console.error('Update error:', error)
-      toast.error('Error inesperado al actualizar el documento')
+
+      console.log('Creating new document:', newDocumentUpdate)
+
+      try {
+        const response = await dispatch(
+          addNewDocument(newDocumentUpdate),
+        ).unwrap()
+
+        if (response.success) {
+          handleClose()
+        } else {
+          toast.error(response.message || 'Error creando el documento')
+        }
+      } catch (error) {
+        console.error('Create error:', error)
+        toast.error('Error inesperado al crear el documento')
+      }
+    } else {
+      // Update existing document
+      const documentUpdate: DocumentUpdateType = convertToDocumentUpdate(
+        { ...store.documentEditData!, ...data } as DocumentType,
+        detailsData,
+        orderCalculations,
+      )
+
+      // Convert date back to ISO format if needed
+      if (data.fecha) {
+        const dateObj = new Date(data.fecha + 'T00:00:00')
+        documentUpdate.fecha = dateObj.toISOString()
+      }
+
+      console.log('Updating existing document:', documentUpdate)
+
+      try {
+        const response = await dispatch(
+          addUpdateDocument(documentUpdate),
+        ).unwrap()
+
+        if (response.success) {
+          handleClose()
+        } else {
+          toast.error(response.message || 'Error actualizando el documento')
+        }
+      } catch (error) {
+        console.error('Update error:', error)
+        toast.error('Error inesperado al actualizar el documento')
+      }
     }
   }
 
   const handleClose = () => {
     toggle()
-    reset()
+    reset(defaultValues)
     setDetailsData([])
     setNewDetailForm({
       codigoProducto: '',
@@ -623,16 +707,22 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
               variant="h6"
               component="div"
             >
-              Editar Documento
+              {store.isCreateMode ? 'Crear Documento' : 'Editar Documento'}
             </Typography>
             <Button
               autoFocus
               color="inherit"
               type="submit"
               form="document-form"
-              disabled={store.isLoadingDetails}
+              disabled={store.isLoadingDetails || store.isSubmitting}
             >
-              {store.isLoadingDetails ? 'Cargando...' : 'Guardar'}
+              {store.isLoadingDetails
+                ? 'Cargando...'
+                : store.isSubmitting
+                ? 'Guardando...'
+                : store.isCreateMode
+                ? 'Crear'
+                : 'Guardar'}
             </Button>
           </Toolbar>
         </AppBar>
@@ -652,115 +742,117 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
             <form onSubmit={handleSubmit(onSubmit)} id="document-form">
               <Grid container spacing={3} maxWidth="lg" sx={{ mx: 'auto' }}>
                 {/* Read-only Information Section */}
-                <Grid item xs={12}>
-                  <Card>
-                    <CardHeader title="Documento" />
-                    <CardContent>
-                      <Grid container spacing={3}>
-                        <Grid item xs={12} sm={3}>
-                          <Box>
-                            <Typography
-                              variant="caption"
-                              color="textSecondary"
-                              sx={{ mb: 0.5, display: 'block' }}
-                            >
-                              No. Pedido
-                            </Typography>
-                            <Typography variant="body1" fontWeight="medium">
-                              {store.documentEditData?.noPedidoStr || '-'}
-                            </Typography>
-                          </Box>
-                        </Grid>
-
-                        <Grid item xs={12} sm={3}>
-                          <Box>
-                            <Typography
-                              variant="caption"
-                              color="textSecondary"
-                              sx={{ mb: 0.5, display: 'block' }}
-                            >
-                              NCF
-                            </Typography>
-                            <Typography variant="body1" fontWeight="medium">
-                              {store.documentEditData?.ncf || '-'}
-                            </Typography>
-                          </Box>
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
-                          <Box>
-                            <Typography
-                              variant="caption"
-                              color="textSecondary"
-                              sx={{ mb: 0.5, display: 'block' }}
-                            >
-                              Descripción NCF
-                            </Typography>
-                            <Typography variant="body1" fontWeight="medium">
-                              {store.documentEditData?.ncfDescripcion || '-'}
-                            </Typography>
-                          </Box>
-                        </Grid>
-                        <Grid item xs={12} sm={2}>
-                          <Box>
-                            <Typography
-                              variant="caption"
-                              color="textSecondary"
-                              sx={{ mb: 0.5, display: 'block' }}
-                            >
-                              Status
-                            </Typography>
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 1,
-                              }}
-                            >
-                              <Typography variant="body1" fontWeight="medium">
-                                {store.documentEditData?.status || '-'}
-                              </Typography>
-                              {store.documentEditData?.anulado && (
-                                <Chip
-                                  label="ANULADO"
-                                  color="error"
-                                  variant="filled"
-                                  size="small"
-                                />
-                              )}
-                            </Box>
-                          </Box>
-                        </Grid>
-
-                        {store.documentEditData?.mensajesError && (
-                          <Grid item xs={12}>
+                {!store.isCreateMode && (
+                  <Grid item xs={12}>
+                    <Card>
+                      <CardHeader title="Documento" />
+                      <CardContent>
+                        <Grid container spacing={3}>
+                          <Grid item xs={12} sm={3}>
                             <Box>
                               <Typography
                                 variant="caption"
-                                color="error"
+                                color="textSecondary"
                                 sx={{ mb: 0.5, display: 'block' }}
                               >
-                                Mensajes de Error
+                                No. Pedido
                               </Typography>
-                              <Typography
-                                variant="body2"
-                                color="error"
-                                sx={{
-                                  p: 2,
-                                  backgroundColor: 'error.light',
-                                  borderRadius: 1,
-                                  border: '1px solid',
-                                  borderColor: 'error.main',
-                                }}
-                              >
-                                {store.documentEditData.mensajesError}
+                              <Typography variant="body1" fontWeight="medium">
+                                {store.documentEditData?.noPedidoStr || '-'}
                               </Typography>
                             </Box>
                           </Grid>
-                        )}
-                      </Grid>
-                    </CardContent>
-                  </Card>
-                </Grid>
+
+                          <Grid item xs={12} sm={3}>
+                            <Box>
+                              <Typography
+                                variant="caption"
+                                color="textSecondary"
+                                sx={{ mb: 0.5, display: 'block' }}
+                              >
+                                NCF
+                              </Typography>
+                              <Typography variant="body1" fontWeight="medium">
+                                {store.documentEditData?.ncf || '-'}
+                              </Typography>
+                            </Box>
+                          </Grid>
+                          <Grid item xs={12} sm={4}>
+                            <Box>
+                              <Typography
+                                variant="caption"
+                                color="textSecondary"
+                                sx={{ mb: 0.5, display: 'block' }}
+                              >
+                                Descripción NCF
+                              </Typography>
+                              <Typography variant="body1" fontWeight="medium">
+                                {store.documentEditData?.ncfDescripcion || '-'}
+                              </Typography>
+                            </Box>
+                          </Grid>
+                          <Grid item xs={12} sm={2}>
+                            <Box>
+                              <Typography
+                                variant="caption"
+                                color="textSecondary"
+                                sx={{ mb: 0.5, display: 'block' }}
+                              >
+                                Status
+                              </Typography>
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 1,
+                                }}
+                              >
+                                <Typography variant="body1" fontWeight="medium">
+                                  {store.documentEditData?.status || '-'}
+                                </Typography>
+                                {store.documentEditData?.anulado && (
+                                  <Chip
+                                    label="ANULADO"
+                                    color="error"
+                                    variant="filled"
+                                    size="small"
+                                  />
+                                )}
+                              </Box>
+                            </Box>
+                          </Grid>
+
+                          {store.documentEditData?.mensajesError && (
+                            <Grid item xs={12}>
+                              <Box>
+                                <Typography
+                                  variant="caption"
+                                  color="error"
+                                  sx={{ mb: 0.5, display: 'block' }}
+                                >
+                                  Mensajes de Error
+                                </Typography>
+                                <Typography
+                                  variant="body2"
+                                  color="error"
+                                  sx={{
+                                    p: 2,
+                                    backgroundColor: 'error.light',
+                                    borderRadius: 1,
+                                    border: '1px solid',
+                                    borderColor: 'error.main',
+                                  }}
+                                >
+                                  {store.documentEditData.mensajesError}
+                                </Typography>
+                              </Box>
+                            </Grid>
+                          )}
+                        </Grid>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                )}
 
                 {/* Editable Fields Section */}
                 <Grid item xs={12}>
@@ -780,7 +872,9 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
                                     {...field}
                                     fullWidth
                                     size="small"
-                                    disabled
+                                    disabled={
+                                      !store.isCreateMode || store.isSubmitting
+                                    }
                                     label="Código del Cliente"
                                     error={!!error}
                                     helperText={error?.message}
@@ -789,6 +883,7 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
                                       endAdornment: (
                                         <IconButton
                                           size="small"
+                                          disabled={store.isSubmitting}
                                           onClick={
                                             customerSearchDialog.openDialog
                                           }
@@ -814,7 +909,7 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
                                   <TextField
                                     {...field}
                                     fullWidth
-                                    disabled
+                                    disabled={true}
                                     size="small"
                                     label="Nombre del Cliente"
                                     value={
@@ -841,10 +936,12 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
                                     sx={{ mt: 0, ml: 0 }}
                                     size="small"
                                     callBack={(selectedCode: string) => {
-                                      setValue(
-                                        'codigoVendedor',
-                                        selectedCode || '',
-                                      )
+                                      if (!store.isSubmitting) {
+                                        setValue(
+                                          'codigoVendedor',
+                                          selectedCode || '',
+                                        )
+                                      }
                                     }}
                                   />
                                 )}
@@ -872,7 +969,9 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
                                     size="small"
                                     selectedPaymentType={value}
                                     callBack={(newValue) => {
-                                      onChange(newValue)
+                                      if (!store.isSubmitting) {
+                                        onChange(newValue)
+                                      }
                                     }}
                                   />
                                 )}
@@ -899,6 +998,7 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
                                     fullWidth
                                     size="small"
                                     type="date"
+                                    disabled={store.isSubmitting}
                                     label="Fecha"
                                     error={!!error}
                                     helperText={error?.message}
@@ -916,12 +1016,18 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
                                     fullWidth
                                     error={!!error}
                                     size="small"
+                                    disabled={store.isSubmitting}
                                   >
                                     <InputLabel>Tipo de Documento</InputLabel>
                                     <Select
                                       {...field}
                                       label="Tipo de Documento"
                                     >
+                                      <MenuItem
+                                        value={TipoDocumentoEnum.INVOICE}
+                                      >
+                                        Factura
+                                      </MenuItem>
                                       <MenuItem value={TipoDocumentoEnum.ORDER}>
                                         Orden
                                       </MenuItem>
@@ -951,6 +1057,7 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
                                     {...field}
                                     fullWidth
                                     size="small"
+                                    disabled={store.isSubmitting}
                                     label="Tipo de Pedido"
                                     error={!!error}
                                     helperText={error?.message}
@@ -960,19 +1067,39 @@ const EditDocumentDialog = (props: EditDocumentDialogProps) => {
                               />
                             </Grid>
                             <Grid item xs={12}>
-                              <TextField
-                                fullWidth
-                                size="small"
-                                label="Localidad"
-                                value={
-                                  store.documentEditData?.localidad
-                                    ?.descripcion || 'N/A'
-                                }
-                                InputProps={{
-                                  readOnly: true,
-                                }}
-                                variant="outlined"
+                              <Controller
+                                name="localidadId"
+                                control={control}
+                                render={({
+                                  field: { value, onChange },
+                                  fieldState: { error },
+                                }) => (
+                                  <LocationAutocomplete
+                                    selectedLocation={value?.toString() || ''}
+                                    sx={{ mt: 0, ml: 0 }}
+                                    callBack={(selectedLocationId: string) => {
+                                      if (!store.isSubmitting) {
+                                        onChange(
+                                          parseInt(selectedLocationId) || 0,
+                                        )
+                                      }
+                                    }}
+                                  />
+                                )}
                               />
+                              {/* Display any validation errors */}
+                              {control._formState.errors.localidadId && (
+                                <Typography
+                                  variant="caption"
+                                  color="error"
+                                  sx={{ mt: 1, ml: 2, display: 'block' }}
+                                >
+                                  {
+                                    control._formState.errors.localidadId
+                                      ?.message
+                                  }
+                                </Typography>
+                              )}
                             </Grid>
                             <Grid item xs={12}>
                               <Controller

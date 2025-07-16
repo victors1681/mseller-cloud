@@ -5,9 +5,8 @@ import {
   SxProps,
   Theme,
 } from '@mui/material'
-import { SyntheticEvent, useEffect, useMemo, useState } from 'react'
+import { SyntheticEvent, useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import select from 'src/@core/theme/overrides/select'
 import { AppDispatch, RootState } from 'src/store'
 import { fetchSellers } from 'src/store/apps/seller'
 
@@ -85,7 +84,9 @@ export const SellerAutocomplete = (props: SellerAutocompleteProps) => {
       size={props.size || 'medium'}
       isOptionEqualToValue={(option, value) => option.codigo === value.codigo}
       id="sellers-dropdown"
-      getOptionLabel={(option) => `${option.codigo}-${option.label}` || ''}
+      getOptionLabel={(option) =>
+        (option.codigo && `${option.codigo}-${option.label}`) || ''
+      }
       sx={props.sx || { mt: 3, ml: 3 }}
       onChange={handleSelection}
       renderInput={(params) => (

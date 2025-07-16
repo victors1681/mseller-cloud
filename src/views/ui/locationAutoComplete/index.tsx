@@ -5,7 +5,7 @@ import {
   SxProps,
   Theme,
 } from '@mui/material'
-import { SyntheticEvent, useEffect } from 'react'
+import { SyntheticEvent, useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/store'
 import { fetchLocations as fetchLocations } from 'src/store/apps/location'
@@ -32,12 +32,36 @@ export const LocationAutocomplete = (props: LocationAutocompleteProps) => {
     )
   }
 
-  const selectLocation =
-    props.selectedLocation
-      ?.split(',')
-      .map((v) => ({ id: v.toString(), label: findLocationLabel(v) }))
-      .filter((item) => item.id.toString() && item.label) || []
+  const selectLocation = useMemo(() => {
+    if (props.multiple) {
+      return (
+        props.selectedLocation
+          ?.split(',')
+          .map((v) => ({ id: v.toString(), label: findLocationLabel(v) }))
+          .filter((item) => item.id.toString() && item.label) || []
+      )
+    } else {
+      if (
+        props.selectedLocation &&
+        !locationStore.data.some(
+          (s) => s.id.toString() === props.selectedLocation,
+        )
+      ) {
+        return []
+      }
 
+      return props.selectedLocation
+        ? [
+            {
+              id: props.selectedLocation.toString(),
+              label: findLocationLabel(props.selectedLocation),
+            },
+          ][0]
+        : []
+    }
+  }, [props.selectedLocation, props.multiple])
+
+  console.log('selectLocation', selectLocation)
   useEffect(() => {
     if (!locationStore?.data?.length) {
       dispatch(fetchLocations())
@@ -66,7 +90,9 @@ export const LocationAutocomplete = (props: LocationAutocompleteProps) => {
       value={selectLocation}
       isOptionEqualToValue={(option, value) => option.id === value.id}
       id="locations-dropdown"
-      getOptionLabel={(option) => `${option.id}-${option.label}` || ''}
+      getOptionLabel={(option) =>
+        (option.id && `${option.id}-${option.label}`) || ''
+      }
       sx={{ mt: 0, ml: 0, ...props.sx }}
       onChange={handleSelection}
       renderInput={(params) => (

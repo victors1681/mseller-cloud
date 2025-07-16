@@ -80,7 +80,8 @@ export const PaymentTypeAutocomplete = (
       }
       id="paymentType-dropdown"
       getOptionLabel={(option) =>
-        `${option.condicionPago}-${option.label}` || ''
+        (option.condicionPago && `${option.condicionPago}-${option.label}`) ||
+        ''
       }
       sx={{ mt: 0, ml: 0 }}
       onChange={handleSelection}
