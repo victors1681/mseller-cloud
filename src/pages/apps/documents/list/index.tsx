@@ -30,11 +30,15 @@ import { fetchData, changeDocumentStatus } from 'src/store/apps/documents'
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
 
-import { DocumentStatus, StatusParam } from 'src/types/apps/documentTypes'
+import {
+  DocumentStatus,
+  StatusParam,
+  TipoDocumentoEnum,
+} from 'src/types/apps/documentTypes'
 
 // ** Custom Components Imports
 import TableHeader from 'src/views/apps/documents/list/TableHeader'
-import EditDocumentDialog from 'src/views/apps/documents/EditDocumentDialog'
+import AddEditDocumentDialog from 'src/views/apps/documents/add-edit-document'
 
 // ** Styled Components
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
@@ -440,8 +444,15 @@ const InvoiceList = () => {
                       labelId="documentType-status-select"
                     >
                       <MenuItem value="">none</MenuItem>
-                      <MenuItem value="order">Pedido</MenuItem>
-                      <MenuItem value="invoice">Cotización</MenuItem>
+                      <MenuItem value={TipoDocumentoEnum.ORDER}>
+                        Pedido
+                      </MenuItem>
+                      <MenuItem value={TipoDocumentoEnum.INVOICE}>
+                        Factura
+                      </MenuItem>
+                      <MenuItem value={TipoDocumentoEnum.QUOTE}>
+                        Cotización
+                      </MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -512,7 +523,7 @@ const InvoiceList = () => {
           </Card>
         </Grid>
       </Grid>
-      <EditDocumentDialog open={store.isEditDialogOpen} />
+      <AddEditDocumentDialog open={store.isEditDialogOpen} />
     </DatePickerWrapper>
   )
 }

@@ -43,7 +43,7 @@ const CustomerSearchDialog: React.FC<CustomerSearchDialogProps> = ({
 }) => {
   // ** State
   const [searchTerm, setSearchTerm] = useState('')
-  const [currentPage, setCurrentPage] = useState(1)
+  const [currentPage, setCurrentPage] = useState(0)
   const [localLoading, setLocalLoading] = useState(false)
 
   // ** Redux
@@ -73,18 +73,11 @@ const CustomerSearchDialog: React.FC<CustomerSearchDialogProps> = ({
   }, [dispatch])
 
   // ** Effects
-  useEffect(() => {
-    if (open) {
-      // Reset search when dialog opens
-      setSearchTerm('')
-      setCurrentPage(1)
-      // Load initial data
-      debouncedSearch('', 1)
-    }
-  }, [open, debouncedSearch])
 
   useEffect(() => {
-    if (open) {
+    setSearchTerm('')
+    setCurrentPage(0)
+    if (open && (searchTerm || store.data.length === 0)) {
       debouncedSearch(searchTerm, currentPage)
     }
   }, [searchTerm, currentPage, debouncedSearch, open])
@@ -93,7 +86,7 @@ const CustomerSearchDialog: React.FC<CustomerSearchDialogProps> = ({
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
     setSearchTerm(value)
-    setCurrentPage(1) // Reset to first page when searching
+    setCurrentPage(0) // Reset to first page when searching
   }
 
   const handlePageChange = (
@@ -110,7 +103,7 @@ const CustomerSearchDialog: React.FC<CustomerSearchDialogProps> = ({
 
   const handleClose = () => {
     setSearchTerm('')
-    setCurrentPage(1)
+    setCurrentPage(0)
     onClose()
   }
 
