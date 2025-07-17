@@ -31,6 +31,7 @@ import { RootState } from '@/store'
 import AddSellerDrawer from '@/views/apps/sellers/AddSellerDrawer'
 import AddLocationDrawer from '@/views/apps/locations/AddLocationDrawer'
 import AddDriverDrawer from '@/views/apps/drivers/AddDriverDrawer'
+import AddLegacyOfferDrawer from '@/views/apps/offers/AddLegacyOfferDrawer'
 
 interface Props {
   children: ReactNode
@@ -72,7 +73,7 @@ const UserLayout = ({ children, contentHeightFixed }: Props) => {
   const isLocationDrawerOpen = store.locations.isAddUpdateDrawerOpen
   const isSellerDrawerOpen = store.sellers.isAddUpdateDrawerOpen
   const isDriverDrawerOpen = store.drivers.isAddUpdateDrawerOpen
-
+  const isLegacyOfferDrawerOpen = store.offers.isAddUpdateDrawerOpen
   if (hidden && settings.layout === 'horizontal') {
     settings.layout = 'vertical'
   }
@@ -125,6 +126,7 @@ const UserLayout = ({ children, contentHeightFixed }: Props) => {
       <AddSellerDrawer open={isSellerDrawerOpen} />
       <AddLocationDrawer open={isLocationDrawerOpen} />
       <AddDriverDrawer open={isDriverDrawerOpen} />
+      <AddLegacyOfferDrawer open={isLegacyOfferDrawerOpen} />
       {children}
     </Layout>
   )

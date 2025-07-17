@@ -14,6 +14,7 @@ interface InvoiceParams {
   dates?: Date[]
   pageNumber: number
   vendedores?: string
+  cliente?: string
 }
 
 interface Redux {

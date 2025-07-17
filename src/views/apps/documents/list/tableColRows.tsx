@@ -16,7 +16,12 @@ import { DocumentStatus } from 'src/types/apps/documentTypes'
 import OptionsMenu from 'src/@core/components/option-menu'
 import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit'
 import { AppDispatch } from 'src/store'
-import { changeDocumentStatus } from 'src/store/apps/documents'
+import {
+  changeDocumentStatus,
+  toggleEditDocument,
+} from 'src/store/apps/documents'
+import PermissionGuard from '@/views/ui/permissionGuard'
+import { usePermissions } from '@/hooks/usePermissions'
 
 const orderStatusObj: any = {
   '1': 'success',
@@ -99,10 +104,10 @@ const defaultColumns: GridColDef[] = [
               variant="body2"
               sx={{ color: 'text.primary', fontWeight: 600 }}
             >
-              {row.vendedor.nombre}
+              {row.vendedor?.nombre}
             </Typography>
             <Typography noWrap variant="caption">
-              {row.vendedor.codigo}
+              {row.vendedor?.codigo}
             </Typography>
           </Box>
         </Box>
@@ -204,81 +209,173 @@ const handleApproval = (
 
 export const columns = (
   dispatch: ThunkDispatch<AppDispatch, undefined, AnyAction>,
-): GridColDef[] => [
-  ...defaultColumns,
-  {
-    flex: 0.2,
-    minWidth: 140,
-    sortable: false,
-    field: 'actions',
-    headerName: 'Actions',
-    renderCell: ({ row }: CellType) => (
-      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <Tooltip title="Aprobar">
-          <IconButton
-            size="small"
-            color="success"
-            disabled={
-              ![DocumentStatus.Pending, DocumentStatus.Retained].includes(
-                row.procesado,
-              )
-            }
-            onClick={() =>
-              handleApproval(
-                row.noPedidoStr,
-                DocumentStatus.ReadyForIntegration,
-                dispatch,
-              )
-            }
+  onViewCustomer?: (codigoCliente: string) => void,
+): GridColDef[] => {
+  const handleEditDocument = (row: DocumentType) => {
+    dispatch(toggleEditDocument(row))
+  }
+
+  const { hasPermission } = usePermissions()
+  let columnsWithHandlers: GridColDef[] = []
+
+  // If user has edit permission, make the first column clickable to edit
+  if (hasPermission('orders.allowEdit')) {
+    columnsWithHandlers = [
+      {
+        flex: 0.2,
+        field: 'id',
+        minWidth: 120,
+        headerName: '#',
+        renderCell: ({ row }: CellType) => (
+          <LinkStyled
+            href="#"
+            onClick={(e) => {
+              e.preventDefault()
+              row.procesado === DocumentStatus.Pending && handleEditDocument(row)
+            }}
+            sx={{
+              cursor: 'pointer',
+              textDecoration: 'none',
+              '&:hover': { textDecoration: 'underline' },
+            }}
           >
-            <Icon icon="material-symbols:order-approve" fontSize={20} />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Retener">
-          <IconButton
-            size="small"
-            color="warning"
-            disabled={![DocumentStatus.Pending].includes(row.procesado)}
-            onClick={() =>
-              handleApproval(row.noPedidoStr, DocumentStatus.Retained, dispatch)
-            }
-          >
-            <Icon
-              icon="fluent:document-header-dismiss-24-filled"
-              fontSize={20}
-            />
-          </IconButton>
-        </Tooltip>
-        {/* <Tooltip title="View">
-          <IconButton
-            size="small"
-            component={Link}
-            href={`/apps/documents/preview/${row.noPedidoStr}`}
-          >
-            <Icon icon="mdi:eye-outline" fontSize={20} />
-          </IconButton>
-        </Tooltip> */}
-        <OptionsMenu
-          iconProps={{ fontSize: 20 }}
-          iconButtonProps={{ size: 'small' }}
-          menuProps={{ sx: { '& .MuiMenuItem-root svg': { mr: 2 } } }}
-          options={[
-            {
-              text: 'Download',
-              icon: <Icon icon="mdi:download" fontSize={20} />,
-            },
-            {
-              text: 'Edit',
-              href: `/apps/documents/edit/${row.noPedidoStr}`,
-              icon: <Icon icon="mdi:pencil-outline" fontSize={20} />,
-            },
-            {
-              text: 'Duplicate',
-              icon: <Icon icon="mdi:content-copy" fontSize={20} />,
-            },
-          ]}
-        />
-      </Box>
-    ),
-  },
-]
+            {`${row.noPedidoStr}`}
+          </LinkStyled>
+        ),
+      },
+      ...defaultColumns.slice(1), // Skip the first column since we're replacing it
+    ]
+  }
+
+  // Create a modified client column that's clickable
+  const clientColumn: GridColDef = {
+    flex: 0.25,
+    field: 'client',
+    minWidth: 300,
+    headerName: 'Cliente',
+    renderCell: ({ row }: CellType) => {
+      return (
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Typography
+              noWrap
+              variant="body2"
+              sx={{
+                color: 'primary.main',
+                fontWeight: 600,
+                textTransform: 'capitalize',
+                cursor: 'pointer',
+                textDecoration: 'none',
+                '&:hover': { textDecoration: 'underline' },
+              }}
+              onClick={() => onViewCustomer?.(row.codigoCliente)}
+            >
+              {row.nombreCliente}
+            </Typography>
+            <Typography noWrap variant="caption">
+              {row.codigoCliente} - {row.condicion.descripcion}
+            </Typography>
+          </Box>
+        </Box>
+      )
+    },
+  }
+
+  // Create the base columns
+  const baseColumns =
+    columnsWithHandlers.length > 0 ? columnsWithHandlers : defaultColumns
+
+  // Replace the client column with our clickable version
+  const finalColumns = baseColumns.map((column) => {
+    if (column.field === 'client') {
+      return clientColumn
+    }
+    return column
+  })
+
+  return [
+    ...finalColumns,
+    {
+      flex: 0.2,
+      minWidth: 140,
+      sortable: false,
+      field: 'actions',
+      headerName: 'Actions',
+      renderCell: ({ row }: CellType) => (
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Tooltip title="Aprobar">
+            <PermissionGuard permission="orders.allowApprove" disabled>
+              <IconButton
+                size="small"
+                color="success"
+                disabled={
+                  ![DocumentStatus.Pending, DocumentStatus.Retained].includes(
+                    row.procesado,
+                  )
+                }
+                onClick={() =>
+                  handleApproval(
+                    row.noPedidoStr,
+                    DocumentStatus.ReadyForIntegration,
+                    dispatch,
+                  )
+                }
+              >
+                <Icon icon="material-symbols:order-approve" fontSize={20} />
+              </IconButton>
+            </PermissionGuard>
+          </Tooltip>
+          <Tooltip title="Retener">
+            <PermissionGuard permission="orders.allowApprove" disabled>
+              <IconButton
+                size="small"
+                color="warning"
+                disabled={![DocumentStatus.Pending].includes(row.procesado)}
+                onClick={() =>
+                  handleApproval(
+                    row.noPedidoStr,
+                    DocumentStatus.Retained,
+                    dispatch,
+                  )
+                }
+              >
+                <Icon
+                  icon="fluent:document-header-dismiss-24-filled"
+                  fontSize={20}
+                />
+              </IconButton>
+            </PermissionGuard>
+          </Tooltip>
+          <Tooltip title="Ver Documento">
+            <IconButton
+              size="small"
+              component={Link}
+              href={`/apps/documents/preview/${row.noPedidoStr}`}
+            >
+              <Icon icon="mdi:eye-outline" fontSize={20} />
+            </IconButton>
+          </Tooltip>
+          <OptionsMenu
+            iconProps={{ fontSize: 20 }}
+            iconButtonProps={{ size: 'small' }}
+            menuProps={{ sx: { '& .MuiMenuItem-root svg': { mr: 2 } } }}
+            options={[
+              {
+                text: 'Editar',
+                icon: <Icon icon="mdi:pencil-outline" fontSize={20} />,
+                menuItemProps: {
+                  disabled: !hasPermission('orders.allowEdit') && row.procesado !== DocumentStatus.Pending,
+                  onClick: () => handleEditDocument(row),
+                },
+              },
+              // {
+              //   text: 'Duplicate',
+              //   icon: <Icon icon="mdi:content-copy" fontSize={20} />,
+              // },
+            ]}
+          />
+        </Box>
+      ),
+    },
+  ]
+}

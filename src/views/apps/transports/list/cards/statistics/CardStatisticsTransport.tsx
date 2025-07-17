@@ -14,7 +14,7 @@ import { ThemeColor } from 'src/@core/layouts/types'
 
 // ** Custom Components Imports
 import CustomAvatar from 'src/@core/components/mui/avatar'
-import { Button, Divider } from '@mui/material'
+import { Button, Divider, IconButton } from '@mui/material'
 
 import { DocumentoEntregaResponse } from 'src/types/apps/transportType'
 import formatDate from 'src/utils/formatDate'
@@ -78,6 +78,7 @@ const renderStats = (docsData: DocumentoEntregaResponse | null) => {
 interface Props {
   docsData: DocumentoEntregaResponse | null
   isLoading: boolean
+  onRefresh?: () => void
 }
 
 const CardStatisticsTransport = (props: Props) => {
@@ -228,6 +229,26 @@ const CardStatisticsTransport = (props: Props) => {
                     <Typography variant="h6">
                       {formatDate(props.docsData?.fecha || '')}
                     </Typography>
+                  </Box>
+                </Box>
+              </Grid>
+              <Grid item xs={6} md={6}>
+                <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    <Typography variant="body2">Código Autorización</Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <Typography variant="h6">
+                        {props.docsData?.codigoAutorizacion || 'No Código'}
+                      </Typography>
+                      <IconButton
+                        size="small"
+                        onClick={() => props.onRefresh?.()}
+                        sx={{ ml: 1 }}
+                        title="Refrescar datos"
+                      >
+                        <Icon icon="mdi:refresh" fontSize="1.25rem" />
+                      </IconButton>
+                    </Box>
                   </Box>
                 </Box>
               </Grid>

@@ -8,25 +8,16 @@ import Link from 'next/link'
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
-import Tooltip from '@mui/material/Tooltip'
 import { styled } from '@mui/material/styles'
 import TextField from '@mui/material/TextField'
-import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
-import { DataGrid, GridColDef, GridRowId } from '@mui/x-data-grid'
-
-// ** Icon Imports
-import Icon from 'src/@core/components/icon'
-
+import { DataGrid, GridColDef } from '@mui/x-data-grid'
 // ** Third Party Imports
 import format from 'date-fns/format'
 
 // ** Store & Actions Imports
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  deleteInvoice,
-  fetchTransportDocsData,
-} from 'src/store/apps/transports'
+import { fetchTransportDocsData } from 'src/store/apps/transports'
 
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
@@ -35,7 +26,6 @@ import { DocumentoEntregaType } from 'src/types/apps/transportType'
 
 // ** Custom Components Imports
 import CustomChip from 'src/@core/components/mui/chip'
-import OptionsMenu from 'src/@core/components/option-menu'
 
 // ** Styled Components
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
@@ -44,7 +34,6 @@ import formatCurrency from 'src/utils/formatCurrency'
 import {
   TransportStatusEnum,
   transportDocStatusLabels,
-  transportStatusLabels,
   transportStatusObj,
 } from '../../../../utils/transportMappings'
 import CardWidgetsDocsDeliveryOverview from 'src/views/apps/transports/list/cards/widgets/CardWidgetsDocsDeliveryOverview'
@@ -52,6 +41,10 @@ import CardStatisticsTransport from 'src/views/apps/transports/list/cards/statis
 import DocDetailModal from './docDetailModal'
 import MapModal from 'src/views/apps/transports/docs/MapModal'
 import SignatureModal from 'src/views/apps/transports/docs/SignatureModal'
+import Tooltip from '@mui/material/Tooltip'
+import IconButton from '@mui/material/IconButton'
+// ** Icon Imports
+import Icon from 'src/@core/components/icon'
 
 interface InvoiceStatusObj {
   [key: string]: {
@@ -208,7 +201,7 @@ const CustomInput = forwardRef((props: CustomInputProps, ref) => {
     props.end !== null ? ` - ${format(props.end, 'MM/dd/yyyy')}` : null
 
   const value = `${startDate}${endDate !== null ? endDate : ''}`
-  props.start === null && props.dates.length && props.setDates
+  props.start === null && props?.dates?.length && props.setDates
     ? props.setDates([])
     : null
   const updatedProps = { ...props }
@@ -243,6 +236,11 @@ const TransportDocs = (props: TransportDocsProps) => {
     dispatch(fetchTransportDocsData(props.noTransporte))
   }, [dispatch])
 
+  const handleRefresh = () => {
+    dispatch(fetchTransportDocsData(props.noTransporte))
+  }
+
+
   const columns: GridColDef[] = [
     ...defaultColumns,
     {
@@ -255,6 +253,18 @@ const TransportDocs = (props: TransportDocsProps) => {
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <MapModal data={[row]}></MapModal>
           <SignatureModal url={row.firmaUrl} />
+
+          <Tooltip title="Comprobante fiscal electrónico">
+            <IconButton
+              type="button"
+              size="small"
+              href={row.qrUrl ?? ""}
+              target="_black"
+              disabled={!row.qrUrl}
+            >
+              <Icon icon="material-symbols:receipt" fontSize={20} />
+            </IconButton>
+          </Tooltip>
         </Box>
       ),
     },
@@ -267,6 +277,7 @@ const TransportDocs = (props: TransportDocsProps) => {
           <CardStatisticsTransport
             docsData={store.docsData}
             isLoading={store.isLoading}
+            onRefresh={handleRefresh}
           />
         </Grid>
         <Grid item xs={12} md={6}>

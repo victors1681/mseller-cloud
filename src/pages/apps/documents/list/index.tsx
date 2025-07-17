@@ -30,10 +30,16 @@ import { fetchData, changeDocumentStatus } from 'src/store/apps/documents'
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
 
-import { DocumentStatus, StatusParam } from 'src/types/apps/documentTypes'
+import {
+  DocumentStatus,
+  StatusParam,
+  TipoDocumentoEnum,
+} from 'src/types/apps/documentTypes'
 
 // ** Custom Components Imports
 import TableHeader from 'src/views/apps/documents/list/TableHeader'
+import AddEditDocumentDialog from 'src/views/apps/documents/add-edit-document'
+import { ViewCustomerInfoDialog } from '@/views/apps/documents/viewCustomerInfoDialog'
 
 // ** Styled Components
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
@@ -100,6 +106,21 @@ const InvoiceList = () => {
     page: 0,
     pageSize: 20,
   })
+
+  // Customer dialog state
+  const [customerDialogOpen, setCustomerDialogOpen] = useState(false)
+  const [selectedCustomerCode, setSelectedCustomerCode] = useState<string>('')
+
+  // Customer view handler
+  const handleViewCustomer = (codigoCliente: string) => {
+    setSelectedCustomerCode(codigoCliente)
+    setCustomerDialogOpen(true)
+  }
+
+  const handleCloseCustomerDialog = () => {
+    setCustomerDialogOpen(false)
+    setSelectedCustomerCode('')
+  }
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
@@ -439,8 +460,15 @@ const InvoiceList = () => {
                       labelId="documentType-status-select"
                     >
                       <MenuItem value="">none</MenuItem>
-                      <MenuItem value="order">Pedido</MenuItem>
-                      <MenuItem value="invoice">Cotización</MenuItem>
+                      <MenuItem value={TipoDocumentoEnum.ORDER}>
+                        Pedido
+                      </MenuItem>
+                      <MenuItem value={TipoDocumentoEnum.INVOICE}>
+                        Factura
+                      </MenuItem>
+                      <MenuItem value={TipoDocumentoEnum.QUOTE}>
+                        Cotización
+                      </MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -496,7 +524,7 @@ const InvoiceList = () => {
                 params.row.procesado === DocumentStatus.Pending
               }
               rows={store.data}
-              columns={columns(dispatch)}
+              columns={columns(dispatch, handleViewCustomer)}
               disableRowSelectionOnClick
               paginationModel={paginationModel}
               onPaginationModelChange={handlePagination}
@@ -511,6 +539,12 @@ const InvoiceList = () => {
           </Card>
         </Grid>
       </Grid>
+      <AddEditDocumentDialog open={store.isEditDialogOpen} />
+      <ViewCustomerInfoDialog
+        open={customerDialogOpen}
+        onClose={handleCloseCustomerDialog}
+        codigoCliente={selectedCustomerCode}
+      />
     </DatePickerWrapper>
   )
 }

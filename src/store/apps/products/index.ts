@@ -10,7 +10,8 @@ import { toast } from 'react-hot-toast'
 import { AppDispatch, RootState } from '@/store'
 
 interface DataParams {
-  query: string
+  query?: string
+  codigoProducto?: string
   status?: string
   pageNumber: number
 }
@@ -124,6 +125,13 @@ export const fetchData = createAsyncThunk(
     if (params.status === '') {
       delete params.status
     }
+    if (params.query === '') {
+      delete params.query
+    }
+    if (params.codigoProducto === '') {
+      delete params.codigoProducto
+    }
+
     const response = await restClient.get<
       any,
       AxiosResponse<PaginatedResponse<ProductType>>

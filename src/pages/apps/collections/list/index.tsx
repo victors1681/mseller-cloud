@@ -11,7 +11,6 @@ import Card from '@mui/material/Card'
 import Tooltip from '@mui/material/Tooltip'
 import { styled } from '@mui/material/styles'
 import MenuItem from '@mui/material/MenuItem'
-import TextField from '@mui/material/TextField'
 import CardHeader from '@mui/material/CardHeader'
 import IconButton from '@mui/material/IconButton'
 import InputLabel from '@mui/material/InputLabel'
@@ -51,6 +50,7 @@ import {
 import { debounce } from '@mui/material'
 import { SellerAutocomplete } from 'src/views/ui/sellerAutoComplete'
 import { CustomInput } from '@/views/ui/customInput'
+import { TipoDocumentoEnum } from '@/types/apps/documentTypes'
 
 interface CellType {
   row: CollectionType
@@ -171,13 +171,11 @@ const defaultColumns: GridColDef[] = [
   },
 ]
 
-
-
 const TransportList = () => {
   // ** State
   const [dates, setDates] = useState<Date[]>([])
   const [value, setValue] = useState<string>('')
-  const [statusValue, setStatusValue] = useState<string>('')
+  const [documentType, setDocumentType] = useState<string>('')
   const [endDateRange, setEndDateRange] = useState<any>(null)
   const [selectedRows, setSelectedRows] = useState<GridRowId[]>([])
   const [startDateRange, setStartDateRange] = useState<any>(null)
@@ -190,18 +188,18 @@ const TransportList = () => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
   const store = useSelector((state: RootState) => state.collections)
-  console.log('storestorestore', store)
+
   useEffect(() => {
     dispatch(
       fetchData({
         dates,
         query: value,
-        status: statusValue,
+        status: documentType,
         pageNumber: paginationModel.page,
         distribuidores: selectedSellers,
       }),
     )
-  }, [statusValue, selectedSellers])
+  }, [documentType, selectedSellers])
 
   const performRequest = useCallback(
     (value: string) => {
@@ -209,13 +207,13 @@ const TransportList = () => {
         fetchData({
           dates,
           query: value,
-          status: statusValue,
+          status: documentType,
           pageNumber: paginationModel.page,
           distribuidores: selectedSellers,
         }),
       )
     },
-    [dispatch, statusValue, value, dates, selectedSellers, paginationModel],
+    [dispatch, documentType, value, dates, selectedSellers, paginationModel],
   )
 
   const fn = useCallback(
@@ -225,8 +223,8 @@ const TransportList = () => {
     }, 900),
     [],
   )
-  const handleStatusValue = (e: SelectChangeEvent) => {
-    setStatusValue(e.target.value)
+  const handleDocumentType = (e: SelectChangeEvent) => {
+    setDocumentType(e.target.value)
   }
 
   const handleFilter = useCallback(
@@ -244,13 +242,13 @@ const TransportList = () => {
         fetchData({
           dates,
           query: value,
-          status: statusValue,
+          status: documentType,
           pageNumber: values.page,
           distribuidores: selectedSellers,
         }),
       )
     },
-    [paginationModel, value, selectedSellers, statusValue],
+    [paginationModel, value, selectedSellers, documentType],
   )
 
   const handleOnChangeRange = (dates: any) => {
@@ -301,10 +299,10 @@ const TransportList = () => {
 
                     <Select
                       fullWidth
-                      value={statusValue}
+                      value={documentType}
                       sx={{ mr: 4, mb: 2 }}
                       label="Estado de la orden"
-                      onChange={handleStatusValue}
+                      onChange={handleDocumentType}
                       labelId="invoice-status-select"
                     >
                       <MenuItem value="">none</MenuItem>
@@ -326,10 +324,10 @@ const TransportList = () => {
 
                     <Select
                       fullWidth
-                      value={statusValue}
+                      value={documentType}
                       sx={{ mr: 4, mb: 2 }}
                       label="Estado de la orden"
-                      onChange={handleStatusValue}
+                      onChange={handleDocumentType}
                       labelId="invoice-status-select"
                     >
                       <MenuItem value="">none</MenuItem>
@@ -351,10 +349,10 @@ const TransportList = () => {
 
                     <Select
                       fullWidth
-                      value={statusValue}
+                      value={documentType}
                       sx={{ mr: 4, mb: 2 }}
                       label="Estado de la orden"
-                      onChange={handleStatusValue}
+                      onChange={handleDocumentType}
                       labelId="invoice-status-select"
                     >
                       <MenuItem value="">none</MenuItem>
@@ -377,15 +375,22 @@ const TransportList = () => {
 
                     <Select
                       fullWidth
-                      value={statusValue}
+                      value={documentType}
                       sx={{ mr: 4, mb: 2 }}
                       label="Estado de la orden"
-                      onChange={handleStatusValue}
+                      onChange={handleDocumentType}
                       labelId="invoice-status-select"
                     >
                       <MenuItem value="">none</MenuItem>
-                      <MenuItem value="2">Pedido</MenuItem>
-                      <MenuItem value="2">Cotización</MenuItem>
+                      <MenuItem value={TipoDocumentoEnum.INVOICE}>
+                        Factura
+                      </MenuItem>
+                      <MenuItem value={TipoDocumentoEnum.ORDER}>
+                        Pedido
+                      </MenuItem>
+                      <MenuItem value={TipoDocumentoEnum.QUOTE}>
+                        Cotización
+                      </MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>

@@ -5,7 +5,7 @@ import {
   SxProps,
   Theme,
 } from '@mui/material'
-import { SyntheticEvent, useEffect } from 'react'
+import { SyntheticEvent, useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/store'
 import { fetchData as fetchDrivers } from 'src/store/apps/driver'
@@ -29,11 +29,24 @@ export const DriverAutocomplete = (props: DriverAutocompleteProps) => {
     return driverStore?.data.find((v) => v.codigo === codigo)?.nombre || ''
   }
 
-  const selectDriverValues =
-    props.selectedDrivers
-      ?.split(',')
-      .map((v) => ({ codigo: v, label: findDriverLabel(v) }))
-      .filter((item) => item.codigo && item.label) || []
+  const selectDriverValues = useMemo(() => {
+    if (props.multiple) {
+      return (
+        props.selectedDrivers
+          ?.split(',')
+          .map((v) => ({ codigo: v, label: findDriverLabel(v) }))
+          .filter((item) => item.codigo && item.label) || []
+      )
+    } else {
+      return props.selectedDrivers
+        ? [
+            {
+              codigo: props.selectedDrivers,
+              label: findDriverLabel(props.selectedDrivers),
+            },
+          ][0] : []
+    }
+  }, [props.selectedDrivers, props.multiple]) // Recompute only when selectedDrivers or multiple changes
 
   useEffect(() => {
     if (!driverStore?.data?.length) {
@@ -62,7 +75,9 @@ export const DriverAutocomplete = (props: DriverAutocompleteProps) => {
       value={selectDriverValues}
       isOptionEqualToValue={(option, value) => option.codigo === value.codigo}
       id="drivers-dropdown"
-      getOptionLabel={(option) => `${option.codigo}-${option.label}` || ''}
+      getOptionLabel={(option) =>
+        (option.codigo && `${option.codigo}-${option.label}`) || ''
+      }
       sx={{ mt: 3, ml: 3, ...props.sx }}
       onChange={handleSelection}
       renderInput={(params) => (

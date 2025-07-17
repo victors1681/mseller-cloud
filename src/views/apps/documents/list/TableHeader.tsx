@@ -5,11 +5,17 @@ import Link from 'next/link'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
-import { GridRowId } from '@mui/x-data-grid'
 import MenuItem from '@mui/material/MenuItem'
 import TextField from '@mui/material/TextField'
 import { ReactNode } from 'react'
 import React from 'react'
+
+// ** Redux Imports
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from 'src/store'
+import { toggleCreateDocument } from 'src/store/apps/documents'
+import { useAuth } from '@/hooks/useAuth'
+import PermissionGuard from '@/views/ui/permissionGuard'
 
 interface TableHeaderProps {
   searchValue: string
@@ -24,6 +30,13 @@ const TableHeader = (props: TableHeaderProps) => {
   // ** Props
   const { searchValue, actionValue, selectedRows, handleFilter, handleAction } =
     props
+
+  // ** Hooks
+  const dispatch = useDispatch<AppDispatch>()
+
+  const handleCreateDocument = () => {
+    dispatch(toggleCreateDocument())
+  }
 
   return (
     <Box
@@ -59,15 +72,17 @@ const TableHeader = (props: TableHeaderProps) => {
           placeholder={props.placeholder}
           onChange={(e) => handleFilter(e.target.value)}
         />
-        <Button
-          sx={{ mb: 2 }}
-          disabled
-          component={Link}
-          variant="contained"
-          href="/apps/invoice/add"
-        >
-          Crear Pedido
-        </Button>
+        <PermissionGuard permission="orders.allowCreate">
+          <Button
+            sx={{ mb: 2 }}
+            // disabled
+            // component={Link}
+            onClick={handleCreateDocument}
+            variant="contained"
+          >
+            Crear Documento
+          </Button>
+        </PermissionGuard>
       </Box>
     </Box>
   )
