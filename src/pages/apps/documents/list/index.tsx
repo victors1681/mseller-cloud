@@ -39,7 +39,7 @@ import {
 // ** Custom Components Imports
 import TableHeader from 'src/views/apps/documents/list/TableHeader'
 import AddEditDocumentDialog from 'src/views/apps/documents/add-edit-document'
-import { ViewCustomerInfoDialog } from 'src/views/apps/documents/list/ViewCustomerInfoDialog'
+import { ViewCustomerInfoDialog } from '@/views/apps/documents/viewCustomerInfoDialog'
 
 // ** Styled Components
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
