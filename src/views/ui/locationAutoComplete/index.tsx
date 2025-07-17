@@ -62,7 +62,6 @@ export const LocationAutocomplete = (props: LocationAutocompleteProps) => {
     }
   }, [props.selectedLocation, props.multiple])
 
-  console.log('selectLocation', selectLocation)
   useEffect(() => {
     if (!locationStore?.data?.length) {
       dispatch(fetchLocations())

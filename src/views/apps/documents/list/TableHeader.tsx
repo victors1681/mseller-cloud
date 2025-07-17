@@ -14,6 +14,8 @@ import React from 'react'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from 'src/store'
 import { toggleCreateDocument } from 'src/store/apps/documents'
+import { useAuth } from '@/hooks/useAuth'
+import PermissionGuard from '@/views/ui/permissionGuard'
 
 interface TableHeaderProps {
   searchValue: string
@@ -70,15 +72,17 @@ const TableHeader = (props: TableHeaderProps) => {
           placeholder={props.placeholder}
           onChange={(e) => handleFilter(e.target.value)}
         />
-        <Button
-          sx={{ mb: 2 }}
-          // disabled
-          // component={Link}
-          onClick={handleCreateDocument}
-          variant="contained"
-        >
-          Crear Documento
-        </Button>
+        <PermissionGuard permission="orders.allowCreate">
+          <Button
+            sx={{ mb: 2 }}
+            // disabled
+            // component={Link}
+            onClick={handleCreateDocument}
+            variant="contained"
+          >
+            Crear Documento
+          </Button>
+        </PermissionGuard>
       </Box>
     </Box>
   )
