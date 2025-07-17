@@ -209,6 +209,7 @@ const handleApproval = (
 
 export const columns = (
   dispatch: ThunkDispatch<AppDispatch, undefined, AnyAction>,
+  onViewCustomer?: (codigoCliente: string) => void,
 ): GridColDef[] => {
   const handleEditDocument = (row: DocumentType) => {
     dispatch(toggleEditDocument(row))
@@ -226,28 +227,74 @@ export const columns = (
         minWidth: 120,
         headerName: '#',
         renderCell: ({ row }: CellType) => (
-          <Typography
+          <LinkStyled
+            href="#"
+            onClick={(e) => {
+              e.preventDefault()
+              row.procesado === DocumentStatus.Pending && handleEditDocument(row)
+            }}
             sx={{
-              color: 'primary.main',
               cursor: 'pointer',
               textDecoration: 'none',
               '&:hover': { textDecoration: 'underline' },
             }}
-            onClick={(e) => {
-              e.preventDefault()
-              handleEditDocument(row)
-            }}
           >
             {`${row.noPedidoStr}`}
-          </Typography>
+          </LinkStyled>
         ),
       },
       ...defaultColumns.slice(1), // Skip the first column since we're replacing it
     ]
   }
 
+  // Create a modified client column that's clickable
+  const clientColumn: GridColDef = {
+    flex: 0.25,
+    field: 'client',
+    minWidth: 300,
+    headerName: 'Cliente',
+    renderCell: ({ row }: CellType) => {
+      return (
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Typography
+              noWrap
+              variant="body2"
+              sx={{
+                color: 'primary.main',
+                fontWeight: 600,
+                textTransform: 'capitalize',
+                cursor: 'pointer',
+                textDecoration: 'none',
+                '&:hover': { textDecoration: 'underline' },
+              }}
+              onClick={() => onViewCustomer?.(row.codigoCliente)}
+            >
+              {row.nombreCliente}
+            </Typography>
+            <Typography noWrap variant="caption">
+              {row.codigoCliente} - {row.condicion.descripcion}
+            </Typography>
+          </Box>
+        </Box>
+      )
+    },
+  }
+
+  // Create the base columns
+  const baseColumns =
+    columnsWithHandlers.length > 0 ? columnsWithHandlers : defaultColumns
+
+  // Replace the client column with our clickable version
+  const finalColumns = baseColumns.map((column) => {
+    if (column.field === 'client') {
+      return clientColumn
+    }
+    return column
+  })
+
   return [
-    ...columnsWithHandlers,
+    ...finalColumns,
     {
       flex: 0.2,
       minWidth: 140,
@@ -317,7 +364,7 @@ export const columns = (
                 text: 'Editar',
                 icon: <Icon icon="mdi:pencil-outline" fontSize={20} />,
                 menuItemProps: {
-                  disabled: !hasPermission('orders.allowEdit'),
+                  disabled: !hasPermission('orders.allowEdit') && row.procesado !== DocumentStatus.Pending,
                   onClick: () => handleEditDocument(row),
                 },
               },

@@ -39,6 +39,7 @@ import {
 // ** Custom Components Imports
 import TableHeader from 'src/views/apps/documents/list/TableHeader'
 import AddEditDocumentDialog from 'src/views/apps/documents/add-edit-document'
+import { ViewCustomerInfoDialog } from 'src/views/apps/documents/list/ViewCustomerInfoDialog'
 
 // ** Styled Components
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
@@ -105,6 +106,21 @@ const InvoiceList = () => {
     page: 0,
     pageSize: 20,
   })
+
+  // Customer dialog state
+  const [customerDialogOpen, setCustomerDialogOpen] = useState(false)
+  const [selectedCustomerCode, setSelectedCustomerCode] = useState<string>('')
+
+  // Customer view handler
+  const handleViewCustomer = (codigoCliente: string) => {
+    setSelectedCustomerCode(codigoCliente)
+    setCustomerDialogOpen(true)
+  }
+
+  const handleCloseCustomerDialog = () => {
+    setCustomerDialogOpen(false)
+    setSelectedCustomerCode('')
+  }
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
@@ -508,7 +524,7 @@ const InvoiceList = () => {
                 params.row.procesado === DocumentStatus.Pending
               }
               rows={store.data}
-              columns={columns(dispatch)}
+              columns={columns(dispatch, handleViewCustomer)}
               disableRowSelectionOnClick
               paginationModel={paginationModel}
               onPaginationModelChange={handlePagination}
@@ -524,6 +540,11 @@ const InvoiceList = () => {
         </Grid>
       </Grid>
       <AddEditDocumentDialog open={store.isEditDialogOpen} />
+      <ViewCustomerInfoDialog
+        open={customerDialogOpen}
+        onClose={handleCloseCustomerDialog}
+        codigoCliente={selectedCustomerCode}
+      />
     </DatePickerWrapper>
   )
 }
