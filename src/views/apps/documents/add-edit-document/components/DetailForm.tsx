@@ -186,7 +186,7 @@ export const DetailForm: React.FC<DetailFormProps> = ({
                 )}
               />
             </Grid>
-            <Grid item xs={12} sm={isEditingDetail !== null ? 3 : 1}>
+            <Grid item xs={12} sm={isEditingDetail !== null ? 3 : 1.5}>
               <Button
                 fullWidth
                 variant="contained"
