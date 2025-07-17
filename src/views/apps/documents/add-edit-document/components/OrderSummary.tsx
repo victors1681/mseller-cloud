@@ -30,7 +30,7 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
         <CardHeader title="Resumen del Pedido" />
         <CardContent>
           <Grid container spacing={3}>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid item xs={2.4} sm={6} md={2}>
               <Box sx={{ textAlign: 'center', p: 2 }}>
                 <Typography variant="h4" color="primary" fontWeight="bold">
                   {orderCalculations.cantidadItems}
@@ -41,7 +41,7 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
               </Box>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid item xs={2.4} sm={6} md={2}>
               <Box sx={{ textAlign: 'center', p: 2 }}>
                 <Typography variant="h6" fontWeight="medium">
                   {formatCurrency(orderCalculations.subtotal)}
@@ -52,12 +52,27 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
               </Box>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid item xs={2.4} sm={6} md={2}>
               <Box sx={{ textAlign: 'center', p: 2 }}>
                 <Typography
                   variant="h6"
                   fontWeight="medium"
                   color="success.main"
+                >
+                  {formatCurrency(orderCalculations.descuentoTotal)}
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  Descuento
+                </Typography>
+              </Box>
+            </Grid>
+
+            <Grid item xs={2.4} sm={6} md={2}>
+              <Box sx={{ textAlign: 'center', p: 2 }}>
+                <Typography
+                  variant="h6"
+                  fontWeight="medium"
+                  color="warning.main"
                 >
                   {formatCurrency(orderCalculations.impuestoTotal)}
                 </Typography>
@@ -67,7 +82,7 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
               </Box>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid item xs={2.4} sm={6} md={3}>
               <Box sx={{ textAlign: 'center', p: 2 }}>
                 <Typography variant="h5" fontWeight="bold" color="primary">
                   {formatCurrency(orderCalculations.total)}

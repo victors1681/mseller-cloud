@@ -6,13 +6,13 @@ export const defaultDocumentValues: Partial<DocumentType> = {
   codigoVendedor: '',
   nombreCliente: '',
   nota: '',
-  condicionPago: '',
+  condicionPago: '1',
   fecha: new Date().toISOString().split('T')[0],
   tipoDocumento: TipoDocumentoEnum.ORDER,
   tipoPedido: '',
   confirmado: false,
   nuevoCliente: false,
-  localidadId: 0,
+  localidadId: 1,
 }
 
 export const defaultDetailFormValues: NewDetailForm = {
@@ -21,10 +21,13 @@ export const defaultDetailFormValues: NewDetailForm = {
   precio: 0,
   descripcion: '',
   unidad: '',
+  porcientoDescuento: 0,
+  porcientoImpuesto: 0
 }
 
 export const defaultDetailControlValues = {
   codigoProducto: '',
   cantidad: 1,
   precio: 0,
+  porcientoDescuento: 0,
 }

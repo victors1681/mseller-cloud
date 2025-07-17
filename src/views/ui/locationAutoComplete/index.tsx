@@ -15,6 +15,7 @@ interface LocationAutocompleteProps {
   multiple?: boolean
   callBack: (values: string) => void
   sx?: SxProps<Theme>
+  size?: 'small' | 'medium'
 }
 
 interface LocationOptions {
@@ -86,6 +87,7 @@ export const LocationAutocomplete = (props: LocationAutocompleteProps) => {
         label: v.descripcion,
         id: v.id.toString(),
       }))}
+      size={props.size || 'medium'}
       filterSelectedOptions
       value={selectLocation}
       isOptionEqualToValue={(option, value) => option.id === value.id}

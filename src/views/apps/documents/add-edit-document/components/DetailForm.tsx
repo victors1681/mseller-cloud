@@ -54,37 +54,10 @@ export const DetailForm: React.FC<DetailFormProps> = ({
               ? 'Editar Línea de Detalle'
               : 'Agregar Línea de Detalle'
           }
-          action={
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              {isEditingDetail !== null && (
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  startIcon={<Icon icon="mdi:close" />}
-                  onClick={onCancelEdit}
-                >
-                  Cancelar
-                </Button>
-              )}
-              <Button
-                variant="contained"
-                color="primary"
-                disabled={!newDetailForm.codigoProducto.trim()}
-                startIcon={
-                  <Icon
-                    icon={isEditingDetail !== null ? 'mdi:check' : 'mdi:plus'}
-                  />
-                }
-                onClick={onSaveDetail}
-              >
-                {isEditingDetail !== null ? 'Actualizar' : 'Agregar'}
-              </Button>
-            </Box>
-          }
         />
         <CardContent>
           <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={isEditingDetail !== null ? 5 : 6}>
               <Controller
                 name="codigoProducto"
                 control={control}
@@ -121,7 +94,7 @@ export const DetailForm: React.FC<DetailFormProps> = ({
               />
             </Grid>
 
-            <Grid item xs={12} sm={3}>
+            <Grid item xs={4} sm={1}>
               <Controller
                 name="cantidad"
                 control={control}
@@ -157,7 +130,7 @@ export const DetailForm: React.FC<DetailFormProps> = ({
               />
             </Grid>
 
-            <Grid item xs={12} sm={3}>
+            <Grid item xs={4} sm={2}>
               <Controller
                 name="precio"
                 control={control}
@@ -171,7 +144,7 @@ export const DetailForm: React.FC<DetailFormProps> = ({
                     placeholder="0.00"
                     error={!!error}
                     helperText={error?.message}
-                    inputProps={{ min: 0, step: 0.01 }}
+                    inputProps={{ min: 0, step: 1 }}
                     autoComplete="off"
                     onChange={(e) => {
                       const newValue = parseFloat(e.target.value) || 0
@@ -184,6 +157,61 @@ export const DetailForm: React.FC<DetailFormProps> = ({
                   />
                 )}
               />
+            </Grid>
+            <Grid item xs={4} sm={1.5}>
+              <Controller
+                name="porcientoDescuento"
+                control={control}
+                render={({ field, fieldState: { error } }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    size="small"
+                    type="number"
+                    label="Descuento (%)"
+                    placeholder="0.00"
+                    error={!!error}
+                    helperText={error?.message}
+                    inputProps={{ min: 0, step: 1, max: 100 }}
+                    autoComplete="off"
+                    onChange={(e) => {
+                      const newValue = parseFloat(e.target.value) || 0
+                      field.onChange(newValue)
+                      handleSetNewDetailForm((prev) => ({
+                        ...prev,
+                        porcientoDescuento: newValue,
+                      }))
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid item xs={12} sm={isEditingDetail !== null ? 3 : 1}>
+              <Button
+                fullWidth
+                variant="contained"
+                color="primary"
+                disabled={!newDetailForm.codigoProducto.trim()}
+                startIcon={
+                  <Icon
+                    icon={isEditingDetail !== null ? 'mdi:check' : 'mdi:plus'}
+                  />
+                }
+                onClick={onSaveDetail}
+              >
+                {isEditingDetail !== null ? 'Actualizar' : 'Agregar'}
+              </Button>
+              {isEditingDetail !== null && (
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  startIcon={<Icon icon="mdi:close" />}
+                  sx={{ ml: 2 }}
+                  onClick={onCancelEdit}
+                >
+                  Cancelar
+                </Button>
+              )}
             </Grid>
 
             {/* Description Display - Read Only */}

@@ -14,9 +14,7 @@ export const documentFormSchema = yup.object().shape({
 
   nota: yup.string().max(500, 'La nota no debe exceder 500 caracteres'),
 
-  condicionPago: yup
-    .string()
-    .max(50, 'La condición de pago no debe exceder 50 caracteres'),
+  condicionPago: yup.string().required('Condición de pago es requerida'),
 
   tipoPedido: yup
     .string()
@@ -51,4 +49,8 @@ export const detailFormSchema = yup.object().shape({
     .number()
     .min(0, 'El precio no puede ser negativo')
     .required('El precio es requerido'),
+  porcientoDescuento: yup
+    .number()
+    .min(0, 'El porcentaje de descuento no puede ser negativo')
+    .max(100, 'El porcentaje de descuento no puede ser mayor a 100'),
 })

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState, AppDispatch } from 'src/store'
 import {
@@ -6,7 +6,7 @@ import {
   fetchDocumentDetails,
 } from 'src/store/apps/documents'
 import { useAuth } from 'src/hooks/useAuth'
-import { useOrderCalculations } from 'src/hooks/useOrderCalculations'
+import { useOrderCalculations } from './useOrderCalculations'
 import { useProductSearchDialog } from 'src/views/ui/productsSearchDialog/useProductSearchDialog'
 import { useCustomerSearchDialog } from 'src/views/ui/customerSearchDialog/useCustomerSearchDialog'
 import { DocumentTypeDetail, DocumentType } from 'src/types/apps/documentTypes'
@@ -20,6 +20,7 @@ import {
 import { useDetailManagement } from './useDetailManagement'
 import { useDocumentForm } from './useDocumentForm'
 import { DocumentService } from '../services/documentService'
+import { toast } from 'react-hot-toast'
 
 export const useEditDocument = (open: boolean) => {
   const dispatch = useDispatch<AppDispatch>()
@@ -55,6 +56,7 @@ export const useEditDocument = (open: boolean) => {
       product: ProductType & {
         selectedPrice?: number
         selectedPriceLabel?: string
+        porcientoDescuento?: number
       },
     ) => {
       detailForm.setValue('codigoProducto', product.codigo)
@@ -66,6 +68,10 @@ export const useEditDocument = (open: boolean) => {
         descripcion: product.nombre || `Producto ${product.codigo}`,
         unidad: product.unidad || 'UND',
         precio: selectedPrice,
+        porcientoDescuento: product.porcientoDescuento || 0,
+        porcientoImpuesto: product.impuesto || 0, // porcentaje from the product object
+        factor: product.factor || 1,
+        tipoImpuesto: product.tipoImpuesto || '',
       }))
 
       detailForm.setValue('precio', selectedPrice)
@@ -129,27 +135,32 @@ export const useEditDocument = (open: boolean) => {
       codigoProducto: watchedDetailValues.codigoProducto || '',
       cantidad: watchedDetailValues.cantidad || 1,
       precio: watchedDetailValues.precio || 0,
+      porcientoDescuento: watchedDetailValues.porcientoDescuento || 0,
     }
 
     if (
       currentFormValues.codigoProducto !== newDetailForm.codigoProducto ||
       currentFormValues.cantidad !== newDetailForm.cantidad ||
-      currentFormValues.precio !== newDetailForm.precio
+      currentFormValues.precio !== newDetailForm.precio ||
+      currentFormValues.porcientoDescuento !== newDetailForm.porcientoDescuento
     ) {
       setNewDetailForm((prev) => ({
         ...prev,
         codigoProducto: currentFormValues.codigoProducto,
         cantidad: currentFormValues.cantidad,
         precio: currentFormValues.precio,
+        porcientoDescuento: currentFormValues.porcientoDescuento || 0,
       }))
     }
   }, [
     watchedDetailValues.codigoProducto,
     watchedDetailValues.cantidad,
     watchedDetailValues.precio,
+    watchedDetailValues.porcientoDescuento,
     newDetailForm.codigoProducto,
     newDetailForm.cantidad,
     newDetailForm.precio,
+    newDetailForm.porcientoDescuento,
   ])
 
   // Fetch document details when dialog opens
@@ -173,17 +184,40 @@ export const useEditDocument = (open: boolean) => {
         discount: orderCalculations.descuentoTotal,
         tax: orderCalculations.impuestoTotal,
         total: orderCalculations.total,
+        detailsCount: detailsData.length,
       })
     }
   }, [orderCalculations, detailsData.length])
+
+  // Reset form and state function
+  const resetFormState = () => {
+    mainForm.reset(undefined, {
+      keepValues: false,
+      keepDirty: false,
+      keepDefaultValues: true,
+    })
+    setDetailsData([])
+    setNewDetailForm(defaultDetailFormValues)
+    detailForm.reset(undefined, {
+      keepValues: false,
+      keepDirty: false,
+      keepDefaultValues: true,
+    })
+
+    detailManagement.isEditingDetail && detailManagement.handleCancelEdit()
+    setSelectedCustomerData(null)
+    productSearchDialog.clearSelection()
+    customerSearchDialog.clearSelection()
+  }
 
   const handleSubmit = async (data: Partial<DocumentType>) => {
     if (!store.isCreateMode && !store.documentEditData) {
       return { success: false, error: 'No hay datos de documento para editar' }
     }
 
+    let result
     if (store.isCreateMode) {
-      return await documentService.createDocument({
+      result = await documentService.createDocument({
         formData: data,
         detailsData,
         orderCalculations,
@@ -191,23 +225,28 @@ export const useEditDocument = (open: boolean) => {
         userPhotoURL: auth.user?.photoURL,
       })
     } else {
-      return await documentService.updateDocument({
+      result = await documentService.updateDocument({
         formData: data,
         documentEditData: store.documentEditData!,
         detailsData,
         orderCalculations,
       })
     }
+
+    // Reset form state after successful operation
+    if (result?.success) {
+      toast.success('Documento guardado exitosamente')
+      resetFormState()
+    }
+
+    return result
   }
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     // Check if form is dirty (has unsaved changes)
     const isMainFormDirty = mainForm.formState.isDirty
-    const hasUnsavedDetails = detailsData.length > 0
     const isDetailFormDirty = detailForm.formState.isDirty
-
-    const hasUnsavedChanges =
-      isMainFormDirty || hasUnsavedDetails || isDetailFormDirty
+    const hasUnsavedChanges = isMainFormDirty || isDetailFormDirty
 
     if (hasUnsavedChanges) {
       const confirmClose = window.confirm(
@@ -221,15 +260,8 @@ export const useEditDocument = (open: boolean) => {
 
     // Proceed with closing
     dispatch(toggleEditDocument(null))
-    mainForm.reset()
-    setDetailsData([])
-    setNewDetailForm(defaultDetailFormValues)
-    detailForm.reset(defaultDetailControlValues)
-    detailManagement.isEditingDetail && detailManagement.handleCancelEdit()
-    setSelectedCustomerData(null)
-    productSearchDialog.clearSelection()
-    customerSearchDialog.clearSelection()
-  }
+    resetFormState()
+  }, [dispatch, resetFormState, detailsData])
 
   return {
     // Store state

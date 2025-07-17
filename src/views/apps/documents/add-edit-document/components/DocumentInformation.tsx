@@ -25,7 +25,6 @@ interface DocumentInformationProps {
 
 export const DocumentInformation: React.FC<DocumentInformationProps> = ({
   control,
-  setValue,
   isSubmitting,
 }) => {
   return (
@@ -91,25 +90,6 @@ export const DocumentInformation: React.FC<DocumentInformationProps> = ({
 
             <Grid item xs={12}>
               <Controller
-                name="tipoPedido"
-                control={control}
-                render={({ field, fieldState: { error } }) => (
-                  <TextField
-                    {...field}
-                    fullWidth
-                    size="small"
-                    disabled={isSubmitting}
-                    label="Tipo de Pedido"
-                    error={!!error}
-                    helperText={error?.message}
-                    autoComplete="off"
-                  />
-                )}
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <Controller
                 name="localidadId"
                 control={control}
                 render={({
@@ -118,6 +98,7 @@ export const DocumentInformation: React.FC<DocumentInformationProps> = ({
                 }) => (
                   <>
                     <LocationAutocomplete
+                      size="small"
                       selectedLocation={value?.toString() || ''}
                       sx={{ mt: 0, ml: 0 }}
                       callBack={(selectedLocationId: string) => {

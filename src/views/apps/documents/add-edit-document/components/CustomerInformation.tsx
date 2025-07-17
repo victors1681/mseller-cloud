@@ -13,7 +13,6 @@ import Icon from 'src/@core/components/icon'
 import { SellerAutocomplete } from 'src/views/ui/sellerAutoComplete'
 import { PaymentTypeAutocomplete } from 'src/views/ui/paymentTypeAutoComplete'
 import { SelectedCustomerData } from '../types'
-import { on } from 'events'
 
 interface CustomerInformationProps {
   control: Control<any>
@@ -135,16 +134,30 @@ export const CustomerInformation: React.FC<CustomerInformationProps> = ({
               <Controller
                 name="condicionPago"
                 control={control}
-                render={({ field: { value, onChange } }) => (
-                  <PaymentTypeAutocomplete
-                    size="small"
-                    selectedPaymentType={value}
-                    callBack={(newValue) => {
-                      if (!isSubmitting) {
-                        onChange(newValue)
-                      }
-                    }}
-                  />
+                render={({
+                  field: { value, onChange },
+                  fieldState: { error },
+                }) => (
+                  <>
+                    <PaymentTypeAutocomplete
+                      size="small"
+                      selectedPaymentType={value}
+                      callBack={(newValue) => {
+                        if (!isSubmitting) {
+                          onChange(newValue)
+                        }
+                      }}
+                    />
+                    {error && (
+                      <Typography
+                        variant="caption"
+                        color="error"
+                        sx={{ mt: 1, ml: 2, display: 'block' }}
+                      >
+                        {error.message}
+                      </Typography>
+                    )}
+                  </>
                 )}
               />
             </Grid>

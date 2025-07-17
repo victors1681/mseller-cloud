@@ -8,6 +8,8 @@ export interface NewDetailForm {
   precio: number
   unidad: string
   descripcion: string
+  porcientoDescuento: number
+  porcientoImpuesto: number
 }
 
 export interface SelectedCustomerData {
