@@ -83,7 +83,34 @@ const navigation = (): VerticalNavItemsType => {
     {
       title: 'Configuración',
       icon: 'uil:setting',
-      path: '/account-settings/account',
+      children: [
+        {
+          title: 'ECF',
+          icon: 'mdi:file-document-edit',
+          children: [
+            {
+              title: 'Integración',
+              icon: 'mdi:cog',
+              path: '/apps/ecf/integration/list',
+            },
+            {
+              title: 'Secuencias ECF',
+              icon: 'mdi:counter',
+              path: '/apps/ecf/secuencia/list',
+            },
+            {
+              title: 'Empresa',
+              icon: 'mdi:office-building',
+              path: '/apps/ecf/business',
+            },
+          ],
+        },
+        {
+          title: 'Cuenta',
+          icon: 'mdi:account-cog',
+          path: '/account-settings/account',
+        },
+      ],
     },
     // {
     //   title: 'Second Page',

@@ -20,6 +20,8 @@ import invoices from 'src/store/apps/invoices'
 import apikeys from './apps/apikeys'
 import removeData from './apps/removeData'
 import offers from './apps/offers'
+import ecf from 'src/store/apps/ecf'
+import business from 'src/store/apps/business'
 
 export const store = configureStore({
   reducer: {
@@ -41,6 +43,8 @@ export const store = configureStore({
     apikeys,
     removeData,
     offers,
+    ecf,
+    business,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
