@@ -13,6 +13,13 @@ const navigation = (): VerticalNavItemsType => {
       icon: 'mdi:file-document-outline',
       children: [
         {
+          title: 'POS',
+          icon: 'mdi:point-of-sale',
+          path: '/apps/pos',
+          // This will be filtered by UserLayout based on permissions
+          permission: 'pos.allowCashierAccess',
+        },
+        {
           title: 'Pedidos',
           icon: 'lets-icons:order',
           path: '/apps/documents/list',

@@ -1,5 +1,5 @@
 // ** React Imports
-import { ReactNode } from 'react'
+import { ReactNode, useMemo } from 'react'
 import Box from '@mui/material/Box'
 
 // ** MUI Imports
@@ -13,6 +13,12 @@ import Layout from 'src/@core/layouts/Layout'
 // ** Navigation Imports
 import VerticalNavItems from 'src/navigation/vertical'
 import HorizontalNavItems from 'src/navigation/horizontal'
+
+// ** Utils
+import { filterNavigationByPermissions } from 'src/utils/navigationUtils'
+
+// ** Hooks
+import { usePermissions } from 'src/hooks/usePermissions'
 
 // ** Component Import
 // Uncomment the below line (according to the layout type) when using server-side menu
@@ -54,6 +60,12 @@ const AppBrand = () => {
 const UserLayout = ({ children, contentHeightFixed }: Props) => {
   // ** Hooks
   const { settings, saveSettings } = useSettings()
+  const { hasPermission } = usePermissions()
+
+  // Filter navigation items based on permissions
+  const filteredVerticalNavItems = useMemo(() => {
+    return filterNavigationByPermissions(VerticalNavItems(), hasPermission)
+  }, [hasPermission])
   // ** Vars for server side navigation
   // const { menuItems: verticalMenuItems } = ServerSideVerticalNavItems()
   // const { menuItems: horizontalMenuItems } = ServerSideHorizontalNavItems()
@@ -86,7 +98,7 @@ const UserLayout = ({ children, contentHeightFixed }: Props) => {
       contentHeightFixed={contentHeightFixed}
       verticalLayoutProps={{
         navMenu: {
-          navItems: VerticalNavItems(),
+          navItems: filteredVerticalNavItems,
           branding: () => <AppBrand />,
           // Uncomment the below line when using server-side menu in vertical layout and comment the above line
           // navItems: verticalMenuItems
