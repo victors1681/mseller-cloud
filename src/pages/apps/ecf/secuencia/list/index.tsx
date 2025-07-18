@@ -51,7 +51,7 @@ import AddSecuenciaECFDrawer from 'src/views/apps/ecf/secuencia/AddSecuenciaECFD
 // ** Styled Components
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import OptionsMenu from 'src/@core/components/option-menu'
-import { getTipoClienteLabel, tipoClienteOptionsJSON } from 'src/utils/tipoClienteOptions'
+import { getTipoClienteLabel } from 'src/utils/tipoClienteOptions'
 
 interface CustomInputProps {
   dates: Date[]
