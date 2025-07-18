@@ -101,9 +101,15 @@ const POSPage: NextPage = () => {
   const router = useRouter()
   const { hasPermission } = usePermissions()
 
-  // Check POS access permission
+  // Check POS access permission on client side only
+  useEffect(() => {
+    if (!hasPermission('pos.allowCashierAccess')) {
+      router.push('/401') // Redirect to unauthorized page
+    }
+  }, [hasPermission, router])
+
+  // Don't render anything if user doesn't have permission
   if (!hasPermission('pos.allowCashierAccess')) {
-    router.push('/401') // Redirect to unauthorized page
     return null
   }
 
