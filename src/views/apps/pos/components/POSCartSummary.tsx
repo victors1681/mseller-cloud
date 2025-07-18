@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Box,
   Card,
@@ -21,6 +21,7 @@ import { styled } from '@mui/material/styles'
 import Icon from 'src/@core/components/icon'
 import { POSCartItem } from 'src/types/apps/posTypes'
 import formatCurrency from 'src/utils/formatCurrency'
+import { usePermissions } from 'src/hooks/usePermissions'
 
 const StyledCartCard = styled(Card)(({ theme }) => ({
   margin: theme.spacing(1),
@@ -80,6 +81,21 @@ const POSCartSummary: React.FC<POSCartSummaryProps> = ({
   onClearCart,
 }) => {
   const theme = useTheme()
+  const { hasPermission } = usePermissions()
+  const [confirmOpen, setConfirmOpen] = useState(false)
+
+  const handleClearCartClick = () => {
+    setConfirmOpen(true)
+  }
+
+  const handleConfirmClear = () => {
+    setConfirmOpen(false)
+    onClearCart()
+  }
+
+  const handleCancelClear = () => {
+    setConfirmOpen(false)
+  }
 
   const handleQuantityChange = (itemId: string, newQuantity: number) => {
     if (newQuantity > 0) {
@@ -107,8 +123,13 @@ const POSCartSummary: React.FC<POSCartSummaryProps> = ({
         title={`Carrito (${cart.length})`}
         titleTypographyProps={{ variant: 'h6', fontSize: '1rem' }}
         action={
-          cart.length > 0 && (
-            <IconButton size="small" onClick={onClearCart} color="error">
+          cart.length > 0 &&
+          hasPermission('pos.clearCart') && (
+            <IconButton
+              size="small"
+              onClick={handleClearCartClick}
+              color="error"
+            >
               <Icon icon="mdi:trash-can-outline" />
             </IconButton>
           )
@@ -328,6 +349,44 @@ const POSCartSummary: React.FC<POSCartSummaryProps> = ({
             Procesar Pago
           </Button>
         </StyledSummarySection>
+      )}
+
+      {/* Confirmation Modal */}
+      {confirmOpen && (
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            bgcolor: 'rgba(0,0,0,0.3)',
+            zIndex: 1300,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Card sx={{ minWidth: 320, p: 2 }}>
+            <CardContent>
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                ¿Seguro que deseas vaciar el carrito?
+              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+                <Button variant="outlined" onClick={handleCancelClear}>
+                  Cancelar
+                </Button>
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={handleConfirmClear}
+                >
+                  Vaciar
+                </Button>
+              </Box>
+            </CardContent>
+          </Card>
+        </Box>
       )}
     </StyledCartCard>
   )
