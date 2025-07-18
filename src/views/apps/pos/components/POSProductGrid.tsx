@@ -121,6 +121,11 @@ const POSProductGrid: React.FC<POSProductGridProps> = ({
     return 4
   }
 
+  // Sort products by name
+  const sortedProducts = [...products].sort((a, b) =>
+    a.nombre.localeCompare(b.nombre, undefined, { sensitivity: 'base' }),
+  )
+
   if (isLoading) {
     return (
       <Grid container spacing={2}>
@@ -175,7 +180,7 @@ const POSProductGrid: React.FC<POSProductGridProps> = ({
 
   return (
     <Grid container spacing={2}>
-      {products.map((product) => {
+      {sortedProducts.map((product) => {
         const productImage = getProductImage(product)
         const totalStock = getTotalStock(product)
         const inStock = isInStock(product)

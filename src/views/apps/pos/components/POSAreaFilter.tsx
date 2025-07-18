@@ -44,6 +44,11 @@ const POSAreaFilter: React.FC<POSAreaFilterProps> = ({
     return null
   }
 
+  // Sort areas alphabetically
+  const sortedAreas = [...areas].sort((a, b) =>
+    a.area.localeCompare(b.area, undefined, { sensitivity: 'base' }),
+  )
+
   return (
     <StyledFilterContainer>
       <StyledChipsContainer>
@@ -68,7 +73,7 @@ const POSAreaFilter: React.FC<POSAreaFilterProps> = ({
           }}
         />
 
-        {areas.map((area) => (
+        {sortedAreas.map((area) => (
           <Chip
             key={area.area}
             label={`${area.area} (${area.count})`}

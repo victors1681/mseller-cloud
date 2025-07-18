@@ -56,6 +56,7 @@ import {
 
 // Utils
 import { usePOSStore } from '../../../hooks/usePOSStore'
+import { useBarcodeScan } from '../../../hooks/useBarcodeScan'
 import { usePermissions } from 'src/hooks/usePermissions'
 
 const StyledMainContainer = styled(Box)({
@@ -321,9 +322,18 @@ const POSPage: NextPage = () => {
   }
 
   const handleGoToMainPage = () => {
-    router.push('/home')
+    router.push('/')
     handleMenuClose()
   }
+
+  // Use custom hook for global barcode scan detection
+  useBarcodeScan({
+    products,
+    onProductFound: (product) => {
+      addToCart(product, 1, product.precio1)
+    },
+    minBarcodeLength: 6,
+  })
 
   const totals = getTotals()
 
