@@ -8,6 +8,16 @@ export type CloudAccessPermissions = {
     allowApprove: boolean
     allowEdit: boolean
   }
+  pos: {
+    allowCashierAccess: boolean
+    allowOpenCashDrawer: boolean
+    allowVoidTransaction: boolean
+    allowRefund: boolean
+    allowDiscounts: boolean
+    allowCashControl: boolean
+    allowReports: boolean
+    allowPriceOverride: boolean
+  }
   settings: Record<string, any>
   statistics: Record<string, any>
   transports: {
@@ -25,6 +35,15 @@ export type Permission =
   | 'orders.allowApprove'
   | 'orders.allowEdit'
   | 'orders.allowCreate'
+  | 'pos'
+  | 'pos.allowCashierAccess'
+  | 'pos.allowOpenCashDrawer'
+  | 'pos.allowVoidTransaction'
+  | 'pos.allowRefund'
+  | 'pos.allowDiscounts'
+  | 'pos.allowCashControl'
+  | 'pos.allowReports'
+  | 'pos.allowPriceOverride'
   | 'settings'
   | 'statistics'
   | 'transports'
@@ -42,6 +61,16 @@ export const usePermissions = () => {
       allowApprove: false,
       allowEdit: false,
     },
+    pos: {
+      allowCashierAccess: false,
+      allowOpenCashDrawer: false,
+      allowVoidTransaction: false,
+      allowRefund: false,
+      allowDiscounts: false,
+      allowCashControl: false,
+      allowReports: false,
+      allowPriceOverride: false,
+    },
     settings: {},
     statistics: {},
     transports: {
@@ -51,8 +80,14 @@ export const usePermissions = () => {
     visits: {},
   }
 
-  const permissions: CloudAccessPermissions =
-    user?.cloudAccess || defaultPermissions
+  const permissions: CloudAccessPermissions = {
+    ...defaultPermissions,
+    ...user?.cloudAccess,
+    pos: {
+      ...defaultPermissions.pos,
+      ...(user?.cloudAccess as any)?.pos,
+    },
+  }
 
   const hasPermission = (permission: Permission): boolean => {
     // Support nested permissions with dot notation
@@ -78,10 +113,16 @@ export const usePermissions = () => {
     return permissions.every((permission) => hasPermission(permission))
   }
 
+  // Helper function specifically for POS access
+  const hasPOSAccess = (): boolean => {
+    return hasPermission('pos.allowCashierAccess')
+  }
+
   return {
     hasPermission,
     hasAnyPermission,
     hasAllPermissions,
+    hasPOSAccess,
     permissions,
   }
 }

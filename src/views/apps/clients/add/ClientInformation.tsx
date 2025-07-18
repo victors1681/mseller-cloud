@@ -9,7 +9,6 @@ import CardContent from '@mui/material/CardContent'
 import TextField from '@mui/material/TextField'
 import { useMemo } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
-import { Autocomplete } from '@mui/material'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
 import LoadingWrapper from '@/views/ui/LoadingWrapper'
@@ -122,7 +121,7 @@ const ClientInformation = () => {
                   label={
                     <InputLabelTooltip
                       title="Tipo de cliente"
-                      description="Este campo se utiliza para determinal el tipo de impuesto que corresponde con el cliente, Crédito Fiscal, Consumo, entre otros, debe configurarse en el mantenimiento de NCF para asignar el comprobante correspondiente"
+                      description="Este campo se utiliza para determinar el tipo de impuesto que corresponde con el cliente, Crédito Fiscal, Consumo, entre otros, debe configurarse en el mantenimiento de NCF para asignar el comprobante correspondiente"
                     />
                   }
                 />

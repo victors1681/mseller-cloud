@@ -13,6 +13,13 @@ const navigation = (): VerticalNavItemsType => {
       icon: 'mdi:file-document-outline',
       children: [
         {
+          title: 'POS',
+          icon: 'mdi:point-of-sale',
+          path: '/apps/pos',
+          // This will be filtered by UserLayout based on permissions
+          permission: 'pos.allowCashierAccess',
+        },
+        {
           title: 'Pedidos',
           icon: 'lets-icons:order',
           path: '/apps/documents/list',
@@ -83,7 +90,34 @@ const navigation = (): VerticalNavItemsType => {
     {
       title: 'Configuración',
       icon: 'uil:setting',
-      path: '/account-settings/account',
+      children: [
+        {
+          title: 'ECF',
+          icon: 'mdi:file-document-edit',
+          children: [
+            {
+              title: 'Integración',
+              icon: 'mdi:cog',
+              path: '/apps/ecf/integration/list',
+            },
+            {
+              title: 'Secuencias ECF',
+              icon: 'mdi:counter',
+              path: '/apps/ecf/secuencia/list',
+            },
+            {
+              title: 'Empresa',
+              icon: 'mdi:office-building',
+              path: '/apps/ecf/business',
+            },
+          ],
+        },
+        {
+          title: 'Cuenta',
+          icon: 'mdi:account-cog',
+          path: '/account-settings/account',
+        },
+      ],
     },
     // {
     //   title: 'Second Page',
