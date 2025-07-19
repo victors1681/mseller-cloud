@@ -161,7 +161,7 @@ export interface DocumentUpdateType {
   subTotal: number
   impuesto: number
   total: number
-  fechaVencimiento: string
+  fechaVencimiento?: string
   detalle: DocumentUpdateDetail[]
   tipoPedido?: string
   nuevoCliente?: boolean
@@ -175,6 +175,43 @@ export interface DocumentUpdateType {
   avatarUrl?: string
   confirmado: boolean
   codigoVendedor?: string
+  clienteNuevo?: CustomerType // if defined indicates a new customer to be created
+  // Added fields from C# model
+  terminal?: string
+  secuenciaDocumento?: string
+  estadoPago?: EstadoPago
+  tipoPago?: TipoPago
+  moneda?: string
+  dispositivo?: string
+  impresion?: number
+  fechaImpresion?: string
+  turnoId?: string
+  cancelada?: boolean
+  razonCancelacion?: string
+  reembolsada?: boolean
+  fechaReembolso?: string
+  montoRecibido?: number
+  montoDevuelto?: number
+  esVentaPOS?: boolean
+}
+
+// TODO: Replace these with actual definitions as needed
+export enum EstadoPago {
+  Paid = 'Paid',
+  Pending = 'Pending',
+  Refunded = 'Refunded',
+  Cancelled = 'Cancelled',
+}
+
+export enum TipoPago {
+  Cash = 'Cash',
+  CreditCard = 'CreditCard',
+  DebitCard = 'DebitCard',
+  BankTransfer = 'BankTransfer',
+  MobilePayment = 'MobilePayment',
+  Check = 'Check',
+  Voucher = 'Voucher',
+  Split = 'Split',
 }
 
 export interface Condicion {

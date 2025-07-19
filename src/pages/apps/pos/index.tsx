@@ -55,9 +55,12 @@ import {
 } from 'src/types/apps/posTypes'
 
 // Utils
-import { usePOSStore } from '../../../hooks/usePOSStore'
+import { usePOSStore } from '../../../views/apps/pos/hook/usePOSStore'
 import { useBarcodeScan } from '../../../hooks/useBarcodeScan'
 import { usePermissions } from 'src/hooks/usePermissions'
+import { transformPaymentDataToDocumentUpdateType } from '@/utils/transformPaymentData'
+import { addNewDocument } from '@/store/apps/documents'
+import toast from 'react-hot-toast'
 
 const StyledMainContainer = styled(Box)({
   display: 'flex',
@@ -279,26 +282,32 @@ const POSPage: NextPage = () => {
     }
   }
 
-  // Save order locally if offline
+  // Save order locally if offline, or process and sync online
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  // Remove errorMsg state, use toast instead
   const handleProcessPayment = async (paymentData: any) => {
+    setIsSubmitting(true)
     try {
-      // TODO: Process payment and create invoice
       if (navigator.onLine) {
-        // Online: process order normally
-        console.log('Processing payment:', paymentData)
-        // TODO: Sync with backend
+        // Online: transform and send to backend
+        const payload = transformPaymentDataToDocumentUpdateType(paymentData)
+        await dispatch(addNewDocument(payload)).unwrap()
+        // Optionally show success toast here
       } else {
         // Offline: save order locally
         await savePendingOrder(cart, customer)
-        // TODO: Show offline order saved message
+        // Optionally show offline saved toast here
       }
       clearCart()
       setCustomer(null)
       setPaymentDialogOpen(false)
-      // TODO: Add toast notification
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error processing payment:', error)
-      // TODO: Show error message
+      toast.error(
+        error?.message || 'Error procesando el pago. Intente nuevamente.',
+      )
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -339,6 +348,24 @@ const POSPage: NextPage = () => {
 
   return (
     <StyledMainContainer>
+      {isSubmitting && (
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            bgcolor: 'rgba(255,255,255,0.5)',
+            zIndex: 2000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Typography variant="h6">Procesando pago...</Typography>
+        </Box>
+      )}
       {/* Header */}
       <AppBar position="static" color="default" elevation={1}>
         <Toolbar>

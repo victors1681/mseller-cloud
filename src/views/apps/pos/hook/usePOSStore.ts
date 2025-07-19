@@ -32,12 +32,39 @@ export const usePOSStore = () => {
     isProcessing: false,
   })
 
+  // Enhanced addToCart to capture discount, tax, and additional info from UI
   const addToCart = useCallback(
-    (product: ProductType, quantity: number, precio: number) => {
+    (
+      product: ProductType,
+      quantity: number,
+      precio: number,
+      options?: {
+        descuento?: number
+        impuesto?: number
+        porcientoDescuento?: number
+        porcientoImpuesto?: number
+        cantidadOriginal?: number
+        promocion?: boolean
+      },
+    ) => {
       setStore((prev) => {
         const existingItemIndex = prev.cart.findIndex(
           (item) => item.producto.codigo === product.codigo,
         )
+
+        // Calculate discount and tax
+        const descuento = options?.descuento ?? 0
+        const impuesto = options?.impuesto ?? product.impuesto
+        const porcientoDescuento = options?.porcientoDescuento ?? product.descuento ?? 0
+        const porcientoImpuesto = options?.porcientoImpuesto ?? 0
+        const factor = product.factor ?? 1
+        const factorOriginal = product.factor ?? 1
+        const area = product.area ?? ''
+        const unidad = product.unidad ?? ''
+        const tipoImpuesto = product.tipoImpuesto ?? ''
+        const cantidadOriginal = options?.cantidadOriginal ?? quantity
+        // Removed existencia, apartado
+        const promocion = options?.promocion ?? product.promocion ?? false
 
         if (existingItemIndex >= 0) {
           // Update existing item
@@ -46,7 +73,20 @@ export const usePOSStore = () => {
           updatedCart[existingItemIndex] = {
             ...existingItem,
             cantidad: existingItem.cantidad + quantity,
-            subtotal: (existingItem.cantidad + quantity) * precio,
+            subtotal: (existingItem.cantidad + quantity) * precio - descuento,
+            descuento,
+            impuesto,
+            porcientoDescuento,
+            porcientoImpuesto,
+            factor,
+            factorOriginal,
+            // Removed isc, adv, grupoId
+            area,
+            unidad,
+            tipoImpuesto,
+            cantidadOriginal,
+            // Removed existencia, apartado
+            promocion,
           }
           return { ...prev, cart: updatedCart }
         } else {
@@ -56,9 +96,20 @@ export const usePOSStore = () => {
             producto: product,
             cantidad: quantity,
             precio: precio,
-            subtotal: quantity * precio,
-            descuento: 0,
-            impuesto: product.impuesto,
+            subtotal: quantity * precio - descuento,
+            descuento,
+            impuesto,
+            porcientoDescuento,
+            porcientoImpuesto,
+            factor,
+            factorOriginal,
+            // Removed isc, adv, grupoId
+            area,
+            unidad,
+            tipoImpuesto,
+            cantidadOriginal,
+            // Removed existencia, apartado
+            promocion,
           }
           return { ...prev, cart: [...prev.cart, newItem] }
         }

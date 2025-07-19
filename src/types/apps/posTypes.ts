@@ -10,8 +10,17 @@ export interface POSCartItem {
   subtotal: number
   descuento: number
   impuesto: number
+  porcientoDescuento?: number
+  porcientoImpuesto?: number
+  factor?: number
+  factorOriginal?: number
+  area?: string
+  unidad?: string
+  tipoImpuesto?: string
+  cantidadOriginal?: number
+  promocion?: boolean
+  // ...other fields as needed
 }
-
 export interface POSCustomer {
   customer?: CustomerType
   isNew?: boolean
