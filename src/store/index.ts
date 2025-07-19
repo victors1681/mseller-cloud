@@ -22,6 +22,7 @@ import removeData from './apps/removeData'
 import offers from './apps/offers'
 import ecf from 'src/store/apps/ecf'
 import business from 'src/store/apps/business'
+import docTypeSec from 'src/store/apps/docTypeSec'
 
 export const store = configureStore({
   reducer: {
@@ -45,6 +46,7 @@ export const store = configureStore({
     offers,
     ecf,
     business,
+    docTypeSec,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

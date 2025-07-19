@@ -162,7 +162,16 @@ const AuthProvider = ({ children }: Props) => {
     setUser(null)
     window.localStorage.removeItem('userData')
     window.localStorage.removeItem(authConfig.storageTokenKeyName)
-    router.push('/login')
+
+    // Only redirect to login if not already on a guest page
+    const guestPages = ['/login', '/register', '/forgot-password']
+    const isOnGuestPage = guestPages.some((page) =>
+      router.asPath.startsWith(page),
+    )
+
+    if (!isOnGuestPage) {
+      router.push('/login')
+    }
     setLoadingForm(false)
   }
 

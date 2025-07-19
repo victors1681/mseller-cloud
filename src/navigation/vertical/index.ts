@@ -113,6 +113,11 @@ const navigation = (): VerticalNavItemsType => {
           ],
         },
         {
+          title: 'Tipos de Documentos',
+          icon: 'mdi:file-document-multiple',
+          path: '/apps/docTypeSec/list',
+        },
+        {
           title: 'Cuenta',
           icon: 'mdi:account-cog',
           path: '/account-settings/account',
