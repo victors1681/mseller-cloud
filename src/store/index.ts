@@ -23,6 +23,7 @@ import offers from './apps/offers'
 import ecf from 'src/store/apps/ecf'
 import business from 'src/store/apps/business'
 import docTypeSec from 'src/store/apps/docTypeSec'
+import pos from 'src/store/apps/pos'
 
 export const store = configureStore({
   reducer: {
@@ -47,6 +48,7 @@ export const store = configureStore({
     ecf,
     business,
     docTypeSec,
+    pos,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

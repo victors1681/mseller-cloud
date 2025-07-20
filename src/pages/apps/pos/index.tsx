@@ -29,6 +29,7 @@ import { useRouter } from 'next/router'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/store'
 import { fetchData, fetchProductDetail } from 'src/store/apps/products'
+import { usePOS } from 'src/hooks/usePOS'
 
 // Layout
 import FullscreenPOSLayout from 'src/layouts/FullscreenPOSLayout'
@@ -43,6 +44,8 @@ import {
   POSPaymentDialog,
 } from 'src/views/apps/pos/components'
 import OnlineStatusIndicator from '@/views/apps/pos/components/OnlineStatusIndicator'
+import AbrirTurnoModal from 'src/views/apps/pos/AbrirTurnoModal'
+import CerrarTurnoModal from 'src/views/apps/pos/CerrarTurnoModal'
 import { usePOSPersistence } from '@/views/apps/pos/hook/usePOSPersistence'
 
 // Types
@@ -118,6 +121,17 @@ const POSPage: NextPage = () => {
     loadProductCache,
     cachedProducts,
   } = usePOSPersistence()
+
+  // POS Turno Management
+  const {
+    store: posStore,
+    isTurnoOpen,
+    hasTurnoActual,
+    loadTurnoActual,
+    showAbrirTurnoModal,
+    showCerrarTurnoModal,
+  } = usePOS()
+
   const [activeHeldCartId, setActiveHeldCartId] = useState<string | null>(null)
 
   // Check POS access permission on client side only
@@ -189,7 +203,35 @@ const POSPage: NextPage = () => {
   // Load initial data
   useEffect(() => {
     loadProducts()
+    loadTurnoActual() // Check for open turno
   }, [])
+
+  // Check if turno is required but not open
+  useEffect(() => {
+    // Only check after initial load is complete and modal is not already open
+    if (
+      !posStore.isTurnoActualLoading &&
+      !isTurnoOpen &&
+      !posStore.isAbrirTurnoModalOpen
+    ) {
+      // No open turno found, force user to open one
+      showAbrirTurnoModal()
+    }
+  }, [
+    posStore.isTurnoActualLoading,
+    isTurnoOpen,
+    posStore.isAbrirTurnoModalOpen,
+    showAbrirTurnoModal,
+  ])
+
+  // Close modal when turno becomes open
+  useEffect(() => {
+    if (isTurnoOpen && posStore.isAbrirTurnoModalOpen) {
+      console.log('Turno is now open, closing modal')
+      // Force close the modal since a turno is now open
+      dispatch({ type: 'appPos/toggleAbrirTurnoModal', payload: null })
+    }
+  }, [isTurnoOpen, posStore.isAbrirTurnoModalOpen, dispatch])
 
   // Load areas after products are loaded
   useEffect(() => {
@@ -225,6 +267,12 @@ const POSPage: NextPage = () => {
   }
 
   const handleProductSelect = (product: ProductType) => {
+    // Don't allow product selection if turno is not open
+    if (!isTurnoOpen) {
+      toast.error('Debe abrir un turno antes de realizar ventas')
+      return
+    }
+
     setSelectedProduct(product)
     setQuantityDialogOpen(true)
   }
@@ -335,10 +383,21 @@ const POSPage: NextPage = () => {
     handleMenuClose()
   }
 
+  const handleCloseTurno = () => {
+    if (posStore.turnoActual) {
+      showCerrarTurnoModal(posStore.turnoActual)
+    }
+    handleMenuClose()
+  }
+
   // Use custom hook for global barcode scan detection
   useBarcodeScan({
     products,
     onProductFound: (product) => {
+      if (!isTurnoOpen) {
+        toast.error('Debe abrir un turno antes de realizar ventas')
+        return
+      }
       addToCart(product, 1, product.precio1)
     },
     minBarcodeLength: 6,
@@ -366,6 +425,45 @@ const POSPage: NextPage = () => {
           <Typography variant="h6">Procesando pago...</Typography>
         </Box>
       )}
+
+      {/* Turno Required Overlay */}
+      {!isTurnoOpen && !posStore.isTurnoActualLoading && (
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            bgcolor: 'rgba(0,0,0,0.3)',
+            zIndex: 1500,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Card sx={{ p: 4, textAlign: 'center', maxWidth: 400 }}>
+            <Box sx={{ mb: 3 }}>
+              <Icon icon="mdi:cash-register" fontSize="4rem" color="primary" />
+            </Box>
+            <Typography variant="h6" gutterBottom>
+              Turno Requerido
+            </Typography>
+            <Typography variant="body2" color="textSecondary" sx={{ mb: 3 }}>
+              Debe abrir un turno antes de realizar ventas en el POS
+            </Typography>
+            <Button
+              variant="contained"
+              startIcon={<Icon icon="mdi:play-circle" />}
+              onClick={showAbrirTurnoModal}
+              size="large"
+              fullWidth
+            >
+              Abrir Turno
+            </Button>
+          </Card>
+        </Box>
+      )}
       {/* Header */}
       <AppBar position="static" color="default" elevation={1}>
         <Toolbar>
@@ -379,6 +477,27 @@ const POSPage: NextPage = () => {
           </Box>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Punto de Venta (POS)
+            {posStore.isTurnoActualLoading ? (
+              <Typography
+                variant="caption"
+                display="block"
+                color="warning.main"
+              >
+                Verificando turno...
+              </Typography>
+            ) : posStore.turnoActual ? (
+              <Typography
+                variant="caption"
+                display="block"
+                color="success.main"
+              >
+                Turno Activo - {posStore.turnoActual.codigoVendedor}
+              </Typography>
+            ) : (
+              <Typography variant="caption" display="block" color="error.main">
+                Sin turno activo
+              </Typography>
+            )}
           </Typography>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -388,7 +507,7 @@ const POSPage: NextPage = () => {
               variant="contained"
               startIcon={<Icon icon="mdi:cart-outline" />}
               onClick={() => setPaymentDialogOpen(true)}
-              disabled={cart.length === 0}
+              disabled={cart.length === 0 || !isTurnoOpen}
             >
               Cobrar ({cart.length})
             </Button>
@@ -396,7 +515,7 @@ const POSPage: NextPage = () => {
               variant="outlined"
               color="secondary"
               onClick={handleHoldCart}
-              disabled={cart.length === 0}
+              disabled={cart.length === 0 || !isTurnoOpen}
             >
               Hold Sale
             </Button>
@@ -413,6 +532,17 @@ const POSPage: NextPage = () => {
                 </ListItemIcon>
                 <ListItemText>Ir a Página Principal</ListItemText>
               </MenuItem>
+
+              {/* Close Turno Option */}
+              {isTurnoOpen && (
+                <MenuItem onClick={handleCloseTurno}>
+                  <ListItemIcon>
+                    <Icon icon="mdi:cash-register" fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>Cerrar Turno</ListItemText>
+                </MenuItem>
+              )}
+
               {/* Resume held carts */}
               {heldCarts.map((held) => (
                 <MenuItem
@@ -534,6 +664,10 @@ const POSPage: NextPage = () => {
         onProcessPayment={handleProcessPayment}
         isProcessing={isProcessing}
       />
+
+      {/* POS Turno Modals */}
+      <AbrirTurnoModal />
+      <CerrarTurnoModal />
     </StyledMainContainer>
   )
 }
