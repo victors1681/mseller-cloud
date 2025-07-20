@@ -15,9 +15,20 @@ const navigation = (): VerticalNavItemsType => {
         {
           title: 'POS',
           icon: 'mdi:point-of-sale',
-          path: '/apps/pos',
           // This will be filtered by UserLayout based on permissions
           permission: 'pos.allowCashierAccess',
+          children: [
+            {
+              title: 'Terminal de Ventas',
+              icon: 'mdi:cash-register',
+              path: '/apps/pos',
+            },
+            {
+              title: 'Gestión de Turnos',
+              icon: 'mdi:clock-outline',
+              path: '/apps/pos/manager',
+            },
+          ],
         },
         {
           title: 'Pedidos',
