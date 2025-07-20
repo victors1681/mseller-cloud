@@ -247,7 +247,8 @@ const POSPage: NextPage = () => {
         fetchData({
           query: '',
           status: 'A', // Only active products for POS
-          pageNumber: 1,
+          pageSize: 1000,
+          pageNumber: 0,
         }),
       )
     } catch (error) {
