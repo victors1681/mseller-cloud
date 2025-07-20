@@ -3,7 +3,7 @@ import { Dispatch } from 'redux'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 // ** Axios Imports
-import axios from 'axios'
+import axios, { isAxiosError } from 'axios'
 import { PaginatedResponse } from 'src/types/apps/response'
 import { getDateParam } from 'src/utils/getDateParam'
 import restClient from 'src/configs/restClient'
@@ -138,9 +138,14 @@ export const addNewDocument = createAsyncThunk<
         }
       }
 
-      return rejectWithValue({
-        message: response?.data?.message || 'Error creando documento',
+      if (isAxiosError(response)) {
+         return rejectWithValue({
+        message: response.response?.data.message || 'Error creando documento',
       })
+      }
+      
+      console.log('Document creation response error:', response)
+     
     } catch (error) {
       console.error('Document creation error:', error)
       return rejectWithValue({

@@ -84,12 +84,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
       console.log(
         error.response?.status,
         error.response?.statusText,
+        error.response?.data,
         `${error.request.path}`,
         `Request to: ${axios.defaults.baseURL}`,
       )
       return res
         .status(error.response?.status || 500)
-        .json({ message: error.message })
+        .json({ message: error.response?.data.error || error.message })
     }
 
     if (error.code === 'ECONNRESET' || error.code === 'ECONNABORTED') {

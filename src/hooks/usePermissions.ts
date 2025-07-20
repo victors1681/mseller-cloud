@@ -44,6 +44,7 @@ export type Permission =
   | 'pos.allowCashControl'
   | 'pos.allowReports'
   | 'pos.allowPriceOverride'
+  | 'pos.clearCart'
   | 'settings'
   | 'statistics'
   | 'transports'

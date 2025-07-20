@@ -42,6 +42,8 @@ import {
   POSQuantityDialog,
   POSPaymentDialog,
 } from 'src/views/apps/pos/components'
+import OnlineStatusIndicator from '@/views/apps/pos/components/OnlineStatusIndicator'
+import { usePOSPersistence } from '@/views/apps/pos/hook/usePOSPersistence'
 
 // Types
 import { ProductType } from 'src/types/apps/productTypes'
@@ -53,8 +55,12 @@ import {
 } from 'src/types/apps/posTypes'
 
 // Utils
-import { usePOSStore } from '../../../hooks/usePOSStore'
+import { usePOSStore } from '../../../views/apps/pos/hook/usePOSStore'
+import { useBarcodeScan } from '../../../hooks/useBarcodeScan'
 import { usePermissions } from 'src/hooks/usePermissions'
+import { transformPaymentDataToDocumentUpdateType } from '@/utils/transformPaymentData'
+import { addNewDocument } from '@/store/apps/documents'
+import toast from 'react-hot-toast'
 
 const StyledMainContainer = styled(Box)({
   display: 'flex',
@@ -100,6 +106,19 @@ const POSPage: NextPage = () => {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
   const { hasPermission } = usePermissions()
+  const {
+    heldCarts,
+    holdCart,
+    resumeCart,
+    removeHeldCart,
+    pendingOrders,
+    savePendingOrder,
+    syncPendingOrders,
+    cacheProducts,
+    loadProductCache,
+    cachedProducts,
+  } = usePOSPersistence()
+  const [activeHeldCartId, setActiveHeldCartId] = useState<string | null>(null)
 
   // Check POS access permission on client side only
   useEffect(() => {
@@ -234,10 +253,74 @@ const POSPage: NextPage = () => {
     })
   }
 
-  const handleCheckout = () => {
+  // Hold current cart for later
+  const handleHoldCart = async () => {
     if (cart.length === 0) return
-    setPaymentDialogOpen(true)
+    await holdCart(cart, customer)
+    clearCart()
+    setCustomer(null)
   }
+
+  // Resume a held cart
+  const handleResumeCart = async (id: string) => {
+    const held = await resumeCart(id)
+    if (held) {
+      // Restore cart and customer
+
+      await clearCart()
+      if (held.cart && Array.isArray(held.cart)) {
+        held.cart.forEach((item) => {
+          // item: { producto, cantidad, precio }
+          if (item.producto && item.cantidad && item.precio !== undefined) {
+            addToCart(item.producto, item.cantidad, item.precio)
+          }
+        })
+      }
+      if (held.customer) setCustomer(held.customer)
+      setActiveHeldCartId(id)
+      await removeHeldCart(id)
+    }
+  }
+
+  // Save order locally if offline, or process and sync online
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  // Remove errorMsg state, use toast instead
+  const handleProcessPayment = async (paymentData: any) => {
+    setIsSubmitting(true)
+    try {
+      if (navigator.onLine) {
+        // Online: transform and send to backend
+        const payload = transformPaymentDataToDocumentUpdateType(paymentData)
+        await dispatch(addNewDocument(payload)).unwrap()
+        // Optionally show success toast here
+      } else {
+        // Offline: save order locally
+        await savePendingOrder(cart, customer)
+        // Optionally show offline saved toast here
+      }
+      clearCart()
+      setCustomer(null)
+      setPaymentDialogOpen(false)
+    } catch (error: any) {
+      console.error('Error processing payment:', error)
+      toast.error(
+        error?.message || 'Error procesando el pago. Intente nuevamente.',
+      )
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  // Sync pending orders when online
+  useEffect(() => {
+    if (navigator.onLine && pendingOrders.length > 0) {
+      // Replace with your backend sync logic
+      syncPendingOrders(async (order) => {
+        // TODO: Send order to backend
+        console.log('Syncing order:', order)
+      })
+    }
+  }, [pendingOrders, syncPendingOrders])
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setMenuAnchorEl(event.currentTarget)
@@ -248,32 +331,41 @@ const POSPage: NextPage = () => {
   }
 
   const handleGoToMainPage = () => {
-    router.push('/home')
+    router.push('/')
     handleMenuClose()
   }
 
-  const handleProcessPayment = async (paymentData: any) => {
-    try {
-      // TODO: Process payment and create invoice
-      console.log('Processing payment:', paymentData)
-
-      // Clear cart after successful payment
-      clearCart()
-      setCustomer(null)
-      setPaymentDialogOpen(false)
-
-      // Show success message
-      // TODO: Add toast notification
-    } catch (error) {
-      console.error('Error processing payment:', error)
-      // TODO: Show error message
-    }
-  }
+  // Use custom hook for global barcode scan detection
+  useBarcodeScan({
+    products,
+    onProductFound: (product) => {
+      addToCart(product, 1, product.precio1)
+    },
+    minBarcodeLength: 6,
+  })
 
   const totals = getTotals()
 
   return (
     <StyledMainContainer>
+      {isSubmitting && (
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            bgcolor: 'rgba(255,255,255,0.5)',
+            zIndex: 2000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Typography variant="h6">Procesando pago...</Typography>
+        </Box>
+      )}
       {/* Header */}
       <AppBar position="static" color="default" elevation={1}>
         <Toolbar>
@@ -290,15 +382,53 @@ const POSPage: NextPage = () => {
           </Typography>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {/* Online/Offline Status Indicator */}
+            <OnlineStatusIndicator />
             <Button
               variant="contained"
               startIcon={<Icon icon="mdi:cart-outline" />}
-              onClick={handleCheckout}
+              onClick={() => setPaymentDialogOpen(true)}
               disabled={cart.length === 0}
             >
               Cobrar ({cart.length})
             </Button>
-
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={handleHoldCart}
+              disabled={cart.length === 0}
+            >
+              Hold Sale
+            </Button>
+            <Menu
+              anchorEl={menuAnchorEl}
+              open={Boolean(menuAnchorEl)}
+              onClose={handleMenuClose}
+              transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+              anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+            >
+              <MenuItem onClick={handleGoToMainPage}>
+                <ListItemIcon>
+                  <Icon icon="mdi:home" fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>Ir a Página Principal</ListItemText>
+              </MenuItem>
+              {/* Resume held carts */}
+              {heldCarts.map((held) => (
+                <MenuItem
+                  key={held.id}
+                  onClick={() => handleResumeCart(held.id)}
+                >
+                  <ListItemIcon>
+                    <Icon icon="mdi:restore" fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>
+                    Resume Sale (
+                    {held.customer?.customer?.nombre || 'Sin cliente'})
+                  </ListItemText>
+                </MenuItem>
+              ))}
+            </Menu>
             <IconButton
               color="inherit"
               onClick={handleMenuOpen}
@@ -378,7 +508,7 @@ const POSPage: NextPage = () => {
             totals={totals}
             onUpdateQuantity={updateCartItem}
             onRemoveItem={removeFromCart}
-            onCheckout={handleCheckout}
+            onCheckout={() => setPaymentDialogOpen(true)}
             onClearCart={clearCart}
           />
         </StyledRightPanel>
@@ -404,22 +534,6 @@ const POSPage: NextPage = () => {
         onProcessPayment={handleProcessPayment}
         isProcessing={isProcessing}
       />
-
-      {/* Header Menu */}
-      <Menu
-        anchorEl={menuAnchorEl}
-        open={Boolean(menuAnchorEl)}
-        onClose={handleMenuClose}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-      >
-        <MenuItem onClick={handleGoToMainPage}>
-          <ListItemIcon>
-            <Icon icon="mdi:home" fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Ir a Página Principal</ListItemText>
-        </MenuItem>
-      </Menu>
     </StyledMainContainer>
   )
 }

@@ -115,14 +115,8 @@ const POSQuantityDialog: React.FC<POSQuantityDialogProps> = ({
   const totalStock = getTotalStock()
   const subtotal = quantity * selectedPrice
 
-  // Available prices (non-zero prices)
-  const availablePrices = [
-    { label: 'Precio 1', value: product.precio1 },
-    { label: 'Precio 2', value: product.precio2 },
-    { label: 'Precio 3', value: product.precio3 },
-    { label: 'Precio 4', value: product.precio4 },
-    { label: 'Precio 5', value: product.precio5 },
-  ].filter((price) => price.value > 0)
+  // Available prices (only Precio 1)
+  const availablePrices = [{ label: 'Precio 1', value: product.precio1 }]
 
   return (
     <Dialog
@@ -209,28 +203,15 @@ const POSQuantityDialog: React.FC<POSQuantityDialogProps> = ({
               </Typography>
             </Box>
 
-            {/* Price Selection */}
-            {availablePrices.length > 1 && (
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
-                  Seleccionar Precio:
-                </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                  {availablePrices.map((price) => (
-                    <Button
-                      key={price.label}
-                      variant={
-                        selectedPrice === price.value ? 'contained' : 'outlined'
-                      }
-                      size="small"
-                      onClick={() => setSelectedPrice(price.value)}
-                    >
-                      {price.label}: {formatCurrency(price.value)}
-                    </Button>
-                  ))}
-                </Box>
-              </Box>
-            )}
+            {/* Price Selection - only show Precio 1 */}
+            <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Typography variant="h5" sx={{ fontWeight: 700 }}>
+              Precio:
+              </Typography>
+              <Typography variant="h6" color="primary" sx={{ fontWeight: 700 }}>
+              {formatCurrency(product.precio1)}
+              </Typography>
+            </Box>
           </Grid>
 
           {/* Quantity Control */}

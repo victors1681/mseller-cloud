@@ -22,15 +22,22 @@ const GuestGuard = (props: GuestGuardProps) => {
       return
     }
 
-    if (window.localStorage.getItem('userData')) {
+    // Only redirect if user is actually authenticated and not loading
+    if (auth.user && !auth.loading && window.localStorage.getItem('userData')) {
       router.replace('/')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.route])
-  // debugger
-  // if (auth.loading || (!auth.loading && auth.user !== null)) {
-  //   return fallback
-  // }
+  }, [router.route, auth.user, auth.loading])
+
+  // Show fallback spinner while authentication is being determined
+  if (auth.loading) {
+    return fallback
+  }
+
+  // If user is authenticated, redirect them away from guest pages
+  if (auth.user && !auth.loading) {
+    return fallback
+  }
 
   return <>{children}</>
 }

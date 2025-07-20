@@ -18,8 +18,31 @@ export type InvoiceClientType = {
 
 export enum TipoDocumentoEnum {
   ORDER = 'order',
-  QUOTE = 'quote',
   INVOICE = 'invoice',
+  QUOTE = 'quote',
+  BUY = 'buy',
+  RECEIPT = 'receipt',
+  CREDIT_NOTE = 'credit_note',
+  DEBIT_NOTE = 'debit_note',
+  RETURN_ORDER = 'return_order',
+  DELIVERY_NOTE = 'delivery_note',
+}
+
+export const tipoDocumentoSpanishNames: Record<TipoDocumentoEnum, string> = {
+  [TipoDocumentoEnum.ORDER]: 'Pedido',
+  [TipoDocumentoEnum.INVOICE]: 'Factura',
+  [TipoDocumentoEnum.QUOTE]: 'Cotización',
+  [TipoDocumentoEnum.BUY]: 'Compra',
+  [TipoDocumentoEnum.RECEIPT]: 'Recibo',
+  [TipoDocumentoEnum.CREDIT_NOTE]: 'Nota de Crédito',
+  [TipoDocumentoEnum.DEBIT_NOTE]: 'Nota de Débito',
+  [TipoDocumentoEnum.RETURN_ORDER]: 'Devolución',
+  [TipoDocumentoEnum.DELIVERY_NOTE]: 'Nota de Entrega',
+}
+
+export function getTipoDocumentoSpanishName(tipo: string): string {
+  const key = tipo as TipoDocumentoEnum
+  return tipoDocumentoSpanishNames[key] ?? tipo
 }
 
 export interface StatusParam {
@@ -161,7 +184,7 @@ export interface DocumentUpdateType {
   subTotal: number
   impuesto: number
   total: number
-  fechaVencimiento: string
+  fechaVencimiento?: string
   detalle: DocumentUpdateDetail[]
   tipoPedido?: string
   nuevoCliente?: boolean
@@ -175,6 +198,43 @@ export interface DocumentUpdateType {
   avatarUrl?: string
   confirmado: boolean
   codigoVendedor?: string
+  clienteNuevo?: CustomerType // if defined indicates a new customer to be created
+  // Added fields from C# model
+  terminal?: string
+  secuenciaDocumento?: string
+  estadoPago?: EstadoPago
+  tipoPago?: TipoPago
+  moneda?: string
+  dispositivo?: string
+  impresion?: number
+  fechaImpresion?: string
+  turnoId?: string
+  cancelada?: boolean
+  razonCancelacion?: string
+  reembolsada?: boolean
+  fechaReembolso?: string
+  montoRecibido?: number
+  montoDevuelto?: number
+  esVentaPOS?: boolean
+}
+
+// TODO: Replace these with actual definitions as needed
+export enum EstadoPago {
+  Paid = 'Paid',
+  Pending = 'Pending',
+  Refunded = 'Refunded',
+  Cancelled = 'Cancelled',
+}
+
+export enum TipoPago {
+  Cash = 'Cash',
+  CreditCard = 'CreditCard',
+  DebitCard = 'DebitCard',
+  BankTransfer = 'BankTransfer',
+  MobilePayment = 'MobilePayment',
+  Check = 'Check',
+  Voucher = 'Voucher',
+  Split = 'Split',
 }
 
 export interface Condicion {
