@@ -44,6 +44,7 @@ import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import { DocTypeSecType } from 'src/types/apps/docTypeSecType'
 import OptionsMenu from 'src/@core/components/option-menu'
 import AddDocTypeSecDrawer from 'src/views/apps/docTypeSec/AddDocTypeSecDrawer'
+import { getTipoDocumentoSpanishName } from '@/types/apps/documentTypes'
 
 interface CustomInputProps {
   dates: Date[]
@@ -104,7 +105,7 @@ const defaultColumns: GridColDef[] = [
           color: 'text.primary',
         }}
       >
-        {row.tipoDocumento}
+        {getTipoDocumentoSpanishName(row.tipoDocumento)}
       </Typography>
     ),
   },

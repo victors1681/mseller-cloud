@@ -1,7 +1,9 @@
+import { TipoDocumentoEnum } from "./documentTypes"
+
 export interface DocTypeSecType {
   id: number
   prefijo: string
-  tipoDocumento: number
+  tipoDocumento: TipoDocumentoEnum
   secuencia: number
   secuenciaContado: number
   localidad: number

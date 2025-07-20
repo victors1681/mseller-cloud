@@ -20,7 +20,15 @@ import { useDispatch, useSelector } from 'react-redux'
 
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
-import { FormControlLabel, Grid, Switch } from '@mui/material'
+import {
+  FormControlLabel,
+  Grid,
+  Switch,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from '@mui/material'
 import toast from 'react-hot-toast'
 import { useEffect } from 'react'
 import {
@@ -28,6 +36,10 @@ import {
   toggleDocTypeSecAddUpdate,
 } from '@/store/apps/docTypeSec'
 import { DocTypeSecType } from '@/types/apps/docTypeSecType'
+import {
+  TipoDocumentoEnum,
+  getTipoDocumentoSpanishName,
+} from 'src/types/apps/documentTypes'
 
 interface AddDocTypeSecDrawerType {
   open: boolean
@@ -46,7 +58,13 @@ const schema = yup.object().shape({
 
   prefijo: yup.string().max(20, 'El prefijo no debe exceder 20 caracteres'),
 
-  tipoDocumento: yup.string().required('Tipo de documento es requerido'),
+  tipoDocumento: yup
+    .string()
+    .oneOf(
+      Object.values(TipoDocumentoEnum),
+      'Debe seleccionar un tipo de documento válido',
+    )
+    .required('Tipo de documento es requerido'),
 
   secuencia: yup
     .number()
@@ -64,7 +82,7 @@ const schema = yup.object().shape({
 const defaultValues = {
   id: 0,
   prefijo: '',
-  tipoDocumento: 0,
+  tipoDocumento: TipoDocumentoEnum.ORDER,
   secuencia: 0,
   secuenciaContado: 0,
   localidad: 0,
@@ -166,15 +184,25 @@ const AddDocTypeSecDrawer = (props: AddDocTypeSecDrawerType) => {
                 name="tipoDocumento"
                 control={control}
                 render={({ field, fieldState: { error } }) => (
-                  <TextField
-                    {...field}
-                    fullWidth
-                    label="Tipo de Documento"
-                    placeholder="1"
-                    error={!!error}
-                    helperText={error?.message}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                  />
+                  <FormControl fullWidth error={!!error}>
+                    <InputLabel>Tipo de Documento</InputLabel>
+                    <Select {...field} label="Tipo de Documento">
+                      {Object.values(TipoDocumentoEnum).map((tipo) => (
+                        <MenuItem key={tipo} value={tipo}>
+                          {getTipoDocumentoSpanishName(tipo)}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {error && (
+                      <Typography
+                        variant="caption"
+                        color="error"
+                        sx={{ mt: 1, ml: 2 }}
+                      >
+                        {error.message}
+                      </Typography>
+                    )}
+                  </FormControl>
                 )}
               />
             </Grid>

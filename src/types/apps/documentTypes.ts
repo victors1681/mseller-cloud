@@ -18,8 +18,31 @@ export type InvoiceClientType = {
 
 export enum TipoDocumentoEnum {
   ORDER = 'order',
-  QUOTE = 'quote',
   INVOICE = 'invoice',
+  QUOTE = 'quote',
+  BUY = 'buy',
+  RECEIPT = 'receipt',
+  CREDIT_NOTE = 'credit_note',
+  DEBIT_NOTE = 'debit_note',
+  RETURN_ORDER = 'return_order',
+  DELIVERY_NOTE = 'delivery_note',
+}
+
+export const tipoDocumentoSpanishNames: Record<TipoDocumentoEnum, string> = {
+  [TipoDocumentoEnum.ORDER]: 'Pedido',
+  [TipoDocumentoEnum.INVOICE]: 'Factura',
+  [TipoDocumentoEnum.QUOTE]: 'Cotización',
+  [TipoDocumentoEnum.BUY]: 'Compra',
+  [TipoDocumentoEnum.RECEIPT]: 'Recibo',
+  [TipoDocumentoEnum.CREDIT_NOTE]: 'Nota de Crédito',
+  [TipoDocumentoEnum.DEBIT_NOTE]: 'Nota de Débito',
+  [TipoDocumentoEnum.RETURN_ORDER]: 'Devolución',
+  [TipoDocumentoEnum.DELIVERY_NOTE]: 'Nota de Entrega',
+}
+
+export function getTipoDocumentoSpanishName(tipo: string): string {
+  const key = tipo as TipoDocumentoEnum
+  return tipoDocumentoSpanishNames[key] ?? tipo
 }
 
 export interface StatusParam {
