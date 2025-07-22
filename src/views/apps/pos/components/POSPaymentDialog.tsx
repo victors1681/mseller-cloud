@@ -162,7 +162,7 @@ const POSPaymentDialog: React.FC<POSPaymentDialogProps> = ({
 
   const isValidPayment = (): boolean => {
     if (!selectedPaymentType) return false
-    if (!customer) return false
+    //if (!customer) return false // use customer MOST
 
     const received = parseFloat(amountReceived) || 0
     const selectedType = paymentTypes.find(
@@ -239,7 +239,7 @@ const POSPaymentDialog: React.FC<POSPaymentDialogProps> = ({
                 <Typography variant="body2">
                   {customer?.isNew
                     ? customer.tempData?.nombre
-                    : customer?.customer?.nombre || 'Cliente general'}
+                    : customer?.customer?.nombre || 'Cliente Mostrador'}
                 </Typography>
                 {customer?.customer?.codigo && (
                   <Typography variant="caption" color="text.secondary">
@@ -360,8 +360,13 @@ const POSPaymentDialog: React.FC<POSPaymentDialogProps> = ({
                         : ''
                     }
                     onClick={() =>
+                      !isProcessing &&
                       setSelectedPaymentType(paymentType.condicionPago)
                     }
+                    sx={{
+                      pointerEvents: isProcessing ? 'none' : 'auto',
+                      opacity: isProcessing ? 0.6 : 1,
+                    }}
                   >
                     <CardContent sx={{ textAlign: 'center', py: 2 }}>
                       <Icon
@@ -396,6 +401,7 @@ const POSPaymentDialog: React.FC<POSPaymentDialogProps> = ({
                 onChange={(e) => setAmountReceived(e.target.value)}
                 sx={{ mb: 2 }}
                 inputProps={{ min: 0, step: 0.01 }}
+                disabled={isProcessing}
               />
 
               {selectedPaymentType === 'EFECTIVO' && (
@@ -421,6 +427,7 @@ const POSPaymentDialog: React.FC<POSPaymentDialogProps> = ({
                   value={paymentReference}
                   onChange={(e) => setPaymentReference(e.target.value)}
                   sx={{ mb: 2 }}
+                  disabled={isProcessing}
                 />
               )}
 
@@ -431,6 +438,7 @@ const POSPaymentDialog: React.FC<POSPaymentDialogProps> = ({
                 rows={2}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
+                disabled={isProcessing}
               />
             </Box>
           </Grid>
@@ -438,7 +446,12 @@ const POSPaymentDialog: React.FC<POSPaymentDialogProps> = ({
       </DialogContent>
 
       <DialogActions sx={{ p: 3 }}>
-        <Button onClick={onClose} disabled={isProcessing} size="large">
+        <Button
+          onClick={onClose}
+          disabled={isProcessing}
+          size="large"
+          variant="outlined"
+        >
           Cancelar
         </Button>
 
@@ -447,15 +460,22 @@ const POSPaymentDialog: React.FC<POSPaymentDialogProps> = ({
           onClick={handleProcessPayment}
           disabled={!isValidPayment() || isProcessing}
           size="large"
-          startIcon={
-            isProcessing ? (
-              <CircularProgress size={20} color="inherit" />
-            ) : (
-              <Icon icon="mdi:cash-check" />
-            )
-          }
+          sx={{
+            minWidth: 180,
+            position: 'relative',
+          }}
         >
-          {isProcessing ? 'Procesando...' : 'Confirmar Pago'}
+          {isProcessing ? (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <CircularProgress size={20} color="inherit" />
+              <span>Procesando...</span>
+            </Box>
+          ) : (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Icon icon="mdi:cash-check" />
+              <span>Confirmar Pago</span>
+            </Box>
+          )}
         </Button>
       </DialogActions>
     </Dialog>

@@ -81,7 +81,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     }
   } catch (error: any) {
     if (isAxiosError(error)) {
-      console.log(
+      console.error(
         error.response?.status,
         error.response?.statusText,
         error.response?.data,

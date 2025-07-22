@@ -16,6 +16,7 @@ import { PaginatedResponse } from 'src/types/apps/response'
 import restClient from 'src/configs/restClient'
 import { AppDispatch, RootState } from '@/store'
 import toast from 'react-hot-toast'
+import { isAxiosError } from 'axios'
 
 interface DataParams {
   query?: string
@@ -62,12 +63,16 @@ export const abrirTurno = createAsyncThunk<
           message: 'Turno abierto exitosamente',
         }
       }
-
+      console.error('Error|| response turno error:', response)
       return rejectWithValue({
         message: response?.data?.message || 'Error abriendo turno',
       })
     } catch (error) {
-      console.error('Abrir turno error:', error)
+      if (isAxiosError(error)) {
+        return rejectWithValue({
+          message: error.message || 'Error inesperado abriendo turno',
+        })
+      }
       return rejectWithValue({
         message: 'Error inesperado abriendo turno',
       })

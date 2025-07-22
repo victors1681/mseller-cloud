@@ -152,7 +152,7 @@ const AbrirTurnoModal = ({ allowToClose = false }: AbrirTurnoModalProps) => {
         toast.error(response.message || 'Error abriendo turno')
       }
     } catch (error) {
-      console.error('Abrir turno error:', error)
+      console.error('Error in modal:', error)
       toast.error('Error inesperado al abrir turno')
     }
   }

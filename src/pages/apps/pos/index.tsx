@@ -29,7 +29,7 @@ import { useRouter } from 'next/router'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/store'
 import { fetchData, fetchProductDetail } from 'src/store/apps/products'
-import { usePOS } from 'src/hooks/usePOS'
+import { usePOS } from '@/views/apps/pos/hook/usePOS'
 
 // Layout
 import FullscreenPOSLayout from 'src/layouts/FullscreenPOSLayout'
@@ -61,7 +61,7 @@ import {
 import { usePOSStore } from '../../../views/apps/pos/hook/usePOSStore'
 import { useBarcodeScan } from '../../../hooks/useBarcodeScan'
 import { usePermissions } from 'src/hooks/usePermissions'
-import { transformPaymentDataToDocumentUpdateType } from '@/utils/transformPaymentData'
+import { transformPOSDataToDocument } from '@/utils/transformPaymentData'
 import { addNewDocument } from '@/store/apps/documents'
 import toast from 'react-hot-toast'
 
@@ -166,6 +166,7 @@ const POSPage: NextPage = () => {
     setSearchQuery,
     clearCart,
     getTotals,
+    setIsProcessing,
   } = usePOSStore()
 
   // Local state
@@ -332,14 +333,12 @@ const POSPage: NextPage = () => {
   }
 
   // Save order locally if offline, or process and sync online
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  // Remove errorMsg state, use toast instead
   const handleProcessPayment = async (paymentData: any) => {
-    setIsSubmitting(true)
+    setIsProcessing(true)
     try {
       if (navigator.onLine) {
         // Online: transform and send to backend
-        const payload = transformPaymentDataToDocumentUpdateType(paymentData)
+        const payload = transformPOSDataToDocument(paymentData)
         await dispatch(addNewDocument(payload)).unwrap()
         // Optionally show success toast here
       } else {
@@ -356,7 +355,7 @@ const POSPage: NextPage = () => {
         error?.message || 'Error procesando el pago. Intente nuevamente.',
       )
     } finally {
-      setIsSubmitting(false)
+      setIsProcessing(false)
     }
   }
 
@@ -408,7 +407,8 @@ const POSPage: NextPage = () => {
 
   return (
     <StyledMainContainer>
-      {isSubmitting && (
+      {/* Payment Processing Overlay */}
+      {isProcessing && (
         <Box
           sx={{
             position: 'fixed',

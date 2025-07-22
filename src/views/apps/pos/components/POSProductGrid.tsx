@@ -12,6 +12,7 @@ import {
   useMediaQuery,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
+import Image from 'next/image'
 import Icon from 'src/@core/components/icon'
 import { ProductType } from 'src/types/apps/productTypes'
 import formatCurrency from 'src/utils/formatCurrency'
@@ -190,14 +191,14 @@ const POSProductGrid: React.FC<POSProductGridProps> = ({
             <StyledProductCard onClick={() => onProductSelect(product)}>
               <StyledProductImage>
                 {productImage ? (
-                  <img
+                  <Image
                     src={productImage}
                     alt={product.nombre}
+                    fill
                     style={{
-                      width: '100%',
-                      height: '100%',
                       objectFit: 'cover',
                     }}
+                    sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none'
                     }}

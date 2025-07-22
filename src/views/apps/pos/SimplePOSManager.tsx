@@ -15,7 +15,7 @@ import {
 } from '@mui/material'
 
 // ** Custom Hook
-import { usePOS } from 'src/hooks/usePOS'
+import { usePOS } from '@/views/apps/pos/hook/usePOS'
 
 // ** Types
 import { getTurnoEstadoSpanishName, TurnoEstado } from 'src/types/apps/posType'

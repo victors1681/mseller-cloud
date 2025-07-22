@@ -5,7 +5,7 @@ import {
   TipoDocumentoEnum,
 } from 'src/types/apps/documentTypes'
 
-export function transformPaymentDataToDocumentUpdateType(
+export function transformPOSDataToDocument(
   paymentData: any,
 ): DocumentUpdateType {
   const customer = paymentData.customer?.customer || {}
