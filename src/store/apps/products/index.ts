@@ -13,7 +13,7 @@ interface DataParams {
   query?: string
   codigoProducto?: string
   status?: string
-  pageSize: number
+  pageSize?: number
   pageNumber: number
 }
 
