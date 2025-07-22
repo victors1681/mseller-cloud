@@ -20,6 +20,7 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
+  CircularProgress,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import Icon from 'src/@core/components/icon'
@@ -29,6 +30,7 @@ import { useRouter } from 'next/router'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/store'
 import { fetchData, fetchProductDetail } from 'src/store/apps/products'
+import { setInitialTurnoData } from 'src/store/apps/pos'
 import { usePOS } from '@/views/apps/pos/hook/usePOS'
 
 // Layout
@@ -56,6 +58,14 @@ import {
   POSCustomer,
   POSAreaFilter as AreaFilterType,
 } from 'src/types/apps/posTypes'
+import { TurnoType } from 'src/types/apps/posType'
+
+// Component Props Interface
+interface POSPageProps {
+  initialTurnoData?: TurnoType | null
+  hasTurnoOpen?: boolean
+  skipSSR?: boolean
+}
 
 // Utils
 import { usePOSStore } from '../../../views/apps/pos/hook/usePOSStore'
@@ -103,7 +113,11 @@ const StyledProductArea = styled(Box)({
   padding: 8,
 })
 
-const POSPage: NextPage = () => {
+const POSPage: NextPage<POSPageProps> = ({
+  initialTurnoData = null,
+  hasTurnoOpen = false,
+  skipSSR = false,
+}) => {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const dispatch = useDispatch<AppDispatch>()
@@ -204,28 +218,39 @@ const POSPage: NextPage = () => {
   // Load initial data
   useEffect(() => {
     loadProducts()
-    loadTurnoActual() // Check for open turno
-  }, [])
+
+    // If we have initial turno data from SSR, use it instead of fetching
+    if (initialTurnoData && !skipSSR) {
+      dispatch(setInitialTurnoData(initialTurnoData))
+    } else {
+      // Enhanced client-side loading with immediate feedback
+      loadTurnoActual() // Fetch turno data on client side
+    }
+  }, [initialTurnoData, skipSSR])
+
+  // Enhanced loading check with better UX
+  const isInitialLoading =
+    posStore.isTurnoActualLoading && !posStore.turnoActual
+  const shouldShowTurnoModal =
+    !isInitialLoading &&
+    !isTurnoOpen &&
+    !posStore.isAbrirTurnoModalOpen &&
+    !hasTurnoOpen
 
   // Check if turno is required but not open
   useEffect(() => {
     // Only check after initial load is complete and modal is not already open
-    if (
-      !posStore.isTurnoActualLoading &&
-      !isTurnoOpen &&
-      !posStore.isAbrirTurnoModalOpen
-    ) {
-      // No open turno found, force user to open one
-      showAbrirTurnoModal()
-    }
-  }, [
-    posStore.isTurnoActualLoading,
-    isTurnoOpen,
-    posStore.isAbrirTurnoModalOpen,
-    showAbrirTurnoModal,
-  ])
+    if (shouldShowTurnoModal) {
+      // Add a small delay to prevent flicker during page load
+      const timer = setTimeout(() => {
+        if (!isTurnoOpen && !posStore.isAbrirTurnoModalOpen) {
+          showAbrirTurnoModal()
+        }
+      }, 100)
 
-  // Close modal when turno becomes open
+      return () => clearTimeout(timer)
+    }
+  }, [shouldShowTurnoModal, showAbrirTurnoModal]) // Close modal when turno becomes open
   useEffect(() => {
     if (isTurnoOpen && posStore.isAbrirTurnoModalOpen) {
       console.log('Turno is now open, closing modal')
@@ -405,6 +430,27 @@ const POSPage: NextPage = () => {
 
   const totals = getTotals()
 
+  // Show loading state if we're still fetching turno data and don't have initial data
+  if (isInitialLoading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100vh',
+          flexDirection: 'column',
+          gap: 2,
+        }}
+      >
+        <CircularProgress size={40} />
+        <Typography variant="h6" color="text.secondary">
+          Cargando información del turno...
+        </Typography>
+      </Box>
+    )
+  }
+
   return (
     <StyledMainContainer>
       {/* Payment Processing Overlay */}
@@ -428,7 +474,7 @@ const POSPage: NextPage = () => {
       )}
 
       {/* Turno Required Overlay */}
-      {!isTurnoOpen && !posStore.isTurnoActualLoading && (
+      {shouldShowTurnoModal && (
         <Box
           sx={{
             position: 'fixed',
@@ -677,5 +723,25 @@ POSPage.authGuard = false
 POSPage.getLayout = (page: React.ReactElement) => (
   <FullscreenPOSLayout>{page}</FullscreenPOSLayout>
 )
+
+// Enhanced client-side approach to minimize flicker
+// This approach provides immediate loading feedback and smooth transitions
+export const getServerSideProps = async () => {
+  // For now, we skip SSR due to complex auth requirements (X-URL, localStorage tokens)
+  // Instead, we provide enhanced client-side loading with better UX
+  return {
+    props: {
+      initialTurnoData: null,
+      hasTurnoOpen: false,
+      skipSSR: true,
+    },
+  }
+}
+
+// Future: If you want to implement SSR later, you would need to:
+// 1. Store auth tokens in httpOnly cookies instead of localStorage
+// 2. Store X-URL configuration in cookies or database
+// 3. Implement proper server-side session management
+// 4. Create server-side restClient configuration
 
 export default POSPage

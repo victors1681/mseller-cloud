@@ -308,6 +308,11 @@ export const appPosSlice = createSlice({
     selectedTurno: null as TurnoType | null,
   },
   reducers: {
+    // Set initial turno data from SSR
+    setInitialTurnoData: (state, action) => {
+      state.turnoActual = action.payload
+      state.isTurnoActualLoading = false
+    },
     toggleAbrirTurnoModal: (state, action) => {
       state.isAbrirTurnoModalOpen = !state.isAbrirTurnoModalOpen
     },
@@ -406,6 +411,7 @@ export const appPosSlice = createSlice({
 
 export default appPosSlice.reducer
 export const {
+  setInitialTurnoData,
   toggleAbrirTurnoModal,
   toggleCerrarTurnoModal,
   toggleMovimientoModal,
