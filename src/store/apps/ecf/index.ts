@@ -72,6 +72,7 @@ export const addECFConfiguration = createAsyncThunk<
   'appECF/addECFConfiguration',
   async (data: ECFType, { dispatch, getState, rejectWithValue }) => {
     try {
+      data.id = crypto.randomUUID()
       const response = await restClient.post<any>(
         '/api/portal/ConfiguracionFacturacionElectronica',
         data,

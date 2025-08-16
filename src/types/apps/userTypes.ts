@@ -23,7 +23,7 @@ export interface UserTypes {
   restoreIpad: boolean
   sellerCode: string
   testMode: boolean
-  type: 'seller' | 'administrator' | 'superuser' | 'driver' | 'office'
+  type: 'seller' | 'administrator' | 'superuser' | 'driver' | 'office' | 'inventory' | 'accounting' | 'manager'
   userLevel: string
   defaultClientByRoute: boolean
   updateBankList: boolean
