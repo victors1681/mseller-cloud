@@ -52,12 +52,14 @@ const CustomTableCell = styled(TableCell)<BoxProps>(({ theme }) => ({
   padding: '0px',
   paddingTop: '1.2px',
   paddingBottom: '1.2px',
+  color: 'black !important',
 }))
 
 const CustomHeaderTableCell = styled(TableCell)<BoxProps>(({ theme }) => ({
   fontSize: '12px',
   padding: '2px',
   fontWeight: 'bold',
+  color: 'black !important',
 }))
 
 const PreviewCard = ({ data }: Props) => {
@@ -289,6 +291,7 @@ const PreviewCard = ({ data }: Props) => {
                     fontWeight: 600,
                     lineHeight: 'normal',
                     textTransform: 'uppercase',
+                    color: 'black',
                   }}
                 >
                   {userData.user?.business.name}
@@ -297,11 +300,16 @@ const PreviewCard = ({ data }: Props) => {
                   <TableRow></TableRow>
                   <TableRow>
                     <MUITableCell>
-                      <Typography variant="body2">Distribuidores:</Typography>
+                      <Typography variant="body2" sx={{ color: 'black' }}>
+                        Distribuidores:
+                      </Typography>
                     </MUITableCell>
                     <MUITableCell>
                       {data.distribuidores.map((distribuidor) => (
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        <Typography
+                          variant="body2"
+                          sx={{ fontWeight: 600, color: 'black' }}
+                        >
                           {distribuidor.codigo}-{distribuidor.nombre}
                         </Typography>
                       ))}
@@ -320,10 +328,12 @@ const PreviewCard = ({ data }: Props) => {
                     <TableBody>
                       <TableRow>
                         <MUITableCell>
-                          <Typography variant="h6">Transporte</Typography>
+                          <Typography variant="h6" sx={{ color: 'black' }}>
+                            Transporte
+                          </Typography>
                         </MUITableCell>
                         <MUITableCell>
-                          <Typography variant="h6">
+                          <Typography variant="h6" sx={{ color: 'black' }}>
                             {Array.isArray(data.noTransporte)
                               ? `#${data.noTransporte.join(', #')}`
                               : `#${data.noTransporte}`}
@@ -332,10 +342,15 @@ const PreviewCard = ({ data }: Props) => {
                       </TableRow>
                       <TableRow>
                         <MUITableCell>
-                          <Typography variant="body2">Fecha:</Typography>
+                          <Typography variant="body2" sx={{ color: 'black' }}>
+                            Fecha:
+                          </Typography>
                         </MUITableCell>
                         <MUITableCell>
-                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                          <Typography
+                            variant="body2"
+                            sx={{ fontWeight: 600, color: 'black' }}
+                          >
                             {formatDate(data.fecha)}
                           </Typography>
                         </MUITableCell>
@@ -346,16 +361,42 @@ const PreviewCard = ({ data }: Props) => {
               </Grid>
             </Grid>
           </CardContent>
-
           <CardContent sx={{ pt: 0, pb: 1 }}>
-            <Typography variant="body2" sx={{ fontWeight: 600, mb: 0 }}>
-              Documentos Entregas:
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: 600, mb: 0, color: 'black' }}
+            >
+              Total de entregas: ({data.documentosEntregas.length}):
             </Typography>
-            <Typography variant="body2">
-              {data.documentosEntregas.map((doc, index) => (
+          </CardContent>
+          <CardContent sx={{ pt: 0, pb: 1 }}>
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: 600, mb: 0, color: 'black' }}
+            >
+              Documentos Entregados ({data.documentosEntregados.length}):
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'black' }}>
+              {data.documentosEntregados.map((doc, index) => (
                 <span key={index}>
                   {doc}
-                  {index < data.documentosEntregas.length - 1 && ', '}
+                  {index < data.documentosEntregados.length - 1 && ', '}
+                </span>
+              ))}
+            </Typography>
+          </CardContent>
+          <CardContent sx={{ pt: 0, pb: 1 }}>
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: 600, mb: 0, color: 'black' }}
+            >
+              Documentos No Entregados ({data.documentosNoEntregados.length}):
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'black' }}>
+              {data.documentosNoEntregados.map((doc, index) => (
+                <span key={index}>
+                  {doc}
+                  {index < data.documentosNoEntregados.length - 1 && ', '}
                 </span>
               ))}
             </Typography>
@@ -392,7 +433,7 @@ const PreviewCard = ({ data }: Props) => {
                     <CustomTableCell>{detalle.vendidas}</CustomTableCell>
                     <CustomTableCell>{detalle.devolver}</CustomTableCell>
                     <CustomTableCell>
-                      {detalle.promocion ? 'Si' : 'No'}
+                      {detalle.promocion ? 'Si' : '-'}
                     </CustomTableCell>
                   </TableRow>
                 ))}

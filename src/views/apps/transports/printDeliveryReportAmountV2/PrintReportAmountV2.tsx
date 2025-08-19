@@ -387,7 +387,7 @@ const PreviewCard = ({ data }: Props) => {
             </FormControl>
           </Grid>
         </StyledGrid>
-        <Card sx={{ width: '50em' }}>
+        <Card sx={{ width: '48em' }}>
           <CardContent>
             <Grid container>
               <Grid item sm={6} xs={6} sx={{ mb: { sm: 0, xs: 4 } }}>
@@ -533,7 +533,7 @@ const PreviewCard = ({ data }: Props) => {
           </div>
           <div>
             <Typography variant="body1" sx={{ mr: 2, fontWeight: 600 }}>
-              Documentos Entregas
+              Documentos Entregados:
             </Typography>
             <Box sx={{ mb: 2 }}>
               {data.documentosEntregas?.map((d) => (
@@ -581,7 +581,11 @@ const PreviewCard = ({ data }: Props) => {
                       {formatCurrency(detalle.bruto)}
                     </CustomTableCell>
                     <CustomTableCell>
-                      {detalle.porcientoDescuento}%
+                      {detalle.porcientoDescuento > 0 ? (
+                        <b>{detalle.porcientoDescuento}%</b>
+                      ) : (
+                        `${detalle.porcientoDescuento}%`
+                      )}
                     </CustomTableCell>
                     <CustomTableCell>
                       {formatCurrency(detalle.descuento)}

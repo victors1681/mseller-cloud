@@ -196,6 +196,8 @@ export interface ReporteEntrega {
   noTransporte: string[]
   distribuidores: DistribuidorType[]
   documentosEntregas: string[]
+  documentosNoEntregados: string[]
+  documentosEntregados: string[]
   detalle: DetalleEntrega[]
 }
 
@@ -253,4 +255,6 @@ export interface ReporteEntregaMontoV2 {
   detalle: Detalle[]
   tiposNcf: NcfType[]
   documentosEntregas: string[] // Este campo es para mantener la compatibilidad con la vista previa de impresión
+  documentosNoEntregas: string[] // Este campo es para mantener la compatibilidad con la vista previa de impresión
+  documentosEntregados: string[] // Este campo es para mantener la compatibilidad con la vista previa de impresión
 }
