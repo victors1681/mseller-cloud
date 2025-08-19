@@ -387,7 +387,17 @@ const PreviewCard = ({ data }: Props) => {
             </FormControl>
           </Grid>
         </StyledGrid>
-        <Card sx={{ width: '48em' }}>
+        <Card
+          sx={{
+            width: '50em',
+            '@media print': {
+              width: '100%',
+              maxWidth: 'none',
+              boxShadow: 'none',
+              border: 'none',
+            },
+          }}
+        >
           <CardContent>
             <Grid container>
               <Grid item sm={6} xs={6} sx={{ mb: { sm: 0, xs: 4 } }}>
