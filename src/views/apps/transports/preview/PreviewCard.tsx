@@ -366,7 +366,7 @@ const PreviewCard = ({ data }: Props) => {
               variant="body2"
               sx={{ fontWeight: 600, mb: 0, color: 'black' }}
             >
-              Total de entregas: ({data.documentosEntregas.length}):
+              Total de entregas: ({data.documentosEntregas.length})
             </Typography>
           </CardContent>
           <CardContent sx={{ pt: 0, pb: 1 }}>
@@ -374,7 +374,8 @@ const PreviewCard = ({ data }: Props) => {
               variant="body2"
               sx={{ fontWeight: 600, mb: 0, color: 'black' }}
             >
-              Documentos Entregados ({data.documentosEntregados.length}):
+              Documentos Entregados ({data.documentosEntregados.length})
+              {promocionesOnly ? ' (Con Promociones)' : ''}:
             </Typography>
             <Typography variant="body2" sx={{ color: 'black' }}>
               {data.documentosEntregados.map((doc, index) => (
@@ -390,7 +391,8 @@ const PreviewCard = ({ data }: Props) => {
               variant="body2"
               sx={{ fontWeight: 600, mb: 0, color: 'black' }}
             >
-              Documentos No Entregados ({data.documentosNoEntregados.length}):
+              Documentos No Entregados ({data.documentosNoEntregados.length})
+              {promocionesOnly ? ' (Con Promociones)' : ''}:
             </Typography>
             <Typography variant="body2" sx={{ color: 'black' }}>
               {data.documentosNoEntregados.map((doc, index) => (
