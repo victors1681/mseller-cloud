@@ -1,23 +1,17 @@
 // ** React Imports
-import {
-  createContext,
-  useEffect,
-  useState,
-  ReactNode,
-  useContext,
-} from 'react'
+import { createContext, ReactNode, useEffect, useState } from 'react'
 
 // ** Next Import
 import { useRouter } from 'next/router'
 
 // ** Axios
-import axios from 'axios'
 
 // ** Config
 import authConfig from 'src/configs/auth'
 
 // ** Types
-import { AuthValuesType, LoginParams, ErrCallbackType } from './types'
+import { FirebaseError } from 'firebase/app'
+import { onAuthStateChanged } from 'firebase/auth'
 import {
   auth,
   cancelSubscriptionFirebase,
@@ -39,10 +33,9 @@ import {
   UpdatePasswordRequest,
   UpdatePasswordType,
 } from 'src/firebase'
-import { onAuthStateChanged } from 'firebase/auth'
-import { UserTypes } from 'src/types/apps/userTypes'
 import { StripeProductType } from 'src/types/apps/stripeTypes'
-import { FirebaseError } from 'firebase/app'
+import { UserTypes } from 'src/types/apps/userTypes'
+import { AuthValuesType, ErrCallbackType, LoginParams } from './types'
 
 // ** Defaults
 const defaultProvider: AuthValuesType = {
@@ -96,7 +89,6 @@ const AuthProvider = ({ children }: Props) => {
             if (!updateAccessToken) {
               throw new Error('Failed to get access token')
             }
-
             window.localStorage.setItem(
               authConfig.storageTokenKeyName,
               updateAccessToken,
