@@ -42,7 +42,8 @@ import {
 } from 'src/types/apps/inventoryTypes'
 
 // ** Utils
-import { format } from 'date-fns'
+import formatCurrency from 'src/utils/formatCurrency'
+import formatDate from 'src/utils/formatDate'
 
 // ** Custom Components
 import CustomAvatar from 'src/@core/components/mui/avatar'
@@ -147,7 +148,9 @@ const InventoryReconciliationsList = () => {
   }
 
   // ** Estado Color Helper
-  const getEstadoColor = (estado: EstadoReconciliacion) => {
+  const getEstadoColor = (estado?: EstadoReconciliacion) => {
+    if (!estado) return 'default'
+
     switch (estado) {
       case EstadoReconciliacion.Pendiente:
         return 'warning'
@@ -158,6 +161,25 @@ const InventoryReconciliationsList = () => {
       default:
         return 'default'
     }
+  }
+
+  // ** Helper to get status from ajustesAplicados
+  const getStatusFromAjustes = (
+    ajustesAplicados: boolean,
+    fechaAplicacion?: string,
+  ) => {
+    if (ajustesAplicados && fechaAplicacion) return 'Aplicado'
+    if (!ajustesAplicados && fechaAplicacion) return 'Pendiente'
+    return 'Creado'
+  }
+
+  const getStatusColor = (
+    ajustesAplicados: boolean,
+    fechaAplicacion?: string,
+  ) => {
+    if (ajustesAplicados && fechaAplicacion) return 'success'
+    if (!ajustesAplicados && fechaAplicacion) return 'warning'
+    return 'info'
   }
 
   // ** Columns
@@ -175,7 +197,7 @@ const InventoryReconciliationsList = () => {
           <IconButton
             size="small"
             component={Link}
-            href={`/apps/inventory-management/reconciliaciones/${row.id}`}
+            href={`/apps/inventory-management/reconciliations/${row.id}`}
           >
             <Icon icon="mdi:eye-outline" fontSize={20} />
           </IconButton>
@@ -195,7 +217,7 @@ const InventoryReconciliationsList = () => {
           noWrap
           variant="body2"
           component={Link}
-          href={`/apps/inventory-management/reconciliaciones/${row.id}`}
+          href={`/apps/inventory-management/reconciliations/${row.id}`}
           sx={{
             fontWeight: 600,
             color: 'primary.main',
@@ -217,7 +239,7 @@ const InventoryReconciliationsList = () => {
           noWrap
           variant="body2"
           component={Link}
-          href={`/apps/inventory-management/conteos/${row.conteoId}`}
+          href={`/apps/inventory-management/counts/${row.conteoId}`}
           sx={{
             color: 'primary.main',
             textDecoration: 'none',
@@ -233,41 +255,83 @@ const InventoryReconciliationsList = () => {
       minWidth: 110,
       field: 'estado',
       headerName: 'Estado',
-      renderCell: ({ row }: CellType) => (
-        <Chip
-          variant="outlined"
-          label={row.estado}
-          color={getEstadoColor(row.estado)}
-          size="small"
-          sx={{ textTransform: 'capitalize' }}
-        />
-      ),
+      renderCell: ({ row }: CellType) => {
+        const status =
+          row.estado ||
+          getStatusFromAjustes(row.ajustesAplicados, row.fechaAplicacion)
+        const color = row.estado
+          ? getEstadoColor(row.estado)
+          : getStatusColor(row.ajustesAplicados, row.fechaAplicacion)
+
+        return (
+          <Chip
+            variant="outlined"
+            label={status}
+            color={color}
+            size="small"
+            sx={{ textTransform: 'capitalize' }}
+          />
+        )
+      },
     },
     {
       flex: 0.1,
       minWidth: 90,
-      field: 'totalDiscrepancias',
-      headerName: 'Discrepancias',
+      field: 'totalAjustes',
+      headerName: 'Ajustes',
       type: 'number',
-      renderCell: ({ row }: CellType) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <CustomAvatar
-            skin="light"
-            color={row.totalDiscrepancias > 0 ? 'error' : 'success'}
-            sx={{ width: 24, height: 24 }}
+      renderCell: ({ row }: CellType) => {
+        const totalAjustes =
+          (row.totalAjustesPositivos || 0) +
+          Math.abs(row.totalAjustesNegativos || 0)
+        const hasAdjustments = totalAjustes > 0
+
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <CustomAvatar
+              skin="light"
+              color={hasAdjustments ? 'warning' : 'success'}
+              sx={{ width: 24, height: 24 }}
+            >
+              <Icon
+                icon={hasAdjustments ? 'mdi:swap-horizontal' : 'mdi:check'}
+                fontSize={14}
+              />
+            </CustomAvatar>
+            <Typography variant="body2" color="text.primary">
+              {totalAjustes}
+            </Typography>
+          </Box>
+        )
+      },
+    },
+    {
+      flex: 0.12,
+      minWidth: 100,
+      field: 'valorTotalAjustes',
+      headerName: 'Valor Total',
+      type: 'number',
+      renderCell: ({ row }: CellType) => {
+        const valorAjustes = row.valorTotalAjustes ?? 0
+
+        return (
+          <Typography
+            variant="body2"
+            color="text.primary"
+            sx={{
+              fontWeight: 'medium',
+              color:
+                valorAjustes > 0
+                  ? 'success.main'
+                  : valorAjustes < 0
+                  ? 'error.main'
+                  : 'text.primary',
+            }}
           >
-            <Icon
-              icon={
-                row.totalDiscrepancias > 0 ? 'mdi:alert-outline' : 'mdi:check'
-              }
-              fontSize={14}
-            />
-          </CustomAvatar>
-          <Typography variant="body2" color="text.primary">
-            {row.totalDiscrepancias}
+            {formatCurrency(valorAjustes)}
           </Typography>
-        </Box>
-      ),
+        )
+      },
     },
     {
       flex: 0.15,
@@ -291,23 +355,42 @@ const InventoryReconciliationsList = () => {
       field: 'fechaReconciliacion',
       headerName: 'Fecha Reconciliación',
       type: 'dateTime',
+      valueGetter: (params) => {
+        return params.row.fechaReconciliacion
+          ? new Date(params.row.fechaReconciliacion)
+          : null
+      },
       renderCell: ({ row }: CellType) => (
         <Typography variant="body2" noWrap>
-          {format(new Date(row.fechaCreacion), 'dd/MM/yyyy HH:mm')}
+          {formatDate(row.fechaReconciliacion)}
         </Typography>
       ),
     },
     {
       flex: 0.15,
       minWidth: 120,
-      field: 'fechaAprobacion',
-      headerName: 'Fecha Aprobación',
+      field: 'fechaAplicacion',
+      headerName: 'Fecha Aplicación',
       type: 'dateTime',
+      valueGetter: (params) => {
+        return params.row.fechaAplicacion
+          ? new Date(params.row.fechaAplicacion)
+          : null
+      },
       renderCell: ({ row }: CellType) => (
         <Typography variant="body2" noWrap>
-          {row.fechaAprobacion
-            ? format(new Date(row.fechaAprobacion), 'dd/MM/yyyy HH:mm')
-            : '-'}
+          {row.fechaAplicacion ? formatDate(row.fechaAplicacion) : '-'}
+        </Typography>
+      ),
+    },
+    {
+      flex: 0.12,
+      minWidth: 100,
+      field: 'aplicadoPor',
+      headerName: 'Aplicado Por',
+      renderCell: ({ row }: CellType) => (
+        <Typography variant="body2" noWrap>
+          {row.aplicadoPor || '-'}
         </Typography>
       ),
     },

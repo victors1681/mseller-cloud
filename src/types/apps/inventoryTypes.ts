@@ -13,9 +13,9 @@ export enum EstadoReconciliacion {
 }
 
 export enum TipoConteo {
-  Completo = 'Completo',
-  Parcial = 'Parcial',
-  Ciclico = 'Ciclico',
+  Completo = 0, // ConteoCompleto
+  Ciclico = 1, // ConteoCiclico
+  Ajuste = 2, // ConteoAjuste
 }
 
 // ** Inventory Snapshot Types
@@ -33,7 +33,6 @@ export interface InventarioSnapshotDTO {
 export interface CrearSnapshotRequest {
   localidadId: number
   descripcion: string
-  creadoPor: string
 }
 
 // ** Inventory Count Types
@@ -62,38 +61,42 @@ export interface PlanificarConteoRequest {
   localidadId: number
   fechaInicio: string
   descripcion?: string
-  planificadoPor: string
   observaciones?: string
   crearSnapshot?: boolean
 }
 
-export interface AccionConteoRequest {
-  usuario: string
-}
+export interface AccionConteoRequest {}
 
 export interface CancelarConteoRequest {
-  usuario: string
   motivo: string
 }
 
 // ** Reconciliation Types
 export interface InventarioReconciliacionDTO {
   id: number
-  codigoReconciliacion: string
   conteoId: number
-  fechaCreacion: string
-  fechaAprobacion?: string
+  codigoReconciliacion: string
+  fechaReconciliacion: string
   reconciliadoPor: string
-  aprobadoPor?: string
-  estado: EstadoReconciliacion
+  totalAjustesPositivos: number
+  totalAjustesNegativos: number
+  valorTotalAjustes: number
   observaciones?: string
-  totalDiscrepancias: number
-  valorTotalDiscrepancias: number
+  ajustesAplicados: boolean
+  fechaAplicacion?: string
+  aplicadoPor?: string
+  businessId?: string
+  // Legacy fields for backwards compatibility
+  fechaCreacion?: string
+  fechaAprobacion?: string
+  aprobadoPor?: string
+  estado?: EstadoReconciliacion
+  totalDiscrepancias?: number
+  valorTotalDiscrepancias?: number
   conteo?: InventarioConteoDTO
 }
 
 export interface CrearReconciliacionRequest {
-  reconciliadoPor: string
   observaciones?: string
 }
 

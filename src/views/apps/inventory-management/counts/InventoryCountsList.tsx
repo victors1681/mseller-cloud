@@ -42,6 +42,32 @@ import {
 // ** Utils
 import { format } from 'date-fns'
 
+// ** Helper Functions
+const mapEstadoFromApi = (estadoNumerico: number): EstadoInventario => {
+  const estadoMap = {
+    0: EstadoInventario.Planificado,
+    1: EstadoInventario.EnProgreso,
+    2: EstadoInventario.Completado,
+    3: EstadoInventario.Cancelado,
+  } as const
+
+  return (
+    estadoMap[estadoNumerico as keyof typeof estadoMap] ||
+    EstadoInventario.Planificado
+  )
+}
+
+const getEstadoLabel = (estado: EstadoInventario): string => {
+  const labelMap = {
+    [EstadoInventario.Planificado]: 'Planificado',
+    [EstadoInventario.EnProgreso]: 'En Progreso',
+    [EstadoInventario.Completado]: 'Completado',
+    [EstadoInventario.Cancelado]: 'Cancelado',
+  }
+
+  return labelMap[estado]
+}
+
 // ** Custom Components
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import PlanCountDialog from './PlanCountDialog'
@@ -103,8 +129,20 @@ const InventoryCountsList = () => {
     )
   }
 
+  // ** Helper function to get current estado as enum
+  const getCurrentEstado = (
+    estadoValue: EstadoInventario | number,
+  ): EstadoInventario => {
+    return typeof estadoValue === 'number'
+      ? mapEstadoFromApi(estadoValue)
+      : estadoValue
+  }
+
   // ** Render estado chip
-  const renderEstadoChip = (estado: EstadoInventario) => {
+  const renderEstadoChip = (estadoValue: EstadoInventario | number) => {
+    // Handle both numeric and string enum values
+    const estado = getCurrentEstado(estadoValue)
+
     const colorMap = {
       [EstadoInventario.Planificado]: 'info',
       [EstadoInventario.EnProgreso]: 'warning',
@@ -115,7 +153,7 @@ const InventoryCountsList = () => {
     return (
       <Chip
         size="small"
-        label={estado}
+        label={getEstadoLabel(estado)}
         color={colorMap[estado]}
         sx={{ textTransform: 'capitalize' }}
       />
@@ -124,19 +162,21 @@ const InventoryCountsList = () => {
 
   // ** Render action buttons
   const renderActionButtons = (conteo: InventarioConteoDTO) => {
+    const currentEstado = getCurrentEstado(conteo.estado)
+
     return (
       <Box sx={{ display: 'flex', gap: 1 }}>
         <Tooltip title="Ver detalles">
           <IconButton
             size="small"
             component={Link}
-            href={`/apps/inventory-management/conteos/${conteo.id}`}
+            href={`/apps/inventory-management/counts/${conteo.id}`}
           >
             <Icon icon="mdi:eye-outline" />
           </IconButton>
         </Tooltip>
 
-        {conteo.estado === EstadoInventario.Planificado && (
+        {currentEstado === EstadoInventario.Planificado && (
           <Tooltip title="Iniciar conteo">
             <IconButton
               size="small"
@@ -148,7 +188,7 @@ const InventoryCountsList = () => {
           </Tooltip>
         )}
 
-        {conteo.estado === EstadoInventario.EnProgreso && (
+        {currentEstado === EstadoInventario.EnProgreso && (
           <Tooltip title="Completar conteo">
             <IconButton
               size="small"
@@ -160,8 +200,8 @@ const InventoryCountsList = () => {
           </Tooltip>
         )}
 
-        {(conteo.estado === EstadoInventario.Planificado ||
-          conteo.estado === EstadoInventario.EnProgreso) && (
+        {(currentEstado === EstadoInventario.Planificado ||
+          currentEstado === EstadoInventario.EnProgreso) && (
           <Tooltip title="Cancelar conteo">
             <IconButton
               size="small"
@@ -175,12 +215,12 @@ const InventoryCountsList = () => {
           </Tooltip>
         )}
 
-        {conteo.estado === EstadoInventario.Completado && (
+        {currentEstado === EstadoInventario.Completado && (
           <Tooltip title="Ver analytics">
             <IconButton
               size="small"
               component={Link}
-              href={`/apps/inventory-management/conteos/${conteo.id}/analytics`}
+              href={`/apps/inventory-management/counts/${conteo.id}/analytics`}
             >
               <Icon icon="mdi:chart-line" />
             </IconButton>

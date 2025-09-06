@@ -46,7 +46,7 @@ interface PlanCountDialogProps {
 
 const schema = yup.object({
   descripcion: yup.string(),
-  tipoConteo: yup.string().required('El tipo de conteo es requerido'),
+  tipoConteo: yup.number().required('El tipo de conteo es requerido'),
   fechaInicio: yup.string().required('La fecha de inicio es requerida'),
   observaciones: yup.string(),
   crearSnapshot: yup.boolean(),
@@ -96,10 +96,17 @@ const PlanCountDialog = ({
 
     setLoading(true)
     try {
+      // Convert date string to ISO datetime format
+      const fechaInicio = new Date(data.fechaInicio)
+      fechaInicio.setHours(new Date().getHours())
+      fechaInicio.setMinutes(new Date().getMinutes())
+      fechaInicio.setSeconds(new Date().getSeconds())
+      fechaInicio.setMilliseconds(new Date().getMilliseconds())
+
       const request: PlanificarConteoRequest = {
         ...data,
+        fechaInicio: fechaInicio.toISOString(),
         localidadId: localidad.id,
-        planificadoPor: auth.user.email || 'unknown-user',
       }
 
       await dispatch(planificarConteo(request)).unwrap()
@@ -160,9 +167,15 @@ const PlanCountDialog = ({
                   <FormControl fullWidth error={Boolean(errors.tipoConteo)}>
                     <InputLabel>Tipo de Conteo</InputLabel>
                     <Select {...field} label="Tipo de Conteo">
-                      <MenuItem value={TipoConteo.Completo}>Completo</MenuItem>
-                      <MenuItem value={TipoConteo.Parcial}>Parcial</MenuItem>
-                      <MenuItem value={TipoConteo.Ciclico}>Cíclico</MenuItem>
+                      <MenuItem value={TipoConteo.Completo}>
+                        Conteo Completo
+                      </MenuItem>
+                      <MenuItem value={TipoConteo.Ciclico}>
+                        Conteo Cíclico
+                      </MenuItem>
+                      <MenuItem value={TipoConteo.Ajuste}>
+                        Conteo de Ajuste
+                      </MenuItem>
                     </Select>
                     {errors.tipoConteo && (
                       <Typography

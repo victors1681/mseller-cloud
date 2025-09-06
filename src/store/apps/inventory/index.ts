@@ -31,6 +31,7 @@ interface InventoryState {
   // Reconciliaciones
   reconciliaciones: InventarioReconciliacionDTO[]
   reconciliacionesPendientes: InventarioReconciliacionDTO[]
+  selectedReconciliacion: InventarioReconciliacionDTO | null
 
   // Analytics y reportes
   analytics: InventarioAnalytics | null
@@ -57,6 +58,7 @@ const initialState: InventoryState = {
   selectedSnapshot: null,
   reconciliaciones: [],
   reconciliacionesPendientes: [],
+  selectedReconciliacion: null,
   analytics: null,
   discrepancias: [],
   usuarioEstadisticas: [],
@@ -236,12 +238,29 @@ export const crearReconciliacion = createAsyncThunk(
 
 export const aprobarReconciliacion = createAsyncThunk(
   'inventory/aprobarReconciliacion',
-  async (params: { reconciliacionId: number; usuario: string }) => {
+  async (params: {
+    reconciliacionId: number
+    usuario: string
+    observaciones?: string
+  }) => {
     const response = await restClient.post(
       `/api/portal/Inventario/reconciliacion/${params.reconciliacionId}/aprobar`,
-      { usuario: params.usuario },
+      {
+        usuario: params.usuario,
+        observaciones: params.observaciones,
+      },
     )
     return { reconciliacionId: params.reconciliacionId, success: response.data }
+  },
+)
+
+export const fetchReconciliacionResumen = createAsyncThunk(
+  'inventory/fetchReconciliacionResumen',
+  async (reconciliacionId: number) => {
+    const response = await restClient.get(
+      `/api/portal/Inventario/reconciliacion/${reconciliacionId}/resumen`,
+    )
+    return response.data
   },
 )
 
@@ -438,6 +457,9 @@ export const inventorySlice = createSlice({
       })
       .addCase(fetchUsuariosActivos.fulfilled, (state, action) => {
         state.usuariosActivos = action.payload
+      })
+      .addCase(fetchReconciliacionResumen.fulfilled, (state, action) => {
+        state.selectedReconciliacion = action.payload
       })
   },
 })
