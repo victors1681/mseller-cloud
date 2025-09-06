@@ -1,5 +1,8 @@
 // ** React Imports
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+
+// ** Next Imports
+import { useRouter } from 'next/router'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
@@ -7,18 +10,21 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
 import Chip from '@mui/material/Chip'
-import FormControl from '@mui/material/FormControl'
 import Grid from '@mui/material/Grid'
-import InputLabel from '@mui/material/InputLabel'
 import LinearProgress from '@mui/material/LinearProgress'
-import MenuItem from '@mui/material/MenuItem'
 import Paper from '@mui/material/Paper'
-import Select from '@mui/material/Select'
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableContainer from '@mui/material/TableContainer'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
 // ** Store Imports
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/store'
+import { fetchAnalyticsConteo } from 'src/store/apps/inventory'
 
 // ** Types
 
@@ -29,125 +35,109 @@ import Icon from 'src/@core/components/icon'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 
 // ** Utils
-import { format, subMonths } from 'date-fns'
+import formatCurrency from 'src/utils/formatCurrency'
+
+// ** Toast
+import toast from 'react-hot-toast'
 
 const InventoryAnalytics = () => {
   // ** State
-  const [selectedLocalidad, setSelectedLocalidad] = useState<number | ''>('')
-  const [fechaInicio, setFechaInicio] = useState<Date>(subMonths(new Date(), 1))
-  const [fechaFin, setFechaFin] = useState<Date>(new Date())
+  const [loading, setLoading] = useState(false)
 
   // ** Hooks
+  const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
   const store = useSelector((state: RootState) => state.inventory)
 
-  // ** Mock data for demonstration
-  const analytics = {
-    totalConteos: 15,
-    conteosCompletados: 12,
-    conteosEnProgreso: 2,
-    conteosPlanificados: 1,
-    totalReconciliaciones: 8,
-    reconciliacionesPendientes: 3,
-    reconciliacionesAprobadas: 5,
-    promedioDiscrepancias: 2.5,
-    valorTotalDiscrepancias: 1250.75,
-    eficienciaPromedio: 92.3,
+  const { id: conteoId } = router.query
+
+  // ** Effects
+  useEffect(() => {
+    if (conteoId && typeof conteoId === 'string') {
+      const id = parseInt(conteoId)
+      handleFetchAnalytics(id)
+    }
+  }, [conteoId])
+
+  // ** Handlers
+  const handleFetchAnalytics = async (id: number) => {
+    setLoading(true)
+    try {
+      await dispatch(fetchAnalyticsConteo(id)).unwrap()
+    } catch (error: any) {
+      toast.error(error.message || 'Error al cargar analytics')
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const estadisticasConteos = [
-    {
-      title: 'Total Conteos',
-      value: analytics.totalConteos,
-      icon: 'mdi:counter',
-      color: 'primary' as const,
-    },
-    {
-      title: 'Completados',
-      value: analytics.conteosCompletados,
-      icon: 'mdi:check-circle-outline',
-      color: 'success' as const,
-    },
-    {
-      title: 'En Progreso',
-      value: analytics.conteosEnProgreso,
-      icon: 'mdi:clock-outline',
-      color: 'warning' as const,
-    },
-    {
-      title: 'Planificados',
-      value: analytics.conteosPlanificados,
-      icon: 'mdi:calendar-outline',
-      color: 'info' as const,
-    },
-  ]
+  const analytics = store.analytics
 
-  const estadisticasReconciliaciones = [
+  if (loading) {
+    return (
+      <Grid container spacing={6}>
+        <Grid item xs={12}>
+          <Card>
+            <CardContent sx={{ textAlign: 'center', py: 10 }}>
+              <Typography variant="h6">Cargando analytics...</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    )
+  }
+
+  if (!analytics) {
+    return (
+      <Grid container spacing={6}>
+        <Grid item xs={12}>
+          <Card>
+            <CardContent sx={{ textAlign: 'center', py: 10 }}>
+              <Typography variant="h6">
+                No se encontraron datos de analytics
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    )
+  }
+  const estadisticasGenerales = [
     {
-      title: 'Total Reconciliaciones',
-      value: analytics.totalReconciliaciones,
-      icon: 'mdi:compare-horizontal',
+      title: 'Total Productos',
+      value: analytics.TotalProductos,
+      icon: 'mdi:package-variant',
       color: 'primary' as const,
     },
     {
-      title: 'Pendientes',
-      value: analytics.reconciliacionesPendientes,
-      icon: 'mdi:clock-alert-outline',
+      title: 'Con Discrepancia',
+      value: analytics.ProductosConDiscrepancia,
+      icon: 'mdi:alert-circle-outline',
       color: 'warning' as const,
     },
     {
-      title: 'Aprobadas',
-      value: analytics.reconciliacionesAprobadas,
-      icon: 'mdi:check-all',
+      title: 'Ajustes Positivos',
+      value: analytics.AjustesPositivos,
+      icon: 'mdi:trending-up',
       color: 'success' as const,
+    },
+    {
+      title: 'Ajustes Negativos',
+      value: analytics.AjustesNegativos,
+      icon: 'mdi:trending-down',
+      color: 'error' as const,
     },
   ]
 
   return (
     <Grid container spacing={6}>
-      {/* Filters */}
+      {/* Estadísticas Generales */}
       <Grid item xs={12}>
         <Card>
-          <CardHeader title="Filtros de Análisis" />
+          <CardHeader title="Estadísticas del Conteo" />
           <CardContent>
             <Grid container spacing={4}>
-              <Grid item xs={12} md={4}>
-                <FormControl fullWidth>
-                  <InputLabel>Localidad</InputLabel>
-                  <Select
-                    value={selectedLocalidad}
-                    label="Localidad"
-                    onChange={(e) =>
-                      setSelectedLocalidad(e.target.value as number)
-                    }
-                  >
-                    <MenuItem value="">Todas las localidades</MenuItem>
-                    <MenuItem value={1}>Localidad Principal</MenuItem>
-                    <MenuItem value={2}>Localidad Secundaria</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  Desde: {format(fechaInicio, 'dd/MM/yyyy')}
-                </Typography>
-                <Typography variant="body2">
-                  Hasta: {format(fechaFin, 'dd/MM/yyyy')}
-                </Typography>
-              </Grid>
-            </Grid>
-          </CardContent>
-        </Card>
-      </Grid>
-
-      {/* Estadísticas de Conteos */}
-      <Grid item xs={12}>
-        <Card>
-          <CardHeader title="Estadísticas de Conteos" />
-          <CardContent>
-            <Grid container spacing={4}>
-              {estadisticasConteos.map((stat, index) => (
+              {estadisticasGenerales.map((stat, index) => (
                 <Grid item xs={12} sm={6} md={3} key={index}>
                   <Paper sx={{ p: 3, textAlign: 'center', height: '100%' }}>
                     <CustomAvatar
@@ -171,55 +161,25 @@ const InventoryAnalytics = () => {
         </Card>
       </Grid>
 
-      {/* Estadísticas de Reconciliaciones */}
-      <Grid item xs={12}>
-        <Card>
-          <CardHeader title="Estadísticas de Reconciliaciones" />
-          <CardContent>
-            <Grid container spacing={4}>
-              {estadisticasReconciliaciones.map((stat, index) => (
-                <Grid item xs={12} sm={6} md={4} key={index}>
-                  <Paper sx={{ p: 3, textAlign: 'center', height: '100%' }}>
-                    <CustomAvatar
-                      skin="light"
-                      color={stat.color}
-                      sx={{ mb: 2, width: 56, height: 56 }}
-                    >
-                      <Icon icon={stat.icon} fontSize="2rem" />
-                    </CustomAvatar>
-                    <Typography variant="h4" sx={{ mb: 1 }}>
-                      {stat.value}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {stat.title}
-                    </Typography>
-                  </Paper>
-                </Grid>
-              ))}
-            </Grid>
-          </CardContent>
-        </Card>
-      </Grid>
-
-      {/* Métricas de Calidad */}
+      {/* Métricas de Rendimiento */}
       <Grid item xs={12} md={6}>
         <Card>
-          <CardHeader title="Métricas de Calidad" />
+          <CardHeader title="Métricas de Rendimiento" />
           <CardContent>
             <Box sx={{ mb: 4 }}>
               <Box
                 sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}
               >
-                <Typography variant="body2">Eficiencia Promedio</Typography>
+                <Typography variant="body2">Porcentaje de Exactitud</Typography>
                 <Typography variant="body2">
-                  {analytics.eficienciaPromedio}%
+                  {analytics.PorcentajeExactitud}%
                 </Typography>
               </Box>
               <LinearProgress
                 variant="determinate"
-                value={analytics.eficienciaPromedio}
+                value={analytics.PorcentajeExactitud}
                 color={
-                  analytics.eficienciaPromedio > 90 ? 'success' : 'warning'
+                  analytics.PorcentajeExactitud > 90 ? 'success' : 'warning'
                 }
                 sx={{ height: 8, borderRadius: 4 }}
               />
@@ -233,12 +193,10 @@ const InventoryAnalytics = () => {
                 mb: 2,
               }}
             >
-              <Typography variant="body2">Promedio de Discrepancias</Typography>
+              <Typography variant="body2">Productos por Hora</Typography>
               <Chip
-                label={`${analytics.promedioDiscrepancias} items`}
-                color={
-                  analytics.promedioDiscrepancias < 3 ? 'success' : 'warning'
-                }
+                label={`${analytics.ProductosPorHora.toFixed(2)}/h`}
+                color="info"
                 size="small"
               />
             </Box>
@@ -250,89 +208,198 @@ const InventoryAnalytics = () => {
                 alignItems: 'center',
               }}
             >
-              <Typography variant="body2">Valor Total Discrepancias</Typography>
-              <Typography variant="h6" color="error.main">
-                ${analytics.valorTotalDiscrepancias.toFixed(2)}
+              <Typography variant="body2">Tiempo Transcurrido</Typography>
+              <Typography variant="h6" color="primary.main">
+                {analytics.TiempoTranscurrido.toFixed(1)}h
               </Typography>
             </Box>
           </CardContent>
         </Card>
       </Grid>
 
-      {/* Distribución por Estado */}
+      {/* Métricas de Ajustes */}
       <Grid item xs={12} md={6}>
         <Card>
-          <CardHeader title="Distribución de Estados" />
+          <CardHeader title="Ajustes de Inventario" />
           <CardContent>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-              <Box>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    mb: 1,
-                  }}
-                >
-                  <Typography variant="body2">Conteos Completados</Typography>
-                  <Typography variant="body2">
-                    {analytics.totalConteos > 0
-                      ? Math.round(
-                          (analytics.conteosCompletados /
-                            analytics.totalConteos) *
-                            100,
-                        )
-                      : 0}
-                    %
-                  </Typography>
-                </Box>
-                <LinearProgress
-                  variant="determinate"
-                  value={
-                    analytics.totalConteos > 0
-                      ? (analytics.conteosCompletados /
-                          analytics.totalConteos) *
-                        100
-                      : 0
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
+                <Typography variant="body2">Valor Total de Ajustes</Typography>
+                <Typography
+                  variant="h6"
+                  color={
+                    analytics.ValorTotalAjustes < 0
+                      ? 'error.main'
+                      : 'success.main'
                   }
-                  color="success"
-                />
+                >
+                  {formatCurrency(analytics.ValorTotalAjustes)}
+                </Typography>
               </Box>
 
-              <Box>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    mb: 1,
-                  }}
-                >
-                  <Typography variant="body2">
-                    Reconciliaciones Aprobadas
-                  </Typography>
-                  <Typography variant="body2">
-                    {analytics.totalReconciliaciones > 0
-                      ? Math.round(
-                          (analytics.reconciliacionesAprobadas /
-                            analytics.totalReconciliaciones) *
-                            100,
-                        )
-                      : 0}
-                    %
-                  </Typography>
-                </Box>
-                <LinearProgress
-                  variant="determinate"
-                  value={
-                    analytics.totalReconciliaciones > 0
-                      ? (analytics.reconciliacionesAprobadas /
-                          analytics.totalReconciliaciones) *
-                        100
-                      : 0
-                  }
-                  color="info"
-                />
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
+                <Typography variant="body2">
+                  Mayor Discrepancia Positiva
+                </Typography>
+                <Typography variant="body2" color="success.main">
+                  {formatCurrency(analytics.MayorDiscrepanciaPositiva)}
+                </Typography>
+              </Box>
+
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
+                <Typography variant="body2">
+                  Mayor Discrepancia Negativa
+                </Typography>
+                <Typography variant="body2" color="error.main">
+                  {formatCurrency(analytics.MayorDiscrepanciaNegativa)}
+                </Typography>
               </Box>
             </Box>
+          </CardContent>
+        </Card>
+      </Grid>
+
+      {/* Top Discrepancias */}
+      <Grid item xs={12} md={6}>
+        <Card>
+          <CardHeader title="Principales Discrepancias" />
+          <CardContent>
+            <TableContainer>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Código</TableCell>
+                    <TableCell>Producto</TableCell>
+                    <TableCell align="right">Diferencia</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {analytics.TopDiscrepancias.map((item, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <Typography variant="body2" fontWeight={600}>
+                          {item.codigoProducto}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" noWrap>
+                          {item.nombre}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="right">
+                        <Chip
+                          label={formatCurrency(item.diferencia)}
+                          color={item.diferencia < 0 ? 'error' : 'success'}
+                          size="small"
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {analytics.TopDiscrepancias.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={3} align="center">
+                        <Typography variant="body2" color="text.secondary">
+                          No hay discrepancias registradas
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </CardContent>
+        </Card>
+      </Grid>
+
+      {/* Productividad por Usuario */}
+      <Grid item xs={12} md={6}>
+        <Card>
+          <CardHeader title="Productividad por Usuario" />
+          <CardContent>
+            <TableContainer>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Usuario</TableCell>
+                    <TableCell align="center">Cantidad</TableCell>
+                    <TableCell align="center">Discrepancias</TableCell>
+                    <TableCell align="center">Exactitud</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {analytics.ProductividadPorUsuario.map((user, index) => {
+                    const exactitud =
+                      user.cantidad > 0
+                        ? Math.round(
+                            ((user.cantidad - user.discrepancias) /
+                              user.cantidad) *
+                              100,
+                          )
+                        : 0
+
+                    return (
+                      <TableRow key={index}>
+                        <TableCell>
+                          <Typography variant="body2" fontWeight={600}>
+                            {user.usuario}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="center">
+                          <Typography variant="body2">
+                            {user.cantidad}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="center">
+                          <Typography variant="body2">
+                            {user.discrepancias}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="center">
+                          <Chip
+                            label={`${exactitud}%`}
+                            color={
+                              exactitud > 90
+                                ? 'success'
+                                : exactitud > 70
+                                ? 'warning'
+                                : 'error'
+                            }
+                            size="small"
+                          />
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                  {analytics.ProductividadPorUsuario.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={4} align="center">
+                        <Typography variant="body2" color="text.secondary">
+                          No hay datos de productividad disponibles
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </CardContent>
         </Card>
       </Grid>

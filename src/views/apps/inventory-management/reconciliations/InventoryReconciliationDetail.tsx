@@ -20,6 +20,13 @@ import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
+import Paper from '@mui/material/Paper'
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableContainer from '@mui/material/TableContainer'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
@@ -74,10 +81,17 @@ const InventoryReconciliationDetail = () => {
 
     setLoading(true)
     try {
+      const reconciliacionId = inventoryStore.selectedReconciliacion.id
+      debugger
+      if (!reconciliacionId) {
+        throw new Error(
+          'No se puede identificar la reconciliación para aprobar',
+        )
+      }
+
       await dispatch(
         aprobarReconciliacion({
-          reconciliacionId: inventoryStore.selectedReconciliacion.id,
-          usuario: 'current-user',
+          reconciliacionId,
           observaciones: observaciones || undefined,
         }),
       ).unwrap()
@@ -85,9 +99,7 @@ const InventoryReconciliationDetail = () => {
       setOpenAprobarDialog(false)
       setObservaciones('')
       // Refresh the data
-      dispatch(
-        fetchReconciliacionResumen(inventoryStore.selectedReconciliacion.id),
-      )
+      dispatch(fetchReconciliacionResumen(reconciliacionId))
     } catch (error: any) {
       toast.error(error.message || 'Error al aprobar reconciliación')
     } finally {
@@ -169,18 +181,18 @@ const InventoryReconciliationDetail = () => {
             }
             action={
               <Box sx={{ display: 'flex', gap: 2 }}>
-                {(!reconciliacion.estado ||
-                  reconciliacion.estado === EstadoReconciliacion.Pendiente) && (
-                  <Button
-                    variant="contained"
-                    color="success"
-                    startIcon={<Icon icon="mdi:check" />}
-                    onClick={() => setOpenAprobarDialog(true)}
-                    disabled={loading}
-                  >
-                    Aprobar Reconciliación
-                  </Button>
-                )}
+                <Button
+                  variant="contained"
+                  color="success"
+                  startIcon={<Icon icon="mdi:check" />}
+                  onClick={() => setOpenAprobarDialog(true)}
+                  disabled={
+                    loading ||
+                    reconciliacion.estado === EstadoReconciliacion.Aprobada
+                  }
+                >
+                  Aprobar Reconciliación
+                </Button>
               </Box>
             }
           />
@@ -200,10 +212,10 @@ const InventoryReconciliationDetail = () => {
                   </CustomAvatar>
                   <Box>
                     <Typography variant="body2" color="text.secondary">
-                      Conteo ID
+                      Total Ajustes
                     </Typography>
                     <Typography variant="h6">
-                      #{reconciliacion.conteoId}
+                      {reconciliacion.totalAjustes || 0}
                     </Typography>
                   </Box>
                 </Box>
@@ -219,7 +231,9 @@ const InventoryReconciliationDetail = () => {
                       Ajustes Positivos
                     </Typography>
                     <Typography variant="h6">
-                      {reconciliacion.totalAjustesPositivos || 0}
+                      {reconciliacion.ajustesPositivos ||
+                        reconciliacion.totalAjustesPositivos ||
+                        0}
                     </Typography>
                   </Box>
                 </Box>
@@ -235,7 +249,11 @@ const InventoryReconciliationDetail = () => {
                       Ajustes Negativos
                     </Typography>
                     <Typography variant="h6">
-                      {Math.abs(reconciliacion.totalAjustesNegativos || 0)}
+                      {Math.abs(
+                        reconciliacion.ajustesNegativos ||
+                          reconciliacion.totalAjustesNegativos ||
+                          0,
+                      )}
                     </Typography>
                   </Box>
                 </Box>
@@ -256,10 +274,176 @@ const InventoryReconciliationDetail = () => {
                   </Box>
                 </Box>
               </Grid>
+
+              {/* New fields - Mayor Ajuste Positivo */}
+              <Grid item xs={12} sm={6} md={3}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <CustomAvatar skin="light" color="success">
+                    <Icon icon="mdi:trending-up" />
+                  </CustomAvatar>
+                  <Box>
+                    <Typography variant="body2" color="text.secondary">
+                      Mayor Ajuste +
+                    </Typography>
+                    <Typography variant="h6">
+                      {formatCurrency(reconciliacion.mayorAjustePositivo ?? 0)}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Grid>
+
+              {/* New fields - Mayor Ajuste Negativo */}
+              <Grid item xs={12} sm={6} md={3}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <CustomAvatar skin="light" color="error">
+                    <Icon icon="mdi:trending-down" />
+                  </CustomAvatar>
+                  <Box>
+                    <Typography variant="body2" color="text.secondary">
+                      Mayor Ajuste -
+                    </Typography>
+                    <Typography variant="h6">
+                      {formatCurrency(
+                        Math.abs(reconciliacion.mayorAjusteNegativo ?? 0),
+                      )}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Grid>
             </Grid>
           </CardContent>
         </Card>
       </Grid>
+
+      {/* Adjustment Details Table */}
+      {reconciliacion.detallesAjustes &&
+        reconciliacion.detallesAjustes.length > 0 && (
+          <Grid item xs={12}>
+            <Card>
+              <CardHeader
+                title="Detalles de Ajustes"
+                subheader={`${reconciliacion.detallesAjustes.length} productos con ajustes`}
+              />
+              <CardContent>
+                <TableContainer component={Paper} variant="outlined">
+                  <Table
+                    sx={{ minWidth: 650 }}
+                    aria-label="detalles de ajustes"
+                  >
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Código</TableCell>
+                        <TableCell>Producto</TableCell>
+                        <TableCell align="right">Cant. Anterior</TableCell>
+                        <TableCell align="right">Cant. Contada</TableCell>
+                        <TableCell align="right">Ajuste</TableCell>
+                        <TableCell align="right">Valor Ajuste</TableCell>
+                        <TableCell align="right">% Diferencia</TableCell>
+                        <TableCell>Motivo</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {reconciliacion.detallesAjustes.map((detalle, index) => (
+                        <TableRow
+                          key={`${detalle.codigoProducto}-${index}`}
+                          sx={{
+                            '&:last-child td, &:last-child th': { border: 0 },
+                          }}
+                        >
+                          <TableCell component="th" scope="row">
+                            <Typography variant="body2" fontWeight="medium">
+                              {detalle.codigoProducto}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2">
+                              {detalle.nombreProducto}
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="right">
+                            {detalle.cantidadAnterior.toFixed(2)}
+                          </TableCell>
+                          <TableCell align="right">
+                            {detalle.cantidadContada.toFixed(2)}
+                          </TableCell>
+                          <TableCell align="right">
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'flex-end',
+                                gap: 0.5,
+                              }}
+                            >
+                              <Icon
+                                icon={
+                                  detalle.cantidadAjuste >= 0
+                                    ? 'mdi:arrow-up'
+                                    : 'mdi:arrow-down'
+                                }
+                                color={
+                                  detalle.cantidadAjuste >= 0
+                                    ? 'success'
+                                    : 'error'
+                                }
+                                fontSize="small"
+                              />
+                              <Typography
+                                variant="body2"
+                                color={
+                                  detalle.cantidadAjuste >= 0
+                                    ? 'success.main'
+                                    : 'error.main'
+                                }
+                                fontWeight="medium"
+                              >
+                                {Math.abs(detalle.cantidadAjuste).toFixed(2)}
+                              </Typography>
+                            </Box>
+                          </TableCell>
+                          <TableCell align="right">
+                            <Typography
+                              variant="body2"
+                              color={
+                                detalle.valorAjuste >= 0
+                                  ? 'success.main'
+                                  : 'error.main'
+                              }
+                              fontWeight="medium"
+                            >
+                              {formatCurrency(detalle.valorAjuste)}
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="right">
+                            <Chip
+                              label={`${detalle.porcentajeDiferencia.toFixed(
+                                1,
+                              )}%`}
+                              size="small"
+                              color={
+                                Math.abs(detalle.porcentajeDiferencia) > 10
+                                  ? 'error'
+                                  : Math.abs(detalle.porcentajeDiferencia) > 5
+                                  ? 'warning'
+                                  : 'default'
+                              }
+                              variant="outlined"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2" color="text.secondary">
+                              {detalle.motivoAjuste || '-'}
+                            </Typography>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </CardContent>
+            </Card>
+          </Grid>
+        )}
 
       {/* Details Information */}
       <Grid item xs={12} md={8}>
@@ -267,6 +451,18 @@ const InventoryReconciliationDetail = () => {
           <CardHeader title="Información Detallada" />
           <CardContent>
             <List>
+              {reconciliacion.conteoId && (
+                <ListItem>
+                  <ListItemIcon>
+                    <Icon icon="mdi:format-list-numbered" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary="Conteo ID"
+                    secondary={`#${reconciliacion.conteoId}`}
+                  />
+                </ListItem>
+              )}
+
               <ListItem>
                 <ListItemIcon>
                   <Icon icon="mdi:calendar-plus" />

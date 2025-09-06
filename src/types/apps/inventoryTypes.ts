@@ -3,6 +3,7 @@ export enum EstadoInventario {
   Planificado = 'Planificado',
   EnProgreso = 'EnProgreso',
   Completado = 'Completado',
+  Reconciliado = 'Reconciliado',
   Cancelado = 'Cancelado',
 }
 
@@ -72,21 +73,46 @@ export interface CancelarConteoRequest {
 }
 
 // ** Reconciliation Types
+export interface DetalleAjusteResponse {
+  codigoProducto: string
+  nombreProducto: string
+  cantidadAnterior: number
+  cantidadContada: number
+  cantidadAjuste: number
+  valorAjuste: number
+  porcentajeDiferencia: number
+  motivoAjuste?: string
+}
+
 export interface InventarioReconciliacionDTO {
-  id: number
-  conteoId: number
+  // Core reconciliation info
   codigoReconciliacion: string
   fechaReconciliacion: string
   reconciliadoPor: string
-  totalAjustesPositivos: number
-  totalAjustesNegativos: number
-  valorTotalAjustes: number
-  observaciones?: string
   ajustesAplicados: boolean
+
+  // Adjustment totals
+  totalAjustes: number
+  ajustesPositivos: number
+  ajustesNegativos: number
+  valorTotalAjustes: number
+  mayorAjustePositivo: number
+  mayorAjusteNegativo: number
+
+  // Adjustment details
+  detallesAjustes: DetalleAjusteResponse[]
+
+  // Additional information for approval
   fechaAplicacion?: string
   aplicadoPor?: string
-  businessId?: string
+  observaciones?: string
+
   // Legacy fields for backwards compatibility
+  id?: number
+  conteoId?: number
+  totalAjustesPositivos?: number
+  totalAjustesNegativos?: number
+  businessId?: string
   fechaCreacion?: string
   fechaAprobacion?: string
   aprobadoPor?: string
@@ -194,20 +220,25 @@ export interface InventarioFilters {
 
 // ** Analytics Types
 export interface InventarioAnalytics {
-  totalConteos: number
-  conteosCompletados: number
-  conteosEnProgreso: number
-  conteosCancelados: number
-  promedioTiempoConteo: number
-  totalDiscrepancias: number
-  valorTotalDiscrepancias: number
-  usuariosMasActivos: {
-    usuario: string
-    totalConteos: number
+  TotalProductos: number
+  ProductosConDiscrepancia: number
+  AjustesPositivos: number
+  AjustesNegativos: number
+  ValorTotalAjustes: number
+  MayorDiscrepanciaPositiva: number
+  MayorDiscrepanciaNegativa: number
+  PorcentajeExactitud: number
+  TiempoTranscurrido: number
+  ProductosPorHora: number
+  TopDiscrepancias: {
+    codigoProducto: string
+    nombre: string
+    diferencia: number
   }[]
-  zonasMasProblematicas: {
-    zona: string
-    totalDiscrepancias: number
+  ProductividadPorUsuario: {
+    usuario: string
+    cantidad: number
+    discrepancias: number
   }[]
 }
 

@@ -238,15 +238,10 @@ export const crearReconciliacion = createAsyncThunk(
 
 export const aprobarReconciliacion = createAsyncThunk(
   'inventory/aprobarReconciliacion',
-  async (params: {
-    reconciliacionId: number
-    usuario: string
-    observaciones?: string
-  }) => {
+  async (params: { reconciliacionId: number; observaciones?: string }) => {
     const response = await restClient.post(
       `/api/portal/Inventario/reconciliacion/${params.reconciliacionId}/aprobar`,
       {
-        usuario: params.usuario,
         observaciones: params.observaciones,
       },
     )

@@ -17,7 +17,6 @@ import DialogTitle from '@mui/material/DialogTitle'
 import FormControl from '@mui/material/FormControl'
 import IconButton from '@mui/material/IconButton'
 import InputLabel from '@mui/material/InputLabel'
-import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import Select from '@mui/material/Select'
 import TextField from '@mui/material/TextField'
@@ -120,7 +119,6 @@ const InventoryReconciliationsList = () => {
       await dispatch(
         aprobarReconciliacion({
           reconciliacionId: selectedReconciliacion.id,
-          usuario: 'current-user',
         }),
       ).unwrap()
 
@@ -184,29 +182,6 @@ const InventoryReconciliationsList = () => {
 
   // ** Columns
   const columns: GridColDef[] = [
-    {
-      flex: 0.1,
-      minWidth: 90,
-      sortable: false,
-      field: 'actions',
-      headerName: 'Acciones',
-      renderCell: ({
-        row,
-      }: GridRenderCellParams<InventarioReconciliacionDTO>) => (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <IconButton
-            size="small"
-            component={Link}
-            href={`/apps/inventory-management/reconciliations/${row.id}`}
-          >
-            <Icon icon="mdi:eye-outline" fontSize={20} />
-          </IconButton>
-          <IconButton size="small" onClick={(e) => handleMenuClick(e, row)}>
-            <Icon icon="mdi:dots-vertical" fontSize={20} />
-          </IconButton>
-        </Box>
-      ),
-    },
     {
       flex: 0.15,
       minWidth: 120,
@@ -340,9 +315,6 @@ const InventoryReconciliationsList = () => {
       headerName: 'Reconciliado Por',
       renderCell: ({ row }: CellType) => (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <CustomAvatar skin="light" sx={{ width: 30, height: 30 }}>
-            {row.reconciliadoPor.charAt(0).toUpperCase()}
-          </CustomAvatar>
           <Typography noWrap variant="body2">
             {row.reconciliadoPor}
           </Typography>
@@ -394,6 +366,26 @@ const InventoryReconciliationsList = () => {
         </Typography>
       ),
     },
+    {
+      flex: 0.1,
+      minWidth: 90,
+      sortable: false,
+      field: 'actions',
+      headerName: 'Acciones',
+      renderCell: ({
+        row,
+      }: GridRenderCellParams<InventarioReconciliacionDTO>) => (
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <IconButton
+            size="small"
+            component={Link}
+            href={`/apps/inventory-management/reconciliations/${row.id}`}
+          >
+            <Icon icon="mdi:eye-outline" fontSize={20} />
+          </IconButton>
+        </Box>
+      ),
+    },
   ]
 
   return (
@@ -439,34 +431,6 @@ const InventoryReconciliationsList = () => {
           paginationMode="server"
         />
       </Card>
-
-      {/* Action Menu */}
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
-      >
-        {selectedReconciliacion?.estado === EstadoReconciliacion.Pendiente && (
-          <>
-            <MenuItem onClick={() => setAprobarDialog(true)}>
-              <Icon icon="mdi:check" fontSize={20} />
-              <Typography sx={{ ml: 2 }}>Aprobar</Typography>
-            </MenuItem>
-            <MenuItem onClick={() => setRechazarDialog(true)}>
-              <Icon icon="mdi:close" fontSize={20} />
-              <Typography sx={{ ml: 2 }}>Rechazar</Typography>
-            </MenuItem>
-          </>
-        )}
-        <MenuItem
-          component={Link}
-          href={`/apps/inventory-management/reconciliaciones/${selectedReconciliacion?.id}`}
-          onClick={handleMenuClose}
-        >
-          <Icon icon="mdi:eye-outline" fontSize={20} />
-          <Typography sx={{ ml: 2 }}>Ver Detalles</Typography>
-        </MenuItem>
-      </Menu>
 
       {/* Aprobar Dialog */}
       <Dialog
