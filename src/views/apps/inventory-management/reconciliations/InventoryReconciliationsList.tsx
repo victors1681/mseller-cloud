@@ -116,11 +116,15 @@ const InventoryReconciliationsList = () => {
     if (!selectedReconciliacion) return
 
     try {
-      await dispatch(
-        aprobarReconciliacion({
-          reconciliacionId: selectedReconciliacion.id,
-        }),
-      ).unwrap()
+      if (typeof selectedReconciliacion.id === 'number') {
+        await dispatch(
+          aprobarReconciliacion({
+            reconciliacionId: selectedReconciliacion.id,
+          }),
+        ).unwrap()
+      } else {
+        throw new Error('ID de reconciliación inválido')
+      }
 
       toast.success('Reconciliación aprobada exitosamente')
       setAprobarDialog(false)

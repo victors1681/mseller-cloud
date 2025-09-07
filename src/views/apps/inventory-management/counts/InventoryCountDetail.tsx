@@ -90,6 +90,7 @@ const getEstadoLabel = (estado: EstadoInventario): string => {
     [EstadoInventario.Planificado]: 'Planificado',
     [EstadoInventario.EnProgreso]: 'En Progreso',
     [EstadoInventario.Completado]: 'Completado',
+    [EstadoInventario.Reconciliado]: 'Reconciliado',
     [EstadoInventario.Cancelado]: 'Cancelado',
   }
 
@@ -268,7 +269,8 @@ const InventoryCountDetail = () => {
     const colorMap = {
       [EstadoInventario.Planificado]: 'info',
       [EstadoInventario.EnProgreso]: 'warning',
-      [EstadoInventario.Completado]: 'success',
+      [EstadoInventario.Completado]: 'primary',
+      [EstadoInventario.Reconciliado]: 'success',
       [EstadoInventario.Cancelado]: 'error',
     } as const
 
