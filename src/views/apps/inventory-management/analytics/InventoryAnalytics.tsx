@@ -40,7 +40,11 @@ import formatCurrency from 'src/utils/formatCurrency'
 // ** Toast
 import toast from 'react-hot-toast'
 
-const InventoryAnalytics = () => {
+interface InventoryAnalyticsProps {
+  countId?: string
+}
+
+const InventoryAnalytics = ({ countId }: InventoryAnalyticsProps) => {
   // ** State
   const [loading, setLoading] = useState(false)
 
@@ -49,7 +53,9 @@ const InventoryAnalytics = () => {
   const dispatch = useDispatch<AppDispatch>()
   const store = useSelector((state: RootState) => state.inventory)
 
-  const { id: conteoId } = router.query
+  // Use prop countId if available, otherwise fallback to router query
+  const { id: routerConteoId } = router.query
+  const conteoId = countId || routerConteoId
 
   // ** Effects
   useEffect(() => {

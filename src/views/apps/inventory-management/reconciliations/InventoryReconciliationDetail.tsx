@@ -54,7 +54,13 @@ import CustomAvatar from 'src/@core/components/mui/avatar'
 // ** Toast
 import toast from 'react-hot-toast'
 
-const InventoryReconciliationDetail = () => {
+interface InventoryReconciliationDetailProps {
+  reconciliationId?: string
+}
+
+const InventoryReconciliationDetail = ({
+  reconciliationId,
+}: InventoryReconciliationDetailProps) => {
   // ** State
   const [loading, setLoading] = useState(false)
   const [openAprobarDialog, setOpenAprobarDialog] = useState(false)
@@ -65,7 +71,9 @@ const InventoryReconciliationDetail = () => {
   const dispatch = useDispatch<AppDispatch>()
   const inventoryStore = useSelector((state: RootState) => state.inventory)
 
-  const { id: reconciliacionId } = router.query
+  // Use prop reconciliationId if available, otherwise fallback to router query
+  const { id: routerReconciliacionId } = router.query
+  const reconciliacionId = reconciliationId || routerReconciliacionId
 
   // ** Effects
   useEffect(() => {

@@ -107,7 +107,11 @@ const getTipoConteoLabel = (tipoConteo: TipoConteo): string => {
   return labelMap[tipoConteo]
 }
 
-const InventoryCountDetail = () => {
+interface InventoryCountDetailProps {
+  countId?: string
+}
+
+const InventoryCountDetail = ({ countId }: InventoryCountDetailProps) => {
   // ** State
   const [loading, setLoading] = useState(false)
   const [openCancelDialog, setOpenCancelDialog] = useState(false)
@@ -120,7 +124,9 @@ const InventoryCountDetail = () => {
   const inventoryStore = useSelector((state: RootState) => state.inventory)
   const zonesStore = useSelector((state: RootState) => state.inventoryZones)
 
-  const { id: conteoId } = router.query
+  // Use prop countId if available, otherwise fallback to router query
+  const { id: routerConteoId } = router.query
+  const conteoId = countId || routerConteoId
 
   // ** Effects
   useEffect(() => {
