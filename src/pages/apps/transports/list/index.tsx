@@ -1,24 +1,21 @@
 // ** React Imports
-import { useState, useEffect, forwardRef, useCallback } from 'react'
+import { forwardRef, useCallback, useEffect, useState } from 'react'
 
 // ** Next Import
 import Link from 'next/link'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
-import Tooltip from '@mui/material/Tooltip'
-import { styled } from '@mui/material/styles'
-import MenuItem from '@mui/material/MenuItem'
-import TextField from '@mui/material/TextField'
-import CardHeader from '@mui/material/CardHeader'
-import IconButton from '@mui/material/IconButton'
-import InputLabel from '@mui/material/InputLabel'
-import Typography from '@mui/material/Typography'
-import FormControl from '@mui/material/FormControl'
 import CardContent from '@mui/material/CardContent'
-import Select, { SelectChangeEvent } from '@mui/material/Select'
+import CardHeader from '@mui/material/CardHeader'
+import Grid from '@mui/material/Grid'
+import IconButton from '@mui/material/IconButton'
+import { SelectChangeEvent } from '@mui/material/Select'
+import TextField from '@mui/material/TextField'
+import Tooltip from '@mui/material/Tooltip'
+import Typography from '@mui/material/Typography'
+import { styled } from '@mui/material/styles'
 import { DataGrid, GridColDef, GridRowId } from '@mui/x-data-grid'
 
 // ** Icon Imports
@@ -31,19 +28,17 @@ import DatePicker from 'react-datepicker'
 // ** Store & Actions Imports
 import { useDispatch, useSelector } from 'react-redux'
 import {
-  fetchData,
-  deleteInvoice,
   changeTransportStatus,
+  fetchData,
   forceCloseTransport,
 } from 'src/store/apps/transports'
 
 // ** Types Imports
-import { RootState, AppDispatch } from 'src/store'
 import { ThemeColor } from 'src/@core/layouts/types'
+import { AppDispatch, RootState } from 'src/store'
 import { TransporteListType } from 'src/types/apps/transportType'
 
 // ** Utils Import
-import { getInitials } from 'src/@core/utils/get-initials'
 
 // ** Custom Components Imports
 import CustomChip from 'src/@core/components/mui/chip'
@@ -51,19 +46,19 @@ import OptionsMenu from 'src/@core/components/option-menu'
 import TableHeader from 'src/views/apps/transports/list/TableHeader'
 
 // ** Styled Components
+import { debounce } from '@mui/material'
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
+import { useAuth } from 'src/hooks/useAuth'
 import formatDate from 'src/utils/formatDate'
+import { DriverAutocomplete } from 'src/views/ui/driverAutoComplete'
+import { LocationAutocomplete } from 'src/views/ui/locationAutoComplete'
 import {
   TransportStatusEnum,
   transportStatusLabels,
   transportStatusObj,
 } from '../../../../utils/transportMappings'
-import { debounce } from '@mui/material'
-import { DriverAutocomplete } from 'src/views/ui/driverAutoComplete'
-import { LocationAutocomplete } from 'src/views/ui/locationAutoComplete'
-import { useAuth } from 'src/hooks/useAuth'
-import TransportStatusSelect from '../transportStatusSelect'
 import ConfirmTransportStatus from '../confirmStatus'
+import TransportStatusSelect from '../transportStatusSelect'
 
 import { useRouter } from 'next/router'
 
@@ -91,16 +86,6 @@ const LinkStyled = styled(Link)(({ theme }) => ({
   textDecoration: 'none',
   color: theme.palette.primary.main,
 }))
-
-// ** Vars
-const invoiceStatusObj: InvoiceStatusObj = {
-  Sent: { color: 'secondary', icon: 'mdi:send' },
-  Paid: { color: 'success', icon: 'mdi:check' },
-  Draft: { color: 'primary', icon: 'mdi:content-save-outline' },
-  'Partial Payment': { color: 'warning', icon: 'mdi:chart-pie' },
-  'Past Due': { color: 'error', icon: 'mdi:information-outline' },
-  Downloaded: { color: 'info', icon: 'mdi:arrow-down' },
-}
 
 // ** renders client column
 
@@ -286,12 +271,7 @@ const TransportList = () => {
     if (LocationParam) {
       setSelectedLocation(decodeURIComponent(LocationParam as string))
     }
-  }, [
-    statusParam,
-    startDateParam,
-    endDateParam,
-    driversParam,
-  ])
+  }, [statusParam, startDateParam, endDateParam, driversParam])
 
   useEffect(() => {
     const fetchDataParams: any = {
@@ -303,7 +283,7 @@ const TransportList = () => {
       localidad: selectedLocation,
     }
     dispatch(fetchData(fetchDataParams))
-  }, [statusValue, selectedDrivers, dates,selectedLocation])
+  }, [statusValue, selectedDrivers, dates, selectedLocation])
 
   const performRequest = useCallback(
     (value: string) => {
@@ -318,20 +298,26 @@ const TransportList = () => {
         }),
       )
     },
-    [dispatch, statusValue, value, dates, selectedDrivers,selectedLocation, paginationModel],
+    [
+      dispatch,
+      statusValue,
+      value,
+      dates,
+      selectedDrivers,
+      selectedLocation,
+      paginationModel,
+    ],
   )
 
-      //Params for Drivers
+  //Params for Drivers
 
-      const selectedDriversParams = Array.isArray(driversParam)
-      ? driversParam.map((param) => decodeURIComponent(param)).join(', ')
-      : decodeURIComponent(driversParam ?? '')
+  const selectedDriversParams = Array.isArray(driversParam)
+    ? driversParam.map((param) => decodeURIComponent(param)).join(', ')
+    : decodeURIComponent(driversParam ?? '')
 
-      const selectedLocationParams = Array.isArray(LocationParam)
-      ? LocationParam.map((param) =>
-          decodeURIComponent(param),
-        ).join(', ')
-      : decodeURIComponent(LocationParam ?? '')
+  const selectedLocationParams = Array.isArray(LocationParam)
+    ? LocationParam.map((param) => decodeURIComponent(param)).join(', ')
+    : decodeURIComponent(LocationParam ?? '')
 
   const fn = useCallback(
     debounce((val: string) => {
@@ -420,7 +406,7 @@ const TransportList = () => {
         }),
       )
     },
-    [paginationModel, value, selectedDrivers, statusValue,selectedLocation],
+    [paginationModel, value, selectedDrivers, statusValue, selectedLocation],
   )
 
   const handleCloseTransport = async (transportNo: string) => {
@@ -457,6 +443,48 @@ const TransportList = () => {
     }
   }
 
+  const handleGenerateDeliveryReport = () => {
+    if (selectedRows.length === 0) {
+      alert(
+        'Por favor selecciona al menos un transporte para generar el reporte.',
+      )
+      return
+    }
+
+    const transportNumbers = selectedRows.join(',')
+    const reportUrl = `/apps/transports/printDeliveryReportAmountV2/?noTransporte=${transportNumbers}`
+
+    window.open(reportUrl, '_blank')
+  }
+
+  const handleGenerateProductReport = () => {
+    if (selectedRows.length === 0) {
+      alert(
+        'Por favor selecciona al menos un transporte para generar el reporte.',
+      )
+      return
+    }
+
+    const transportNumbers = selectedRows.join(',')
+    const reportUrl = `/apps/transports/print/?noTransporte=${transportNumbers}`
+
+    window.open(reportUrl, '_blank')
+  }
+
+  const handleGeneratePromotionReport = () => {
+    if (selectedRows.length === 0) {
+      alert(
+        'Por favor selecciona al menos un transporte para generar el reporte.',
+      )
+      return
+    }
+
+    const transportNumbers = selectedRows.join(',')
+    const reportUrl = `/apps/transports/print/?noTransporte=${transportNumbers}&promocionesOnly=true`
+
+    window.open(reportUrl, '_blank')
+  }
+
   const handleOnChangeRange = (dates: any) => {
     const [start, end] = dates
     if (start !== null && end !== null) {
@@ -478,6 +506,24 @@ const TransportList = () => {
       page: 0,
     })
   }
+  const reportOptions = [
+    {
+      label: 'Resumen de Entrega',
+      action: handleGenerateDeliveryReport,
+      icon: 'mdi:file-document-outline',
+    },
+    {
+      label: 'Entrega Productos',
+      action: handleGenerateProductReport,
+      icon: 'mdi:package-variant',
+    },
+    {
+      label: 'Entrega Promociones',
+      action: handleGeneratePromotionReport,
+      icon: 'mdi:gift-outline',
+    },
+  ]
+
   const columns: GridColDef[] = [
     ...defaultColumns,
     {
@@ -593,9 +639,11 @@ const TransportList = () => {
                 </Grid>
 
                 <Grid xs={12} sm={4}>
-                  <DriverAutocomplete selectedDrivers={selectedDriversParams}
-                   multiple 
-                   callBack={handleDriversValue} />
+                  <DriverAutocomplete
+                    selectedDrivers={selectedDriversParams}
+                    multiple
+                    callBack={handleDriversValue}
+                  />
                 </Grid>
                 <Grid item xs={12} sm={4}>
                   <LocationAutocomplete
@@ -637,13 +685,14 @@ const TransportList = () => {
               selectedRows={selectedRows}
               handleFilter={handleFilter}
               placeholder="No.Transporte"
+              reportOptions={reportOptions}
             />
             <DataGrid
               autoHeight
               pagination
               rows={store.transportData}
               columns={columns}
-              disableRowSelectionOnClick
+              checkboxSelection
               paginationModel={paginationModel}
               onPaginationModelChange={handlePagination}
               onRowSelectionModelChange={(rows) => setSelectedRows(rows)}
