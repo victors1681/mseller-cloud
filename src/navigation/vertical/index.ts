@@ -53,6 +53,22 @@ const navigation = (): VerticalNavItemsType => {
       ],
     },
     {
+      title: 'Gestión Inventario',
+      icon: 'mdi:warehouse',
+      children: [
+        {
+          title: 'Conteos de Inventario',
+          icon: 'mdi:clipboard-list-outline',
+          path: '/apps/inventory-management/counts',
+        },
+        {
+          title: 'Reconciliaciones',
+          icon: 'mdi:compare-horizontal',
+          path: '/apps/inventory-management/reconciliations',
+        },
+      ],
+    },
+    {
       title: 'Data Maestra',
       icon: 'bxs:data',
       children: [
@@ -95,6 +111,11 @@ const navigation = (): VerticalNavItemsType => {
           title: 'Distribuidores',
           icon: 'healthicons:truck-driver',
           path: '/apps/drivers/list',
+        },
+        {
+          title: 'Zonas de Inventario',
+          icon: 'mdi:map-marker-multiple',
+          path: '/apps/inventory-zones',
         },
       ],
     },

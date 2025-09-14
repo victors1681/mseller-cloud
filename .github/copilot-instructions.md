@@ -100,6 +100,38 @@ const MyForm = () => {
 }
 ```
 
+### API Integration
+
+When making API calls:
+
+1. **Use restClient**: Always use the configured `restClient` instead of axios directly
+2. **Include /api prefix**: All endpoints should start with `/api/portal/`
+3. **Handle Errors**: Implement proper error handling with try/catch
+4. **Type Responses**: Always type API responses
+
+Example API integration in Redux slice:
+
+```typescript
+import { createAsyncThunk } from '@reduxjs/toolkit'
+import restClient from 'src/configs/restClient'
+
+export const fetchData = createAsyncThunk(
+  'module/fetchData',
+  async (params: RequestParams) => {
+    const response = await restClient.get('/api/portal/Module/data', { params })
+    return response.data
+  },
+)
+
+export const createItem = createAsyncThunk(
+  'module/createItem',
+  async (request: CreateItemRequest) => {
+    const response = await restClient.post('/api/portal/Module/create', request)
+    return response.data
+  },
+)
+```
+
 ### Firebase Integration
 
 When working with Firebase:
@@ -176,7 +208,7 @@ import { useRouter } from 'next/router'
 import { Card, Typography, Box } from '@mui/material'
 
 // ** Third Party Imports
-import axios from 'axios'
+import restClient from 'src/configs/restClient'
 
 // ** Type Imports
 import { ModuleType } from 'src/types/apps/moduleTypes'
