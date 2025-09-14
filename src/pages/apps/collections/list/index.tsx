@@ -1,30 +1,30 @@
 // ** React Imports
-import { useState, useEffect, forwardRef, useCallback } from 'react'
+import { forwardRef, useCallback, useEffect, useState } from 'react'
 
 // ** Next Import
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
-import Tooltip from '@mui/material/Tooltip'
-import { styled } from '@mui/material/styles'
-import MenuItem from '@mui/material/MenuItem'
-import CardHeader from '@mui/material/CardHeader'
-import IconButton from '@mui/material/IconButton'
-import InputLabel from '@mui/material/InputLabel'
-import Typography from '@mui/material/Typography'
-import FormControl from '@mui/material/FormControl'
 import CardContent from '@mui/material/CardContent'
-import Select, { SelectChangeEvent } from '@mui/material/Select'
+import CardHeader from '@mui/material/CardHeader'
+import Grid from '@mui/material/Grid'
+import IconButton from '@mui/material/IconButton'
+import { SelectChangeEvent } from '@mui/material/Select'
+import TextField from '@mui/material/TextField'
+import Tooltip from '@mui/material/Tooltip'
+import Typography from '@mui/material/Typography'
+import { styled } from '@mui/material/styles'
 import { DataGrid, GridColDef, GridRowId } from '@mui/x-data-grid'
 import CustomAvatar from 'src/@core/components/mui/avatar'
+
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
 // ** Third Party Imports
-
+import format from 'date-fns/format'
 import DatePicker from 'react-datepicker'
 
 // ** Store & Actions Imports
@@ -32,7 +32,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { fetchData } from 'src/store/apps/collections'
 
 // ** Types Imports
-import { RootState, AppDispatch } from 'src/store'
+import { AppDispatch, RootState } from 'src/store'
 import { CollectionType } from 'src/types/apps/collectionType'
 
 // ** Custom Components Imports
@@ -40,17 +40,25 @@ import CustomChip from 'src/@core/components/mui/chip'
 import TableHeader from 'src/views/apps/transports/list/TableHeader'
 
 // ** Styled Components
+import { debounce } from '@mui/material'
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
-import formatDate from 'src/utils/formatDate'
 import formatCurrency from 'src/utils/formatCurrency'
+import formatDate from 'src/utils/formatDate'
+import { LocationAutocomplete } from 'src/views/ui/locationAutoComplete'
+import { SellerAutocomplete } from 'src/views/ui/sellerAutoComplete'
 import {
   collectionStatusLabels,
   collectionStatusObj,
 } from '../../../../utils/collectionMappings'
-import { debounce } from '@mui/material'
-import { SellerAutocomplete } from 'src/views/ui/sellerAutoComplete'
-import { CustomInput } from '@/views/ui/customInput'
-import { TipoDocumentoEnum } from '@/types/apps/documentTypes'
+import CollectionStatusSelect from '../collectionStatusSelect'
+
+interface CustomInputProps {
+  dates: Date[]
+  label: string
+  end: number | Date
+  start: number | Date
+  setDates?: (value: Date[]) => void
+}
 
 interface CellType {
   row: CollectionType
@@ -73,6 +81,32 @@ const renderClient = (row: CollectionType) => {
     )
   }
 }
+
+/* eslint-disable */
+const CustomInput = forwardRef((props: CustomInputProps, ref) => {
+  const startDate =
+    props.start !== null ? format(props.start, 'MM/dd/yyyy') : ''
+  const endDate =
+    props.end !== null ? ` - ${format(props.end, 'MM/dd/yyyy')}` : null
+
+  const value = `${startDate}${endDate !== null ? endDate : ''}`
+  props.start === null && props.dates.length && props.setDates
+    ? props.setDates([])
+    : null
+  const updatedProps = { ...props }
+  delete updatedProps.setDates
+
+  return (
+    <TextField
+      fullWidth
+      inputRef={ref}
+      {...updatedProps}
+      label={props.label || ''}
+      value={value}
+    />
+  )
+})
+/* eslint-enable */
 
 // ** renders client column
 
@@ -171,15 +205,19 @@ const defaultColumns: GridColDef[] = [
   },
 ]
 
-const TransportList = () => {
+const CollectionList = () => {
   // ** State
   const [dates, setDates] = useState<Date[]>([])
   const [value, setValue] = useState<string>('')
+  const [statusValue, setStatusValue] = useState<string>('')
   const [documentType, setDocumentType] = useState<string>('')
   const [endDateRange, setEndDateRange] = useState<any>(null)
   const [selectedRows, setSelectedRows] = useState<GridRowId[]>([])
   const [startDateRange, setStartDateRange] = useState<any>(null)
   const [selectedSellers, setSelectedSellers] = useState<any>(null)
+  const [selectedLocation, setSelectedLocation] = useState<string | undefined>(
+    undefined,
+  )
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 20,
@@ -188,18 +226,58 @@ const TransportList = () => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
   const store = useSelector((state: RootState) => state.collections)
+  const router = useRouter()
+
+  const statusParam = router?.query?.status
+  const sellersParam = router?.query?.sellers
+  const startDateParam = router?.query?.startDate
+  const endDateParam = router?.query?.endDate
+  const locationParam = router?.query?.location
+  const { page, pageSize } = router.query
 
   useEffect(() => {
-    dispatch(
-      fetchData({
-        dates,
-        query: value,
-        status: documentType,
-        pageNumber: paginationModel.page,
-        distribuidores: selectedSellers,
-      }),
-    )
-  }, [documentType, selectedSellers])
+    setPaginationModel({
+      page: page ? Number(page) : 0,
+      pageSize: pageSize ? Number(pageSize) : 20,
+    })
+
+    if (!statusParam) {
+      router.push({
+        pathname: router.pathname,
+        query: { ...router.query, status: '' },
+      })
+    } else {
+      setStatusValue(statusParam as string)
+    }
+
+    if (startDateParam && endDateParam) {
+      const startDate = new Date(startDateParam as string)
+      const endDate = new Date(endDateParam as string)
+      if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+        setStartDateRange(startDate)
+        setEndDateRange(endDate)
+        setDates([startDate, endDate])
+      }
+    }
+    if (sellersParam) {
+      setSelectedSellers(decodeURIComponent(sellersParam as string))
+    }
+    if (locationParam) {
+      setSelectedLocation(decodeURIComponent(locationParam as string))
+    }
+  }, [statusParam, startDateParam, endDateParam, sellersParam, locationParam])
+
+  useEffect(() => {
+    const fetchDataParams: any = {
+      dates,
+      query: value,
+      pageNumber: paginationModel.page,
+      vendedor: selectedSellers,
+      status: statusValue,
+      localidad: selectedLocation,
+    }
+    dispatch(fetchData(fetchDataParams))
+  }, [statusValue, selectedSellers, dates, selectedLocation])
 
   const performRequest = useCallback(
     (value: string) => {
@@ -207,14 +285,32 @@ const TransportList = () => {
         fetchData({
           dates,
           query: value,
-          status: documentType,
+          status: statusValue,
           pageNumber: paginationModel.page,
-          distribuidores: selectedSellers,
+          vendedor: selectedSellers,
+          localidad: selectedLocation,
         }),
       )
     },
-    [dispatch, documentType, value, dates, selectedSellers, paginationModel],
+    [
+      dispatch,
+      statusValue,
+      value,
+      dates,
+      selectedSellers,
+      selectedLocation,
+      paginationModel,
+    ],
   )
+
+  //Params for Sellers
+  const selectedSellersParams = Array.isArray(sellersParam)
+    ? sellersParam.map((param) => decodeURIComponent(param)).join(', ')
+    : decodeURIComponent(sellersParam ?? '')
+
+  const selectedLocationParams = Array.isArray(locationParam)
+    ? locationParam.map((param) => decodeURIComponent(param)).join(', ')
+    : decodeURIComponent(locationParam ?? '')
 
   const fn = useCallback(
     debounce((val: string) => {
@@ -223,9 +319,6 @@ const TransportList = () => {
     }, 900),
     [],
   )
-  const handleDocumentType = (e: SelectChangeEvent) => {
-    setDocumentType(e.target.value)
-  }
 
   const handleFilter = useCallback(
     (val: string) => {
@@ -235,20 +328,85 @@ const TransportList = () => {
     },
     [fn],
   )
+
+  const handleStatusValue = (e: SelectChangeEvent) => {
+    setStatusValue(e.target.value)
+    router.push({
+      pathname: `/apps/collections/list`,
+      query: {
+        ...router.query,
+        page: 0,
+        status: e.target.value,
+      },
+    })
+    setPaginationModel({
+      ...paginationModel,
+      page: 0,
+    })
+  }
+
+  const handleSellersValue = (sellers: string) => {
+    setSelectedSellers(sellers)
+    router.push({
+      pathname: `/apps/collections/list`,
+      query: {
+        ...router.query,
+        page: 0,
+        sellers: sellers,
+      },
+    })
+    setPaginationModel({
+      ...paginationModel,
+      page: 0,
+    })
+  }
+
+  const handleLocationValue = (location: string) => {
+    setSelectedLocation(location)
+    router.push({
+      pathname: `/apps/collections/list`,
+      query: {
+        ...router.query,
+        page: 0,
+        location: location,
+      },
+    })
+    setPaginationModel({
+      ...paginationModel,
+      page: 0,
+    })
+  }
+
   const handlePagination = useCallback(
     (values: any) => {
       setPaginationModel(values)
+      router.push({
+        pathname: router.pathname,
+        query: {
+          ...router.query,
+          page: values.page,
+          pageSize: values.pageSize,
+        },
+      })
       dispatch(
         fetchData({
           dates,
           query: value,
-          status: documentType,
+          status: statusValue,
           pageNumber: values.page,
-          distribuidores: selectedSellers,
+          vendedor: selectedSellers,
+          localidad: selectedLocation,
         }),
       )
     },
-    [paginationModel, value, selectedSellers, documentType],
+    [
+      paginationModel,
+      value,
+      selectedSellers,
+      statusValue,
+      selectedLocation,
+      documentType,
+    ],
   )
 
   const handleOnChangeRange = (dates: any) => {
@@ -258,7 +416,43 @@ const TransportList = () => {
     }
     setStartDateRange(start)
     setEndDateRange(end)
+    router.push({
+      pathname: `/apps/collections/list`,
+      query: {
+        ...router.query,
+        page: 0,
+        startDate: start ? start.toISOString() : '',
+        endDate: end ? end.toISOString() : '',
+      },
+    })
+    setPaginationModel({
+      ...paginationModel,
+      page: 0,
+    })
   }
+
+  const handleGenerateCollectionReport = () => {
+    if (selectedRows.length === 0) {
+      alert(
+        'Por favor selecciona al menos una cobranza para generar el reporte.',
+      )
+      return
+    }
+
+    const collectionNumbers = selectedRows.join(',')
+    const reportUrl = `/apps/collections/print/${collectionNumbers}`
+
+    window.open(reportUrl, '_blank')
+  }
+
+  const reportOptions = [
+    {
+      label: 'Reporte de Cobranza',
+      action: handleGenerateCollectionReport,
+      icon: 'mdi:file-document-outline',
+    },
+  ]
+
   const columns: GridColDef[] = [
     ...defaultColumns,
     {
@@ -292,111 +486,27 @@ const TransportList = () => {
             <CardContent>
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={4}>
-                  <FormControl fullWidth>
-                    <InputLabel id="invoice-status-select">
-                      Estado de la orden
-                    </InputLabel>
-
-                    <Select
-                      fullWidth
-                      value={documentType}
-                      sx={{ mr: 4, mb: 2 }}
-                      label="Estado de la orden"
-                      onChange={handleDocumentType}
-                      labelId="invoice-status-select"
-                    >
-                      <MenuItem value="">none</MenuItem>
-                      {Object.keys(collectionStatusLabels).map((k: any) => {
-                        return (
-                          <MenuItem value={k}>
-                            {collectionStatusLabels[k]}
-                          </MenuItem>
-                        )
-                      })}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <FormControl fullWidth>
-                    <InputLabel id="invoice-status-select">
-                      Condición de Pago
-                    </InputLabel>
-
-                    <Select
-                      fullWidth
-                      value={documentType}
-                      sx={{ mr: 4, mb: 2 }}
-                      label="Estado de la orden"
-                      onChange={handleDocumentType}
-                      labelId="invoice-status-select"
-                    >
-                      <MenuItem value="">none</MenuItem>
-                      {Object.keys(collectionStatusLabels).map((k: any) => {
-                        return (
-                          <MenuItem value={k}>
-                            {collectionStatusLabels[k]}
-                          </MenuItem>
-                        )
-                      })}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <FormControl fullWidth>
-                    <InputLabel id="invoice-status-select">
-                      Localidad
-                    </InputLabel>
-
-                    <Select
-                      fullWidth
-                      value={documentType}
-                      sx={{ mr: 4, mb: 2 }}
-                      label="Estado de la orden"
-                      onChange={handleDocumentType}
-                      labelId="invoice-status-select"
-                    >
-                      <MenuItem value="">none</MenuItem>
-                      {Object.keys(collectionStatusLabels).map((k: any) => {
-                        return (
-                          <MenuItem value={k}>
-                            {collectionStatusLabels[k]}
-                          </MenuItem>
-                        )
-                      })}
-                    </Select>
-                  </FormControl>
+                  <CollectionStatusSelect
+                    handleStatusValue={handleStatusValue}
+                    statusValue={statusValue}
+                    label="Estado de la Cobranza"
+                  />
                 </Grid>
 
                 <Grid item xs={12} sm={4}>
-                  <FormControl fullWidth>
-                    <InputLabel id="invoice-status-select">
-                      Tipo Documento
-                    </InputLabel>
-
-                    <Select
-                      fullWidth
-                      value={documentType}
-                      sx={{ mr: 4, mb: 2 }}
-                      label="Estado de la orden"
-                      onChange={handleDocumentType}
-                      labelId="invoice-status-select"
-                    >
-                      <MenuItem value="">none</MenuItem>
-                      <MenuItem value={TipoDocumentoEnum.INVOICE}>
-                        Factura
-                      </MenuItem>
-                      <MenuItem value={TipoDocumentoEnum.ORDER}>
-                        Pedido
-                      </MenuItem>
-                      <MenuItem value={TipoDocumentoEnum.QUOTE}>
-                        Cotización
-                      </MenuItem>
-                    </Select>
-                  </FormControl>
+                  <LocationAutocomplete
+                    selectedLocation={selectedLocationParams}
+                    multiple
+                    callBack={handleLocationValue}
+                  />
                 </Grid>
 
                 <Grid xs={12} sm={4}>
-                  <SellerAutocomplete multiple callBack={setSelectedSellers} />
+                  <SellerAutocomplete
+                    selectedSellers={selectedSellersParams}
+                    multiple
+                    callBack={handleSellersValue}
+                  />
                 </Grid>
                 <Grid item xs={12} sm={4}>
                   <DatePicker
@@ -431,13 +541,14 @@ const TransportList = () => {
               selectedRows={selectedRows}
               handleFilter={handleFilter}
               placeholder="No.Deposito"
+              reportOptions={reportOptions}
             />
             <DataGrid
               autoHeight
               pagination
               rows={store.collectionsData}
               columns={columns}
-              disableRowSelectionOnClick
+              // checkboxSelection
               paginationModel={paginationModel}
               onPaginationModelChange={handlePagination}
               onRowSelectionModelChange={(rows) => setSelectedRows(rows)}
@@ -453,4 +564,4 @@ const TransportList = () => {
   )
 }
 
-export default TransportList
+export default CollectionList

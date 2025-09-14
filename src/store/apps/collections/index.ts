@@ -1,20 +1,20 @@
 // ** Redux Imports
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { Dispatch } from 'redux'
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 // ** Axios Imports
-import axios from 'axios'
-import { CollectionType, ReceiptType } from 'src/types/apps/collectionType'
+import restClient from 'src/configs/restClient'
+import { CollectionType } from 'src/types/apps/collectionType'
 import { PaginatedResponse } from 'src/types/apps/response'
 import { getDateParam } from 'src/utils/getDateParam'
-import restClient from 'src/configs/restClient'
 
 interface DataParams {
   query: string
   dates?: Date[]
   status?: string
   pageNumber?: number
-  distribuidores?: string
+  vendedor?: string
+  localidad?: string
 }
 
 export interface AxiosResponse<T> {
@@ -25,12 +25,15 @@ interface Redux {
   dispatch: Dispatch<any>
 }
 
-// ** Fetch transports
+// ** Fetch collections
 export const fetchData = createAsyncThunk(
   'appCollection/fetchData',
   async (params: DataParams) => {
     if (params.status === '') {
       delete params.status
+    }
+    if (params.localidad === '') {
+      delete params.localidad
     }
     const response = await restClient.get<
       any,
