@@ -90,7 +90,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
       )
       return res
         .status(error.response?.status || 500)
-        .json({ message: error.response?.data.error || error.message })
+        .json({
+          message:
+            error.response?.data?.message ||
+            error.response?.data?.error ||
+            error.message,
+        })
     }
 
     if (error.code === 'ECONNRESET' || error.code === 'ECONNABORTED') {

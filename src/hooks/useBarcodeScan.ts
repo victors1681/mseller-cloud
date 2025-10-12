@@ -28,7 +28,6 @@ export function useBarcodeScan({
 
       // If Enter is pressed, process barcode
       if (e.key === 'Enter' && barcodeBuffer.length >= minBarcodeLength) {
-        debugger
         const code = barcodeBuffer.trim()
         const foundProduct = products.find(
           (product: ProductType) =>

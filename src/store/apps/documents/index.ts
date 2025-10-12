@@ -1,20 +1,21 @@
 // ** Redux Imports
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { Dispatch } from 'redux'
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 // ** Axios Imports
-import axios, { isAxiosError } from 'axios'
-import { PaginatedResponse } from 'src/types/apps/response'
-import { getDateParam } from 'src/utils/getDateParam'
+import { AppDispatch, RootState } from '@/store'
+import { isAxiosError } from 'axios'
+import toast from 'react-hot-toast'
 import restClient from 'src/configs/restClient'
 import {
   DocumentStatus,
+  DocumentType,
   DocumentUpdateType,
   StatusParam,
 } from 'src/types/apps/documentTypes'
-import toast from 'react-hot-toast'
-import { DocumentType } from 'src/types/apps/documentTypes'
-import { AppDispatch, RootState } from '@/store'
+import { PaginatedResponse } from 'src/types/apps/response'
+import { extractDocumentErrorMessage } from 'src/utils/errorUtils'
+import { getDateParam } from 'src/utils/getDateParam'
 interface DataParams {
   query: string
   dates?: Date[]
@@ -139,17 +140,19 @@ export const addNewDocument = createAsyncThunk<
       }
 
       if (isAxiosError(response)) {
-         return rejectWithValue({
-        message: response.response?.data.message || 'Error creando documento',
-      })
+        return rejectWithValue({
+          message: response.response?.data.message || 'Error creando documento',
+        })
       }
-      
+
       console.log('Document creation response error:', response)
-     
-    } catch (error) {
+    } catch (error: any) {
       console.error('Document creation error:', error)
+
+      const errorMessage = extractDocumentErrorMessage(error, 'create')
+
       return rejectWithValue({
-        message: 'Error inesperado creando el documento',
+        message: errorMessage,
       })
     }
   },
@@ -189,10 +192,13 @@ export const addUpdateDocument = createAsyncThunk<
       return rejectWithValue({
         message: response?.data?.message || 'Error actualizando documento',
       })
-    } catch (error) {
+    } catch (error: any) {
       console.error('Document update error:', error)
+
+      const errorMessage = extractDocumentErrorMessage(error, 'update')
+
       return rejectWithValue({
-        message: 'Error inesperado actualizando el documento',
+        message: errorMessage,
       })
     }
   },

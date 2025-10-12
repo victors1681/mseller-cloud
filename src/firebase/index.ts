@@ -1,22 +1,23 @@
-import * as firebase from 'firebase/app'
-import firebaseConfig from './firebaseConfig'
-import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore'
 import {
-  getFunctions,
-  httpsCallable,
-  connectFunctionsEmulator,
-} from 'firebase/functions'
+  UploadImagesResponseType,
+  UploadImagesType,
+} from '@/types/apps/imageTypes'
+import * as firebase from 'firebase/app'
 import {
   browserLocalPersistence,
   browserSessionPersistence,
-  connectAuthEmulator,
   getAuth,
   setPersistence,
   signInWithEmailAndPassword,
   signOut,
 } from 'firebase/auth'
+import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore'
+import {
+  connectFunctionsEmulator,
+  getFunctions,
+  httpsCallable,
+} from 'firebase/functions'
 import { axiosSetClientUrl } from 'src/configs/restClient'
-import { UserTypes } from 'src/types/apps/userTypes'
 import {
   CustomerPaymentsHistoryResponseType,
   PaymentMethodsResponseType,
@@ -25,10 +26,8 @@ import {
   UpdateCardRequestType,
   UpdateCardResponseType,
 } from 'src/types/apps/stripeTypes'
-import {
-  UploadImagesResponseType,
-  UploadImagesType,
-} from '@/types/apps/imageTypes'
+import { UserTypes } from 'src/types/apps/userTypes'
+import firebaseConfig from './firebaseConfig'
 const LOCAL_HOST = '127.0.0.1'
 
 let app
@@ -114,7 +113,7 @@ export const signInByEmail = async (
     return await getAllCurrentProfile()
   } catch (error: any) {
     console.log('Authentication error', error)
-    debugger
+
     throw new Error(error.message)
   }
 }
@@ -379,4 +378,4 @@ export const firebaseError = (err: any) => {
   }
 }
 
-export { db, firebase, functions, auth }
+export { auth, db, firebase, functions }

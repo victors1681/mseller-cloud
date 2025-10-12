@@ -1,13 +1,14 @@
+import toast from 'react-hot-toast'
 import { AppDispatch } from 'src/store'
+import { addNewDocument, addUpdateDocument } from 'src/store/apps/documents'
 import {
   DocumentType,
   DocumentUpdateType,
   TipoDocumentoEnum,
 } from 'src/types/apps/documentTypes'
-import { addNewDocument, addUpdateDocument } from 'src/store/apps/documents'
 import { convertToDocumentUpdate } from 'src/utils/documentUtils'
+import { extractDocumentErrorMessage } from 'src/utils/errorUtils'
 import { SelectedCustomerData } from '../types'
-import toast from 'react-hot-toast'
 
 interface CreateDocumentParams {
   formData: Partial<DocumentType>
@@ -98,10 +99,13 @@ export class DocumentService {
         toast.error(response.message || 'Error creando el documento')
         return { success: false, error: response.message }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Create error:', error)
-      toast.error('Error inesperado al crear el documento')
-      return { success: false, error: 'Error inesperado al crear el documento' }
+
+      const errorMessage = extractDocumentErrorMessage(error, 'create')
+
+      toast.error(errorMessage)
+      return { success: false, error: errorMessage }
     }
   }
 
@@ -136,12 +140,15 @@ export class DocumentService {
         toast.error(response.message || 'Error actualizando el documento')
         return { success: false, error: response.message }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Update error:', error)
-      toast.error('Error inesperado al actualizar el documento')
+
+      const errorMessage = extractDocumentErrorMessage(error, 'update')
+
+      toast.error(errorMessage)
       return {
         success: false,
-        error: 'Error inesperado al actualizar el documento',
+        error: errorMessage,
       }
     }
   }

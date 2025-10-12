@@ -1,17 +1,17 @@
 // ** React Imports
-import { useState, useEffect, forwardRef, useCallback } from 'react'
+import { forwardRef, useCallback, useEffect, useState } from 'react'
 
 // ** MUI Imports
-import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
+import Grid from '@mui/material/Grid'
 
+import CardHeader from '@mui/material/CardHeader'
 import MenuItem from '@mui/material/MenuItem'
 import TextField from '@mui/material/TextField'
-import CardHeader from '@mui/material/CardHeader'
 
-import InputLabel from '@mui/material/InputLabel'
-import FormControl from '@mui/material/FormControl'
 import CardContent from '@mui/material/CardContent'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 import { DataGrid, GridRowParams } from '@mui/x-data-grid'
 import {
@@ -25,10 +25,10 @@ import DatePicker from 'react-datepicker'
 
 // ** Store & Actions Imports
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchData, changeDocumentStatus } from 'src/store/apps/documents'
+import { changeDocumentStatus, fetchData } from 'src/store/apps/documents'
 
 // ** Types Imports
-import { RootState, AppDispatch } from 'src/store'
+import { AppDispatch, RootState } from 'src/store'
 
 import {
   DocumentStatus,
@@ -37,17 +37,17 @@ import {
 } from 'src/types/apps/documentTypes'
 
 // ** Custom Components Imports
-import TableHeader from 'src/views/apps/documents/list/TableHeader'
-import AddEditDocumentDialog from 'src/views/apps/documents/add-edit-document'
 import { ViewCustomerInfoDialog } from '@/views/apps/documents/viewCustomerInfoDialog'
+import AddEditDocumentDialog from 'src/views/apps/documents/add-edit-document'
+import TableHeader from 'src/views/apps/documents/list/TableHeader'
 
 // ** Styled Components
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 
 import { debounce } from '@mui/material'
-import { SellerAutocomplete } from 'src/views/ui/sellerAutoComplete'
 import { LocationAutocomplete } from 'src/views/ui/locationAutoComplete'
 import { PaymentTypeAutocomplete } from 'src/views/ui/paymentTypeAutoComplete'
+import { SellerAutocomplete } from 'src/views/ui/sellerAutoComplete'
 
 import { useRouter } from 'next/router'
 
@@ -396,7 +396,7 @@ const InvoiceList = () => {
       <Grid container spacing={6}>
         <Grid item xs={12}>
           <Card>
-            <CardHeader title="Pedidos" />
+            <CardHeader title="Documentos" />
             <CardContent>
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={4}>

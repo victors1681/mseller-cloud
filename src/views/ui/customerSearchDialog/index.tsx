@@ -1,28 +1,33 @@
-import React, { useState, useEffect, useMemo } from 'react'
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
+  Box,
   Button,
+  Card,
+  CardActions,
+  CardContent,
+  Chip,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Pagination,
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
-  Box,
+  TextField,
   Typography,
-  CircularProgress,
-  Pagination,
-  IconButton,
-  Chip,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import Icon from 'src/@core/components/icon'
-import { RootState, AppDispatch } from 'src/store'
+import { AppDispatch, RootState } from 'src/store'
 import { fetchData } from 'src/store/apps/clients'
 import { CustomerType } from 'src/types/apps/customerType'
 
@@ -45,6 +50,11 @@ const CustomerSearchDialog: React.FC<CustomerSearchDialogProps> = ({
   const [searchTerm, setSearchTerm] = useState('')
   const [currentPage, setCurrentPage] = useState(0)
   const [localLoading, setLocalLoading] = useState(false)
+
+  // ** Responsive
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
   // ** Redux
   const dispatch = useDispatch<AppDispatch>()
@@ -109,14 +119,120 @@ const CustomerSearchDialog: React.FC<CustomerSearchDialogProps> = ({
 
   const isLoading = store.isLoading || localLoading
 
+  // Mobile card component
+  const CustomerCard = ({ customer }: { customer: CustomerType }) => (
+    <Card
+      sx={{
+        mb: 2,
+        '&:hover': { boxShadow: 4 },
+        cursor: 'pointer',
+      }}
+      onClick={() => handleSelectCustomer(customer)}
+    >
+      <CardContent sx={{ pb: 1 }}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="flex-start"
+          mb={1}
+        >
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{ fontSize: '1rem', fontWeight: 600 }}
+          >
+            {customer.nombre}
+          </Typography>
+          <Chip
+            label={customer.status || 'N/A'}
+            color={customer.status === 'ACTIVO' ? 'success' : 'default'}
+            size="small"
+            variant="outlined"
+          />
+        </Box>
+
+        <Box sx={{ mb: 1 }}>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ fontSize: '0.875rem' }}
+          >
+            <Icon
+              icon="mdi:identifier"
+              fontSize="0.875rem"
+              style={{ marginRight: 4, verticalAlign: 'middle' }}
+            />
+            Código: {customer.codigo}
+          </Typography>
+        </Box>
+
+        {customer.telefono1 && (
+          <Box sx={{ mb: 1 }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ fontSize: '0.875rem' }}
+            >
+              <Icon
+                icon="mdi:phone"
+                fontSize="0.875rem"
+                style={{ marginRight: 4, verticalAlign: 'middle' }}
+              />
+              {customer.telefono1}
+            </Typography>
+          </Box>
+        )}
+
+        {customer.ciudad && (
+          <Box sx={{ mb: 1 }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ fontSize: '0.875rem' }}
+            >
+              <Icon
+                icon="mdi:map-marker"
+                fontSize="0.875rem"
+                style={{ marginRight: 4, verticalAlign: 'middle' }}
+              />
+              {customer.ciudad}
+            </Typography>
+          </Box>
+        )}
+      </CardContent>
+
+      <CardActions sx={{ px: 2, pb: 2, pt: 0 }}>
+        <Button
+          variant="contained"
+          color="primary"
+          size="small"
+          fullWidth
+          startIcon={<Icon icon="mdi:check" />}
+          onClick={(e) => {
+            e.stopPropagation()
+            handleSelectCustomer(customer)
+          }}
+        >
+          Seleccionar
+        </Button>
+      </CardActions>
+    </Card>
+  )
+
   return (
     <Dialog
       open={open}
       onClose={handleClose}
-      maxWidth={maxWidth}
-      fullWidth
+      maxWidth={isMobile ? false : maxWidth}
+      fullWidth={!isMobile}
+      fullScreen={isSmallMobile}
       PaperProps={{
-        sx: { minHeight: '40vh', maxHeight: '90vh' },
+        sx: {
+          minHeight: isMobile ? '100vh' : '40vh',
+          maxHeight: isMobile ? '100vh' : '90vh',
+          width: isMobile ? '100%' : 'auto',
+          margin: isMobile ? 0 : 'auto',
+        },
       }}
     >
       <DialogTitle>
@@ -128,23 +244,35 @@ const CustomerSearchDialog: React.FC<CustomerSearchDialogProps> = ({
         </Box>
       </DialogTitle>
 
-      <DialogContent dividers>
+      <DialogContent dividers sx={{ p: isMobile ? 2 : 3 }}>
         <Box sx={{ mb: 3 }}>
           <TextField
             fullWidth
-            size="small"
+            size={isMobile ? 'medium' : 'small'}
             label="Buscar por código o nombre"
             placeholder="Ingrese código o nombre del cliente..."
             value={searchTerm}
             onChange={handleSearchChange}
+            autoFocus={!isMobile} // Avoid auto-focus on mobile to prevent keyboard issues
             InputProps={{
               startAdornment: (
                 <Box sx={{ mr: 1 }}>
                   <Icon icon="mdi:magnify" fontSize="1.25rem" />
                 </Box>
               ),
+              sx: {
+                '& .MuiInputBase-input': {
+                  fontSize: isMobile ? '1rem' : '0.875rem',
+                  padding: isMobile ? '12px 8px' : undefined,
+                },
+              },
             }}
-            sx={{ mb: 2 }}
+            sx={{
+              mb: 2,
+              '& .MuiInputLabel-root': {
+                fontSize: isMobile ? '1rem' : '0.875rem',
+              },
+            }}
           />
         </Box>
 
@@ -159,103 +287,138 @@ const CustomerSearchDialog: React.FC<CustomerSearchDialogProps> = ({
           </Box>
         ) : (
           <>
-            <TableContainer component={Paper} sx={{ maxHeight: '400px' }}>
-              <Table stickyHeader size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: 'bold' }}>Código</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>Nombre</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>Teléfono</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>Ciudad</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>Estado</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 'bold' }}>
-                      Acciones
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {store.data?.length > 0 ? (
-                    store.data.map((customer) => (
-                      <TableRow
-                        key={customer.codigo}
-                        hover
-                        sx={{
-                          cursor: 'pointer',
-                          '&:hover': { backgroundColor: 'action.hover' },
-                        }}
-                      >
-                        <TableCell>
-                          <Typography
-                            variant="body2"
-                            fontWeight="medium"
-                            sx={{ fontSize: '0.875rem' }}
-                          >
-                            {customer.codigo}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography
-                            variant="body2"
-                            sx={{ fontSize: '0.875rem' }}
-                          >
-                            {customer.nombre}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography
-                            variant="body2"
-                            sx={{ fontSize: '0.875rem' }}
-                          >
-                            {customer.telefono1 || '-'}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography
-                            variant="body2"
-                            sx={{ fontSize: '0.875rem' }}
-                          >
-                            {customer.ciudad || '-'}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Chip
-                            label={customer.status || 'N/A'}
-                            color={
-                              customer.status === 'ACTIVO'
-                                ? 'success'
-                                : 'default'
-                            }
-                            size="small"
-                            variant="outlined"
-                          />
-                        </TableCell>
-                        <TableCell align="center">
-                          <Button
-                            variant="contained"
-                            color="primary"
-                            size="small"
-                            onClick={() => handleSelectCustomer(customer)}
-                            startIcon={<Icon icon="mdi:check" />}
-                          >
-                            Seleccionar
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
+            {/* Desktop Table View */}
+            {!isMobile ? (
+              <TableContainer component={Paper} sx={{ maxHeight: '400px' }}>
+                <Table stickyHeader size="small">
+                  <TableHead>
                     <TableRow>
-                      <TableCell colSpan={6} align="center">
-                        <Typography variant="body2" color="textSecondary">
-                          {searchTerm
-                            ? 'No se encontraron clientes con los criterios de búsqueda'
-                            : 'No hay clientes disponibles'}
-                        </Typography>
+                      <TableCell sx={{ fontWeight: 'bold' }}>Código</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold' }}>Nombre</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold' }}>
+                        Teléfono
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 'bold' }}>Ciudad</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold' }}>Estado</TableCell>
+                      <TableCell align="center" sx={{ fontWeight: 'bold' }}>
+                        Acciones
                       </TableCell>
                     </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                  </TableHead>
+                  <TableBody>
+                    {store.data?.length > 0 ? (
+                      store.data.map((customer) => (
+                        <TableRow
+                          key={customer.codigo}
+                          hover
+                          sx={{
+                            cursor: 'pointer',
+                            '&:hover': { backgroundColor: 'action.hover' },
+                          }}
+                        >
+                          <TableCell>
+                            <Typography
+                              variant="body2"
+                              fontWeight="medium"
+                              sx={{ fontSize: '0.875rem' }}
+                            >
+                              {customer.codigo}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography
+                              variant="body2"
+                              sx={{ fontSize: '0.875rem' }}
+                            >
+                              {customer.nombre}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography
+                              variant="body2"
+                              sx={{ fontSize: '0.875rem' }}
+                            >
+                              {customer.telefono1 || '-'}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography
+                              variant="body2"
+                              sx={{ fontSize: '0.875rem' }}
+                            >
+                              {customer.ciudad || '-'}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Chip
+                              label={customer.status || 'N/A'}
+                              color={
+                                customer.status === 'ACTIVO'
+                                  ? 'success'
+                                  : 'default'
+                              }
+                              size="small"
+                              variant="outlined"
+                            />
+                          </TableCell>
+                          <TableCell align="center">
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              size="small"
+                              onClick={() => handleSelectCustomer(customer)}
+                              startIcon={<Icon icon="mdi:check" />}
+                            >
+                              Seleccionar
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={6} align="center">
+                          <Typography variant="body2" color="textSecondary">
+                            {searchTerm
+                              ? 'No se encontraron clientes con los criterios de búsqueda'
+                              : 'No hay clientes disponibles'}
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            ) : (
+              /* Mobile Card View */
+              <Box
+                sx={{
+                  maxHeight: isSmallMobile ? '60vh' : '400px',
+                  overflow: 'auto',
+                  px: 1,
+                }}
+              >
+                {store.data?.length > 0 ? (
+                  store.data.map((customer) => (
+                    <CustomerCard key={customer.codigo} customer={customer} />
+                  ))
+                ) : (
+                  <Card sx={{ textAlign: 'center', py: 4 }}>
+                    <CardContent>
+                      <Icon
+                        icon="mdi:account-search"
+                        fontSize="3rem"
+                        style={{ color: '#ccc', marginBottom: 16 }}
+                      />
+                      <Typography variant="body2" color="textSecondary">
+                        {searchTerm
+                          ? 'No se encontraron clientes con los criterios de búsqueda'
+                          : 'No hay clientes disponibles'}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                )}
+              </Box>
+            )}
 
             {/* Pagination */}
             {store.totalPages > 1 && (
@@ -264,15 +427,26 @@ const CustomerSearchDialog: React.FC<CustomerSearchDialogProps> = ({
                 justifyContent="center"
                 alignItems="center"
                 mt={2}
+                px={isMobile ? 1 : 0}
               >
                 <Pagination
                   count={store.totalPages}
                   page={currentPage}
                   onChange={handlePageChange}
                   color="primary"
-                  size="small"
-                  showFirstButton
-                  showLastButton
+                  size={isMobile ? 'medium' : 'small'}
+                  showFirstButton={!isSmallMobile}
+                  showLastButton={!isSmallMobile}
+                  siblingCount={isMobile ? 1 : 2}
+                  boundaryCount={isSmallMobile ? 1 : 2}
+                  sx={{
+                    '& .MuiPaginationItem-root': {
+                      minWidth: isMobile ? 40 : 32,
+                      height: isMobile ? 40 : 32,
+                      fontSize: isMobile ? '1rem' : '0.875rem',
+                      margin: isMobile ? '0 2px' : '0 1px',
+                    },
+                  }}
                 />
               </Box>
             )}
@@ -280,16 +454,26 @@ const CustomerSearchDialog: React.FC<CustomerSearchDialogProps> = ({
             {/* Results info */}
             <Box
               display="flex"
+              flexDirection={isSmallMobile ? 'column' : 'row'}
               justifyContent="space-between"
-              alignItems="center"
+              alignItems={isSmallMobile ? 'center' : 'center'}
               mt={2}
               px={1}
+              gap={isSmallMobile ? 1 : 0}
             >
-              <Typography variant="caption" color="textSecondary">
+              <Typography
+                variant="caption"
+                color="textSecondary"
+                sx={{ fontSize: isMobile ? '0.875rem' : '0.75rem' }}
+              >
                 Mostrando {store.data?.length || 0} de {store.totalResults || 0}{' '}
                 resultados
               </Typography>
-              <Typography variant="caption" color="textSecondary">
+              <Typography
+                variant="caption"
+                color="textSecondary"
+                sx={{ fontSize: isMobile ? '0.875rem' : '0.75rem' }}
+              >
                 Página {currentPage} de {store.totalPages || 1}
               </Typography>
             </Box>
@@ -297,8 +481,23 @@ const CustomerSearchDialog: React.FC<CustomerSearchDialogProps> = ({
         )}
       </DialogContent>
 
-      <DialogActions>
-        <Button onClick={handleClose} color="secondary">
+      <DialogActions
+        sx={{
+          p: isMobile ? 3 : 2,
+          flexDirection: isSmallMobile ? 'column' : 'row',
+          gap: isSmallMobile ? 1 : 0,
+        }}
+      >
+        <Button
+          onClick={handleClose}
+          color="secondary"
+          size={isMobile ? 'large' : 'medium'}
+          fullWidth={isSmallMobile}
+          sx={{
+            minHeight: isMobile ? 48 : 'auto',
+            fontSize: isMobile ? '1rem' : '0.875rem',
+          }}
+        >
           Cancelar
         </Button>
       </DialogActions>

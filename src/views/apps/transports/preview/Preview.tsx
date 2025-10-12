@@ -1,25 +1,22 @@
 // ** React Imports
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 // ** Next Import
 import Link from 'next/link'
 
 // ** MUI Imports
-import Grid from '@mui/material/Grid'
 import Alert from '@mui/material/Alert'
+import Grid from '@mui/material/Grid'
 
 // ** Third Party Components
-import axios from 'axios'
 
 // ** Types
 import { DocumentType } from 'src/types/apps/documentTypes'
 
 // ** Demo Components Imports
-import PreviewCard from 'src/views/apps/documents/preview/PreviewCard'
-import PreviewActions from 'src/views/apps/documents/preview/PreviewActions'
-import AddPaymentDrawer from 'src/views/apps/documents/shared-drawer/AddPaymentDrawer'
-import SendInvoiceDrawer from 'src/views/apps/documents/shared-drawer/SendInvoiceDrawer'
 import restClient from 'src/configs/restClient'
+import PreviewActions from 'src/views/apps/documents/preview/PreviewActions'
+import PreviewCard from 'src/views/apps/documents/preview/PreviewCard'
 
 interface DocumentPreviewProps {
   id: string
@@ -76,8 +73,8 @@ const InvoicePreview = ({ id }: DocumentPreviewProps) => {
       <Grid container spacing={6}>
         <Grid item xs={12}>
           <Alert severity="error">
-            Pedido: {id} no existe. Por favor diríjase al listado de pedidos:{' '}
-            <Link href="/apps/documents/list">Pedidos</Link>
+            Documento: {id} no existe. Por favor diríjase al listado de
+            documentos: <Link href="/apps/documents/list">Documentos</Link>
           </Alert>
         </Grid>
       </Grid>

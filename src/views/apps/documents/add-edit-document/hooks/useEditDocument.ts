@@ -1,26 +1,23 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { toast } from 'react-hot-toast'
 import { useDispatch, useSelector } from 'react-redux'
-import { RootState, AppDispatch } from 'src/store'
-import {
-  toggleEditDocument,
-  fetchDocumentDetails,
-} from 'src/store/apps/documents'
 import { useAuth } from 'src/hooks/useAuth'
-import { useOrderCalculations } from './useOrderCalculations'
-import { useProductSearchDialog } from 'src/views/ui/productsSearchDialog/useProductSearchDialog'
-import { useCustomerSearchDialog } from 'src/views/ui/customerSearchDialog/useCustomerSearchDialog'
-import { DocumentTypeDetail, DocumentType } from 'src/types/apps/documentTypes'
-import { ProductType } from 'src/types/apps/productTypes'
-import { CustomerType } from 'src/types/apps/customerType'
-import { NewDetailForm, SelectedCustomerData } from '../types'
+import { AppDispatch, RootState } from 'src/store'
 import {
-  defaultDetailFormValues,
-  defaultDetailControlValues,
-} from '../defaults'
+  fetchDocumentDetails,
+  toggleEditDocument,
+} from 'src/store/apps/documents'
+import { CustomerType } from 'src/types/apps/customerType'
+import { DocumentType, DocumentTypeDetail } from 'src/types/apps/documentTypes'
+import { ProductType } from 'src/types/apps/productTypes'
+import { useCustomerSearchDialog } from 'src/views/ui/customerSearchDialog/useCustomerSearchDialog'
+import { useProductSearchDialog } from 'src/views/ui/productsSearchDialog/useProductSearchDialog'
+import { defaultDetailFormValues } from '../defaults'
+import { DocumentService } from '../services/documentService'
+import { NewDetailForm, SelectedCustomerData } from '../types'
 import { useDetailManagement } from './useDetailManagement'
 import { useDocumentForm } from './useDocumentForm'
-import { DocumentService } from '../services/documentService'
-import { toast } from 'react-hot-toast'
+import { useOrderCalculations } from './useOrderCalculations'
 
 export const useEditDocument = (open: boolean) => {
   const dispatch = useDispatch<AppDispatch>()
@@ -91,6 +88,10 @@ export const useEditDocument = (open: boolean) => {
     onCustomerSelect: (customer: CustomerType) => {
       mainForm.setValue('codigoCliente', customer.codigo)
       mainForm.setValue('codigoVendedor', customer.codigoVendedor)
+      mainForm.setValue(
+        'condicionPago',
+        customer.condicionPago?.condicionPago || '',
+      )
 
       setSelectedCustomerData({
         nombreCliente: customer.nombre,

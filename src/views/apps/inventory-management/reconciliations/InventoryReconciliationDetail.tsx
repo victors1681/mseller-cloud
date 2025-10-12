@@ -90,7 +90,6 @@ const InventoryReconciliationDetail = ({
     setLoading(true)
     try {
       const reconciliacionId = inventoryStore.selectedReconciliacion.id
-      debugger
       if (!reconciliacionId) {
         throw new Error(
           'No se puede identificar la reconciliación para aprobar',

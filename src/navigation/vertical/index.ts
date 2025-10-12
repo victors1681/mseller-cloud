@@ -31,7 +31,7 @@ const navigation = (): VerticalNavItemsType => {
           ],
         },
         {
-          title: 'Pedidos',
+          title: 'Documentos',
           icon: 'lets-icons:order',
           path: '/apps/documents/list',
         },
