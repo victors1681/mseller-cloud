@@ -1,27 +1,26 @@
-import formatDate from 'src/utils/formatDate'
-import formatCurrency from 'src/utils/formatCurrency'
-import CustomChip from 'src/@core/components/mui/chip'
-import CustomAvatar from 'src/@core/components/mui/avatar'
-import { getInitials } from 'src/@core/utils/get-initials'
-import Typography from '@mui/material/Typography'
-import { DocumentType } from 'src/types/apps/documentTypes'
-import { GridColDef } from '@mui/x-data-grid'
-import { styled } from '@mui/material/styles'
-import Link from 'next/link'
+import { usePermissions } from '@/hooks/usePermissions'
+import PermissionGuard from '@/views/ui/permissionGuard'
 import Box from '@mui/material/Box'
-import Tooltip from '@mui/material/Tooltip'
 import IconButton from '@mui/material/IconButton'
-import Icon from 'src/@core/components/icon'
-import { DocumentStatus } from 'src/types/apps/documentTypes'
-import OptionsMenu from 'src/@core/components/option-menu'
+import { styled } from '@mui/material/styles'
+import Tooltip from '@mui/material/Tooltip'
+import Typography from '@mui/material/Typography'
+import { GridColDef } from '@mui/x-data-grid'
 import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit'
+import Link from 'next/link'
+import Icon from 'src/@core/components/icon'
+import CustomAvatar from 'src/@core/components/mui/avatar'
+import CustomChip from 'src/@core/components/mui/chip'
+import OptionsMenu from 'src/@core/components/option-menu'
+import { getInitials } from 'src/@core/utils/get-initials'
 import { AppDispatch } from 'src/store'
 import {
   changeDocumentStatus,
   toggleEditDocument,
 } from 'src/store/apps/documents'
-import PermissionGuard from '@/views/ui/permissionGuard'
-import { usePermissions } from '@/hooks/usePermissions'
+import { DocumentStatus, DocumentType } from 'src/types/apps/documentTypes'
+import formatCurrency from 'src/utils/formatCurrency'
+import formatDate from 'src/utils/formatDate'
 
 const orderStatusObj: any = {
   '1': 'success',
@@ -92,8 +91,9 @@ const defaultColumns: GridColDef[] = [
   {
     flex: 0.2,
     field: 'seller',
-    minWidth: 210,
+    minWidth: 180,
     headerName: 'Vendedor',
+    hideable: true,
     renderCell: ({ row }: CellType) => {
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -117,7 +117,7 @@ const defaultColumns: GridColDef[] = [
   {
     flex: 0.25,
     field: 'client',
-    minWidth: 300,
+    minWidth: 250,
     headerName: 'Cliente',
     renderCell: ({ row }: CellType) => {
       return (
@@ -158,6 +158,7 @@ const defaultColumns: GridColDef[] = [
     minWidth: 130,
     field: 'issuedDate',
     headerName: 'Fecha',
+    hideable: true,
     renderCell: ({ row }: CellType) => (
       <Typography variant="body2">{formatDate(row.fecha)}</Typography>
     ),
@@ -231,7 +232,8 @@ export const columns = (
             href="#"
             onClick={(e) => {
               e.preventDefault()
-              row.procesado === DocumentStatus.Pending && handleEditDocument(row)
+              row.procesado === DocumentStatus.Pending &&
+                handleEditDocument(row)
             }}
             sx={{
               cursor: 'pointer',
@@ -302,7 +304,7 @@ export const columns = (
       field: 'actions',
       headerName: 'Actions',
       renderCell: ({ row }: CellType) => (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
           <Tooltip title="Aprobar">
             <PermissionGuard permission="orders.allowApprove" disabled>
               <IconButton
@@ -320,6 +322,11 @@ export const columns = (
                     dispatch,
                   )
                 }
+                sx={{
+                  minWidth: 44,
+                  minHeight: 44,
+                  p: 1,
+                }}
               >
                 <Icon icon="material-symbols:order-approve" fontSize={20} />
               </IconButton>
@@ -338,6 +345,11 @@ export const columns = (
                     dispatch,
                   )
                 }
+                sx={{
+                  minWidth: 44,
+                  minHeight: 44,
+                  p: 1,
+                }}
               >
                 <Icon
                   icon="fluent:document-header-dismiss-24-filled"
@@ -351,21 +363,36 @@ export const columns = (
               size="small"
               component={Link}
               href={`/apps/documents/preview/${row.noPedidoStr}`}
+              sx={{
+                minWidth: 44,
+                minHeight: 44,
+                p: 1,
+              }}
             >
               <Icon icon="mdi:eye-outline" fontSize={20} />
             </IconButton>
           </Tooltip>
           <OptionsMenu
             iconProps={{ fontSize: 20 }}
-            iconButtonProps={{ size: 'small' }}
+            iconButtonProps={{
+              size: 'small',
+              sx: {
+                minWidth: 44,
+                minHeight: 44,
+                p: 1,
+              },
+            }}
             menuProps={{ sx: { '& .MuiMenuItem-root svg': { mr: 2 } } }}
             options={[
               {
                 text: 'Editar',
                 icon: <Icon icon="mdi:pencil-outline" fontSize={20} />,
                 menuItemProps: {
-                  disabled: !hasPermission('orders.allowEdit') && row.procesado !== DocumentStatus.Pending,
+                  disabled:
+                    !hasPermission('orders.allowEdit') &&
+                    row.procesado !== DocumentStatus.Pending,
                   onClick: () => handleEditDocument(row),
+                  sx: { minHeight: 44 }, // Better touch target for menu items
                 },
               },
               // {

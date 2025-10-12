@@ -24,7 +24,7 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import Icon from 'src/@core/components/icon'
 import { AppDispatch, RootState } from 'src/store'
@@ -51,6 +51,9 @@ const CustomerSearchDialog: React.FC<CustomerSearchDialogProps> = ({
   const [currentPage, setCurrentPage] = useState(0)
   const [localLoading, setLocalLoading] = useState(false)
 
+  // ** Refs
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
   // ** Responsive
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -63,10 +66,12 @@ const CustomerSearchDialog: React.FC<CustomerSearchDialogProps> = ({
   // ** Debounced search function
   const debouncedSearch = useMemo(() => {
     let timeoutId: NodeJS.Timeout
-    return (query: string, page: number) => {
+
+    const searchFunction = (query: string, page: number) => {
       clearTimeout(timeoutId)
+      setLocalLoading(true)
+
       timeoutId = setTimeout(() => {
-        setLocalLoading(true)
         dispatch(
           fetchData({
             query,
@@ -80,14 +85,34 @@ const CustomerSearchDialog: React.FC<CustomerSearchDialogProps> = ({
         })
       }, 300)
     }
+
+    // Return a function that includes cleanup
+    return searchFunction
   }, [dispatch])
 
   // ** Effects
 
   useEffect(() => {
-    setSearchTerm('')
-    setCurrentPage(0)
-    if (open && (searchTerm || store.data.length === 0)) {
+    if (open) {
+      setSearchTerm('')
+      setCurrentPage(0)
+      // Initial load when dialog opens
+      debouncedSearch('', 0)
+
+      // Auto focus on desktop browsers (Chrome, Firefox, etc.)
+      if (!isMobile) {
+        const timer = setTimeout(() => {
+          searchInputRef.current?.focus()
+        }, 150)
+
+        return () => clearTimeout(timer)
+      }
+    }
+  }, [open, debouncedSearch, isMobile])
+
+  // Separate effect for search term changes
+  useEffect(() => {
+    if (open) {
       debouncedSearch(searchTerm, currentPage)
     }
   }, [searchTerm, currentPage, debouncedSearch, open])
@@ -236,7 +261,12 @@ const CustomerSearchDialog: React.FC<CustomerSearchDialogProps> = ({
       }}
     >
       <DialogTitle>
-        <Box display="flex" alignItems="center" justifyContent="space-between">
+        <Box
+          display="flex"
+          alignItems="center"
+          sx={{ mt: 4 }}
+          justifyContent="space-between"
+        >
           <Typography variant="h6">{title}</Typography>
           <IconButton onClick={handleClose} size="small">
             <Icon icon="mdi:close" />
@@ -245,7 +275,7 @@ const CustomerSearchDialog: React.FC<CustomerSearchDialogProps> = ({
       </DialogTitle>
 
       <DialogContent dividers sx={{ p: isMobile ? 2 : 3 }}>
-        <Box sx={{ mb: 3 }}>
+        <Box sx={{ mb: 3, mt: 5 }}>
           <TextField
             fullWidth
             size={isMobile ? 'medium' : 'small'}
@@ -253,7 +283,7 @@ const CustomerSearchDialog: React.FC<CustomerSearchDialogProps> = ({
             placeholder="Ingrese código o nombre del cliente..."
             value={searchTerm}
             onChange={handleSearchChange}
-            autoFocus={!isMobile} // Avoid auto-focus on mobile to prevent keyboard issues
+            inputRef={searchInputRef}
             InputProps={{
               startAdornment: (
                 <Box sx={{ mr: 1 }}>

@@ -2,7 +2,10 @@
 import { forwardRef, useCallback, useEffect, useState } from 'react'
 
 // ** MUI Imports
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
+import Collapse from '@mui/material/Collapse'
 import Grid from '@mui/material/Grid'
 
 import CardHeader from '@mui/material/CardHeader'
@@ -38,6 +41,7 @@ import {
 
 // ** Custom Components Imports
 import { ViewCustomerInfoDialog } from '@/views/apps/documents/viewCustomerInfoDialog'
+import Icon from 'src/@core/components/icon'
 import AddEditDocumentDialog from 'src/views/apps/documents/add-edit-document'
 import TableHeader from 'src/views/apps/documents/list/TableHeader'
 
@@ -111,6 +115,10 @@ const InvoiceList = () => {
   const [customerDialogOpen, setCustomerDialogOpen] = useState(false)
   const [selectedCustomerCode, setSelectedCustomerCode] = useState<string>('')
 
+  // Filter collapse state (mobile only)
+  const [filtersExpanded, setFiltersExpanded] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
   // Customer view handler
   const handleViewCustomer = (codigoCliente: string) => {
     setSelectedCustomerCode(codigoCliente)
@@ -120,6 +128,10 @@ const InvoiceList = () => {
   const handleCloseCustomerDialog = () => {
     setCustomerDialogOpen(false)
     setSelectedCustomerCode('')
+  }
+
+  const toggleFilters = () => {
+    setFiltersExpanded(!filtersExpanded)
   }
 
   // ** Hooks
@@ -135,6 +147,22 @@ const InvoiceList = () => {
   const PaymentTypeParam = router?.query?.paymentType
   const LocationParam = router?.query?.location
   const { page, pageSize } = router.query
+
+  // Handle mobile detection
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 600)
+    }
+
+    // Initial check
+    handleResize()
+
+    // Add event listener
+    window.addEventListener('resize', handleResize)
+
+    // Cleanup
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   useEffect(() => {
     setPaginationModel({
@@ -393,116 +421,166 @@ const InvoiceList = () => {
 
   return (
     <DatePickerWrapper>
-      <Grid container spacing={6}>
+      <Grid container spacing={{ xs: 3, sm: 6 }}>
         <Grid item xs={12}>
           <Card>
-            <CardHeader title="Documentos" />
-            <CardContent>
-              <Grid container spacing={3}>
-                <Grid item xs={12} sm={4}>
-                  <FormControl fullWidth>
-                    <InputLabel id="order-status-select">
-                      Estado de la orden
-                    </InputLabel>
+            <CardHeader
+              title="Documentos"
+              sx={{
+                '& .MuiCardHeader-title': {
+                  fontSize: { xs: '1.25rem', sm: '1.5rem' },
+                },
+              }}
+            />
+            <CardContent sx={{ p: { xs: 2, sm: 5 } }}>
+              <Box sx={{ display: { xs: 'block', sm: 'none' }, mb: 2 }}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={toggleFilters}
+                  startIcon={
+                    <Icon
+                      icon={
+                        filtersExpanded
+                          ? 'mdi:chevron-up'
+                          : 'mdi:filter-variant'
+                      }
+                    />
+                  }
+                  sx={{
+                    minHeight: 44,
+                    fontSize: '0.875rem',
+                  }}
+                >
+                  {filtersExpanded ? 'Ocultar Filtros' : 'Mostrar Filtros'}
+                </Button>
+              </Box>
+              <Collapse in={!isMobile || filtersExpanded} timeout="auto">
+                <Grid container spacing={3}>
+                  <Grid item xs={12} sm={6} md={4}>
+                    <FormControl fullWidth>
+                      <InputLabel id="order-status-select">
+                        Estado de la orden
+                      </InputLabel>
 
-                    <Select
-                      fullWidth
-                      value={statusValue}
-                      sx={{ mr: 4, mb: 2 }}
-                      label="Estado de la orden"
-                      onChange={handleStatusValue}
-                      labelId="order-status-select"
-                    >
-                      <MenuItem value="">none</MenuItem>
-                      {Object.keys(orderStatusLabels).map((k, index) => {
-                        return (
-                          <MenuItem value={k} key={`${k}-${index}`}>
-                            {orderStatusLabels[k]}
-                          </MenuItem>
-                        )
-                      })}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <PaymentTypeAutocomplete
-                    selectedPaymentType={selectedPaymentTypeParams}
-                    multiple
-                    callBack={handlePaymentTypeValue}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <LocationAutocomplete
-                    selectedLocation={
-                      Array.isArray(LocationParam)
-                        ? LocationParam.map((param) =>
-                            decodeURIComponent(param),
-                          ).join(', ')
-                        : decodeURIComponent(LocationParam ?? '')
-                    }
-                    multiple
-                    callBack={handleLocationValue}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={4}>
-                  <FormControl fullWidth>
-                    <InputLabel id="documentType-status-select">
-                      Tipo Documento
-                    </InputLabel>
-
-                    <Select
-                      fullWidth
-                      value={documentTypeValue}
-                      sx={{ mr: 4, mb: 2 }}
-                      label="Tipo Documento"
-                      onChange={handleDocumentTypeValue}
-                      labelId="documentType-status-select"
-                    >
-                      <MenuItem value="">none</MenuItem>
-                      <MenuItem value={TipoDocumentoEnum.ORDER}>
-                        Pedido
-                      </MenuItem>
-                      <MenuItem value={TipoDocumentoEnum.INVOICE}>
-                        Factura
-                      </MenuItem>
-                      <MenuItem value={TipoDocumentoEnum.QUOTE}>
-                        Cotización
-                      </MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-
-                <Grid xs={12} sm={4}>
-                  <SellerAutocomplete
-                    selectedSellers={selectedSellersParams}
-                    multiple
-                    callBack={handleSellerValue}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <DatePicker
-                    isClearable
-                    selectsRange
-                    monthsShown={2}
-                    endDate={endDateRange}
-                    selected={startDateRange}
-                    startDate={startDateRange}
-                    shouldCloseOnSelect={false}
-                    id="date-range-picker-months"
-                    onChange={handleOnChangeRange}
-                    customInput={
-                      <CustomInput
-                        dates={dates}
-                        setDates={setDates}
-                        label="Fecha"
-                        end={endDateRange as number | Date}
-                        start={startDateRange as number | Date}
+                      <Select
+                        fullWidth
+                        value={statusValue}
+                        sx={{ mb: 2 }}
+                        label="Estado de la orden"
+                        onChange={handleStatusValue}
+                        labelId="order-status-select"
+                      >
+                        <MenuItem value="">none</MenuItem>
+                        {Object.keys(orderStatusLabels).map((k, index) => {
+                          return (
+                            <MenuItem value={k} key={`${k}-${index}`}>
+                              {orderStatusLabels[k]}
+                            </MenuItem>
+                          )
+                        })}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Box sx={{ mb: 2 }}>
+                      <PaymentTypeAutocomplete
+                        selectedPaymentType={selectedPaymentTypeParams}
+                        multiple
+                        callBack={handlePaymentTypeValue}
                       />
-                    }
-                  />
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Box sx={{ mb: 2 }}>
+                      <LocationAutocomplete
+                        selectedLocation={
+                          Array.isArray(LocationParam)
+                            ? LocationParam.map((param) =>
+                                decodeURIComponent(param),
+                              ).join(', ')
+                            : decodeURIComponent(LocationParam ?? '')
+                        }
+                        multiple
+                        callBack={handleLocationValue}
+                      />
+                    </Box>
+                  </Grid>
+
+                  <Grid item xs={12} sm={6} md={4}>
+                    <FormControl fullWidth>
+                      <InputLabel id="documentType-status-select">
+                        Tipo Documento
+                      </InputLabel>
+
+                      <Select
+                        fullWidth
+                        value={documentTypeValue}
+                        sx={{ mb: 2 }}
+                        label="Tipo Documento"
+                        onChange={handleDocumentTypeValue}
+                        labelId="documentType-status-select"
+                      >
+                        <MenuItem value="">none</MenuItem>
+                        <MenuItem value={TipoDocumentoEnum.ORDER}>
+                          Pedido
+                        </MenuItem>
+                        <MenuItem value={TipoDocumentoEnum.INVOICE}>
+                          Factura
+                        </MenuItem>
+                        <MenuItem value={TipoDocumentoEnum.QUOTE}>
+                          Cotización
+                        </MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Box sx={{ mb: 2 }}>
+                      <SellerAutocomplete
+                        selectedSellers={selectedSellersParams}
+                        multiple
+                        callBack={handleSellerValue}
+                      />
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Box sx={{ mb: 2 }}>
+                      <DatePicker
+                        isClearable
+                        selectsRange
+                        monthsShown={2}
+                        endDate={endDateRange}
+                        selected={startDateRange}
+                        startDate={startDateRange}
+                        shouldCloseOnSelect={false}
+                        id="date-range-picker-months"
+                        onChange={handleOnChangeRange}
+                        popperProps={{
+                          strategy: 'fixed',
+                          modifiers: [
+                            {
+                              name: 'preventOverflow',
+                              options: {
+                                boundary: 'viewport',
+                              },
+                            },
+                          ],
+                        }}
+                        customInput={
+                          <CustomInput
+                            dates={dates}
+                            setDates={setDates}
+                            label="Fecha"
+                            end={endDateRange as number | Date}
+                            start={startDateRange as number | Date}
+                          />
+                        }
+                      />
+                    </Box>
+                  </Grid>
                 </Grid>
-              </Grid>
+              </Collapse>
             </CardContent>
           </Card>
         </Grid>
@@ -534,7 +612,48 @@ const InvoiceList = () => {
               getRowId={(row) => row.noPedidoStr}
               paginationMode="server"
               loading={store.isLoading}
-              rowCount={store.totalResults} //
+              rowCount={store.totalResults}
+              sx={{
+                // Mobile-specific styles
+                '& .MuiDataGrid-main': {
+                  minWidth: 0,
+                },
+                '& .MuiDataGrid-columnHeaders': {
+                  minHeight: 56, // Better touch target
+                },
+                '& .MuiDataGrid-row': {
+                  minHeight: 64, // Better touch target for rows
+                },
+                '& .MuiDataGrid-cell': {
+                  padding: { xs: 1, sm: 2 },
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                },
+                '& .MuiDataGrid-columnHeader': {
+                  padding: { xs: 1, sm: 2 },
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                },
+                // Hide columns on mobile
+                '& .MuiDataGrid-columnHeader[data-field="seller"]': {
+                  display: { xs: 'none', md: 'flex' },
+                },
+                '& .MuiDataGrid-cell[data-field="seller"]': {
+                  display: { xs: 'none', md: 'flex' },
+                },
+                '& .MuiDataGrid-columnHeader[data-field="issuedDate"]': {
+                  display: { xs: 'none', sm: 'flex' },
+                },
+                '& .MuiDataGrid-cell[data-field="issuedDate"]': {
+                  display: { xs: 'none', sm: 'flex' },
+                },
+              }}
+              initialState={{
+                columns: {
+                  columnVisibilityModel: {
+                    seller: false, // Hidden by default on small screens
+                    issuedDate: false, // Hidden by default on small screens
+                  },
+                },
+              }}
             />
           </Card>
         </Grid>

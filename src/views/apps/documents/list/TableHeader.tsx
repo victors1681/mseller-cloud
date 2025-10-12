@@ -111,9 +111,11 @@ const TableHeader = (props: TableHeaderProps) => {
         pb: 3,
         width: '100%',
         display: 'flex',
+        flexDirection: { xs: 'column', sm: 'row' },
         flexWrap: 'wrap',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        alignItems: { xs: 'stretch', sm: 'center' },
+        justifyContent: { xs: 'center', sm: 'space-between' },
+        gap: 2,
       }}
     >
       <Select
@@ -121,7 +123,11 @@ const TableHeader = (props: TableHeaderProps) => {
         displayEmpty
         defaultValue={actionValue}
         value={actionValue}
-        sx={{ mr: 4, mb: 2 }}
+        sx={{
+          minWidth: { xs: '100%', sm: 200 },
+          mb: { xs: 2, sm: 0 },
+          minHeight: 44, // Better touch target
+        }}
         disabled={selectedRows && selectedRows.length === 0}
         onChange={handleAction}
       >
@@ -130,11 +136,25 @@ const TableHeader = (props: TableHeaderProps) => {
         <MenuItem value="3">Retener</MenuItem>
         {/* <MenuItem value="delete">Eliminar</MenuItem> */}
       </Select>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          flexWrap: 'wrap',
+          alignItems: { xs: 'stretch', sm: 'center' },
+          gap: 2,
+          width: { xs: '100%', sm: 'auto' },
+        }}
+      >
         <TextField
           size="small"
           value={searchValue}
-          sx={{ mr: 4, mb: 2 }}
+          sx={{
+            minWidth: { xs: '100%', sm: 250 },
+            '& .MuiInputBase-root': {
+              minHeight: 44, // Better touch target
+            },
+          }}
           placeholder={props.placeholder}
           onChange={(e) => handleFilter(e.target.value)}
         />
@@ -142,10 +162,15 @@ const TableHeader = (props: TableHeaderProps) => {
           <ButtonGroup
             variant="contained"
             ref={anchorRef}
-            sx={{ mb: 2 }}
             size="small"
+            sx={{
+              width: { xs: '100%', sm: 'auto' },
+              '& .MuiButton-root': {
+                minHeight: 44, // Better touch target
+              },
+            }}
           >
-            <Button onClick={handleClick}>
+            <Button onClick={handleClick} sx={{ flex: { xs: 1, sm: 'none' } }}>
               Crear {documentTypes[selectedIndex].label}
             </Button>
             <Button size="small" onClick={handleToggle} sx={{ px: 1 }}>

@@ -180,18 +180,19 @@ const EditDocumentDialog: React.FC<EditDocumentDialogProps> = ({ open }) => {
             {/* Button - separate row on small mobile */}
             <Button
               autoFocus
+              variant="outlined"
               color="inherit"
               type="submit"
               form="document-form"
               disabled={store.isLoadingDetails || store.isSubmitting}
-              size={isMobile ? 'medium' : 'large'}
+              size={'small'}
               sx={{
                 minHeight: isMobile ? 40 : 'auto',
                 fontSize: isMobile ? '0.875rem' : '1rem',
                 fontWeight: 600,
                 px: isMobile ? 2 : 3,
                 width: isSmallMobile ? '100%' : 'auto',
-                mt: isSmallMobile ? 0.5 : 0,
+                mt: isSmallMobile ? 1 : 0,
               }}
             >
               {getButtonText()}

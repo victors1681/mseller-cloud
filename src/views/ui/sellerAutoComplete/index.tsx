@@ -1,8 +1,8 @@
 import {
   Autocomplete,
   AutocompleteValue,
-  TextField,
   SxProps,
+  TextField,
   Theme,
 } from '@mui/material'
 import { SyntheticEvent, useEffect, useMemo } from 'react'
@@ -87,7 +87,7 @@ export const SellerAutocomplete = (props: SellerAutocompleteProps) => {
       getOptionLabel={(option) =>
         (option.codigo && `${option.codigo}-${option.label}`) || ''
       }
-      sx={props.sx || { mt: 3, ml: 3 }}
+      sx={props.sx || { mt: 0, ml: 0 }}
       onChange={handleSelection}
       renderInput={(params) => (
         <TextField {...params} label="Vendedores" placeholder="Vendedores" />

@@ -3,8 +3,7 @@ import Link from 'next/link'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
-import { Theme } from '@mui/material/styles'
-import { styled } from '@mui/material/styles'
+import { styled, Theme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import useMediaQuery from '@mui/material/useMediaQuery'
 
@@ -26,8 +25,8 @@ const FooterContent = () => {
         justifyContent: 'space-between',
       }}
     >
-      <Typography sx={{ mr: 2 }}>
-        {`© ${new Date().getFullYear()}, Made with `}
+      <Typography sx={{ mr: 2 }} variant="body2">
+        {`© ${new Date().getFullYear()}, Powered by `}
         {` by `}
         <LinkStyled target="_blank" href="https://mseller.app">
           Mobile Seller LLC
