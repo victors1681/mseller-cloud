@@ -1,31 +1,36 @@
-import React from 'react'
-import { Controller, Control } from 'react-hook-form'
 import {
-  Grid,
   Card,
-  CardHeader,
   CardContent,
-  TextField,
+  CardHeader,
   FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Typography,
   FormControlLabel,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
   Switch,
+  TextField,
+  Typography,
 } from '@mui/material'
-import { TipoDocumentoEnum } from 'src/types/apps/documentTypes'
+import React from 'react'
+import { Control, Controller } from 'react-hook-form'
+import {
+  TipoDocumentoEnum,
+  tipoDocumentoSpanishNames,
+} from 'src/types/apps/documentTypes'
 import { LocationAutocomplete } from 'src/views/ui/locationAutoComplete'
 
 interface DocumentInformationProps {
   control: Control<any>
   setValue: (name: string, value: any) => void
   isSubmitting: boolean
+  isCreateMode?: boolean
 }
 
 export const DocumentInformation: React.FC<DocumentInformationProps> = ({
   control,
   isSubmitting,
+  isCreateMode = false,
 }) => {
   return (
     <Grid item xs={12} md={6}>
@@ -62,16 +67,18 @@ export const DocumentInformation: React.FC<DocumentInformationProps> = ({
                     fullWidth
                     error={!!error}
                     size="small"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || isCreateMode}
                   >
                     <InputLabel>Tipo de Documento</InputLabel>
                     <Select {...field} label="Tipo de Documento">
                       <MenuItem value={TipoDocumentoEnum.INVOICE}>
-                        Factura
+                        {tipoDocumentoSpanishNames[TipoDocumentoEnum.INVOICE]}
                       </MenuItem>
-                      <MenuItem value={TipoDocumentoEnum.ORDER}>Orden</MenuItem>
+                      <MenuItem value={TipoDocumentoEnum.ORDER}>
+                        {tipoDocumentoSpanishNames[TipoDocumentoEnum.ORDER]}
+                      </MenuItem>
                       <MenuItem value={TipoDocumentoEnum.QUOTE}>
-                        Cotización
+                        {tipoDocumentoSpanishNames[TipoDocumentoEnum.QUOTE]}
                       </MenuItem>
                     </Select>
                     {error && (

@@ -1,16 +1,18 @@
-import React, { forwardRef } from 'react'
 import {
-  Dialog,
-  Button,
-  Typography,
-  Box,
   AppBar,
-  Toolbar,
-  Slide,
-  Grid,
+  Box,
+  Button,
   CircularProgress,
+  Dialog,
+  Grid,
+  Slide,
+  Toolbar,
+  Typography,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material'
 import { TransitionProps } from '@mui/material/transitions'
+import React, { forwardRef } from 'react'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -19,18 +21,18 @@ import Icon from 'src/@core/components/icon'
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 
 // ** Components
-import ProductSearchDialog from 'src/views/ui/productsSearchDialog'
 import CustomerSearchDialog from 'src/views/ui/customerSearchDialog'
+import ProductSearchDialog from 'src/views/ui/productsSearchDialog'
 
 // ** Local Components
 import {
-  DocumentHeader,
-  CustomerInformation,
-  DocumentInformation,
-  DetailsTable,
-  DetailForm,
-  OrderSummary,
   AdditionalInformation,
+  CustomerInformation,
+  DetailForm,
+  DetailsTable,
+  DocumentHeader,
+  DocumentInformation,
+  OrderSummary,
 } from './components'
 
 // ** Hooks
@@ -38,6 +40,10 @@ import { useEditDocument } from './hooks'
 import { useFormNavWarning } from './hooks/useFormNavWarning'
 
 // ** Types
+import {
+  TipoDocumentoEnum,
+  tipoDocumentoSpanishNames,
+} from 'src/types/apps/documentTypes'
 import { EditDocumentDialogProps } from './types'
 
 const Transition = forwardRef(function Transition(
@@ -50,6 +56,11 @@ const Transition = forwardRef(function Transition(
 })
 
 const EditDocumentDialog: React.FC<EditDocumentDialogProps> = ({ open }) => {
+  // ** Responsive
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'))
+
   const {
     store,
     detailsData,
@@ -76,6 +87,21 @@ const EditDocumentDialog: React.FC<EditDocumentDialogProps> = ({ open }) => {
   // Protect against accidental navigation with unsaved changes
   useFormNavWarning({ isDirty, isOpen: open })
 
+  // Get button text based on document type
+  const getButtonText = () => {
+    if (store.isLoadingDetails) return 'Cargando...'
+    if (store.isSubmitting) return 'Guardando...'
+
+    if (store.isCreateMode) {
+      const tipoDocumento = mainForm.watch('tipoDocumento') as TipoDocumentoEnum
+      const documentTypeName =
+        tipoDocumentoSpanishNames[tipoDocumento] || 'Documento'
+      return `Crear ${documentTypeName}`
+    }
+
+    return 'Guardar'
+  }
+
   // Handle dialog close with dirty check
   const handleDialogClose = (
     event: {},
@@ -95,61 +121,113 @@ const EditDocumentDialog: React.FC<EditDocumentDialogProps> = ({ open }) => {
     >
       <DatePickerWrapper>
         <AppBar sx={{ position: 'sticky', top: 0, zIndex: 1300 }}>
-          <Toolbar>
-            <Icon
-              icon="mdi:close"
-              onClick={handleClose}
-              style={{
-                cursor: 'pointer',
-                marginRight: '16px',
-                color: 'white',
+          <Toolbar
+            sx={{
+              minHeight: isMobile ? 56 : 64,
+              px: isMobile ? 1 : 3,
+              flexDirection: isSmallMobile ? 'column' : 'row',
+              alignItems: isSmallMobile ? 'stretch' : 'center',
+              gap: isSmallMobile ? 1 : 0,
+              py: isSmallMobile ? 1 : 0,
+            }}
+          >
+            {/* Top row for small mobile */}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                width: isSmallMobile ? '100%' : 'auto',
+                flex: isSmallMobile ? 'none' : 1,
               }}
-            />
-            <Typography
-              sx={{ ml: 2, flex: 1, color: 'white' }}
-              variant="h6"
-              component="div"
             >
-              {store.isCreateMode ? 'Crear Documento' : 'Editar Documento'}
-              {isDirty && (
-                <span style={{ color: '#ffeb3b', marginLeft: '8px' }}>
-                  • (Sin guardar)
-                </span>
-              )}
-            </Typography>
+              <Icon
+                icon="mdi:close"
+                onClick={handleClose}
+                style={{
+                  cursor: 'pointer',
+                  marginRight: isMobile ? '8px' : '16px',
+                  color: 'white',
+                  fontSize: isMobile ? '1.25rem' : '1.5rem',
+                }}
+              />
+              <Typography
+                sx={{
+                  ml: isMobile ? 1 : 2,
+                  flex: 1,
+                  color: 'white',
+                  fontSize: isMobile ? '1rem' : '1.25rem',
+                  fontWeight: 500,
+                }}
+                variant={isMobile ? 'subtitle1' : 'h6'}
+                component="div"
+                noWrap={!isSmallMobile}
+              >
+                {store.isCreateMode ? 'Crear Documento' : 'Editar Documento'}
+                {isDirty && (
+                  <span
+                    style={{
+                      color: '#ffeb3b',
+                      marginLeft: isMobile ? '4px' : '8px',
+                      fontSize: isMobile ? '0.875rem' : '1rem',
+                    }}
+                  >
+                    • (Sin guardar)
+                  </span>
+                )}
+              </Typography>
+            </Box>
+
+            {/* Button - separate row on small mobile */}
             <Button
               autoFocus
               color="inherit"
               type="submit"
               form="document-form"
               disabled={store.isLoadingDetails || store.isSubmitting}
+              size={isMobile ? 'medium' : 'large'}
+              sx={{
+                minHeight: isMobile ? 40 : 'auto',
+                fontSize: isMobile ? '0.875rem' : '1rem',
+                fontWeight: 600,
+                px: isMobile ? 2 : 3,
+                width: isSmallMobile ? '100%' : 'auto',
+                mt: isSmallMobile ? 0.5 : 0,
+              }}
             >
-              {store.isLoadingDetails
-                ? 'Cargando...'
-                : store.isSubmitting
-                ? 'Guardando...'
-                : store.isCreateMode
-                ? 'Crear'
-                : 'Guardar'}
+              {getButtonText()}
             </Button>
           </Toolbar>
         </AppBar>
 
-        <Box sx={{ p: 3, overflow: 'auto' }}>
+        <Box
+          sx={{
+            p: isMobile ? 2 : 3,
+            overflow: 'auto',
+            pb: isMobile ? 3 : 3, // Extra bottom padding for mobile
+          }}
+        >
           {store.isLoadingDetails ? (
             <Box
               sx={{
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                minHeight: 400,
+                minHeight: isMobile ? 300 : 400,
               }}
             >
-              <CircularProgress size={60} />
+              <CircularProgress size={isMobile ? 40 : 60} />
             </Box>
           ) : (
             <form onSubmit={mainForm.handleSubmit(onSubmit)} id="document-form">
-              <Grid container spacing={3} maxWidth="lg" sx={{ mx: 'auto' }}>
+              <Grid
+                container
+                spacing={isMobile ? 2 : 3}
+                maxWidth="lg"
+                sx={{
+                  mx: 'auto',
+                  width: '100%',
+                }}
+              >
                 {/* Document Header */}
                 <DocumentHeader
                   documentData={store.documentEditData}
@@ -158,7 +236,7 @@ const EditDocumentDialog: React.FC<EditDocumentDialogProps> = ({ open }) => {
 
                 {/* Customer and Document Information */}
                 <Grid item xs={12}>
-                  <Grid container spacing={3}>
+                  <Grid container spacing={isMobile ? 2 : 3}>
                     <CustomerInformation
                       control={mainForm.control}
                       setValue={mainForm.setValue as any}
@@ -173,6 +251,7 @@ const EditDocumentDialog: React.FC<EditDocumentDialogProps> = ({ open }) => {
                       control={mainForm.control}
                       setValue={mainForm.setValue as any}
                       isSubmitting={store.isSubmitting}
+                      isCreateMode={store.isCreateMode}
                     />
                   </Grid>
                 </Grid>
@@ -217,7 +296,7 @@ const EditDocumentDialog: React.FC<EditDocumentDialogProps> = ({ open }) => {
         onClose={productSearchDialog.closeDialog}
         onSelectProduct={productSearchDialog.handleSelectProduct}
         title="Buscar y Seleccionar Producto"
-        maxWidth="lg"
+        maxWidth={isMobile ? 'sm' : 'lg'}
       />
 
       {/* Customer Search Dialog */}
@@ -226,7 +305,7 @@ const EditDocumentDialog: React.FC<EditDocumentDialogProps> = ({ open }) => {
         onClose={customerSearchDialog.closeDialog}
         onSelectCustomer={customerSearchDialog.handleSelectCustomer}
         title="Buscar y Seleccionar Cliente"
-        maxWidth="lg"
+        maxWidth={isMobile ? 'sm' : 'lg'}
       />
     </Dialog>
   )

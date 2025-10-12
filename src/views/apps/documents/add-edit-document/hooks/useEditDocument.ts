@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { useDispatch, useSelector } from 'react-redux'
@@ -23,6 +24,7 @@ export const useEditDocument = (open: boolean) => {
   const dispatch = useDispatch<AppDispatch>()
   const store = useSelector((state: RootState) => state.documents)
   const auth = useAuth()
+  const router = useRouter()
 
   // Local state
   const [detailsData, setDetailsData] = useState<DocumentTypeDetail[]>([])
@@ -31,6 +33,9 @@ export const useEditDocument = (open: boolean) => {
   )
   const [selectedCustomerData, setSelectedCustomerData] =
     useState<SelectedCustomerData | null>(null)
+
+  // Get document type from query parameter
+  const createDocumentType = router.query.createDocumentType as string
 
   // Document service
   const documentService = new DocumentService(dispatch)
@@ -45,6 +50,7 @@ export const useEditDocument = (open: boolean) => {
     isLoadingDetails: store.isLoadingDetails,
     setDetailsData,
     setSelectedCustomerData,
+    createDocumentType,
   })
 
   // Product search dialog
@@ -237,6 +243,16 @@ export const useEditDocument = (open: boolean) => {
     // Reset form state after successful operation
     if (result?.success) {
       toast.success('Documento guardado exitosamente')
+
+      // Clear query parameter on successful creation
+      if (store.isCreateMode && createDocumentType) {
+        const { createDocumentType: _, ...queryWithoutDocType } = router.query
+        router.push({
+          pathname: router.pathname,
+          query: queryWithoutDocType,
+        })
+      }
+
       resetFormState()
     }
 
@@ -259,10 +275,19 @@ export const useEditDocument = (open: boolean) => {
       }
     }
 
+    // Clear query parameter when closing
+    if (createDocumentType) {
+      const { createDocumentType: _, ...queryWithoutDocType } = router.query
+      router.push({
+        pathname: router.pathname,
+        query: queryWithoutDocType,
+      })
+    }
+
     // Proceed with closing
     dispatch(toggleEditDocument(null))
     resetFormState()
-  }, [dispatch, resetFormState, detailsData])
+  }, [dispatch, resetFormState, detailsData, createDocumentType, router])
 
   return {
     // Store state

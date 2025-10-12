@@ -1,9 +1,9 @@
+import { yupResolver } from '@hookform/resolvers/yup'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
+import { TipoDocumentoEnum } from 'src/types/apps/documentTypes'
+import { defaultDetailControlValues, defaultDocumentValues } from '../defaults'
 import { documentFormSchema } from '../validation'
-import { defaultDocumentValues, defaultDetailControlValues } from '../defaults'
-import { DocumentType } from 'src/types/apps/documentTypes'
 
 interface UseDocumentFormProps {
   documentEditData: any
@@ -11,6 +11,7 @@ interface UseDocumentFormProps {
   isLoadingDetails: boolean
   setDetailsData: (details: any[]) => void
   setSelectedCustomerData: (data: any) => void
+  createDocumentType?: string
 }
 
 export const useDocumentForm = ({
@@ -19,6 +20,7 @@ export const useDocumentForm = ({
   isLoadingDetails,
   setDetailsData,
   setSelectedCustomerData,
+  createDocumentType,
 }: UseDocumentFormProps) => {
   const mainForm = useForm({
     defaultValues: defaultDocumentValues,
@@ -34,7 +36,14 @@ export const useDocumentForm = ({
   useEffect(() => {
     if (isCreateMode) {
       // Reset to default values for create mode
-      mainForm.reset(defaultDocumentValues)
+      const createValues = {
+        ...defaultDocumentValues,
+        // Set document type from query parameter if available
+        tipoDocumento:
+          (createDocumentType as TipoDocumentoEnum) ||
+          defaultDocumentValues.tipoDocumento,
+      }
+      mainForm.reset(createValues)
       setDetailsData([])
       setSelectedCustomerData(null)
     } else if (documentEditData && !isLoadingDetails) {
@@ -67,6 +76,7 @@ export const useDocumentForm = ({
     documentEditData,
     isLoadingDetails,
     isCreateMode,
+    createDocumentType,
     mainForm.reset,
     setDetailsData,
     setSelectedCustomerData,
