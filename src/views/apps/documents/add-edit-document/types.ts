@@ -1,3 +1,5 @@
+import { CondicionPagoType } from '../../../../types/apps/paymentTypeTypes'
+
 export interface EditDocumentDialogProps {
   open: boolean
 }
@@ -21,4 +23,5 @@ export interface SelectedCustomerData {
     status?: string
     localidad?: number
   }
+  condicionPago: CondicionPagoType
 }

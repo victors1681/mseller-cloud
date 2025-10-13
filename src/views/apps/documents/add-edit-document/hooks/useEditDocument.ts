@@ -96,11 +96,26 @@ export const useEditDocument = (open: boolean) => {
       mainForm.setValue('codigoVendedor', customer.codigoVendedor)
       mainForm.setValue(
         'condicionPago',
-        customer.condicionPago?.condicionPago || '',
+        customer.condicionPago?.condicionPago || customer.condicion || '',
       )
 
       setSelectedCustomerData({
         nombreCliente: customer.nombre,
+        condicionPago: customer.condicionPago
+          ? {
+              condicionPago: customer.condicion || '',
+              id: customer.condicionPago.id,
+              dias: 0,
+              tipo_condicion: '',
+              descripcion: '',
+            }
+          : {
+              id: 0,
+              condicionPago: '',
+              dias: 0,
+              tipo_condicion: '',
+              descripcion: '',
+            },
         vendedor: customer.vendedor
           ? {
               codigo: customer.codigoVendedor,

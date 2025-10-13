@@ -3,26 +3,26 @@ import Grid from '@mui/material/Grid'
 
 // Component Imports
 import ClientHeader from '@/views/apps/clients/add/ClientAddHeader'
-import ClientInformation from '@/views/apps/clients/add/ClientInformation'
 import ClientConfig from '@/views/apps/clients/add/ClientConfig'
+import ClientInformation from '@/views/apps/clients/add/ClientInformation'
 import ClientRoute from '@/views/apps/clients/add/ClientRoute'
 
-import { useForm, FormProvider } from 'react-hook-form'
-import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/store'
+import { FormProvider, useForm } from 'react-hook-form'
+import { useDispatch, useSelector } from 'react-redux'
 
-import { useEffect, useState } from 'react'
-import { fetchCustomer, addOrUpdateCustomer } from '@/store/apps/clients'
-import { useRouter } from 'next/router'
-import LoadingWrapper from '@/views/ui/LoadingWrapper'
+import { addOrUpdateCustomer, fetchCustomer } from '@/store/apps/clients'
 import ClientSettings from '@/views/apps/clients/add/ClientSettings'
+import LoadingWrapper from '@/views/ui/LoadingWrapper'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
 // Import statements
-import * as yup from 'yup'
-import { yupResolver } from '@hookform/resolvers/yup'
 import { useFormNavWarning } from '@/hooks/useFormNavWarning'
 import { CustomerType } from '@/types/apps/customerType'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from 'yup'
 
 // Validation schema
 const clientSchema = yup.object().shape({
@@ -256,7 +256,7 @@ const AddCustomer = ({ id }: AddCustomerProps) => {
             <Grid item xs={12} md={8}>
               <Grid container spacing={6}>
                 <Grid item xs={12}>
-                  <ClientInformation />
+                  <ClientInformation id={id} />
                 </Grid>
 
                 <Grid item xs={6}>

@@ -30,6 +30,7 @@ import Icon from 'src/@core/components/icon'
 import { AppDispatch, RootState } from 'src/store'
 import { fetchData } from 'src/store/apps/clients'
 import { CustomerType } from 'src/types/apps/customerType'
+import AddClientModal from './AddClientModal'
 
 interface CustomerSearchDialogProps {
   open: boolean
@@ -37,6 +38,7 @@ interface CustomerSearchDialogProps {
   onSelectCustomer: (customer: CustomerType) => void
   title?: string
   maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+  showAddNewButton?: boolean
 }
 
 const CustomerSearchDialog: React.FC<CustomerSearchDialogProps> = ({
@@ -45,11 +47,13 @@ const CustomerSearchDialog: React.FC<CustomerSearchDialogProps> = ({
   onSelectCustomer,
   title = 'Buscar Cliente',
   maxWidth = 'md',
+  showAddNewButton = true,
 }) => {
   // ** State
   const [searchTerm, setSearchTerm] = useState('')
   const [currentPage, setCurrentPage] = useState(0)
   const [localLoading, setLocalLoading] = useState(false)
+  const [addClientModalOpen, setAddClientModalOpen] = useState(false)
 
   // ** Refs
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -139,6 +143,23 @@ const CustomerSearchDialog: React.FC<CustomerSearchDialogProps> = ({
   const handleClose = () => {
     setSearchTerm('')
     setCurrentPage(0)
+    onClose()
+  }
+
+  const handleAddNewClient = () => {
+    setAddClientModalOpen(true)
+  }
+
+  const handleCloseAddClientModal = () => {
+    setAddClientModalOpen(false)
+  }
+
+  const handleClientCreated = (newClient: CustomerType) => {
+    setAddClientModalOpen(false)
+    // Refresh the search to include the new client
+    debouncedSearch(searchTerm, 0)
+    // Optionally auto-select the new client
+    onSelectCustomer(newClient)
     onClose()
   }
 
@@ -245,293 +266,379 @@ const CustomerSearchDialog: React.FC<CustomerSearchDialogProps> = ({
   )
 
   return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      maxWidth={isMobile ? false : maxWidth}
-      fullWidth={!isMobile}
-      fullScreen={isSmallMobile}
-      PaperProps={{
-        sx: {
-          minHeight: isMobile ? '100vh' : '40vh',
-          maxHeight: isMobile ? '100vh' : '90vh',
-          width: isMobile ? '100%' : 'auto',
-          margin: isMobile ? 0 : 'auto',
-        },
-      }}
-    >
-      <DialogTitle>
-        <Box
-          display="flex"
-          alignItems="center"
-          sx={{ mt: 4 }}
-          justifyContent="space-between"
-        >
-          <Typography variant="h6">{title}</Typography>
-          <IconButton onClick={handleClose} size="small">
-            <Icon icon="mdi:close" />
-          </IconButton>
-        </Box>
-      </DialogTitle>
-
-      <DialogContent dividers sx={{ p: isMobile ? 2 : 3 }}>
-        <Box sx={{ mb: 3, mt: 5 }}>
-          <TextField
-            fullWidth
-            size={isMobile ? 'medium' : 'small'}
-            label="Buscar por código o nombre"
-            placeholder="Ingrese código o nombre del cliente..."
-            value={searchTerm}
-            onChange={handleSearchChange}
-            inputRef={searchInputRef}
-            InputProps={{
-              startAdornment: (
-                <Box sx={{ mr: 1 }}>
-                  <Icon icon="mdi:magnify" fontSize="1.25rem" />
-                </Box>
-              ),
-              sx: {
-                '& .MuiInputBase-input': {
-                  fontSize: isMobile ? '1rem' : '0.875rem',
-                  padding: isMobile ? '12px 8px' : undefined,
-                },
-              },
-            }}
-            sx={{
-              mb: 2,
-              '& .MuiInputLabel-root': {
-                fontSize: isMobile ? '1rem' : '0.875rem',
-              },
-            }}
-          />
-        </Box>
-
-        {isLoading ? (
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            minHeight="300px"
-          >
-            <CircularProgress size={40} />
-          </Box>
-        ) : (
-          <>
-            {/* Desktop Table View */}
-            {!isMobile ? (
-              <TableContainer component={Paper} sx={{ maxHeight: '400px' }}>
-                <Table stickyHeader size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Código</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Nombre</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>
-                        Teléfono
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Ciudad</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Estado</TableCell>
-                      <TableCell align="center" sx={{ fontWeight: 'bold' }}>
-                        Acciones
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {store.data?.length > 0 ? (
-                      store.data.map((customer) => (
-                        <TableRow
-                          key={customer.codigo}
-                          hover
-                          sx={{
-                            cursor: 'pointer',
-                            '&:hover': { backgroundColor: 'action.hover' },
-                          }}
-                        >
-                          <TableCell>
-                            <Typography
-                              variant="body2"
-                              fontWeight="medium"
-                              sx={{ fontSize: '0.875rem' }}
-                            >
-                              {customer.codigo}
-                            </Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Typography
-                              variant="body2"
-                              sx={{ fontSize: '0.875rem' }}
-                            >
-                              {customer.nombre}
-                            </Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Typography
-                              variant="body2"
-                              sx={{ fontSize: '0.875rem' }}
-                            >
-                              {customer.telefono1 || '-'}
-                            </Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Typography
-                              variant="body2"
-                              sx={{ fontSize: '0.875rem' }}
-                            >
-                              {customer.ciudad || '-'}
-                            </Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Chip
-                              label={customer.status || 'N/A'}
-                              color={
-                                customer.status === 'ACTIVO'
-                                  ? 'success'
-                                  : 'default'
-                              }
-                              size="small"
-                              variant="outlined"
-                            />
-                          </TableCell>
-                          <TableCell align="center">
-                            <Button
-                              variant="contained"
-                              color="primary"
-                              size="small"
-                              onClick={() => handleSelectCustomer(customer)}
-                              startIcon={<Icon icon="mdi:check" />}
-                            >
-                              Seleccionar
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={6} align="center">
-                          <Typography variant="body2" color="textSecondary">
-                            {searchTerm
-                              ? 'No se encontraron clientes con los criterios de búsqueda'
-                              : 'No hay clientes disponibles'}
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            ) : (
-              /* Mobile Card View */
-              <Box
-                sx={{
-                  maxHeight: isSmallMobile ? '60vh' : '400px',
-                  overflow: 'auto',
-                  px: 1,
-                }}
-              >
-                {store.data?.length > 0 ? (
-                  store.data.map((customer) => (
-                    <CustomerCard key={customer.codigo} customer={customer} />
-                  ))
-                ) : (
-                  <Card sx={{ textAlign: 'center', py: 4 }}>
-                    <CardContent>
-                      <Icon
-                        icon="mdi:account-search"
-                        fontSize="3rem"
-                        style={{ color: '#ccc', marginBottom: 16 }}
-                      />
-                      <Typography variant="body2" color="textSecondary">
-                        {searchTerm
-                          ? 'No se encontraron clientes con los criterios de búsqueda'
-                          : 'No hay clientes disponibles'}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                )}
-              </Box>
-            )}
-
-            {/* Pagination */}
-            {store.totalPages > 1 && (
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                mt={2}
-                px={isMobile ? 1 : 0}
-              >
-                <Pagination
-                  count={store.totalPages}
-                  page={currentPage}
-                  onChange={handlePageChange}
-                  color="primary"
-                  size={isMobile ? 'medium' : 'small'}
-                  showFirstButton={!isSmallMobile}
-                  showLastButton={!isSmallMobile}
-                  siblingCount={isMobile ? 1 : 2}
-                  boundaryCount={isSmallMobile ? 1 : 2}
-                  sx={{
-                    '& .MuiPaginationItem-root': {
-                      minWidth: isMobile ? 40 : 32,
-                      height: isMobile ? 40 : 32,
-                      fontSize: isMobile ? '1rem' : '0.875rem',
-                      margin: isMobile ? '0 2px' : '0 1px',
-                    },
-                  }}
-                />
-              </Box>
-            )}
-
-            {/* Results info */}
-            <Box
-              display="flex"
-              flexDirection={isSmallMobile ? 'column' : 'row'}
-              justifyContent="space-between"
-              alignItems={isSmallMobile ? 'center' : 'center'}
-              mt={2}
-              px={1}
-              gap={isSmallMobile ? 1 : 0}
-            >
-              <Typography
-                variant="caption"
-                color="textSecondary"
-                sx={{ fontSize: isMobile ? '0.875rem' : '0.75rem' }}
-              >
-                Mostrando {store.data?.length || 0} de {store.totalResults || 0}{' '}
-                resultados
-              </Typography>
-              <Typography
-                variant="caption"
-                color="textSecondary"
-                sx={{ fontSize: isMobile ? '0.875rem' : '0.75rem' }}
-              >
-                Página {currentPage} de {store.totalPages || 1}
-              </Typography>
-            </Box>
-          </>
-        )}
-      </DialogContent>
-
-      <DialogActions
-        sx={{
-          p: isMobile ? 3 : 2,
-          flexDirection: isSmallMobile ? 'column' : 'row',
-          gap: isSmallMobile ? 1 : 0,
+    <>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        maxWidth={isMobile ? false : maxWidth}
+        fullWidth={!isMobile}
+        fullScreen={isSmallMobile}
+        PaperProps={{
+          sx: {
+            minHeight: isMobile ? '100vh' : '40vh',
+            maxHeight: isMobile ? '100vh' : '90vh',
+            width: isMobile ? '100%' : 'auto',
+            margin: isMobile ? 0 : 'auto',
+          },
         }}
       >
-        <Button
-          onClick={handleClose}
-          color="secondary"
-          size={isMobile ? 'large' : 'medium'}
-          fullWidth={isSmallMobile}
+        <DialogTitle
           sx={{
-            minHeight: isMobile ? 48 : 'auto',
-            fontSize: isMobile ? '1rem' : '0.875rem',
+            p: { xs: 2, sm: 3 },
+            pb: { xs: 1, sm: 2 },
           }}
         >
-          Cancelar
-        </Button>
-      </DialogActions>
-    </Dialog>
+          <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="space-between"
+          >
+            <Typography
+              variant="h6"
+              sx={{
+                fontSize: { xs: '1.125rem', sm: '1.25rem' },
+                fontWeight: { xs: 600, sm: 500 },
+              }}
+            >
+              {title}
+            </Typography>
+            <IconButton
+              onClick={handleClose}
+              size={isMobile ? 'medium' : 'small'}
+              sx={{
+                minHeight: { xs: 44, sm: 'auto' },
+                minWidth: { xs: 44, sm: 'auto' },
+              }}
+            >
+              <Icon icon="mdi:close" />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+
+        <DialogContent
+          dividers
+          sx={{
+            p: { xs: 2, sm: 3 },
+            '& .MuiTextField-root': {
+              '& .MuiInputLabel-root': {
+                fontSize: { xs: '1rem', sm: '0.875rem' },
+              },
+            },
+          }}
+        >
+          <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+            <TextField
+              fullWidth
+              size={isMobile ? 'medium' : 'small'}
+              label="Buscar por código o nombre"
+              placeholder="Ingrese código o nombre del cliente..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              inputRef={searchInputRef}
+              InputProps={{
+                startAdornment: (
+                  <Box sx={{ mr: 1 }}>
+                    <Icon icon="mdi:magnify" fontSize="1.25rem" />
+                  </Box>
+                ),
+                sx: {
+                  '& .MuiInputBase-input': {
+                    fontSize: { xs: '1rem', sm: '0.875rem' },
+                    padding: { xs: '14px 8px', sm: '12px 8px' },
+                  },
+                },
+              }}
+            />
+
+            {/* Add New Client Button */}
+            {showAddNewButton && (
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: isMobile ? 'center' : 'flex-end',
+                  mb: 2,
+                  pt: 2,
+                  width: '100%',
+                }}
+              >
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  onClick={handleAddNewClient}
+                  startIcon={<Icon icon="mdi:plus" />}
+                  size={isMobile ? 'medium' : 'small'}
+                  fullWidth={isSmallMobile}
+                  sx={{
+                    minHeight: { xs: 44, sm: 'auto' },
+                    fontSize: { xs: '0.875rem', sm: '0.75rem' },
+                    fontWeight: 500,
+                  }}
+                >
+                  <Box
+                    component="span"
+                    sx={{ display: { xs: 'none', sm: 'inline' } }}
+                  >
+                    Agregar Nuevo Cliente
+                  </Box>
+                  <Box
+                    component="span"
+                    sx={{ display: { xs: 'inline', sm: 'none' } }}
+                  >
+                    Nuevo Cliente
+                  </Box>
+                </Button>
+              </Box>
+            )}
+          </Box>
+
+          {isLoading ? (
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              minHeight="300px"
+            >
+              <CircularProgress size={40} />
+            </Box>
+          ) : (
+            <>
+              {/* Desktop Table View */}
+              {!isMobile ? (
+                <TableContainer component={Paper} sx={{ maxHeight: '400px' }}>
+                  <Table stickyHeader size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell sx={{ fontWeight: 'bold' }}>
+                          Código
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>
+                          Nombre
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>
+                          Teléfono
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>
+                          Ciudad
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>
+                          Estado
+                        </TableCell>
+                        <TableCell align="center" sx={{ fontWeight: 'bold' }}>
+                          Acciones
+                        </TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {store.data?.length > 0 ? (
+                        store.data.map((customer) => (
+                          <TableRow
+                            key={customer.codigo}
+                            hover
+                            sx={{
+                              cursor: 'pointer',
+                              '&:hover': { backgroundColor: 'action.hover' },
+                            }}
+                          >
+                            <TableCell>
+                              <Typography
+                                variant="body2"
+                                fontWeight="medium"
+                                sx={{ fontSize: '0.875rem' }}
+                              >
+                                {customer.codigo}
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography
+                                variant="body2"
+                                sx={{ fontSize: '0.875rem' }}
+                              >
+                                {customer.nombre}
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography
+                                variant="body2"
+                                sx={{ fontSize: '0.875rem' }}
+                              >
+                                {customer.telefono1 || '-'}
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography
+                                variant="body2"
+                                sx={{ fontSize: '0.875rem' }}
+                              >
+                                {customer.ciudad || '-'}
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Chip
+                                label={customer.status || 'N/A'}
+                                color={
+                                  customer.status === 'ACTIVO'
+                                    ? 'success'
+                                    : 'default'
+                                }
+                                size="small"
+                                variant="outlined"
+                              />
+                            </TableCell>
+                            <TableCell align="center">
+                              <Button
+                                variant="contained"
+                                color="primary"
+                                size="small"
+                                onClick={() => handleSelectCustomer(customer)}
+                                startIcon={<Icon icon="mdi:check" />}
+                              >
+                                Seleccionar
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={6} align="center">
+                            <Typography variant="body2" color="textSecondary">
+                              {searchTerm
+                                ? 'No se encontraron clientes con los criterios de búsqueda'
+                                : 'No hay clientes disponibles'}
+                            </Typography>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              ) : (
+                /* Mobile Card View */
+                <Box
+                  sx={{
+                    maxHeight: isSmallMobile ? '60vh' : '400px',
+                    overflow: 'auto',
+                    px: 1,
+                  }}
+                >
+                  {store.data?.length > 0 ? (
+                    store.data.map((customer) => (
+                      <CustomerCard key={customer.codigo} customer={customer} />
+                    ))
+                  ) : (
+                    <Card sx={{ textAlign: 'center', py: 4 }}>
+                      <CardContent>
+                        <Icon
+                          icon="mdi:account-search"
+                          fontSize="3rem"
+                          style={{ color: '#ccc', marginBottom: 16 }}
+                        />
+                        <Typography variant="body2" color="textSecondary">
+                          {searchTerm
+                            ? 'No se encontraron clientes con los criterios de búsqueda'
+                            : 'No hay clientes disponibles'}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  )}
+                </Box>
+              )}
+
+              {/* Pagination */}
+              {store.totalPages > 1 && (
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  mt={2}
+                  px={isMobile ? 1 : 0}
+                >
+                  <Pagination
+                    count={store.totalPages}
+                    page={currentPage}
+                    onChange={handlePageChange}
+                    color="primary"
+                    size={isMobile ? 'medium' : 'small'}
+                    showFirstButton={!isSmallMobile}
+                    showLastButton={!isSmallMobile}
+                    siblingCount={isMobile ? 1 : 2}
+                    boundaryCount={isSmallMobile ? 1 : 2}
+                    sx={{
+                      '& .MuiPaginationItem-root': {
+                        minWidth: isMobile ? 40 : 32,
+                        height: isMobile ? 40 : 32,
+                        fontSize: isMobile ? '1rem' : '0.875rem',
+                        margin: isMobile ? '0 2px' : '0 1px',
+                      },
+                    }}
+                  />
+                </Box>
+              )}
+
+              {/* Results info */}
+              <Box
+                display="flex"
+                flexDirection={isSmallMobile ? 'column' : 'row'}
+                justifyContent="space-between"
+                alignItems={isSmallMobile ? 'center' : 'center'}
+                mt={2}
+                px={1}
+                gap={isSmallMobile ? 1 : 0}
+              >
+                <Typography
+                  variant="caption"
+                  color="textSecondary"
+                  sx={{ fontSize: isMobile ? '0.875rem' : '0.75rem' }}
+                >
+                  Mostrando {store.data?.length || 0} de{' '}
+                  {store.totalResults || 0} resultados
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="textSecondary"
+                  sx={{ fontSize: isMobile ? '0.875rem' : '0.75rem' }}
+                >
+                  Página {currentPage} de {store.totalPages || 1}
+                </Typography>
+              </Box>
+            </>
+          )}
+        </DialogContent>
+
+        <DialogActions
+          sx={{
+            p: { xs: 3, sm: 2 },
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: { xs: 1, sm: 0 },
+            '& .MuiButton-root': {
+              minHeight: { xs: 48, sm: 'auto' },
+              fontSize: { xs: '1rem', sm: '0.875rem' },
+            },
+          }}
+        >
+          <Button
+            onClick={handleClose}
+            color="secondary"
+            size={isMobile ? 'large' : 'medium'}
+            fullWidth={isSmallMobile}
+            sx={{
+              width: { xs: '100%', sm: 'auto' },
+              fontWeight: { xs: 600, sm: 'normal' },
+              textTransform: { xs: 'none', sm: 'uppercase' },
+              borderRadius: { xs: 2, sm: 1 },
+            }}
+          >
+            Cancelar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Add Client Modal */}
+      <AddClientModal
+        open={addClientModalOpen}
+        onClose={handleCloseAddClientModal}
+        onClientCreated={handleClientCreated}
+      />
+    </>
   )
 }
 

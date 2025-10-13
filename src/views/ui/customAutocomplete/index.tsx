@@ -1,4 +1,4 @@
-import { Autocomplete, TextField, Chip } from '@mui/material'
+import { Autocomplete, Chip, TextField } from '@mui/material'
 import { Control, Controller } from 'react-hook-form'
 
 interface OptionType {
@@ -14,6 +14,7 @@ interface CustomAutocompleteProps {
   label: React.ReactNode | string
   freeSolo?: boolean
   placeholder?: string
+  size?: 'small' | 'medium' | 'large'
 }
 
 const CustomAutocomplete = ({
@@ -23,6 +24,7 @@ const CustomAutocomplete = ({
   label,
   freeSolo = false,
   placeholder,
+  size = 'medium',
 }: CustomAutocompleteProps) => {
   return (
     <Controller
@@ -82,6 +84,7 @@ const CustomAutocomplete = ({
               error={!!error}
               helperText={error?.message}
               variant="outlined"
+              size={size === 'large' ? 'medium' : size} // MUI supports only small and medium
             />
           )}
           filterOptions={(options, params) => {
