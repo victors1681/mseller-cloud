@@ -1,13 +1,13 @@
 // ** React Imports
-import { MouseEvent, useState } from 'react'
+import { useState } from 'react'
 
 // ** MUI Imports
-import Menu from '@mui/material/Menu'
+import { Typography, useMediaQuery } from '@mui/material'
 import Button from '@mui/material/Button'
+import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
+import { useTheme } from '@mui/material/styles'
 import formatCurrency from 'src/utils/formatCurrency'
-import Link from 'next/link'
-import { Typography } from '@mui/material'
 
 interface Props {
   defaultPrice: number
@@ -16,6 +16,10 @@ interface Props {
 const PriceDisplay = ({ prices, defaultPrice }: Props) => {
   // ** State
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+
+  // ** Hooks
+  const theme = useTheme()
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
   const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget)
@@ -33,6 +37,11 @@ const PriceDisplay = ({ prices, defaultPrice }: Props) => {
         aria-haspopup="true"
         size="small"
         onClick={handleClick}
+        sx={{
+          fontSize: isSmallScreen ? '0.75rem' : 'inherit',
+          padding: isSmallScreen ? '2px 6px' : '6px 8px',
+          minWidth: isSmallScreen ? 'auto' : '64px',
+        }}
       >
         {formatCurrency(defaultPrice)}
       </Button>
@@ -45,7 +54,10 @@ const PriceDisplay = ({ prices, defaultPrice }: Props) => {
       >
         {prices.map((p, index) => (
           <MenuItem onClick={handleClose} key={index}>
-            <Typography variant="subtitle2">
+            <Typography
+              variant="subtitle2"
+              sx={{ fontSize: isSmallScreen ? '0.75rem' : 'inherit' }}
+            >
               Precio{index + 2}: {formatCurrency(p)}
             </Typography>
           </MenuItem>

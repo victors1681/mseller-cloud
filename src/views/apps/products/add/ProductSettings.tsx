@@ -1,23 +1,40 @@
 'use client'
 
 // MUI Imports
-import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
-import CardContent from '@mui/material/CardContent'
-import { FormControlLabel, Grid, Switch } from '@mui/material'
-import { Controller, useFormContext } from 'react-hook-form'
 import { RootState } from '@/store'
+import {
+  FormControlLabel,
+  Grid,
+  Switch,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import CardHeader from '@mui/material/CardHeader'
+import { Controller, useFormContext } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 
 const ProductSettings = () => {
-  const { control } = useFormContext()
+  const { control, watch } = useFormContext()
   const store = useSelector((state: RootState) => state.products)
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+
+  // Watch esServicio field
+  const esServicio = watch('esServicio')
 
   return (
     <Card>
-      <CardHeader title="Organización" />
+      <CardHeader
+        title="Configuración"
+        titleTypographyProps={{
+          variant: isMobile ? 'h6' : 'h5',
+        }}
+      />
       <CardContent>
-        <Grid container spacing={3}>
+        <Grid container spacing={isMobile ? 2 : 3}>
           <Grid item xs={12}>
             <Controller
               name="status"
@@ -31,9 +48,17 @@ const ProductSettings = () => {
                       onChange={(e) => {
                         onChange(e.target.checked ? 'A' : 'I')
                       }}
+                      color="primary"
                     />
                   }
-                  label="Status (Activo/Inactivo)"
+                  label={
+                    <Typography
+                      variant={isMobile ? 'body2' : 'body1'}
+                      sx={{ fontWeight: 500 }}
+                    >
+                      Status (Activo/Inactivo)
+                    </Typography>
+                  }
                 />
               )}
             />
@@ -49,31 +74,49 @@ const ProductSettings = () => {
                     <Switch
                       checked={value}
                       onChange={(e) => onChange(e.target.checked)}
+                      color="primary"
                     />
                   }
-                  label="Visible en Tienda"
+                  label={
+                    <Typography
+                      variant={isMobile ? 'body2' : 'body1'}
+                      sx={{ fontWeight: 500 }}
+                    >
+                      Visible en Tienda
+                    </Typography>
+                  }
                 />
               )}
             />
           </Grid>
-          <Grid item xs={12}>
-            <Controller
-              name="promocion"
-              control={control}
-              defaultValue={false}
-              render={({ field: { onChange, value } }) => (
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={value}
-                      onChange={(e) => onChange(e.target.checked)}
-                    />
-                  }
-                  label="En Promoción"
-                />
-              )}
-            />
-          </Grid>
+          {!esServicio && (
+            <Grid item xs={12}>
+              <Controller
+                name="promocion"
+                control={control}
+                defaultValue={false}
+                render={({ field: { onChange, value } }) => (
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={value}
+                        onChange={(e) => onChange(e.target.checked)}
+                        color="primary"
+                      />
+                    }
+                    label={
+                      <Typography
+                        variant={isMobile ? 'body2' : 'body1'}
+                        sx={{ fontWeight: 500 }}
+                      >
+                        En Promoción
+                      </Typography>
+                    }
+                  />
+                )}
+              />
+            </Grid>
+          )}
         </Grid>
       </CardContent>
     </Card>

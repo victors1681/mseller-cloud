@@ -1,24 +1,24 @@
 'use client'
 
 // React Imports
-import { useState } from 'react'
 import type { SyntheticEvent } from 'react'
+import { useState } from 'react'
 
 // MUI Imports
-import Grid from '@mui/material/Grid'
-import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
-import CardContent from '@mui/material/CardContent'
 import Button from '@mui/material/Button'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import CardHeader from '@mui/material/CardHeader'
 import Divider from '@mui/material/Divider'
+import Grid from '@mui/material/Grid'
 
-import Tab from '@mui/material/Tab'
 import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
+import { useTheme } from '@mui/material/styles'
+import Tab from '@mui/material/Tab'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import useMediaQuery from '@mui/material/useMediaQuery'
-import { useTheme } from '@mui/material/styles'
 
 // Component Imports
 //import Link from '@components/Link'
@@ -26,46 +26,83 @@ import CustomTabList from '@core/components/mui/TabList'
 
 // Styled Component Imports
 //import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
-import Icon from 'src/@core/components/icon'
-import { Box, Stack } from '@mui/material'
-import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
+import { Alert, Box, Stack } from '@mui/material'
+import { useFormContext } from 'react-hook-form'
+import { useSelector } from 'react-redux'
+import Icon from 'src/@core/components/icon'
 
 const ProductInventory = () => {
   // States
   const [activeTab, setActiveTab] = useState('restock')
 
   const store = useSelector((state: RootState) => state.products)
+  const { watch } = useFormContext()
 
   // Hooks
   const theme = useTheme()
   const isBelowMdScreen = useMediaQuery(theme.breakpoints.down('md'))
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+
+  // Watch esServicio field
+  const esServicio = watch('esServicio')
 
   const handleChange = (event: SyntheticEvent, value: string) => {
     setActiveTab(value)
   }
 
+  // Don't render inventory component for services
+  if (esServicio) {
+    return (
+      <Card>
+        <CardHeader title="Inventario" />
+        <CardContent>
+          <Alert
+            severity="info"
+            icon={<Icon icon="mdi:information" />}
+            sx={{
+              '& .MuiAlert-message': {
+                fontSize: isMobile ? '0.875rem' : '1rem',
+              },
+            }}
+          >
+            Los servicios no requieren control de inventario
+          </Alert>
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
     <Card>
-      <CardHeader title="Inventario" />
+      <CardHeader
+        title="Inventario"
+        titleTypographyProps={{
+          variant: isMobile ? 'h6' : 'h5',
+        }}
+      />
       <CardContent>
         <TabContext value={activeTab}>
-          <Grid container spacing={6}>
+          <Grid container spacing={isMobile ? 3 : 6}>
             <Grid item xs={12} md={4}>
               <CustomTabList
                 color="primary"
-                orientation="vertical"
+                orientation={isBelowMdScreen ? 'horizontal' : 'vertical'}
                 onChange={handleChange}
                 pill="true"
               >
                 <Tab
                   value="restock"
-                  label="Almacenes"
+                  label={isMobile ? 'Almacenes' : 'Almacenes'}
                   icon={
                     <Icon icon="mdi:box-variant-closed" fontSize="inherit" />
                   }
                   iconPosition="start"
                   className="flex-row justify-start min-is-full text-start"
+                  sx={{
+                    fontSize: isMobile ? '0.75rem' : '0.875rem',
+                    minHeight: isMobile ? '40px' : '48px',
+                  }}
                 />
                 {/* <Tab
                   value="shipping"
@@ -104,27 +141,64 @@ const ProductInventory = () => {
             <Grid item xs={12} md={7}>
               {/* TODO: Future feature handle stocks */}
               <TabPanel value="restock">
-                <Typography className="font-medium">Cantidades</Typography>
-                <Stack direction="row" spacing={2}>
+                <Typography
+                  className="font-medium"
+                  variant={isMobile ? 'body2' : 'body1'}
+                  sx={{ mb: 2 }}
+                >
+                  Cantidades
+                </Typography>
+                <Stack
+                  direction={isMobile ? 'column' : 'row'}
+                  spacing={2}
+                  sx={{ mb: 2 }}
+                >
                   <TextField
                     disabled
                     fullWidth
                     label="Agregar Cantidad"
                     placeholder="100"
-                    size="small"
+                    size={isMobile ? 'medium' : 'small'}
+                    sx={{
+                      '& .MuiInputBase-input': {
+                        fontSize: isMobile ? '0.875rem' : '0.875rem',
+                      },
+                    }}
                   />
                   <Button
                     disabled
                     variant="contained"
                     startIcon={<Icon icon="ri-check-line" />}
+                    size={isMobile ? 'medium' : 'medium'}
+                    sx={{
+                      minWidth: isMobile ? '100%' : '120px',
+                      fontSize: isMobile ? '0.875rem' : '0.875rem',
+                    }}
                   >
                     Confirmar
                   </Button>
                 </Stack>
-                <Box sx={{ m: 2 }}>
-                  <Typography color="text.primary">
+                <Box
+                  sx={{
+                    mt: 2,
+                    p: 2,
+                    bgcolor: 'background.default',
+                    borderRadius: 1,
+                  }}
+                >
+                  <Typography
+                    color="text.primary"
+                    variant={isMobile ? 'body2' : 'body1'}
+                    sx={{ fontWeight: 500 }}
+                  >
                     Inventario actual:{' '}
-                    {store?.productDetail?.existenciaAlmacen1 || 0}
+                    <Typography
+                      component="span"
+                      color="primary.main"
+                      sx={{ fontWeight: 600 }}
+                    >
+                      {store?.productDetail?.existenciaAlmacen1 || 0}
+                    </Typography>
                   </Typography>
                 </Box>
               </TabPanel>

@@ -1,23 +1,29 @@
-import React from 'react'
+import { ProductImageType } from '@/types/apps/productTypes'
 import {
+  Box,
   Card,
-  Grid,
-  CardMedia,
   CardActions,
-  Stack,
-  IconButton,
+  CardMedia,
   Checkbox,
   FormControlLabel,
-  Box,
+  Grid,
+  IconButton,
+  Stack,
+  Typography,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material'
-import Icon from 'src/@core/components/icon'
+import React from 'react'
 import { useFormContext } from 'react-hook-form'
-import { ProductImageType } from '@/types/apps/productTypes'
+import Icon from 'src/@core/components/icon'
 
 const ImageGallery: React.FC = () => {
   const { watch, setValue } = useFormContext<{
     imagenes: ProductImageType[]
   }>()
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'))
 
   const images = watch('imagenes')
 
@@ -46,22 +52,31 @@ const ImageGallery: React.FC = () => {
 
   return (
     <Card>
-      <Grid container spacing={2} sx={{ p: 5 }}>
+      <Grid container spacing={isMobile ? 1.5 : 2} sx={{ p: isMobile ? 3 : 5 }}>
         {images && images.length ? (
           images
             .filter((f) => f.tipoImagen === 'thumbnail')
             .map((item, index) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                <Card sx={{ position: 'relative' }}>
+              <Grid item xs={6} sm={4} md={3} lg={2} key={index}>
+                <Card
+                  sx={{
+                    position: 'relative',
+                    transition: 'transform 0.2s ease-in-out',
+                    '&:hover': {
+                      transform: 'scale(1.02)',
+                    },
+                  }}
+                >
                   <Box sx={{ position: 'relative' }}>
                     <CardMedia
                       component="img"
-                      height="140"
+                      height={isMobile ? '120' : '140'}
                       image={item.rutaPublica}
                       alt={item.titulo || ''}
                       sx={{
                         objectFit: 'cover',
                         opacity: item.esImagenPredeterminada ? 1 : 0.8,
+                        cursor: 'pointer',
                       }}
                     />
                     {item.esImagenPredeterminada && (
@@ -72,47 +87,94 @@ const ImageGallery: React.FC = () => {
                           left: 4,
                           backgroundColor: 'primary.main',
                           color: 'white',
-                          padding: '2px 8px',
+                          padding: isMobile ? '1px 6px' : '2px 8px',
                           borderRadius: 1,
-                          fontSize: '0.75rem',
+                          fontSize: isMobile ? '0.625rem' : '0.75rem',
+                          fontWeight: 500,
                         }}
                       >
-                        Predeterminada
+                        Principal
                       </Box>
                     )}
                   </Box>
-                  <CardActions sx={{ justifyContent: 'space-between' }}>
+                  <CardActions
+                    sx={{
+                      justifyContent: 'space-between',
+                      p: isMobile ? 1 : 1.5,
+                      minHeight: isMobile ? '48px' : '56px',
+                    }}
+                  >
                     <FormControlLabel
                       control={
                         <Checkbox
                           checked={item.esImagenPredeterminada}
                           onChange={() => handleDefaultChange(item.idObjeto)}
-                          size="small"
+                          size={isMobile ? 'small' : 'small'}
                         />
                       }
-                      label="Principal"
-                    />
-                    <IconButton
-                      size="small"
-                      color="secondary"
-                      onClick={() => handleRemove(index)}
+                      label={
+                        <Typography
+                          variant={isMobile ? 'caption' : 'body2'}
+                          sx={{ fontSize: isMobile ? '0.7rem' : '0.875rem' }}
+                        >
+                          Principal
+                        </Typography>
+                      }
                       sx={{
-                        backgroundColor: 'rgba(255, 255, 255, 0.7)',
-                        '&:hover': {
-                          backgroundColor: 'rgba(255, 255, 255, 1)',
+                        '& .MuiFormControlLabel-label': {
+                          fontSize: isMobile ? '0.7rem' : '0.875rem',
                         },
                       }}
+                    />
+                    <IconButton
+                      size={isMobile ? 'small' : 'small'}
+                      color="error"
+                      onClick={() => handleRemove(index)}
+                      sx={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        border: '1px solid rgba(0, 0, 0, 0.1)',
+                        '&:hover': {
+                          backgroundColor: 'rgba(255, 255, 255, 1)',
+                          transform: 'scale(1.1)',
+                        },
+                        width: isMobile ? 28 : 32,
+                        height: isMobile ? 28 : 32,
+                      }}
                     >
-                      <Icon icon={'mdi:close-circle'} />
+                      <Icon
+                        icon={'mdi:close-circle'}
+                        fontSize={isMobile ? 16 : 18}
+                      />
                     </IconButton>
                   </CardActions>
                 </Card>
               </Grid>
             ))
         ) : (
-          <Stack textAlign="center" width={'100%'}>
-            Este producto no cuenta con imagenes
-          </Stack>
+          <Grid item xs={12}>
+            <Stack
+              textAlign="center"
+              width={'100%'}
+              sx={{
+                py: isMobile ? 3 : 4,
+                minHeight: isMobile ? '120px' : '160px',
+                justifyContent: 'center',
+              }}
+            >
+              <Icon
+                icon="mdi:image-outline"
+                fontSize={isMobile ? 48 : 64}
+                style={{ opacity: 0.5, marginBottom: 16 }}
+              />
+              <Typography
+                variant={isMobile ? 'body2' : 'body1'}
+                color="text.secondary"
+                sx={{ fontWeight: 500 }}
+              >
+                Este producto no cuenta con imágenes
+              </Typography>
+            </Stack>
+          </Grid>
         )}
       </Grid>
     </Card>

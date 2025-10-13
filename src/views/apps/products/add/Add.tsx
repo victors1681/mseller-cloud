@@ -1,46 +1,59 @@
 // MUI Imports
+import { useMediaQuery, useTheme } from '@mui/material'
 import Grid from '@mui/material/Grid'
 
 // Component Imports
-import ProductAddHeader from 'src/views/apps/products/add/ProductAddHeader'
-import ProductInformation from 'src/views/apps/products/add/ProductInformation'
-import ProductImage from 'src/views/apps/products/add/ProductImage'
-import ProductInventory from 'src/views/apps/products/add/ProductInventory'
-import ProductPricing from 'src/views/apps/products/add/ProductPricing'
-import ProductOrganize from 'src/views/apps/products/add/ProductOrganize'
 import DropzoneWrapper from '@/@core/styles/libs/react-dropzone'
 import ImageGallery from '@/views/apps/products/add/ImageGallery'
+import ProductAddHeader from 'src/views/apps/products/add/ProductAddHeader'
+import ProductImage from 'src/views/apps/products/add/ProductImage'
+import ProductInformation from 'src/views/apps/products/add/ProductInformation'
+import ProductInventory from 'src/views/apps/products/add/ProductInventory'
+import ProductOrganize from 'src/views/apps/products/add/ProductOrganize'
+import ProductPricing from 'src/views/apps/products/add/ProductPricing'
 
-import { useForm, FormProvider } from 'react-hook-form'
-import { ProductType } from '@/types/apps/productTypes'
-import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/store'
+import { ProductType } from '@/types/apps/productTypes'
+import { FormProvider, useForm } from 'react-hook-form'
+import { useDispatch, useSelector } from 'react-redux'
 
-import { useEffect, useState } from 'react'
 import { fetchProductDetail, updateProduct } from '@/store/apps/products'
-import { useRouter } from 'next/router'
-import LoadingWrapper from '@/views/ui/LoadingWrapper'
 import ProductSettings from '@/views/apps/products/add/ProductSettings'
+import LoadingWrapper from '@/views/ui/LoadingWrapper'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
 // Import statements
-import * as yup from 'yup'
-import { yupResolver } from '@hookform/resolvers/yup'
 import { useFormNavWarning } from '@/hooks/useFormNavWarning'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from 'yup'
 
 // Validation schema
 const productSchema = yup.object().shape({
   // Basic Information
   codigo: yup.string().required('Código es requerido'),
-  codigoBarra: yup.string().optional(),
+  codigoBarra: yup.string().when('esServicio', {
+    is: false,
+    then: (schema) => schema.optional(),
+    otherwise: (schema) => schema.optional(),
+  }),
   nombre: yup.string().required('Nombre es requerido'),
   descripcion: yup.string().optional().nullable(),
+  esServicio: yup.boolean(),
 
-  // Organization
-  area: yup.string(),
+  // Organization - conditional based on esServicio
+  area: yup.string().when('esServicio', {
+    is: false,
+    then: (schema) => schema,
+    otherwise: (schema) => schema.optional(),
+  }),
   iDArea: yup.number().nullable(),
-  // grupoId: yup.string().optional(),
-  departamento: yup.string().optional(),
+  departamento: yup.string().when('esServicio', {
+    is: false,
+    then: (schema) => schema.optional(),
+    otherwise: (schema) => schema.optional(),
+  }),
 
   // Pricing
   precio1: yup.number().min(0, 'Precio debe ser mayor o igual a 0'),
@@ -50,8 +63,15 @@ const productSchema = yup.object().shape({
   precio5: yup.number().min(0, 'Precio debe ser mayor o igual a 0'),
   costo: yup.number().min(0, 'Costo debe ser mayor o igual a 0'),
 
-  // Inventory
-  existenciaAlmacen1: yup.number().min(0).optional(),
+  // Inventory - conditional based on esServicio
+  existenciaAlmacen1: yup
+    .number()
+    .min(0)
+    .when('esServicio', {
+      is: false,
+      then: (schema) => schema.optional(),
+      otherwise: (schema) => schema.optional(),
+    }),
   existenciaAlmacen2: yup.number().min(0).optional(),
   existenciaAlmacen3: yup.number().min(0).optional(),
   existenciaAlmacen4: yup.number().min(0).optional(),
@@ -61,7 +81,11 @@ const productSchema = yup.object().shape({
 
   // Product Details
   unidad: yup.string().required('Unidad es requerida'),
-  empaque: yup.string().optional(),
+  empaque: yup.string().when('esServicio', {
+    is: false,
+    then: (schema) => schema.optional(),
+    otherwise: (schema) => schema.optional(),
+  }),
   impuesto: yup.number().min(0),
   factor: yup.number().min(1, 'Factor debe ser mayor o igual a 1').required(),
   iSC: yup.number().min(0).optional(),
@@ -70,7 +94,11 @@ const productSchema = yup.object().shape({
   tipoImpuesto: yup.string().optional(),
   apartado: yup.number().min(0),
   status: yup.string().oneOf(['A', 'I']).required(),
-  promocion: yup.boolean(),
+  promocion: yup.boolean().when('esServicio', {
+    is: false,
+    then: (schema) => schema,
+    otherwise: (schema) => schema.optional(),
+  }),
   visibleTienda: yup.boolean(),
 
   // Images
@@ -82,6 +110,10 @@ interface AddProductProps {
 }
 
 const AddProduct = ({ id }: AddProductProps) => {
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'))
+
   // Initialize form
   const methods = useForm<ProductType>({
     defaultValues: {
@@ -90,6 +122,7 @@ const AddProduct = ({ id }: AddProductProps) => {
       codigoBarra: '',
       nombre: '',
       descripcion: '',
+      esServicio: false,
 
       // Organization
       area: '',
@@ -184,12 +217,14 @@ const AddProduct = ({ id }: AddProductProps) => {
     <LoadingWrapper isLoading={store.isLoading}>
       <FormProvider {...methods}>
         <form onSubmit={methods.handleSubmit(onSubmit)}>
-          <Grid container spacing={6}>
+          <Grid container spacing={isMobile ? 3 : isTablet ? 4 : 6}>
             <Grid item xs={12}>
               <ProductAddHeader id={id} />
             </Grid>
-            <Grid item xs={12} md={8}>
-              <Grid container spacing={6}>
+
+            {/* Main content - responsive layout */}
+            <Grid item xs={12} md={8} lg={8}>
+              <Grid container spacing={isMobile ? 3 : isTablet ? 4 : 6}>
                 <Grid item xs={12}>
                   <ProductInformation />
                 </Grid>
@@ -206,16 +241,17 @@ const AddProduct = ({ id }: AddProductProps) => {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item xs={12} md={4}>
-              <Grid container spacing={6}>
-                <Grid item xs={12}>
+
+            {/* Sidebar - responsive layout */}
+            <Grid item xs={12} md={4} lg={4}>
+              <Grid container spacing={isMobile ? 3 : isTablet ? 4 : 6}>
+                <Grid item xs={12} sm={isMobile ? 12 : 6} md={12}>
                   <ProductPricing />
                 </Grid>
-
-                <Grid item xs={12}>
+                <Grid item xs={12} sm={isMobile ? 12 : 6} md={12}>
                   <ProductOrganize />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs={12} sm={isMobile ? 12 : 6} md={12}>
                   <ProductSettings />
                 </Grid>
               </Grid>

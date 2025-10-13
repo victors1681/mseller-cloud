@@ -1,8 +1,7 @@
 // MUI Imports
 import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
-import Checkbox from '@mui/material/Checkbox'
+import CardHeader from '@mui/material/CardHeader'
 import Divider from '@mui/material/Divider'
 import Typography from '@mui/material/Typography'
 import { useSelector } from 'react-redux'
@@ -10,13 +9,15 @@ import { RootState } from 'src/store'
 
 // Component Imports
 
-import { Autocomplete, Grid, TextField } from '@mui/material'
-import { Controller, useFormContext } from 'react-hook-form'
-import { useMemo } from 'react'
 import CustomAutocomplete from '@/views/ui/customAutocomplete'
+import { Grid, TextField, useMediaQuery, useTheme } from '@mui/material'
+import { useMemo } from 'react'
+import { Controller, useFormContext } from 'react-hook-form'
 
 const ProductPricing = () => {
   const { register, control } = useFormContext()
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
   const store = useSelector((state: RootState) => state.products)
 
@@ -29,9 +30,14 @@ const ProductPricing = () => {
 
   return (
     <Card>
-      <CardHeader title="Precios" />
+      <CardHeader
+        title="Precios"
+        titleTypographyProps={{
+          variant: isMobile ? 'h6' : 'h5',
+        }}
+      />
       <CardContent>
-        <Grid container spacing={5}>
+        <Grid container spacing={isMobile ? 3 : 5}>
           <Grid item xs={12} sm={6}>
             <Controller
               name="precio1"
@@ -45,6 +51,12 @@ const ProductPricing = () => {
                   type="number"
                   error={!!error}
                   helperText={error?.message}
+                  size={isMobile ? 'medium' : 'medium'}
+                  sx={{
+                    '& .MuiInputBase-input': {
+                      fontSize: isMobile ? '0.875rem' : '1rem',
+                    },
+                  }}
                 />
               )}
             />
@@ -62,6 +74,12 @@ const ProductPricing = () => {
                   type="number"
                   error={!!error}
                   helperText={error?.message}
+                  size={isMobile ? 'medium' : 'medium'}
+                  sx={{
+                    '& .MuiInputBase-input': {
+                      fontSize: isMobile ? '0.875rem' : '1rem',
+                    },
+                  }}
                 />
               )}
             />
@@ -79,6 +97,12 @@ const ProductPricing = () => {
                   type="number"
                   error={!!error}
                   helperText={error?.message}
+                  size={isMobile ? 'medium' : 'medium'}
+                  sx={{
+                    '& .MuiInputBase-input': {
+                      fontSize: isMobile ? '0.875rem' : '1rem',
+                    },
+                  }}
                 />
               )}
             />
@@ -96,6 +120,12 @@ const ProductPricing = () => {
                   type="number"
                   error={!!error}
                   helperText={error?.message}
+                  size={isMobile ? 'medium' : 'medium'}
+                  sx={{
+                    '& .MuiInputBase-input': {
+                      fontSize: isMobile ? '0.875rem' : '1rem',
+                    },
+                  }}
                 />
               )}
             />
@@ -113,6 +143,12 @@ const ProductPricing = () => {
                   type="number"
                   error={!!error}
                   helperText={error?.message}
+                  size={isMobile ? 'medium' : 'medium'}
+                  sx={{
+                    '& .MuiInputBase-input': {
+                      fontSize: isMobile ? '0.875rem' : '1rem',
+                    },
+                  }}
                 />
               )}
             />
@@ -130,12 +166,26 @@ const ProductPricing = () => {
                   type="number"
                   error={!!error}
                   helperText={error?.message}
+                  size={isMobile ? 'medium' : 'medium'}
+                  sx={{
+                    '& .MuiInputBase-input': {
+                      fontSize: isMobile ? '0.875rem' : '1rem',
+                    },
+                  }}
                 />
               )}
             />
           </Grid>
           <Grid item xs={12}>
-            <Divider>Impuestos</Divider>
+            <Divider sx={{ my: isMobile ? 1 : 2 }}>
+              <Typography
+                variant={isMobile ? 'body2' : 'body1'}
+                color="text.secondary"
+                sx={{ fontWeight: 500 }}
+              >
+                Impuestos
+              </Typography>
+            </Divider>
           </Grid>
           <Grid item xs={12} sm={6}>
             <Controller
@@ -150,6 +200,12 @@ const ProductPricing = () => {
                   type="number"
                   error={!!error}
                   helperText={error?.message}
+                  size={isMobile ? 'medium' : 'medium'}
+                  sx={{
+                    '& .MuiInputBase-input': {
+                      fontSize: isMobile ? '0.875rem' : '1rem',
+                    },
+                  }}
                 />
               )}
             />

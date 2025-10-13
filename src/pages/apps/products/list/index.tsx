@@ -1,26 +1,23 @@
 // ** React Imports
-import { useState, useEffect, forwardRef, useCallback } from 'react'
+import { forwardRef, useCallback, useEffect, useState } from 'react'
 
 // ** Next Import
 import Link from 'next/link'
 
 // ** MUI Imports
-import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
-import Card from '@mui/material/Card'
-import Tooltip from '@mui/material/Tooltip'
-import { styled } from '@mui/material/styles'
-import MenuItem from '@mui/material/MenuItem'
-import TextField from '@mui/material/TextField'
-import CardHeader from '@mui/material/CardHeader'
-import IconButton from '@mui/material/IconButton'
-import InputLabel from '@mui/material/InputLabel'
-import Typography from '@mui/material/Typography'
-import FormControl from '@mui/material/FormControl'
-import CardContent from '@mui/material/CardContent'
-import Select, { SelectChangeEvent } from '@mui/material/Select'
-import { DataGrid, GridColDef, GridRowId } from '@mui/x-data-grid'
 import { debounce } from '@mui/material'
+import Box from '@mui/material/Box'
+import Card from '@mui/material/Card'
+import CardHeader from '@mui/material/CardHeader'
+import Grid from '@mui/material/Grid'
+import IconButton from '@mui/material/IconButton'
+import { SelectChangeEvent } from '@mui/material/Select'
+import TextField from '@mui/material/TextField'
+import Tooltip from '@mui/material/Tooltip'
+import Typography from '@mui/material/Typography'
+import { styled, useTheme } from '@mui/material/styles'
+import useMediaQuery from '@mui/material/useMediaQuery'
+import { DataGrid, GridColDef, GridRowId } from '@mui/x-data-grid'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
@@ -29,17 +26,17 @@ import format from 'date-fns/format'
 
 // ** Store & Actions Imports
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchData, deleteProduct } from 'src/store/apps/products'
+import { deleteProduct, fetchData } from 'src/store/apps/products'
 
 // ** Types Imports
-import { RootState, AppDispatch } from 'src/store'
+import { AppDispatch, RootState } from 'src/store'
 import TableHeader from 'src/views/apps/products/list/TableHeader'
 
 // ** Styled Components
+import OptionsMenu from 'src/@core/components/option-menu'
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import { ProductType } from 'src/types/apps/productTypes'
 import PriceDisplay from 'src/views/apps/products/list/PriceDisplay'
-import OptionsMenu from 'src/@core/components/option-menu'
 
 interface CustomInputProps {
   dates: Date[]
@@ -205,6 +202,9 @@ const InvoiceList = () => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
   const store = useSelector((state: RootState) => state.products)
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
   //Initial Load
   useEffect(() => {
@@ -265,61 +265,233 @@ const InvoiceList = () => {
     setStatusValue(e.target.value)
   }
 
-  const columns: GridColDef[] = [
-    ...defaultColumns,
-    {
-      flex: 0.1,
-      minWidth: 130,
+  // Create responsive columns based on screen size
+  const getColumns = (): GridColDef[] => {
+    const baseColumns: GridColDef[] = []
+
+    // Always show: ID, Name, Price, Actions
+    baseColumns.push({
+      flex: isSmallScreen ? 0.15 : 0.1,
+      field: 'id',
+      minWidth: isSmallScreen ? 60 : 80,
+      headerName: 'Código',
+      renderCell: ({ row }: CellType) => (
+        <Typography
+          variant="body2"
+          sx={{ fontSize: isSmallScreen ? '0.75rem' : 'inherit' }}
+        >
+          {row.codigo}
+        </Typography>
+      ),
+    })
+
+    baseColumns.push({
+      flex: isSmallScreen ? 0.45 : 0.35,
+      field: 'name',
+      minWidth: isSmallScreen ? 200 : 300,
+      headerName: 'Producto',
+      renderCell: ({ row }: CellType) => {
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Typography
+                noWrap
+                variant="body2"
+                sx={{
+                  color: 'text.primary',
+                  fontWeight: 600,
+                  textTransform: 'capitalize',
+                  fontSize: isSmallScreen ? '0.75rem' : 'inherit',
+                }}
+              >
+                {row.nombre}
+              </Typography>
+              <Typography
+                noWrap
+                variant="caption"
+                sx={{ fontSize: isSmallScreen ? '0.6rem' : 'inherit' }}
+              >
+                {row.area} - {row.iDArea} | {row.unidad} | Imp: {row.impuesto}%
+              </Typography>
+              {isSmallScreen && (
+                <Typography
+                  variant="caption"
+                  sx={{ fontSize: '0.6rem', color: 'text.secondary' }}
+                >
+                  Empaque: {row.empaque} | Factor: {row.factor}
+                </Typography>
+              )}
+            </Box>
+          </Box>
+        )
+      },
+    })
+
+    // Show unit, pack, tax, and factor only on larger screens
+    if (!isMobile) {
+      baseColumns.push({
+        flex: 0.15,
+        minWidth: 130,
+        field: 'unit',
+        headerName: 'Un',
+        renderCell: ({ row }: CellType) => (
+          <Typography variant="body2">{row.unidad}</Typography>
+        ),
+      })
+
+      baseColumns.push({
+        flex: 0.15,
+        minWidth: 130,
+        field: 'pack',
+        headerName: 'Empaque',
+        renderCell: ({ row }: CellType) => (
+          <Typography variant="body2">{row.empaque}</Typography>
+        ),
+      })
+    }
+
+    // Always show price
+    baseColumns.push({
+      flex: isSmallScreen ? 0.25 : 0.2,
+      field: 'price',
+      minWidth: isSmallScreen ? 120 : 200,
+      headerName: 'Precios',
+      renderCell: ({ row }: CellType) => {
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              <PriceDisplay
+                defaultPrice={row.precio1}
+                prices={[row.precio2, row.precio3, row.precio4, row.precio5]}
+              />
+            </Box>
+          </Box>
+        )
+      },
+    })
+
+    // Show tax and factor only on larger screens
+    if (!isMobile) {
+      baseColumns.push({
+        flex: 0.1,
+        minWidth: 90,
+        field: 'stock',
+        headerName: 'Impuesto',
+        renderCell: ({ row }: CellType) => (
+          <Typography variant="body2">{row.impuesto}%</Typography>
+        ),
+      })
+
+      baseColumns.push({
+        flex: 0.1,
+        minWidth: 80,
+        field: 'fact',
+        headerName: 'Factor',
+        renderCell: ({ row }: CellType) => (
+          <Typography variant="body2">{row.factor}</Typography>
+        ),
+      })
+    }
+
+    // Always show status and actions
+    baseColumns.push({
+      flex: 0.05,
+      field: 'active',
+      headerName: '',
+      renderCell: ({ row }: CellType) =>
+        row.status == 'A' ? (
+          <Icon
+            icon="lets-icons:check-fill"
+            color="#56ca00"
+            fontSize={isSmallScreen ? 16 : 20}
+          />
+        ) : (
+          <Icon
+            icon="bxs:x-circle"
+            color="#ff4b51"
+            fontSize={isSmallScreen ? 16 : 20}
+          />
+        ),
+    })
+
+    baseColumns.push({
+      flex: isSmallScreen ? 0.15 : 0.1,
+      minWidth: isSmallScreen ? 80 : 130,
       sortable: false,
       field: 'actions',
-      headerName: 'Actions',
+      headerName: 'Acciones',
       renderCell: ({ row }: CellType) => (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Tooltip title="Aprobar">
+          <Tooltip title="Editar">
             <IconButton
               size="small"
               component={Link}
               href={`/apps/products/add/${row.codigo}`}
             >
-              <Icon icon="tabler:edit" fontSize={20} />
+              <Icon icon="tabler:edit" fontSize={isSmallScreen ? 16 : 20} />
             </IconButton>
           </Tooltip>
-          <Tooltip title="View">
-            <IconButton
-              size="small"
-              disabled
-              onClick={() => dispatch(deleteProduct(row.codigo))}
-            >
-              <Icon icon="mdi:eye-outline" fontSize={20} />
-            </IconButton>
-          </Tooltip>
+          {!isSmallScreen && (
+            <Tooltip title="Ver">
+              <IconButton
+                size="small"
+                disabled
+                onClick={() => dispatch(deleteProduct(row.codigo))}
+              >
+                <Icon icon="mdi:eye-outline" fontSize={20} />
+              </IconButton>
+            </Tooltip>
+          )}
         </Box>
       ),
-    },
-  ]
+    })
+
+    return baseColumns
+  }
+
+  const columns = getColumns()
 
   return (
     <DatePickerWrapper>
-      <Grid container spacing={6}>
+      <Grid container spacing={isMobile ? 3 : 6}>
         <Grid item xs={12}>
           <Card>
             <CardHeader
               title="Productos"
+              sx={{
+                padding: isSmallScreen ? '16px' : '24px',
+                '& .MuiCardHeader-title': {
+                  fontSize: isSmallScreen ? '1.25rem' : '1.5rem',
+                },
+              }}
               action={
                 <OptionsMenu
                   options={[
                     {
                       text: 'Importar',
-                      icon: <Icon icon="tabler:file-import" fontSize={20} />,
+                      icon: (
+                        <Icon
+                          icon="tabler:file-import"
+                          fontSize={isSmallScreen ? 18 : 20}
+                        />
+                      ),
                     },
                     {
                       text: 'Exportar',
-                      icon: <Icon icon="clarity:export-line" fontSize={20} />,
+                      icon: (
+                        <Icon
+                          icon="clarity:export-line"
+                          fontSize={isSmallScreen ? 18 : 20}
+                        />
+                      ),
                     },
                   ]}
                   iconButtonProps={{
-                    size: 'small',
-                    sx: { color: 'text.primary' },
+                    size: isSmallScreen ? 'small' : 'medium',
+                    sx: {
+                      color: 'text.primary',
+                      padding: isSmallScreen ? '4px' : '8px',
+                    },
                   }}
                 />
               }
@@ -346,7 +518,22 @@ const InvoiceList = () => {
               getRowId={(row) => row.codigo}
               paginationMode="server"
               loading={store.isLoading}
-              rowCount={store.totalResults} //
+              rowCount={store.totalResults}
+              sx={{
+                '& .MuiDataGrid-columnHeaders': {
+                  fontSize: isSmallScreen ? '0.75rem' : 'inherit',
+                },
+                '& .MuiDataGrid-cell': {
+                  fontSize: isSmallScreen ? '0.75rem' : 'inherit',
+                  padding: isSmallScreen ? '4px 8px' : '8px 16px',
+                },
+                '& .MuiDataGrid-row': {
+                  minHeight: isSmallScreen ? '40px !important' : 'auto',
+                },
+                '& .MuiDataGrid-columnHeader': {
+                  padding: isSmallScreen ? '4px 8px' : '8px 16px',
+                },
+              }}
             />
           </Card>
         </Grid>
