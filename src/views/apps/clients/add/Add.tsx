@@ -1,5 +1,7 @@
 // MUI Imports
 import Grid from '@mui/material/Grid'
+import { useTheme } from '@mui/material/styles'
+import useMediaQuery from '@mui/material/useMediaQuery'
 
 // Component Imports
 import ClientHeader from '@/views/apps/clients/add/ClientAddHeader'
@@ -146,6 +148,10 @@ interface AddCustomerProps {
 }
 
 const AddCustomer = ({ id }: AddCustomerProps) => {
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'))
+
   // Initialize form
   const methods = useForm<CustomerType>({
     defaultValues: {
@@ -249,27 +255,40 @@ const AddCustomer = ({ id }: AddCustomerProps) => {
     <LoadingWrapper isLoading={store.isLoading}>
       <FormProvider {...methods}>
         <form onSubmit={methods.handleSubmit(onSubmit)}>
-          <Grid container spacing={6}>
+          <Grid
+            container
+            spacing={{ xs: 3, sm: 4, md: 6 }}
+            sx={{
+              px: { xs: 1, sm: 2 },
+              maxWidth: '100%',
+              margin: 0,
+              width: '100%',
+            }}
+          >
             <Grid item xs={12}>
               <ClientHeader id={id} />
             </Grid>
-            <Grid item xs={12} md={8}>
-              <Grid container spacing={6}>
+
+            {/* Main Content - Stack on mobile, side-by-side on desktop */}
+            <Grid item xs={12} lg={8}>
+              <Grid container spacing={{ xs: 3, sm: 4, md: 6 }}>
                 <Grid item xs={12}>
                   <ClientInformation id={id} />
                 </Grid>
 
-                <Grid item xs={6}>
+                {/* Route and Settings - Stack on mobile */}
+                <Grid item xs={12} sm={6}>
                   <ClientRoute />
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={12} sm={6}>
                   <ClientSettings />
                 </Grid>
               </Grid>
             </Grid>
 
-            <Grid item xs={12} md={4}>
-              <Grid container spacing={6}>
+            {/* Config Section - Full width on mobile, sidebar on desktop */}
+            <Grid item xs={12} lg={4}>
+              <Grid container spacing={{ xs: 3, sm: 4, md: 6 }}>
                 <Grid item xs={12}>
                   <ClientConfig />
                 </Grid>

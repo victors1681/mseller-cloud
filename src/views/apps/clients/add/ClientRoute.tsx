@@ -2,12 +2,12 @@
 
 // MUI Imports
 import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
+import CardHeader from '@mui/material/CardHeader'
 import TextField from '@mui/material/TextField'
 
 // Component Imports
-import { Controller, useFormContext } from 'react-hook-form'
+import { RootState } from '@/store'
 import {
   FormControl,
   FormHelperText,
@@ -16,8 +16,8 @@ import {
   MenuItem,
   Select,
 } from '@mui/material'
+import { Controller, useFormContext } from 'react-hook-form'
 import { useSelector } from 'react-redux'
-import { RootState } from '@/store'
 
 const ProductOrganize = () => {
   const { control } = useFormContext()
@@ -41,8 +41,8 @@ const ProductOrganize = () => {
   return (
     <Card>
       <CardHeader title="Rutas de ventas" />
-      <CardContent>
-        <Grid container spacing={3}>
+      <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+        <Grid container spacing={{ xs: 2, sm: 3 }}>
           <Grid item xs={12} sm={12}>
             <Controller
               name="dia"

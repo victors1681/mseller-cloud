@@ -2,18 +2,22 @@
 import { RootState } from '@/store'
 import {
   Alert,
-  Grid,
+  Box,
   Dialog,
-  DialogTitle,
-  DialogContent,
   DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  Stack,
 } from '@mui/material'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
-import { useFormContext } from 'react-hook-form'
-import { useSelector } from 'react-redux'
+import { useTheme } from '@mui/material/styles'
+import useMediaQuery from '@mui/material/useMediaQuery'
 import { useRouter } from 'next/router' // Add this import
 import { useState } from 'react'
+import { useFormContext } from 'react-hook-form'
+import { useSelector } from 'react-redux'
 
 interface Props {
   id: string
@@ -23,6 +27,9 @@ const ProductAddHeader = ({ id }: Props) => {
   const router = useRouter() // Add router
   const store = useSelector((state: RootState) => state.clients)
   const [openDialog, setOpenDialog] = useState(false)
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
   const isCustomerExist = store.customerDetail?.client
   const isNewCustomerWithError = !isCustomerExist && id !== 'new'
@@ -50,41 +57,70 @@ const ProductAddHeader = ({ id }: Props) => {
 
   return (
     <>
-      <Grid container spacing={4}>
+      <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
         {isNewCustomerWithError && (
-          <Grid item sm={12}>
+          <Grid item xs={12}>
             <Alert severity="error">No se encontró el cliente</Alert>
           </Grid>
         )}
-        <Grid item sm={6} md={9}>
-          <Typography variant="h4" sx={{ mb: 1 }}>
-            {!isCustomerExist
-              ? 'Agregar nuevo cliente'
-              : `Actualizar ${store.customerDetail?.client?.nombre || ''}`}
-          </Typography>
-          <Typography>Mantenimiento de clientes</Typography>
+        <Grid item xs={12} md={9}>
+          <Box>
+            <Typography
+              variant={isMobile ? 'h5' : 'h4'}
+              sx={{
+                mb: 1,
+                fontSize: { xs: '1.5rem', sm: '2rem' },
+                wordBreak: 'break-word',
+              }}
+            >
+              {!isCustomerExist
+                ? 'Agregar nuevo cliente'
+                : `Actualizar ${store.customerDetail?.client?.nombre || ''}`}
+            </Typography>
+            <Typography
+              variant={isMobile ? 'body2' : 'body1'}
+              color="text.secondary"
+            >
+              Mantenimiento de clientes
+            </Typography>
+          </Box>
         </Grid>
-        <Grid item sm={6} md={3}>
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={handleGoBack}
-            sx={{ marginRight: 1 }}
+        <Grid item xs={12} md={3}>
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={1}
+            justifyContent={{ md: 'flex-end' }}
+            sx={{ width: '100%' }}
           >
-            Cerrar
-          </Button>
-          <Button
-            variant="outlined"
-            color="secondary"
-            sx={{ marginRight: 1 }}
-            onClick={handleRestoreClick}
-            disabled={!isDirty}
-          >
-            Restaurar
-          </Button>
-          <Button variant="contained" type="submit" disabled={!isDirty}>
-            Grabar
-          </Button>
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={handleGoBack}
+              size={isSmallMobile ? 'small' : 'medium'}
+              fullWidth={isSmallMobile}
+            >
+              Cerrar
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={handleRestoreClick}
+              disabled={!isDirty}
+              size={isSmallMobile ? 'small' : 'medium'}
+              fullWidth={isSmallMobile}
+            >
+              Restaurar
+            </Button>
+            <Button
+              variant="contained"
+              type="submit"
+              disabled={!isDirty}
+              size={isSmallMobile ? 'small' : 'medium'}
+              fullWidth={isSmallMobile}
+            >
+              Grabar
+            </Button>
+          </Stack>
         </Grid>
       </Grid>
 

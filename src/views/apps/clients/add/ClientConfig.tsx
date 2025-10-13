@@ -1,13 +1,18 @@
 // MUI Imports
 import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
+import CardHeader from '@mui/material/CardHeader'
 import Divider from '@mui/material/Divider'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/store'
 
 // Component Imports
 
+import { fetchLocations } from '@/store/apps/location'
+import { fetchPaymentType } from '@/store/apps/paymentType'
+import { fetchSellers } from '@/store/apps/seller'
+import CustomAutocomplete from '@/views/ui/customAutocomplete'
+import InputLabelTooltip from '@/views/ui/inputLabelTooltip'
 import {
   FormControl,
   FormHelperText,
@@ -17,13 +22,8 @@ import {
   Select,
   TextField,
 } from '@mui/material'
-import { Controller, useFormContext } from 'react-hook-form'
 import { useEffect, useMemo } from 'react'
-import { fetchSellers } from '@/store/apps/seller'
-import { fetchLocations } from '@/store/apps/location'
-import { fetchPaymentType } from '@/store/apps/paymentType'
-import InputLabelTooltip from '@/views/ui/inputLabelTooltip'
-import CustomAutocomplete from '@/views/ui/customAutocomplete'
+import { Controller, useFormContext } from 'react-hook-form'
 
 const ProductPricing = () => {
   const { control } = useFormContext()
@@ -77,8 +77,8 @@ const ProductPricing = () => {
   return (
     <Card>
       <CardHeader title="Configuraciones" />
-      <CardContent>
-        <Grid container spacing={5}>
+      <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+        <Grid container spacing={{ xs: 3, sm: 4, md: 5 }}>
           <Grid item xs={12} sm={12}>
             <CustomAutocomplete
               name="codigoVendedor"

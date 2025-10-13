@@ -14,6 +14,8 @@ import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
+import { useTheme } from '@mui/material/styles'
+import useMediaQuery from '@mui/material/useMediaQuery'
 import { useMemo } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
 import { useSelector } from 'react-redux'
@@ -24,6 +26,9 @@ const ClientInformation = ({ id }: { id: string }) => {
   const { control, watch, setValue } = useFormContext()
   const store = useSelector((state: RootState) => state.clients)
   const { generateCustomer } = useCodeGenerator()
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
   const isNewCustomer = id === 'new'
 
@@ -58,12 +63,26 @@ const ClientInformation = ({ id }: { id: string }) => {
   return (
     <>
       <Card>
-        <CardHeader title="Información del Cliente" />
-        <CardContent>
+        <CardHeader
+          title="Información del Cliente"
+          sx={{
+            '& .MuiCardHeader-title': {
+              fontSize: { xs: '1.25rem', sm: '1.5rem' },
+            },
+          }}
+        />
+        <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
           <LoadingWrapper isLoading={store.isLoading}>
-            <Grid container spacing={5} className="mbe-5">
-              <Grid item xs={12} sm={2}>
-                <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+            <Grid container spacing={{ xs: 3, sm: 4, md: 5 }} className="mbe-5">
+              <Grid item xs={12} sm={6} md={4}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    gap: 1,
+                    alignItems: 'flex-start',
+                    flexDirection: { xs: 'column', sm: 'row' },
+                  }}
+                >
                   <Controller
                     name="codigo"
                     control={control}
@@ -74,6 +93,8 @@ const ClientInformation = ({ id }: { id: string }) => {
                         label="Código"
                         error={!!error}
                         helperText={error?.message}
+                        disabled={!isNewCustomer}
+                        size={isSmallMobile ? 'small' : 'medium'}
                       />
                     )}
                   />
@@ -90,21 +111,27 @@ const ClientInformation = ({ id }: { id: string }) => {
                         })
                         setValue('codigo', generatedCode)
                       }}
-                      size="small"
+                      size={isSmallMobile ? 'small' : 'medium'}
                       color="primary"
                       sx={{
-                        mt: 0.5,
-                        minWidth: 40,
-                        minHeight: 40,
+                        mt: { xs: 0, sm: 0.5 },
+                        minWidth: { xs: '100%', sm: 40 },
+                        minHeight: { xs: 36, sm: 40 },
+                        alignSelf: { xs: 'stretch', sm: 'flex-start' },
                       }}
                       title="Generar código automáticamente"
                     >
                       <Icon icon="mdi:refresh" />
+                      {isSmallMobile && (
+                        <Typography variant="caption" sx={{ ml: 1 }}>
+                          Generar
+                        </Typography>
+                      )}
                     </IconButton>
                   )}
                 </Box>
               </Grid>
-              <Grid item xs={12} sm={10}>
+              <Grid item xs={12} sm={6} md={8}>
                 <Controller
                   name="nombre"
                   control={control}
@@ -115,11 +142,12 @@ const ClientInformation = ({ id }: { id: string }) => {
                       label="Nombre del cliente"
                       error={!!error}
                       helperText={error?.message}
+                      size={isSmallMobile ? 'small' : 'medium'}
                     />
                   )}
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} sm={6} md={4}>
                 <Controller
                   name="rnc"
                   control={control}
@@ -130,11 +158,12 @@ const ClientInformation = ({ id }: { id: string }) => {
                       label="Impuesto/RNC"
                       error={!!error}
                       helperText={error?.message}
+                      size={isSmallMobile ? 'small' : 'medium'}
                     />
                   )}
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} sm={6} md={4}>
                 <Controller
                   name="tipoCliente"
                   control={control}
@@ -143,7 +172,7 @@ const ClientInformation = ({ id }: { id: string }) => {
                       <CustomerTypeAutocomplete
                         selectedCustomerType={field.value}
                         callBack={(value) => field.onChange(value)}
-                        size="medium"
+                        size={isSmallMobile ? 'small' : 'medium'}
                         multiple={false}
                         sx={{ width: '100%' }}
                       />
@@ -160,7 +189,7 @@ const ClientInformation = ({ id }: { id: string }) => {
                   )}
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} sm={6} md={4}>
                 <Controller
                   name="telefono1"
                   control={control}
@@ -171,11 +200,12 @@ const ClientInformation = ({ id }: { id: string }) => {
                       label="Teléfono"
                       error={!!error}
                       helperText={error?.message}
+                      size={isSmallMobile ? 'small' : 'medium'}
                     />
                   )}
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} sm={6} md={4}>
                 <Controller
                   name="email"
                   control={control}
@@ -186,11 +216,12 @@ const ClientInformation = ({ id }: { id: string }) => {
                       label="Correo Electrónico"
                       error={!!error}
                       helperText={error?.message}
+                      size={isSmallMobile ? 'small' : 'medium'}
                     />
                   )}
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} sm={6} md={4}>
                 <Controller
                   name="contacto"
                   control={control}
@@ -201,11 +232,12 @@ const ClientInformation = ({ id }: { id: string }) => {
                       label="Persona de contacto"
                       error={!!error}
                       helperText={error?.message}
+                      size={isSmallMobile ? 'small' : 'medium'}
                     />
                   )}
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} sm={6} md={4}>
                 <Controller
                   name="contactoWhatsApp"
                   control={control}
@@ -216,11 +248,12 @@ const ClientInformation = ({ id }: { id: string }) => {
                       label="WhatsApp"
                       error={!!error}
                       helperText={error?.message}
+                      size={isSmallMobile ? 'small' : 'medium'}
                     />
                   )}
                 />
               </Grid>
-              <Grid item xs={12} sm={12}>
+              <Grid item xs={12}>
                 <Controller
                   name="notas"
                   control={control}
@@ -231,15 +264,22 @@ const ClientInformation = ({ id }: { id: string }) => {
                       label="Notas del cliente"
                       error={!!error}
                       helperText={error?.message}
+                      multiline
+                      rows={isMobile ? 2 : 3}
+                      size={isSmallMobile ? 'small' : 'medium'}
                     />
                   )}
                 />
               </Grid>
               <Grid item xs={12}>
-                <Divider>Localización</Divider>
+                <Divider sx={{ my: { xs: 1, sm: 2 } }}>
+                  <Typography variant={isMobile ? 'body2' : 'body1'}>
+                    Localización
+                  </Typography>
+                </Divider>
               </Grid>
 
-              <Grid item xs={12} sm={12}>
+              <Grid item xs={12}>
                 <Controller
                   name="direccion"
                   control={control}
@@ -250,31 +290,36 @@ const ClientInformation = ({ id }: { id: string }) => {
                       label="Dirección"
                       error={!!error}
                       helperText={error?.message}
+                      multiline
+                      rows={isMobile ? 2 : 3}
+                      size={isSmallMobile ? 'small' : 'medium'}
                     />
                   )}
                 />
               </Grid>
 
-              <Grid item xs={6} sm={4}>
+              <Grid item xs={12} sm={6} md={4}>
                 <CustomAutocomplete
                   name="ciudad"
                   control={control}
                   options={cityOpts}
                   label="Ciudad"
                   freeSolo
+                  size={isSmallMobile ? 'small' : 'medium'}
                 />
               </Grid>
 
-              <Grid item xs={6} sm={4}>
+              <Grid item xs={12} sm={6} md={4}>
                 <CustomAutocomplete
                   name="estado"
                   control={control}
                   options={statesOpts}
                   label="Estado/Sector"
                   freeSolo
+                  size={isSmallMobile ? 'small' : 'medium'}
                 />
               </Grid>
-              <Grid item xs={6} sm={4}>
+              <Grid item xs={12} sm={6} md={4}>
                 <Controller
                   name="codigoPostal"
                   control={control}
@@ -285,17 +330,19 @@ const ClientInformation = ({ id }: { id: string }) => {
                       label="Código Postal"
                       error={!!error}
                       helperText={error?.message}
+                      size={isSmallMobile ? 'small' : 'medium'}
                     />
                   )}
                 />
               </Grid>
-              <Grid item xs={12} sm={12}>
+              <Grid item xs={12}>
                 <CustomAutocomplete
                   name="pais"
                   control={control}
                   options={countriesOpts}
                   label="País"
                   freeSolo
+                  size={isSmallMobile ? 'small' : 'medium'}
                 />
               </Grid>
             </Grid>

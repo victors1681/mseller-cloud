@@ -1,14 +1,12 @@
 'use client'
 
 // MUI Imports
-import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
-import CardContent from '@mui/material/CardContent'
-import { FormControlLabel, Grid, Switch } from '@mui/material'
-import { Controller, useFormContext } from 'react-hook-form'
-import { RootState } from '@/store'
-import { useSelector } from 'react-redux'
 import InputLabelTooltip from '@/views/ui/inputLabelTooltip'
+import { FormControlLabel, Grid, Switch } from '@mui/material'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import CardHeader from '@mui/material/CardHeader'
+import { Controller, useFormContext } from 'react-hook-form'
 
 const ClientSettings = () => {
   const { control } = useFormContext()
@@ -16,8 +14,8 @@ const ClientSettings = () => {
   return (
     <Card>
       <CardHeader title="Más opciones" />
-      <CardContent>
-        <Grid container spacing={3}>
+      <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+        <Grid container spacing={{ xs: 2, sm: 3 }}>
           <Grid item xs={12}>
             <Controller
               name="impuesto"
