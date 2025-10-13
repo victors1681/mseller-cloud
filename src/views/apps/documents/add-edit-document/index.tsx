@@ -36,8 +36,8 @@ import {
 } from './components'
 
 // ** Hooks
+import { useFormNavWarning } from 'src/hooks/useFormNavWarning'
 import { useEditDocument } from './hooks'
-import { useFormNavWarning } from './hooks/useFormNavWarning'
 
 // ** Types
 import {
@@ -80,12 +80,17 @@ const EditDocumentDialog: React.FC<EditDocumentDialogProps> = ({ open }) => {
   const onSubmit = async (data: any) => {
     const result = await handleSubmit(data)
     if (result.success) {
-      handleClose()
+      handleClose(true) // Skip dirty check after successful submission
     }
   }
 
   // Protect against accidental navigation with unsaved changes
-  useFormNavWarning({ isDirty, isOpen: open })
+  // Hook will cleanup listeners when isOpen becomes false
+  useFormNavWarning({
+    isDirty: open && isDirty,
+    isOpen: open,
+    isSubmitting: store.isSubmitting,
+  })
 
   // Get button text based on document type
   const getButtonText = () => {
@@ -142,7 +147,7 @@ const EditDocumentDialog: React.FC<EditDocumentDialogProps> = ({ open }) => {
             >
               <Icon
                 icon="mdi:close"
-                onClick={handleClose}
+                onClick={() => handleClose()}
                 style={{
                   cursor: 'pointer',
                   marginRight: isMobile ? '8px' : '16px',

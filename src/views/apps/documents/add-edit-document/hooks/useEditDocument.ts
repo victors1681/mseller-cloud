@@ -1,6 +1,5 @@
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
-import { toast } from 'react-hot-toast'
 import { useDispatch, useSelector } from 'react-redux'
 import { useAuth } from 'src/hooks/useAuth'
 import { AppDispatch, RootState } from 'src/store'
@@ -33,6 +32,7 @@ export const useEditDocument = (open: boolean) => {
   )
   const [selectedCustomerData, setSelectedCustomerData] =
     useState<SelectedCustomerData | null>(null)
+  const [hasBeenReset, setHasBeenReset] = useState(false)
 
   // Get document type from query parameter
   const createDocumentType = router.query.createDocumentType as string
@@ -197,6 +197,23 @@ export const useEditDocument = (open: boolean) => {
     }
   }, [open, store.documentEditData?.noPedidoStr, store.isCreateMode, dispatch])
 
+  // Reset the hasBeenReset flag when user starts making changes
+  useEffect(() => {
+    if (
+      hasBeenReset &&
+      (mainForm.formState.isDirty ||
+        detailForm.formState.isDirty ||
+        detailsData.length > 0)
+    ) {
+      setHasBeenReset(false)
+    }
+  }, [
+    hasBeenReset,
+    mainForm.formState.isDirty,
+    detailForm.formState.isDirty,
+    detailsData.length,
+  ])
+
   // Effect to log calculation changes (for debugging)
   useEffect(() => {
     if (detailsData.length > 0) {
@@ -212,25 +229,30 @@ export const useEditDocument = (open: boolean) => {
   }, [orderCalculations, detailsData.length])
 
   // Reset form and state function
-  const resetFormState = () => {
-    mainForm.reset(undefined, {
-      keepValues: false,
-      keepDirty: false,
-      keepDefaultValues: true,
-    })
+  const resetFormState = useCallback(() => {
+    // Clear all local state FIRST
     setDetailsData([])
     setNewDetailForm(defaultDetailFormValues)
-    detailForm.reset(undefined, {
-      keepValues: false,
-      keepDirty: false,
-      keepDefaultValues: true,
-    })
-
-    detailManagement.isEditingDetail && detailManagement.handleCancelEdit()
     setSelectedCustomerData(null)
+    setHasBeenReset(true) // Mark that we've reset the form
+
+    // Clear edit state and dialogs
+    detailManagement.isEditingDetail && detailManagement.handleCancelEdit()
     productSearchDialog.clearSelection()
     customerSearchDialog.clearSelection()
-  }
+
+    // Reset both forms completely - this should clear isDirty
+    mainForm.reset()
+    detailForm.reset()
+
+    console.log('Forms reset complete')
+  }, [
+    mainForm,
+    detailForm,
+    detailManagement,
+    productSearchDialog,
+    customerSearchDialog,
+  ])
 
   const handleSubmit = async (data: Partial<DocumentType>) => {
     if (!store.isCreateMode && !store.documentEditData) {
@@ -257,9 +279,10 @@ export const useEditDocument = (open: boolean) => {
 
     // Reset form state after successful operation
     if (result?.success) {
-      toast.success('Documento guardado exitosamente')
+      // Reset forms FIRST to clear isDirty immediately
+      resetFormState()
 
-      // Clear query parameter on successful creation
+      // Then clear query parameter on successful creation
       if (store.isCreateMode && createDocumentType) {
         const { createDocumentType: _, ...queryWithoutDocType } = router.query
         router.push({
@@ -267,42 +290,55 @@ export const useEditDocument = (open: boolean) => {
           query: queryWithoutDocType,
         })
       }
-
-      resetFormState()
     }
 
     return result
   }
 
-  const handleClose = useCallback(() => {
-    // Check if form is dirty (has unsaved changes)
-    const isMainFormDirty = mainForm.formState.isDirty
-    const isDetailFormDirty = detailForm.formState.isDirty
-    const hasUnsavedChanges = isMainFormDirty || isDetailFormDirty
+  const handleClose = useCallback(
+    (skipDirtyCheck: boolean = false) => {
+      // Check if form is dirty (has unsaved changes) only if not skipping
+      if (!skipDirtyCheck) {
+        const isMainFormDirty = mainForm.formState.isDirty
+        const isDetailFormDirty = detailForm.formState.isDirty
+        const hasUnsavedChanges =
+          isMainFormDirty || isDetailFormDirty || detailsData.length > 0
+        if (hasUnsavedChanges) {
+          const confirmClose = window.confirm(
+            '¿Estás seguro de que quieres cerrar? Los cambios no guardados se perderán.',
+          )
 
-    if (hasUnsavedChanges) {
-      const confirmClose = window.confirm(
-        '¿Estás seguro de que quieres cerrar? Los cambios no guardados se perderán.',
-      )
-
-      if (!confirmClose) {
-        return // Don't close if user cancels
+          if (!confirmClose) {
+            return // Don't close if user cancels
+          }
+        }
       }
-    }
 
-    // Clear query parameter when closing
-    if (createDocumentType) {
-      const { createDocumentType: _, ...queryWithoutDocType } = router.query
-      router.push({
-        pathname: router.pathname,
-        query: queryWithoutDocType,
-      })
-    }
+      // Reset forms FIRST to clear isDirty immediately
+      resetFormState()
 
-    // Proceed with closing
-    dispatch(toggleEditDocument(null))
-    resetFormState()
-  }, [dispatch, resetFormState, detailsData, createDocumentType, router])
+      // Clear query parameter when closing
+      if (createDocumentType) {
+        const { createDocumentType: _, ...queryWithoutDocType } = router.query
+        router.push({
+          pathname: router.pathname,
+          query: queryWithoutDocType,
+        })
+      }
+
+      // Proceed with closing
+      dispatch(toggleEditDocument(null))
+    },
+    [
+      dispatch,
+      resetFormState,
+      detailsData,
+      createDocumentType,
+      router,
+      mainForm.formState.isDirty,
+      detailForm.formState.isDirty,
+    ],
+  )
 
   return {
     // Store state
@@ -313,11 +349,12 @@ export const useEditDocument = (open: boolean) => {
     newDetailForm,
     selectedCustomerData,
 
-    // Form state
-    isDirty:
-      mainForm.formState.isDirty ||
-      detailsData.length > 0 ||
-      detailForm.formState.isDirty,
+    // Form state - if we just reset, don't consider it dirty until user makes changes
+    isDirty: hasBeenReset
+      ? false
+      : mainForm.formState.isDirty ||
+        detailsData.length > 0 ||
+        detailForm.formState.isDirty,
 
     // Calculations
     orderCalculations,
