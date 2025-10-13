@@ -46,6 +46,27 @@ const navigation = (): VerticalNavItemsType => {
           path: '/apps/collections/list',
         },
         {
+          title: 'Cuentas por Cobrar',
+          icon: 'mdi:account-cash-outline',
+          children: [
+            {
+              title: 'Gestión CXC',
+              icon: 'mdi:format-list-bulleted',
+              path: '/apps/cxc',
+            },
+            {
+              title: 'Cuentas Vencidas',
+              icon: 'mdi:alert-circle-outline',
+              path: '/apps/cxc/overdue',
+            },
+            {
+              title: 'Reportes',
+              icon: 'mdi:chart-line',
+              path: '/apps/cxc/reports',
+            },
+          ],
+        },
+        {
           title: 'Visitas',
           icon: 'material-symbols:map-outline',
           path: '/apps/visits/list',

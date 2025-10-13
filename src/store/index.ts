@@ -26,6 +26,7 @@ import user from 'src/store/apps/user'
 import apikeys from './apps/apikeys'
 import offers from './apps/offers'
 import removeData from './apps/removeData'
+import cxc from './apps/cxc'
 
 export const store = configureStore({
   reducer: {
@@ -53,6 +54,7 @@ export const store = configureStore({
     pos,
     inventory,
     inventoryZones,
+    cxc,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
