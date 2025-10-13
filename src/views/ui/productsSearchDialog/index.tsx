@@ -842,13 +842,11 @@ export const ProductSearchDialog = (props: ProductSearchDialogProps) => {
             onClick={() => setShowAddProductModal(true)}
             color="primary"
             variant="outlined"
-            size={isMobile ? 'large' : 'medium'}
+            size="small"
             fullWidth={isSmallMobile}
             startIcon={<Icon icon="mdi:plus" />}
             sx={{
-              minHeight: isMobile ? 48 : 'auto',
-              fontSize: isMobile ? '1rem' : '0.875rem',
-              order: isSmallMobile ? 1 : 1,
+              order: 1,
             }}
           >
             {isMobile ? 'Crear Producto' : 'Nuevo Producto'}

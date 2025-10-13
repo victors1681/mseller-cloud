@@ -1,13 +1,13 @@
 // ** Redux Imports
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { Dispatch } from 'redux'
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 // ** Axios Imports
-import { PaginatedResponse } from 'src/types/apps/response'
-import { ProductDetailType, ProductType } from 'src/types/apps/productTypes'
-import restClient from 'src/configs/restClient'
-import { toast } from 'react-hot-toast'
 import { AppDispatch, RootState } from '@/store'
+import { toast } from 'react-hot-toast'
+import restClient from 'src/configs/restClient'
+import { ProductDetailType, ProductType } from 'src/types/apps/productTypes'
+import { PaginatedResponse } from 'src/types/apps/response'
 
 interface DataParams {
   query?: string
@@ -30,10 +30,25 @@ export const addProducts = createAsyncThunk(
   'appProduct/addProducts',
   async (products: ProductType[], { dispatch, getState }: Redux) => {
     const response = await restClient.post('/api/portal/Producto', products)
-    const state = getState()
-    const params = state.appSeller.params
 
-    await dispatch(fetchData(params))
+    const state = getState()
+    const params = state.products.params || {
+      query: '',
+      codigoProducto: '',
+      status: '',
+      pageSize: 10,
+      pageNumber: 1,
+    }
+
+    // Refresh the list to show the new product, but catch any errors
+    try {
+      if (params) {
+        await dispatch(fetchData(params))
+      }
+    } catch (error) {
+      console.warn('Failed to refresh products list after creation:', error)
+      // Don't throw the error since the product was successfully created
+    }
 
     return response.data
   },
@@ -224,7 +239,8 @@ export const appProductSlice = createSlice({
     })
 
     builder.addCase(addProducts.fulfilled, (state, action) => {
-      state.data = [...state.data, ...action.payload]
+      // No need to update state.data here since fetchData will handle the refresh
+      // The fetchData call in addProducts will update the list
     })
   },
 })

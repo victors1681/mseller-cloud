@@ -39,6 +39,7 @@ const mockProducts: ProductType[] = [
     status: 'A',
     imagenes: [],
     visibleTienda: true,
+    esServicio: false,
   },
   {
     codigo: 'PROD002',
@@ -76,6 +77,7 @@ const mockProducts: ProductType[] = [
     status: 'A',
     imagenes: [],
     visibleTienda: true,
+    esServicio: false,
   },
   {
     codigo: 'PROD003',
@@ -113,6 +115,7 @@ const mockProducts: ProductType[] = [
     status: 'A',
     imagenes: [],
     visibleTienda: true,
+    esServicio: false,
   },
   {
     codigo: 'PROD004',
@@ -150,6 +153,7 @@ const mockProducts: ProductType[] = [
     status: 'A',
     imagenes: [],
     visibleTienda: true,
+    esServicio: false,
   },
   {
     codigo: 'PROD005',
@@ -187,6 +191,7 @@ const mockProducts: ProductType[] = [
     status: 'A',
     imagenes: [],
     visibleTienda: true,
+    esServicio: false,
   },
 ]
 

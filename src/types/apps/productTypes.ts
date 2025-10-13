@@ -34,7 +34,7 @@ export interface ProductType {
   status: 'A' | 'I' | string
   imagenes: ProductImageType[]
   visibleTienda: boolean
-  esServicio: boolean
+  esServicio?: boolean
 }
 
 export interface ProductImageType {

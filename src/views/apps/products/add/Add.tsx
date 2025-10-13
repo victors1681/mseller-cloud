@@ -17,7 +17,11 @@ import { ProductType } from '@/types/apps/productTypes'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { fetchProductDetail, updateProduct } from '@/store/apps/products'
+import {
+  addProducts,
+  fetchProductDetail,
+  updateProduct,
+} from '@/store/apps/products'
 import ProductSettings from '@/views/apps/products/add/ProductSettings'
 import LoadingWrapper from '@/views/ui/LoadingWrapper'
 import { useRouter } from 'next/router'
@@ -25,6 +29,7 @@ import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
 // Import statements
+import { useCodeGenerator } from '@/hooks/useCodeGenerator'
 import { useFormNavWarning } from '@/hooks/useFormNavWarning'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
@@ -56,12 +61,48 @@ const productSchema = yup.object().shape({
   }),
 
   // Pricing
-  precio1: yup.number().min(0, 'Precio debe ser mayor o igual a 0'),
-  precio2: yup.number().min(0, 'Precio debe ser mayor o igual a 0'),
-  precio3: yup.number().min(0, 'Precio debe ser mayor o igual a 0'),
-  precio4: yup.number().min(0, 'Precio debe ser mayor o igual a 0'),
-  precio5: yup.number().min(0, 'Precio debe ser mayor o igual a 0'),
-  costo: yup.number().min(0, 'Costo debe ser mayor o igual a 0'),
+  precio1: yup
+    .number()
+    .transform((value, originalValue) => {
+      return originalValue === '' ? 0 : value
+    })
+    .required('El precio es requerido')
+    .min(0, 'Precio debe ser mayor o igual a 0'),
+  precio2: yup
+    .number()
+    .transform((value, originalValue) => {
+      return originalValue === '' ? 0 : value
+    })
+    .min(0, 'Precio debe ser mayor o igual a 0')
+    .default(0),
+  precio3: yup
+    .number()
+    .transform((value, originalValue) => {
+      return originalValue === '' ? 0 : value
+    })
+    .min(0, 'Precio debe ser mayor o igual a 0')
+    .default(0),
+  precio4: yup
+    .number()
+    .transform((value, originalValue) => {
+      return originalValue === '' ? 0 : value
+    })
+    .min(0, 'Precio debe ser mayor o igual a 0')
+    .default(0),
+  precio5: yup
+    .number()
+    .transform((value, originalValue) => {
+      return originalValue === '' ? 0 : value
+    })
+    .min(0, 'Precio debe ser mayor o igual a 0')
+    .default(0),
+  costo: yup
+    .number()
+    .transform((value, originalValue) => {
+      return originalValue === '' ? 0 : value
+    })
+    .min(0, 'Costo debe ser mayor o igual a 0')
+    .default(0),
 
   // Inventory - conditional based on esServicio
   existenciaAlmacen1: yup
@@ -86,12 +127,20 @@ const productSchema = yup.object().shape({
     then: (schema) => schema.optional(),
     otherwise: (schema) => schema.optional(),
   }),
-  impuesto: yup.number().min(0),
+  impuesto: yup
+    .number()
+    .transform((value, originalValue) => {
+      return originalValue === '' ? 0 : value
+    })
+    .required('El impuesto es requerido')
+    .min(0, 'El impuesto debe ser mayor o igual a 0')
+    .max(100, 'El impuesto no puede ser mayor a 100'),
+  tipoImpuesto: yup.string().required('El tipo de impuesto es requerido'),
   factor: yup.number().min(1, 'Factor debe ser mayor o igual a 1').required(),
   iSC: yup.number().min(0).optional(),
   aDV: yup.number().min(0).optional(),
   descuento: yup.number().min(0).optional(),
-  tipoImpuesto: yup.string().optional(),
+
   apartado: yup.number().min(0),
   status: yup.string().oneOf(['A', 'I']).required(),
   promocion: yup.boolean().when('esServicio', {
@@ -151,12 +200,12 @@ const AddProduct = ({ id }: AddProductProps) => {
       // Product Details
       unidad: 'UN',
       empaque: 'UN',
-      impuesto: 0,
+      impuesto: 18,
       factor: 1,
       iSC: 0,
       aDV: 0,
       descuento: 0,
-      tipoImpuesto: '',
+      tipoImpuesto: 'ITBIS',
       apartado: 0,
       status: 'A',
       promocion: false,
@@ -171,6 +220,7 @@ const AddProduct = ({ id }: AddProductProps) => {
   const [isSubmitting, setIsformSubmitted] = useState(false)
 
   const router = useRouter()
+  const { generateProduct } = useCodeGenerator()
 
   useFormNavWarning({
     form: methods,
@@ -183,32 +233,109 @@ const AddProduct = ({ id }: AddProductProps) => {
   const dispatch = useDispatch<AppDispatch>()
   const store = useSelector((state: RootState) => state.products)
 
-  useEffect(() => {
-    if (id) {
-      dispatch(fetchProductDetail(id))
-    }
-  }, [id, dispatch])
+  // Determine if this is create or update mode
+  const isCreateMode = id === 'new'
 
   useEffect(() => {
-    if (store.productDetail) {
+    if (id && !isCreateMode) {
+      dispatch(fetchProductDetail(id))
+    } else if (isCreateMode) {
+      // For create mode, fetch product detail to get options (areas, departments, taxes, etc.)
+      dispatch(fetchProductDetail('new'))
+    }
+  }, [id, dispatch, isCreateMode])
+
+  useEffect(() => {
+    if (store.productDetail && !isCreateMode) {
       methods.reset(store.productDetail)
     }
-  }, [methods, store.productDetail])
+  }, [methods, store.productDetail, isCreateMode])
+
+  // Watch precio1 and update other prices automatically (same logic as AddProductModal)
+  const precio1Value = methods.watch('precio1')
+
+  useEffect(() => {
+    if (precio1Value !== undefined && isCreateMode && isMobile) {
+      // Convert to number to ensure consistent data types
+      const numericPrice =
+        typeof precio1Value === 'string'
+          ? parseFloat(precio1Value) || 0
+          : precio1Value
+      methods.setValue('precio2', numericPrice)
+      methods.setValue('precio3', numericPrice)
+      methods.setValue('precio4', numericPrice)
+      methods.setValue('precio5', numericPrice)
+    }
+  }, [precio1Value, methods, isCreateMode])
+
+  // Helper functions for create mode
+  const handleGenerateCode = () => {
+    if (isCreateMode) {
+      const productName = methods.watch('nombre')
+      const generatedCode = generateProduct(productName)
+      methods.setValue('codigo', generatedCode)
+    }
+  }
 
   // Handle form submission
   const onSubmit = async (data: ProductType) => {
     try {
       setIsformSubmitted(true)
-      const response = await dispatch(updateProduct(data)).unwrap()
 
-      if (response.success) {
-        router.push('/apps/products/list') // Redirect to products list
+      if (isCreateMode) {
+        // Create new product - Transform data to ensure proper types (reusing AddProductModal logic)
+        const transformedData: ProductType = {
+          ...data,
+          imagenes:
+            data.imagenes?.map((imagen) => ({
+              ...imagen,
+              codigoProducto: data.codigo,
+              idObjeto: data.codigo,
+            })) || [],
+        }
+
+        console.log(
+          'Creating product with data:',
+          JSON.stringify(transformedData, null, 2),
+        )
+
+        const response = await dispatch(addProducts([transformedData])).unwrap()
+
+        if (response && response.success !== false) {
+          toast.success('Producto creado exitosamente')
+          router.push('/apps/products/list') // Redirect to products list
+        } else {
+          toast.error(response?.message || 'Error al crear el producto')
+          setIsformSubmitted(false)
+        }
       } else {
-        toast.error(response.message || 'Error actualizando producto')
+        // Update existing product
+        const response = await dispatch(updateProduct(data)).unwrap()
+
+        if (response.success) {
+          router.push('/apps/products/list') // Redirect to products list
+        } else {
+          toast.error(response.message || 'Error actualizando producto')
+          setIsformSubmitted(false)
+        }
       }
-    } catch (error) {
-      console.error('Update error:', error)
-      toast.error('Error inesperado al actualizar producto')
+    } catch (error: any) {
+      console.error(isCreateMode ? 'Create error:' : 'Update error:', error)
+
+      // Handle different types of errors (reusing AddProductModal logic)
+      let errorMessage = isCreateMode
+        ? 'Error inesperado al crear producto'
+        : 'Error inesperado al actualizar producto'
+
+      if (error?.message) {
+        errorMessage = error.message
+      } else if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message
+      } else if (typeof error === 'string') {
+        errorMessage = error
+      }
+
+      toast.error(errorMessage)
       setIsformSubmitted(false)
     }
   }
