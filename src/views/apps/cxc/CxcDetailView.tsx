@@ -902,7 +902,9 @@ const CxcDetailView: React.FC<CxcDetailViewProps> = ({ numeroCxc }) => {
                             width: isMobile ? 28 : 32,
                             height: isMobile ? 28 : 32,
                             bgcolor: (theme) => {
-                              const colorName = getMovementColor(movimiento.tipoMovimiento)
+                              const colorName = getMovementColor(
+                                movimiento.tipoMovimiento,
+                              )
                               switch (colorName) {
                                 case 'success':
                                   return theme.palette.success.main
@@ -917,18 +919,30 @@ const CxcDetailView: React.FC<CxcDetailViewProps> = ({ numeroCxc }) => {
                               }
                             },
                             color: (theme) => {
-                              const colorName = getMovementColor(movimiento.tipoMovimiento)
+                              const colorName = getMovementColor(
+                                movimiento.tipoMovimiento,
+                              )
                               switch (colorName) {
                                 case 'success':
-                                  return theme.palette.success.contrastText || '#fff'
+                                  return (
+                                    theme.palette.success.contrastText || '#fff'
+                                  )
                                 case 'info':
-                                  return theme.palette.info.contrastText || '#fff'
+                                  return (
+                                    theme.palette.info.contrastText || '#fff'
+                                  )
                                 case 'warning':
-                                  return theme.palette.warning.contrastText || '#fff'
+                                  return (
+                                    theme.palette.warning.contrastText || '#fff'
+                                  )
                                 case 'error':
-                                  return theme.palette.error.contrastText || '#fff'
+                                  return (
+                                    theme.palette.error.contrastText || '#fff'
+                                  )
                                 default:
-                                  return theme.palette.getContrastText(theme.palette.grey[400])
+                                  return theme.palette.getContrastText(
+                                    theme.palette.grey[400],
+                                  )
                               }
                             },
                           }}

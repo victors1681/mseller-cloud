@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 // ** Next Imports
 import Link from 'next/link'
@@ -7,99 +7,95 @@ import { useRouter } from 'next/router'
 
 // ** MUI Imports
 import {
-  Card,
-  CardHeader,
-  CardContent,
-  Grid,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Box,
   Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  TextField,
+  Card,
+  CardContent,
+  CardHeader,
   Chip,
-  Typography,
   Collapse,
-  IconButton,
-  Tooltip,
-  Stack,
   Fab,
-  SwipeableDrawer,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Divider,
-  useTheme,
-  useMediaQuery,
-  Paper,
-  InputAdornment,
-  LinearProgress,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
+  FormControl,
   FormControlLabel,
+  Grid,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  LinearProgress,
+  MenuItem,
+  Paper,
+  Select,
+  Stack,
+  SwipeableDrawer,
   Switch,
-  Slider,
-  Autocomplete,
+  TextField,
+  Typography,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material'
-import DatePicker from 'react-datepicker'
-import 'react-datepicker/dist/react-datepicker.css'
 import {
   DataGrid,
   GridColDef,
-  GridRowId,
   GridPaginationModel,
+  GridRowId,
 } from '@mui/x-data-grid'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
 
 // ** Third Party Imports
-import { useDispatch, useSelector } from 'react-redux'
-import { debounce } from 'lodash'
-import toast from 'react-hot-toast'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
+import { debounce } from 'lodash'
+import toast from 'react-hot-toast'
+import { useDispatch, useSelector } from 'react-redux'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
+// ** Components
+import CardStatsHorizontal from 'src/@core/components/card-statistics/card-stats-horizontal'
+
 // ** Store Imports
 import { AppDispatch, RootState } from 'src/store'
 import {
-  fetchCxcList,
-  setFilters,
   clearFilters,
-  setFilterValue,
-  setDateRangeFilter,
-  setAmountRangeFilter,
-  setOverdueFilter,
-  setPageSize,
-  setPageNumber,
+  fetchCxcList,
   fetchCxcSummaryStats,
+  setAmountRangeFilter,
+  setDateRangeFilter,
+  setFilters,
+  setFilterValue,
+  setOverdueFilter,
+  setPageNumber,
+  setPageSize,
 } from 'src/store/apps/cxc'
 
 // ** Component Imports
-import { SellerAutocomplete } from 'src/views/ui/sellerAutoComplete'
 import { LocationAutocomplete } from 'src/views/ui/locationAutoComplete'
 import { PaymentTypeAutocomplete } from 'src/views/ui/paymentTypeAutoComplete'
+import { SellerAutocomplete } from 'src/views/ui/sellerAutoComplete'
 
 // ** Types
 import {
-  EstadoCxc,
+  AmountRange,
   CuentaCxc,
   CxcFilters,
-  MobileViewConfig,
-  AdvancedFilters,
   DateRange,
-  AmountRange,
+  EstadoCxc,
+  MobileViewConfig,
 } from 'src/types/apps/cxcTypes'
 
 // ** Utils
 import formatCurrency from 'src/utils/formatCurrency'
 
 // ** Components
-import CxcStatusBadge from './components/CxcStatusBadge'
+import CreditNoteModal from './components/CreditNoteModal'
 import CxcCard from './components/CxcCard'
+import CxcStatusBadge from './components/CxcStatusBadge'
+import PaymentModal from './components/PaymentModal'
 
 interface CellType {
   row: CuentaCxc
@@ -119,6 +115,19 @@ const CxcListView = () => {
   const [selectedRows, setSelectedRows] = useState<GridRowId[]>([])
   const [filtersDrawerOpen, setFiltersDrawerOpen] = useState(false)
   const [advancedFiltersOpen, setAdvancedFiltersOpen] = useState(false)
+
+  // ** Modal states
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false)
+  const [creditNoteModalOpen, setCreditNoteModalOpen] = useState(false)
+  const [selectedCxc, setSelectedCxc] = useState<CuentaCxc | null>(null)
+
+  // ** Local search state for specific fields
+  const [localSearchValues, setLocalSearchValues] = useState({
+    codigoCliente: '',
+    nombreCliente: '',
+    numeroDocumento: '',
+    secuenciaDocumento: '',
+  })
   const [mobileView, setMobileView] = useState<MobileViewConfig>({
     showFilters: false,
     compactMode: isMobile,
@@ -153,8 +162,8 @@ const CxcListView = () => {
 
   // ** Effects
   useEffect(() => {
-    dispatch(fetchCxcSummaryStats())
-  }, [dispatch])
+    dispatch(fetchCxcSummaryStats(store.filters))
+  }, [dispatch, store.filters])
 
   useEffect(() => {
     dispatch(
@@ -176,10 +185,32 @@ const CxcListView = () => {
     [dispatch],
   )
 
+  // ** Debounced specific field searches
+  const debouncedFieldSearch = useCallback(
+    debounce((field: keyof CxcFilters, value: string) => {
+      dispatch(setFilterValue({ key: field, value: value || undefined }))
+      dispatch(setPageNumber(1))
+    }, 500),
+    [dispatch],
+  )
+
   // ** Handlers
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
     debouncedSearch(value)
+  }
+
+  const handleSpecificFieldSearch = (
+    field: keyof CxcFilters,
+    value: string,
+  ) => {
+    // Update local state immediately for UI responsiveness
+    setLocalSearchValues((prev) => ({
+      ...prev,
+      [field]: value,
+    }))
+    // Debounce the actual filter update
+    debouncedFieldSearch(field, value)
   }
 
   const handleStatusFilter = (estados: EstadoCxc[]) => {
@@ -194,6 +225,12 @@ const CxcListView = () => {
   const handleClearFilters = () => {
     dispatch(clearFilters())
     setSearchValue('')
+    setLocalSearchValues({
+      codigoCliente: '',
+      nombreCliente: '',
+      numeroDocumento: '',
+      secuenciaDocumento: '',
+    })
   }
 
   const handlePaginationChange = (model: GridPaginationModel) => {
@@ -216,13 +253,13 @@ const CxcListView = () => {
   )
 
   const handlePayment = useCallback((cxc: CuentaCxc) => {
-    // TODO: Open payment dialog
-    toast.success(`Procesar pago para ${cxc.numeroCxc}`)
+    setSelectedCxc(cxc)
+    setPaymentModalOpen(true)
   }, [])
 
   const handleCreditNote = useCallback((cxc: CuentaCxc) => {
-    // TODO: Open credit note dialog
-    toast.success(`Crear nota de crédito para ${cxc.numeroCxc}`)
+    setSelectedCxc(cxc)
+    setCreditNoteModalOpen(true)
   }, [])
 
   const handleReturn = useCallback((cxc: CuentaCxc) => {
@@ -304,6 +341,12 @@ const CxcListView = () => {
   const handleClearAdvancedFilters = () => {
     dispatch(clearFilters())
     setSearchValue('')
+    setLocalSearchValues({
+      codigoCliente: '',
+      nombreCliente: '',
+      numeroDocumento: '',
+      secuenciaDocumento: '',
+    })
     setTempDateRange({
       emission: { from: undefined, to: undefined },
       due: { from: undefined, to: undefined },
@@ -473,116 +516,52 @@ const CxcListView = () => {
   // ** Summary Stats Cards
   const SummaryCards = () => (
     <Grid container spacing={3} sx={{ mb: 3 }}>
-      <Grid item xs={6} sm={3}>
-        <Paper
-          elevation={2}
-          sx={{
-            p: 2,
-            textAlign: 'center',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            color: 'white',
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 700,
-              fontSize: isSmallMobile ? '1rem' : '1.25rem',
-            }}
-          >
-            {store.summaryStats?.totalCuentas || 0}
-          </Typography>
-          <Typography
-            variant="caption"
-            sx={{ fontSize: isSmallMobile ? '0.7rem' : '0.75rem' }}
-          >
-            Total CXC
-          </Typography>
-        </Paper>
+      <Grid item xs={12} sm={6} md={3}>
+        <CardStatsHorizontal
+          title="Total CXC"
+          stats={(store.summaryStats?.totalCuentas || 0).toString()}
+          icon={<Icon icon="mdi:file-document-multiple" />}
+          color="primary"
+          trendNumber="100%"
+          trend="positive"
+        />
       </Grid>
 
-      <Grid item xs={6} sm={3}>
-        <Paper
-          elevation={2}
-          sx={{
-            p: 2,
-            textAlign: 'center',
-            background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-            color: 'white',
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 700,
-              fontSize: isSmallMobile ? '0.9rem' : '1.1rem',
-            }}
-          >
-            {formatCurrency(store.summaryStats?.montoTotalPendiente || 0)}
-          </Typography>
-          <Typography
-            variant="caption"
-            sx={{ fontSize: isSmallMobile ? '0.7rem' : '0.75rem' }}
-          >
-            Pendiente
-          </Typography>
-        </Paper>
+      <Grid item xs={12} sm={6} md={3}>
+        <CardStatsHorizontal
+          title="Pendiente"
+          stats={formatCurrency(store.summaryStats?.montoTotalPendiente || 0)}
+          icon={<Icon icon="mdi:clock-outline" />}
+          color="warning"
+          trendNumber="0%"
+          trend="negative"
+        />
       </Grid>
 
-      <Grid item xs={6} sm={3}>
-        <Paper
-          elevation={2}
-          sx={{
-            p: 2,
-            textAlign: 'center',
-            background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-            color: 'white',
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 700,
-              fontSize: isSmallMobile ? '1rem' : '1.25rem',
-            }}
-          >
-            {store.summaryStats?.cuentasVencidas || 0}
-          </Typography>
-          <Typography
-            variant="caption"
-            sx={{ fontSize: isSmallMobile ? '0.7rem' : '0.75rem' }}
-          >
-            Vencidas
-          </Typography>
-        </Paper>
+      <Grid item xs={12} sm={6} md={3}>
+        <CardStatsHorizontal
+          title="Vencidas"
+          stats={(store.summaryStats?.cuentasVencidas || 0).toString()}
+          icon={<Icon icon="mdi:alert-circle-outline" />}
+          color="error"
+          trendNumber={`${Math.round(
+            ((store.summaryStats?.cuentasVencidas || 0) /
+              (store.summaryStats?.totalCuentas || 1)) *
+              100,
+          )}%`}
+          trend="negative"
+        />
       </Grid>
 
-      <Grid item xs={6} sm={3}>
-        <Paper
-          elevation={2}
-          sx={{
-            p: 2,
-            textAlign: 'center',
-            background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-            color: 'white',
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 700,
-              fontSize: isSmallMobile ? '0.85rem' : '1rem',
-            }}
-          >
-            {store.summaryStats?.tasaCobranza?.toFixed(1) || 0}%
-          </Typography>
-          <Typography
-            variant="caption"
-            sx={{ fontSize: isSmallMobile ? '0.7rem' : '0.75rem' }}
-          >
-            Tasa Cobranza
-          </Typography>
-        </Paper>
+      <Grid item xs={12} sm={6} md={3}>
+        <CardStatsHorizontal
+          title="Tasa Cobranza"
+          stats={`${store.summaryStats?.tasaCobranza?.toFixed(1) || 0}%`}
+          icon={<Icon icon="mdi:chart-line" />}
+          color="success"
+          trendNumber={`${store.summaryStats?.tasaCobranza?.toFixed(1) || 0}%`}
+          trend="positive"
+        />
       </Grid>
     </Grid>
   )
@@ -981,25 +960,92 @@ const CxcListView = () => {
         />
 
         <CardContent>
-          {/* Search Bar */}
           <Box sx={{ mb: 3 }}>
-            <TextField
-              fullWidth
-              placeholder="Buscar por No. CXC, No. Documento o Cliente..."
-              onChange={handleSearch}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Icon icon="mdi:magnify" />
-                  </InputAdornment>
-                ),
-              }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 2,
-                },
-              }}
-            />
+            {/* Specific Search Fields */}
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6} md={3}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="Código Cliente"
+                  placeholder="Ej: CLI001"
+                  value={localSearchValues.codigoCliente}
+                  onChange={(e) =>
+                    handleSpecificFieldSearch('codigoCliente', e.target.value)
+                  }
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Icon icon="mdi:account-outline" fontSize="1rem" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={3}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="Nombre Cliente"
+                  placeholder="Ej: Juan Pérez"
+                  value={localSearchValues.nombreCliente}
+                  onChange={(e) =>
+                    handleSpecificFieldSearch('nombreCliente', e.target.value)
+                  }
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Icon icon="mdi:account-search" fontSize="1rem" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={3}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="No. Documento"
+                  placeholder="Ej: FAC-001"
+                  value={localSearchValues.numeroDocumento}
+                  onChange={(e) =>
+                    handleSpecificFieldSearch('numeroDocumento', e.target.value)
+                  }
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Icon icon="mdi:file-document" fontSize="1rem" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={3}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="Secuencia Documento"
+                  placeholder="Ej: 00001"
+                  value={localSearchValues.secuenciaDocumento}
+                  onChange={(e) =>
+                    handleSpecificFieldSearch(
+                      'secuenciaDocumento',
+                      e.target.value,
+                    )
+                  }
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Icon icon="mdi:numeric" fontSize="1rem" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+            </Grid>
           </Box>
 
           {/* Desktop Filters */}
@@ -1594,6 +1640,20 @@ const CxcListView = () => {
 
       {/* Mobile Filters Drawer */}
       <FiltersDrawer />
+
+      {/* Payment Modal */}
+      <PaymentModal
+        open={paymentModalOpen}
+        onClose={() => setPaymentModalOpen(false)}
+        cxc={selectedCxc}
+      />
+
+      {/* Credit Note Modal */}
+      <CreditNoteModal
+        open={creditNoteModalOpen}
+        onClose={() => setCreditNoteModalOpen(false)}
+        cxc={selectedCxc}
+      />
     </Box>
   )
 }

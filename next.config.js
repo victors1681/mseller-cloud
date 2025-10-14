@@ -9,7 +9,7 @@ module.exports = {
   trailingSlash: true,
   reactStrictMode: false, //fix issue with the wysiwyg editor
   images: {
-    domains: ['https://cloud.mseller.app'],
+    domains: ['cloud.mseller.app', 'storage.googleapis.com'],
   },
   webpack: (config) => {
     config.resolve.alias = {

@@ -1,25 +1,24 @@
 // ** React Imports
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 
 // ** Next Imports
 import { useRouter } from 'next/router'
 
 // ** MUI Imports
 import {
-  Card,
-  CardHeader,
-  CardContent,
-  Grid,
-  Box,
-  Typography,
-  Stack,
-  Button,
-  IconButton,
-  Paper,
-  useTheme,
-  useMediaQuery,
-  Skeleton,
   Alert,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Grid,
+  IconButton,
+  Skeleton,
+  Stack,
+  Typography,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material'
 
 // ** Third Party Imports
@@ -27,6 +26,9 @@ import { useDispatch, useSelector } from 'react-redux'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
+
+// ** Components
+import CardStatsHorizontal from 'src/@core/components/card-statistics/card-stats-horizontal'
 
 // ** Store Imports
 import { AppDispatch, RootState } from 'src/store'
@@ -133,78 +135,52 @@ const CxcClientView: React.FC<CxcClientViewProps> = ({ codigoCliente }) => {
 
       {/* Summary Cards */}
       <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid item xs={6} sm={3}>
-          <Paper
-            elevation={2}
-            sx={{
-              p: 2,
-              textAlign: 'center',
-              bgcolor: 'primary.main',
-              color: 'white',
-            }}
-          >
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              {clientData.length}
-            </Typography>
-            <Typography variant="caption">Total CXC</Typography>
-          </Paper>
+        <Grid item xs={12} sm={6} md={3}>
+          <CardStatsHorizontal
+            title="Total CXC"
+            stats={clientData.length.toString()}
+            icon={<Icon icon="mdi:file-document-multiple" />}
+            color="primary"
+            trendNumber="100%"
+            trend="positive"
+          />
         </Grid>
 
-        <Grid item xs={6} sm={3}>
-          <Paper
-            elevation={2}
-            sx={{
-              p: 2,
-              textAlign: 'center',
-              bgcolor: 'info.main',
-              color: 'white',
-            }}
-          >
-            <Typography
-              variant="h6"
-              sx={{ fontWeight: 700, fontSize: isMobile ? '1rem' : '1.25rem' }}
-            >
-              {formatCurrency(totalAmount)}
-            </Typography>
-            <Typography variant="caption">Total Facturado</Typography>
-          </Paper>
+        <Grid item xs={12} sm={6} md={3}>
+          <CardStatsHorizontal
+            title="Total Facturado"
+            stats={formatCurrency(totalAmount)}
+            icon={<Icon icon="mdi:currency-usd" />}
+            color="info"
+            trendNumber="100%"
+            trend="positive"
+          />
         </Grid>
 
-        <Grid item xs={6} sm={3}>
-          <Paper
-            elevation={2}
-            sx={{
-              p: 2,
-              textAlign: 'center',
-              bgcolor: 'warning.main',
-              color: 'white',
-            }}
-          >
-            <Typography
-              variant="h6"
-              sx={{ fontWeight: 700, fontSize: isMobile ? '1rem' : '1.25rem' }}
-            >
-              {formatCurrency(totalOutstanding)}
-            </Typography>
-            <Typography variant="caption">Saldo Pendiente</Typography>
-          </Paper>
+        <Grid item xs={12} sm={6} md={3}>
+          <CardStatsHorizontal
+            title="Saldo Pendiente"
+            stats={formatCurrency(totalOutstanding)}
+            icon={<Icon icon="mdi:clock-outline" />}
+            color="warning"
+            trendNumber={`${
+              Math.round((totalOutstanding / totalAmount) * 100) || 0
+            }%`}
+            trend="negative"
+          />
         </Grid>
 
-        <Grid item xs={6} sm={3}>
-          <Paper
-            elevation={2}
-            sx={{
-              p: 2,
-              textAlign: 'center',
-              bgcolor: 'error.main',
-              color: 'white',
-            }}
-          >
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              {overdueCount}
-            </Typography>
-            <Typography variant="caption">Vencidas</Typography>
-          </Paper>
+        <Grid item xs={12} sm={6} md={3}>
+          <CardStatsHorizontal
+            title="Vencidas"
+            stats={overdueCount.toString()}
+            icon={<Icon icon="mdi:alert-circle-outline" />}
+            color="error"
+            trendNumber={`${
+              Math.round((overdueCount / clientData.length) * 100) || 0
+            }%`}
+            trend="negative"
+          />
         </Grid>
       </Grid>
 

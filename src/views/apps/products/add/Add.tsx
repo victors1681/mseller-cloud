@@ -281,19 +281,18 @@ const AddProduct = ({ id }: AddProductProps) => {
   const onSubmit = async (data: ProductType) => {
     try {
       setIsformSubmitted(true)
+      // Create new product - Transform data to ensure proper types (reusing AddProductModal logic)
+      const transformedData: ProductType = {
+        ...data,
+        imagenes:
+          data.imagenes?.map((imagen) => ({
+            ...imagen,
+            codigoProducto: data.codigo,
+            idObjeto: data.codigo,
+          })) || [],
+      }
 
       if (isCreateMode) {
-        // Create new product - Transform data to ensure proper types (reusing AddProductModal logic)
-        const transformedData: ProductType = {
-          ...data,
-          imagenes:
-            data.imagenes?.map((imagen) => ({
-              ...imagen,
-              codigoProducto: data.codigo,
-              idObjeto: data.codigo,
-            })) || [],
-        }
-
         console.log(
           'Creating product with data:',
           JSON.stringify(transformedData, null, 2),
@@ -310,7 +309,7 @@ const AddProduct = ({ id }: AddProductProps) => {
         }
       } else {
         // Update existing product
-        const response = await dispatch(updateProduct(data)).unwrap()
+        const response = await dispatch(updateProduct(transformedData)).unwrap()
 
         if (response.success) {
           router.push('/apps/products/list') // Redirect to products list

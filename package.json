@@ -106,6 +106,7 @@
     "@types/google.maps": "^3.54.10",
     "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "8.5.9",
+    "@types/lodash": "^4.17.20",
     "@types/node": "18.16.3",
     "@types/nprogress": "0.2.0",
     "@types/payment": "2.1.4",

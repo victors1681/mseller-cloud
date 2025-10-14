@@ -163,9 +163,12 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ open, onClose, cxc }) => {
             </Typography>
           </Box>
           {isMobile && (
-            <IconButton onClick={handleClose} sx={{ ml: 'auto' }} size="small">
-              <Icon icon="mdi:close" />
-            </IconButton>
+            <>
+              <Box sx={{ flexGrow: 1 }} />
+              <IconButton onClick={handleClose} sx={{ ml: 1 }} size="small">
+                <Icon icon="mdi:close" />
+              </IconButton>
+            </>
           )}
         </Stack>
       </DialogTitle>
@@ -181,17 +184,25 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ open, onClose, cxc }) => {
             {/* Balance Information */}
             <Box
               sx={{
-                p: 2,
-                bgcolor: 'primary.light',
+                p: 2.5,
+                bgcolor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(145, 85, 253, 0.08)'
+                    : 'rgba(145, 85, 253, 0.04)',
                 borderRadius: 2,
                 border: `1px solid`,
                 borderColor: 'primary.main',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
               }}
             >
               <Typography
                 variant="caption"
                 color="primary.main"
                 fontWeight={600}
+                sx={{
+                  letterSpacing: '0.5px',
+                  fontSize: isMobile ? '0.7rem' : '0.75rem',
+                }}
               >
                 INFORMACIÓN DE SALDO
               </Typography>
@@ -239,15 +250,6 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ open, onClose, cxc }) => {
                     startAdornment: (
                       <InputAdornment position="start">RD$</InputAdornment>
                     ),
-                    sx: { fontSize: isMobile ? '1.1rem' : '1rem' },
-                  }}
-                  InputLabelProps={{
-                    sx: { fontSize: isMobile ? '0.9rem' : '1rem' },
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                    },
                   }}
                 />
               )}
@@ -269,12 +271,6 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ open, onClose, cxc }) => {
                         <Icon icon="mdi:receipt" fontSize="1.2rem" />
                       </InputAdornment>
                     ),
-                    sx: { fontSize: isMobile ? '1rem' : '0.9rem' },
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                    },
                   }}
                 />
               )}
@@ -292,11 +288,6 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ open, onClose, cxc }) => {
                   rows={isMobile ? 2 : 3}
                   fullWidth
                   placeholder="Comentarios adicionales sobre el pago..."
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                    },
-                  }}
                 />
               )}
             />
@@ -317,18 +308,9 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ open, onClose, cxc }) => {
             p: isMobile ? 2 : 3,
             pt: isMobile ? 1 : 2,
             gap: 1,
+            flexDirection: isMobile ? 'column' : 'row',
           }}
         >
-          {!isMobile && (
-            <Button
-              onClick={handleClose}
-              variant="outlined"
-              size="large"
-              sx={{ minWidth: 120 }}
-            >
-              Cancelar
-            </Button>
-          )}
           <Button
             type="submit"
             variant="contained"
@@ -343,24 +325,18 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ open, onClose, cxc }) => {
             }
             size="large"
             fullWidth={isMobile}
-            sx={{
-              minHeight: isMobile ? 48 : 44,
-              minWidth: isMobile ? 'auto' : 140,
-            }}
           >
             {isProcessing ? 'Procesando...' : 'Procesar Pago'}
           </Button>
-          {isMobile && (
-            <Button
-              onClick={handleClose}
-              variant="outlined"
-              fullWidth
-              size="large"
-              sx={{ minHeight: 48 }}
-            >
-              Cancelar
-            </Button>
-          )}
+          <Button
+            onClick={handleClose}
+            variant="outlined"
+            size="large"
+            fullWidth={isMobile}
+            sx={isMobile ? { mr: 2, mt: 1 } : undefined}
+          >
+            Cancelar
+          </Button>
         </DialogActions>
       </form>
     </Dialog>

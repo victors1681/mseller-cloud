@@ -69,7 +69,7 @@ const CreditNoteModal: React.FC<CreditNoteModalProps> = ({
         cxc?.saldoPendiente || 0,
         `El monto no puede exceder ${formatCurrency(cxc?.saldoPendiente || 0)}`,
       ),
-    motivo: yup.string().optional(),
+    motivo: yup.string().required('El motivo es requerido'),
     observaciones: yup.string().optional(),
   })
 
@@ -174,9 +174,12 @@ const CreditNoteModal: React.FC<CreditNoteModalProps> = ({
             </Typography>
           </Box>
           {isMobile && (
-            <IconButton onClick={handleClose} sx={{ ml: 'auto' }} size="small">
-              <Icon icon="mdi:close" />
-            </IconButton>
+            <>
+              <Box sx={{ flexGrow: 1 }} />
+              <IconButton onClick={handleClose} sx={{ ml: 1 }} size="small">
+                <Icon icon="mdi:close" />
+              </IconButton>
+            </>
           )}
         </Stack>
       </DialogTitle>
@@ -192,14 +195,26 @@ const CreditNoteModal: React.FC<CreditNoteModalProps> = ({
             {/* Balance Information */}
             <Box
               sx={{
-                p: 2,
-                bgcolor: 'info.light',
+                p: 2.5,
+                bgcolor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(33, 150, 243, 0.08)'
+                    : 'rgba(33, 150, 243, 0.04)',
                 borderRadius: 2,
                 border: `1px solid`,
                 borderColor: 'info.main',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
               }}
             >
-              <Typography variant="caption" color="info.main" fontWeight={600}>
+              <Typography
+                variant="caption"
+                color="info.main"
+                fontWeight={600}
+                sx={{
+                  letterSpacing: '0.5px',
+                  fontSize: isMobile ? '0.7rem' : '0.75rem',
+                }}
+              >
                 INFORMACIÓN DE SALDO
               </Typography>
               <Stack spacing={1} mt={1}>
@@ -246,15 +261,6 @@ const CreditNoteModal: React.FC<CreditNoteModalProps> = ({
                     startAdornment: (
                       <InputAdornment position="start">RD$</InputAdornment>
                     ),
-                    sx: { fontSize: isMobile ? '1.1rem' : '1rem' },
-                  }}
-                  InputLabelProps={{
-                    sx: { fontSize: isMobile ? '0.9rem' : '1rem' },
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                    },
                   }}
                 />
               )}
@@ -267,8 +273,10 @@ const CreditNoteModal: React.FC<CreditNoteModalProps> = ({
               render={({ field }) => (
                 <TextField
                   {...field}
-                  label="Motivo (Opcional)"
+                  label="Motivo"
                   fullWidth
+                  error={!!errors.motivo}
+                  helperText={errors.motivo?.message}
                   placeholder="Ej: Error de facturación, Descuento por cliente frecuente"
                   InputProps={{
                     startAdornment: (
@@ -276,12 +284,6 @@ const CreditNoteModal: React.FC<CreditNoteModalProps> = ({
                         <Icon icon="mdi:file-document-edit" fontSize="1.2rem" />
                       </InputAdornment>
                     ),
-                    sx: { fontSize: isMobile ? '1rem' : '0.9rem' },
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                    },
                   }}
                 />
               )}
@@ -299,11 +301,6 @@ const CreditNoteModal: React.FC<CreditNoteModalProps> = ({
                   rows={isMobile ? 2 : 3}
                   fullWidth
                   placeholder="Comentarios adicionales sobre la nota de crédito..."
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                    },
-                  }}
                 />
               )}
             />
@@ -324,18 +321,9 @@ const CreditNoteModal: React.FC<CreditNoteModalProps> = ({
             p: isMobile ? 2 : 3,
             pt: isMobile ? 1 : 2,
             gap: 1,
+            flexDirection: isMobile ? 'column' : 'row',
           }}
         >
-          {!isMobile && (
-            <Button
-              onClick={handleClose}
-              variant="outlined"
-              size="large"
-              sx={{ minWidth: 120 }}
-            >
-              Cancelar
-            </Button>
-          )}
           <Button
             type="submit"
             variant="contained"
@@ -350,24 +338,18 @@ const CreditNoteModal: React.FC<CreditNoteModalProps> = ({
             }
             size="large"
             fullWidth={isMobile}
-            sx={{
-              minHeight: isMobile ? 48 : 44,
-              minWidth: isMobile ? 'auto' : 160,
-            }}
           >
             {isProcessing ? 'Procesando...' : 'Crear Nota de Crédito'}
           </Button>
-          {isMobile && (
-            <Button
-              onClick={handleClose}
-              variant="outlined"
-              fullWidth
-              size="large"
-              sx={{ minHeight: 48 }}
-            >
-              Cancelar
-            </Button>
-          )}
+          <Button
+            onClick={handleClose}
+            variant="outlined"
+            size="large"
+            fullWidth={isMobile}
+            sx={isMobile ? { mr: 2, mt: 1 } : undefined}
+          >
+            Cancelar
+          </Button>
         </DialogActions>
       </form>
     </Dialog>

@@ -136,7 +136,7 @@ const FileUploaderRestrictions = () => {
       }
       setIsUploading(false)
     },
-    [files],
+    [files, currentImages],
   )
 
   // ** Hooks
