@@ -13,20 +13,23 @@ import drivers from 'src/store/apps/driver'
 import ecf from 'src/store/apps/ecf'
 import email from 'src/store/apps/email'
 import inventory from 'src/store/apps/inventory'
+import inventoryMovements from 'src/store/apps/inventoryMovements'
 import inventoryZones from 'src/store/apps/inventoryZones'
 import invoices from 'src/store/apps/invoices'
+import itemReturns from 'src/store/apps/itemReturns'
 import locations from 'src/store/apps/location'
 import paymentTypes from 'src/store/apps/paymentType'
 import permissions from 'src/store/apps/permissions'
 import pos from 'src/store/apps/pos'
 import products from 'src/store/apps/products'
 import sellers from 'src/store/apps/seller'
+import stockTransfers from 'src/store/apps/stockTransfers'
 import transports from 'src/store/apps/transports'
 import user from 'src/store/apps/user'
 import apikeys from './apps/apikeys'
+import cxc from './apps/cxc'
 import offers from './apps/offers'
 import removeData from './apps/removeData'
-import cxc from './apps/cxc'
 
 export const store = configureStore({
   reducer: {
@@ -54,6 +57,9 @@ export const store = configureStore({
     pos,
     inventory,
     inventoryZones,
+    inventoryMovements,
+    stockTransfers,
+    itemReturns,
     cxc,
   },
   middleware: (getDefaultMiddleware) =>

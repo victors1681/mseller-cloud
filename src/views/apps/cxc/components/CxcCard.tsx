@@ -1,25 +1,25 @@
 // ** React Imports
-import { useState, useCallback } from 'react'
+import { useCallback, useState } from 'react'
 
 // ** MUI Imports
 import {
-  Card,
-  CardContent,
-  CardActions,
-  Typography,
   Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
   Chip,
+  Collapse,
+  Divider,
   IconButton,
-  Menu,
-  MenuItem,
   ListItemIcon,
   ListItemText,
-  Collapse,
-  Button,
-  useTheme,
-  useMediaQuery,
+  Menu,
+  MenuItem,
   Stack,
-  Divider,
+  Typography,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
@@ -61,7 +61,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
   },
   '&.overdue': {
     borderLeft: `4px solid ${theme.palette.error.main}`,
-    backgroundColor: theme.palette.error.lighter || 'rgba(255, 82, 82, 0.04)',
+    backgroundColor: 'rgba(255, 82, 82, 0.04)',
   },
   '&.paid': {
     borderLeft: `4px solid ${theme.palette.success.main}`,

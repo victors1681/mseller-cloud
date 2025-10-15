@@ -33,7 +33,18 @@ const navigation = (): VerticalNavItemsType => {
         {
           title: 'Documentos',
           icon: 'lets-icons:order',
-          path: '/apps/documents/list',
+          children: [
+            {
+              title: 'Listado',
+              icon: 'mdi:format-list-bulleted',
+              path: '/apps/documents/list',
+            },
+            {
+              title: 'Devolución',
+              icon: 'mdi:keyboard-return',
+              path: '/apps/documents/item-returns',
+            },
+          ],
         },
         {
           title: 'Transportes',
@@ -81,6 +92,21 @@ const navigation = (): VerticalNavItemsType => {
           title: 'Reconciliaciones',
           icon: 'mdi:compare-horizontal',
           path: '/apps/inventory-management/reconciliations',
+        },
+        {
+          title: 'Movimientos',
+          icon: 'mdi:swap-horizontal',
+          path: '/apps/inventory-management/movements',
+        },
+        {
+          title: 'Ajustes',
+          icon: 'mdi:playlist-edit',
+          path: '/apps/inventory-management/adjustments',
+        },
+        {
+          title: 'Transferencias',
+          icon: 'mdi:transfer-right',
+          path: '/apps/inventory-management/transfers',
         },
       ],
     },
