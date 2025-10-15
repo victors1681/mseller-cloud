@@ -135,9 +135,9 @@ const ReturnCalculationCard = ({
   useEffect(() => {
     if (documentItems.length > 0 && fields.length === 0) {
       console.log('Auto-populating with document items:', documentItems)
-      
+
       // Create products from document items
-      const allProducts = documentItems.map(item => ({
+      const allProducts = documentItems.map((item) => ({
         codigoProducto: item.codigoProducto,
         cantidad: 0, // Start with 0 so user can select what to return
         motivoDevolucion: motivosDevolucion[0] || '', // Default reason
@@ -146,7 +146,7 @@ const ReturnCalculationCard = ({
       console.log('Products to populate:', allProducts)
 
       // Use the field array replace method to properly update the form
-      allProducts.forEach(product => {
+      allProducts.forEach((product) => {
         append(product)
       })
     }
@@ -302,9 +302,15 @@ const ReturnCalculationCard = ({
                           onClick={() => {
                             fields.forEach((field, index: number) => {
                               // Find the corresponding document item
-                              const docItem = documentItems.find(item => item.codigoProducto === field.codigoProducto)
+                              const docItem = documentItems.find(
+                                (item) =>
+                                  item.codigoProducto === field.codigoProducto,
+                              )
                               if (docItem) {
-                                setValue(`productos.${index}.cantidad`, docItem.cantidadDisponible || 0)
+                                setValue(
+                                  `productos.${index}.cantidad`,
+                                  docItem.cantidadDisponible || 0,
+                                )
                               }
                             })
                           }}
@@ -393,7 +399,7 @@ const ReturnCalculationCard = ({
                                   variant="body2"
                                   sx={{
                                     fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                                    fontWeight: 'medium'
+                                    fontWeight: 'medium',
                                   }}
                                 >
                                   {watchedProducts[index]?.codigoProducto ||
@@ -404,12 +410,15 @@ const ReturnCalculationCard = ({
                                   color="text.secondary"
                                   sx={{
                                     fontSize: { xs: '0.625rem', sm: '0.75rem' },
-                                    display: 'block'
+                                    display: 'block',
                                   }}
                                 >
-                                  {documentItems.find(item => 
-                                    item.codigoProducto === watchedProducts[index]?.codigoProducto
-                                  )?.descripcionProducto || 'Descripción no disponible'}
+                                  {documentItems.find(
+                                    (item) =>
+                                      item.codigoProducto ===
+                                      watchedProducts[index]?.codigoProducto,
+                                  )?.descripcionProducto ||
+                                    'Descripción no disponible'}
                                 </Typography>
                               </Box>
                             </TableCell>
