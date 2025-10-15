@@ -1,5 +1,4 @@
 // ** React Imports
-import type { ReactElement } from 'react'
 
 // ** Next Imports
 import { useRouter } from 'next/router'

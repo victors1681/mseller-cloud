@@ -235,15 +235,45 @@ export const generateCxcReport = createAsyncThunk(
     { rejectWithValue },
   ) => {
     try {
+      // Build URLSearchParams to properly handle multiple estados without brackets
+      const searchParams = new URLSearchParams()
+      searchParams.append('fechaInicio', params.fechaInicio)
+      searchParams.append('fechaFin', params.fechaFin)
+
+      // Handle filters if provided
+      if (params.filters) {
+        const { estado, ...otherFilters } = params.filters
+
+        // Add other filters
+        Object.entries(otherFilters).forEach(([key, value]) => {
+          if (value != null) {
+            searchParams.append(key, String(value))
+          }
+        })
+
+        // Handle estados array for proper query string format
+        if (estado) {
+          const estadoToNumber = {
+            [EstadoCxc.Pendiente]: 0,
+            [EstadoCxc.PagoParcial]: 1,
+            [EstadoCxc.Pagado]: 2,
+            [EstadoCxc.Vencido]: 3,
+            [EstadoCxc.Anulado]: 4,
+          }
+
+          const estados = Array.isArray(estado) ? estado : [estado]
+          estados
+            .map((e) => estadoToNumber[e])
+            .filter((n) => n !== undefined)
+            .forEach((estadoNum) => {
+              searchParams.append('estados', String(estadoNum))
+            })
+        }
+      }
+
+      // Make the request with the properly formatted query string
       const response = await restClient.get<ReporteCxc>(
-        '/api/portal/cxc/reporte',
-        {
-          params: {
-            fechaInicio: params.fechaInicio,
-            fechaFin: params.fechaFin,
-            ...params.filters,
-          },
-        },
+        `/api/portal/cxc/reporte?${searchParams.toString()}`,
       )
       return response.data
     } catch (error: any) {

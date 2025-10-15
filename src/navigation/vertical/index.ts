@@ -55,11 +55,6 @@ const navigation = (): VerticalNavItemsType => {
               path: '/apps/cxc',
             },
             {
-              title: 'Cuentas Vencidas',
-              icon: 'mdi:alert-circle-outline',
-              path: '/apps/cxc/overdue',
-            },
-            {
               title: 'Reportes',
               icon: 'mdi:chart-line',
               path: '/apps/cxc/reports',
