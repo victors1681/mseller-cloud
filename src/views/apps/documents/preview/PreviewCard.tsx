@@ -1,35 +1,34 @@
 // ** MUI Imports
-import Grid from '@mui/material/Grid'
-import Card from '@mui/material/Card'
-import Table from '@mui/material/Table'
-import Divider from '@mui/material/Divider'
-import TableRow from '@mui/material/TableRow'
-import TableHead from '@mui/material/TableHead'
-import TableBody from '@mui/material/TableBody'
-import Typography from '@mui/material/Typography'
-import Box, { BoxProps } from '@mui/material/Box'
-import CardContent from '@mui/material/CardContent'
-import { styled, useTheme } from '@mui/material/styles'
-import TableContainer from '@mui/material/TableContainer'
-import TableCell, { TableCellBaseProps } from '@mui/material/TableCell'
-import Chip from '@mui/material/Chip'
 import Alert from '@mui/material/Alert'
+import Box, { BoxProps } from '@mui/material/Box'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import Chip from '@mui/material/Chip'
+import Divider from '@mui/material/Divider'
+import Grid from '@mui/material/Grid'
+import { styled, useTheme } from '@mui/material/styles'
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableCell, { TableCellBaseProps } from '@mui/material/TableCell'
+import TableContainer from '@mui/material/TableContainer'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
+import Typography from '@mui/material/Typography'
 
 // ** React Imports
 import { useEffect } from 'react'
 
 // ** Configs
-import themeConfig from 'src/configs/themeConfig'
 
 // ** Types
+import { useAuth } from 'src/hooks/useAuth'
 import {
+  DocumentStatus,
   DocumentType,
   TipoDocumentoEnum,
-  DocumentStatus,
 } from 'src/types/apps/documentTypes'
-import formatDate from 'src/utils/formatDate'
-import { useAuth } from 'src/hooks/useAuth'
 import formatCurrency from 'src/utils/formatCurrency'
+import formatDate from 'src/utils/formatDate'
 import formattedNumber from 'src/utils/formattedNumber'
 import { orderStatusLabels } from 'src/views/apps/documents/list/tableColRows'
 
@@ -315,22 +314,24 @@ const PreviewCard = ({ data }: Props) => {
                   {userData.user?.business.logoUrl && (
                     <img
                       src={userData.user?.business.logoUrl || ''}
-                      height={50}
-                      alt="Company Logo"
+                      height={40}
+                      alt={userData.user?.business.name || 'Company Logo'}
                     />
                   )}
-                  <Typography
-                    variant="subtitle1"
-                    sx={{
-                      ml: 1.5,
-                      fontWeight: 600,
-                      lineHeight: 'normal',
-                      textTransform: 'uppercase',
-                      fontSize: { xs: '1rem', print: '0.8rem' },
-                    }}
-                  >
-                    {userData.user?.business.name}
-                  </Typography>
+                  {!userData.user?.business.logoUrl && (
+                    <Typography
+                      variant="subtitle1"
+                      sx={{
+                        ml: 1.5,
+                        fontWeight: 600,
+                        lineHeight: 'normal',
+                        textTransform: 'uppercase',
+                        fontSize: { xs: '1rem', print: '0.8rem' },
+                      }}
+                    >
+                      {userData.user?.business.name}
+                    </Typography>
+                  )}
                 </Box>
                 <Box
                   sx={{
@@ -399,6 +400,23 @@ const PreviewCard = ({ data }: Props) => {
                   >
                     {userData.user?.business.phone}
                   </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontWeight: 600,
+                      fontSize: { xs: '0.875rem', print: '0.7rem' },
+                    }}
+                  >
+                    Web:
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontSize: { xs: '0.875rem', print: '0.7rem' },
+                    }}
+                  >
+                    {userData.user?.business.website}
+                  </Typography>
                 </Box>
               </Box>
             </Grid>
@@ -458,6 +476,27 @@ const PreviewCard = ({ data }: Props) => {
                   >
                     {data.noPedidoStr}
                   </Typography>
+                  {data.secuenciaDocumento && (
+                    <>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: 600,
+                          fontSize: { xs: '0.875rem', print: '0.7rem' },
+                        }}
+                      >
+                        Secuencia:
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontSize: { xs: '0.875rem', print: '0.7rem' },
+                        }}
+                      >
+                        {data.secuenciaDocumento}
+                      </Typography>
+                    </>
+                  )}
                   {data.noOrden && (
                     <>
                       <Typography
@@ -518,29 +557,31 @@ const PreviewCard = ({ data }: Props) => {
                   >
                     {formatDate(data.fecha)}
                   </Typography>
-                  {data.fechaVencimiento && (
-                    <>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          fontWeight: 600,
-                          fontSize: { xs: '0.875rem', print: '0.7rem' },
-                        }}
-                      >
-                        Fecha Vencimiento:
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        color="error"
-                        sx={{
-                          fontSize: { xs: '0.875rem', print: '0.7rem' },
-                          '@media print': { color: '#666' },
-                        }}
-                      >
-                        {formatDate(data.fechaVencimiento)}
-                      </Typography>
-                    </>
-                  )}
+                  {data.fechaVencimiento &&
+                    data.tipoDocumento === TipoDocumentoEnum.ORDER &&
+                    (data.condicion?.dias || 0) > 0 && (
+                      <>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontWeight: 600,
+                            fontSize: { xs: '0.875rem', print: '0.7rem' },
+                          }}
+                        >
+                          Fecha Vencimiento:
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          color="error"
+                          sx={{
+                            fontSize: { xs: '0.875rem', print: '0.7rem' },
+                            '@media print': { color: '#666' },
+                          }}
+                        >
+                          {formatDate(data.fechaVencimiento)}
+                        </Typography>
+                      </>
+                    )}
                 </Box>
               </Box>
             </Grid>
@@ -710,23 +751,28 @@ const PreviewCard = ({ data }: Props) => {
                 >
                   {data.cliente?.telefono1 || 'N/A'}
                 </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontWeight: 600,
-                    fontSize: { xs: '0.875rem', print: '0.7rem' },
-                  }}
-                >
-                  Condición de Pago:
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontSize: { xs: '0.875rem', print: '0.7rem' },
-                  }}
-                >
-                  {data.condicion?.descripcion || data.condicionPago}
-                </Typography>
+                {data.tipoDocumento === TipoDocumentoEnum.ORDER &&
+                  (data.condicion?.dias || 0) > 0 && (
+                    <>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: 600,
+                          fontSize: { xs: '0.875rem', print: '0.7rem' },
+                        }}
+                      >
+                        Condición de Pago:
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontSize: { xs: '0.875rem', print: '0.7rem' },
+                        }}
+                      >
+                        {data.condicion?.descripcion || data.condicionPago}
+                      </Typography>
+                    </>
+                  )}
                 <Typography
                   variant="body2"
                   sx={{
@@ -1168,28 +1214,30 @@ const PreviewCard = ({ data }: Props) => {
                   {formatCurrency(data.subTotal)}
                 </Typography>
               </CalcWrapper>
-              <CalcWrapper>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontWeight: 600,
-                    fontSize: { xs: '0.875rem', print: '0.75rem' },
-                  }}
-                >
-                  Descuento:
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontWeight: 600,
-                    color: 'success.main',
-                    fontSize: { xs: '0.875rem', print: '0.75rem' },
-                    '@media print': { color: '#000' },
-                  }}
-                >
-                  -{formatCurrency(data.descuento)}
-                </Typography>
-              </CalcWrapper>
+              {(data.descuento || 0) > 0 && (
+                <CalcWrapper>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontWeight: 600,
+                      fontSize: { xs: '0.875rem', print: '0.75rem' },
+                    }}
+                  >
+                    Descuento:
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontWeight: 600,
+                      color: 'success.main',
+                      fontSize: { xs: '0.875rem', print: '0.75rem' },
+                      '@media print': { color: '#000' },
+                    }}
+                  >
+                    -{formatCurrency(data.descuento)}
+                  </Typography>
+                </CalcWrapper>
+              )}
               <CalcWrapper>
                 <Typography
                   variant="body2"

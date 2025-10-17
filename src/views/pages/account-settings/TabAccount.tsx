@@ -1,37 +1,40 @@
 // ** React Imports
-import { useState, ElementType, ChangeEvent, useEffect } from 'react'
+import { ChangeEvent, ElementType, useEffect, useRef, useState } from 'react'
 
 // ** MUI Imports
+import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
+import Button, { ButtonProps } from '@mui/material/Button'
 import Card from '@mui/material/Card'
-import Select from '@mui/material/Select'
-import Dialog from '@mui/material/Dialog'
-import { styled } from '@mui/material/styles'
+import CardContent from '@mui/material/CardContent'
+import CardHeader from '@mui/material/CardHeader'
 import Checkbox from '@mui/material/Checkbox'
+import CircularProgress from '@mui/material/CircularProgress'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import FormControl from '@mui/material/FormControl'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import FormHelperText from '@mui/material/FormHelperText'
+import Grid from '@mui/material/Grid'
+import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
+import Select from '@mui/material/Select'
+import { styled } from '@mui/material/styles'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
-import InputLabel from '@mui/material/InputLabel'
-import CardHeader from '@mui/material/CardHeader'
-import FormControl from '@mui/material/FormControl'
-import CardContent from '@mui/material/CardContent'
-import DialogContent from '@mui/material/DialogContent'
-import DialogActions from '@mui/material/DialogActions'
-import FormHelperText from '@mui/material/FormHelperText'
-import InputAdornment from '@mui/material/InputAdornment'
-import Button, { ButtonProps } from '@mui/material/Button'
-import FormControlLabel from '@mui/material/FormControlLabel'
 
 // ** Third Party Imports
-import { useForm, Controller } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
-import { useAuth } from 'src/hooks/useAuth'
 import Avatar from '@mui/material/Avatar'
-import RemoveDataForm from './removeData/RemoveData'
+import Icon from 'src/@core/components/icon'
+import { IUpdateUserProfileProps } from 'src/firebase'
+import { useFirebase } from 'src/firebase/useFirebase'
+import { useAuth } from 'src/hooks/useAuth'
 import { countryList } from 'src/utils/countryList'
+import RemoveDataForm from './removeData/RemoveData'
 
 interface Data {
   email: string
@@ -91,18 +94,26 @@ const ResetButtonStyled = styled(Button)<ButtonProps>(({ theme }) => ({
 const TabAccount = () => {
   // ** State
   const [open, setOpen] = useState<boolean>(false)
-  const [inputValue, setInputValue] = useState<string>('')
   const [userInput, setUserInput] = useState<string>('yes')
   const [formData, setFormData] = useState<Data>(initialData)
   const [imgSrc, setImgSrc] = useState<string>('/images/avatars/1.png')
   const [secondDialogOpen, setSecondDialogOpen] = useState<boolean>(false)
+  const [isUpdating, setIsUpdating] = useState<boolean>(false)
+  const [updateError, setUpdateError] = useState<string | null>(null)
+  const [updateSuccess, setUpdateSuccess] = useState<boolean>(false)
+  const [selectedImageFile, setSelectedImageFile] = useState<string | null>(
+    null,
+  )
+  const [isImageUploading, setIsImageUploading] = useState<boolean>(false)
 
   // ** Hooks
   const { user } = useAuth()
+  const { updateUserProfile, uploadImages } = useFirebase()
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     const initialData: Data = {
-      phone: user?.phone || '',
+      phone: user?.business.phone || '',
       address: user?.business.address.street || '',
       city: user?.business.address.city || '',
       country: user?.business.address.country || '',
@@ -127,6 +138,86 @@ const TabAccount = () => {
 
   const onSubmit = () => setOpen(true)
 
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!user?.userId) {
+      setUpdateError('User ID not found. Please try logging in again.')
+      return
+    }
+
+    setIsUpdating(true)
+    setUpdateError(null)
+    setUpdateSuccess(false)
+
+    try {
+      let photoURL = user.photoURL // Keep existing photo URL by default
+
+      // Step 1: Upload image if a new one is selected
+      if (selectedImageFile) {
+        setIsImageUploading(true)
+
+        const imageUploadData = {
+          images: [selectedImageFile],
+          type: 'profile' as const,
+        }
+
+        const uploadResult = await uploadImages(imageUploadData)
+
+        if (uploadResult && 'error' in uploadResult) {
+          setUpdateError(`Error uploading image: ${uploadResult.error}`)
+          return
+        } else if (
+          uploadResult &&
+          'uploads' in uploadResult &&
+          uploadResult.uploads.length > 0
+        ) {
+          // Use the original URL from the uploaded image
+          photoURL = uploadResult.uploads[0].originalUrl
+        } else {
+          setUpdateError('Error uploading image. Please try again.')
+          return
+        }
+
+        setIsImageUploading(false)
+      }
+
+      // Step 2: Update user profile with form data and photo URL
+      const updateData: IUpdateUserProfileProps = {
+        userId: user.userId,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        photoURL: photoURL, // Include the photo URL (either existing or newly uploaded)
+        business: {
+          name: formData.organization,
+          rnc: formData.rnc,
+          website: formData.website,
+          phone: formData.phone,
+          address: {
+            street: formData.address,
+            city: formData.city,
+            country: formData.country,
+          },
+        },
+      }
+
+      const result = await updateUserProfile(updateData)
+
+      if (result && 'error' in result) {
+        setUpdateError(result.error)
+      } else {
+        setUpdateSuccess(true)
+        setSelectedImageFile(null) // Clear selected image after successful update
+        setTimeout(() => setUpdateSuccess(false), 3000) // Hide success message after 3 seconds
+      }
+    } catch (error) {
+      setUpdateError('Error updating profile. Please try again.')
+    } finally {
+      setIsUpdating(false)
+      setIsImageUploading(false)
+    }
+  }
+
   const handleConfirmation = (value: string) => {
     handleClose()
     setUserInput(value)
@@ -137,17 +228,21 @@ const TabAccount = () => {
     const reader = new FileReader()
     const { files } = file.target as HTMLInputElement
     if (files && files.length !== 0) {
-      reader.onload = () => setImgSrc(reader.result as string)
-      reader.readAsDataURL(files[0])
-
-      if (reader.result !== null) {
-        setInputValue(reader.result as string)
+      reader.onload = () => {
+        const result = reader.result as string
+        setImgSrc(result) // Update preview
+        setSelectedImageFile(result) // Store for upload
       }
+      reader.readAsDataURL(files[0])
     }
   }
   const handleInputImageReset = () => {
-    setInputValue('')
-    setImgSrc('/images/avatars/1.png')
+    setImgSrc(user?.photoURL || '/images/avatars/1.png')
+    setSelectedImageFile(null) // Clear selected image
+    // Clear the file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
   }
 
   const handleFormChange = (field: keyof Data, value: Data[keyof Data]) => {
@@ -159,7 +254,7 @@ const TabAccount = () => {
       {/* Account Details Card */}
       <Grid item xs={12}>
         <Card>
-          <form>
+          <form onSubmit={handleUpdateProfile}>
             <CardContent sx={{ pb: (theme) => `${theme.spacing(10)}` }}>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 {/* <ImgStyled src={user?.photoURL || imgSrc} alt="Profile Pic" /> */}
@@ -170,19 +265,22 @@ const TabAccount = () => {
                     height: 120,
                     marginRight: 10,
                   }}
-                  src={user?.photoURL}
+                  src={selectedImageFile ? imgSrc : user?.photoURL}
                 />
                 <div>
                   <ButtonStyled
                     component="label"
                     variant="contained"
                     htmlFor="account-settings-upload-image"
+                    disabled={isUpdating || isImageUploading}
                   >
-                    Cargar nueva imagen
+                    {selectedImageFile
+                      ? 'Cambiar imagen'
+                      : 'Cargar nueva imagen'}
                     <input
                       hidden
                       type="file"
-                      value={inputValue}
+                      ref={fileInputRef}
                       accept="image/png, image/jpeg"
                       onChange={handleInputImageChange}
                       id="account-settings-upload-image"
@@ -192,6 +290,7 @@ const TabAccount = () => {
                     color="secondary"
                     variant="outlined"
                     onClick={handleInputImageReset}
+                    disabled={isUpdating || isImageUploading}
                   >
                     Restaurar
                   </ResetButtonStyled>
@@ -200,6 +299,14 @@ const TabAccount = () => {
                     sx={{ mt: 4, display: 'block', color: 'text.disabled' }}
                   >
                     Permitido PNG or JPEG. Max size of 800K.
+                    {selectedImageFile && (
+                      <Box
+                        component="span"
+                        sx={{ color: 'success.main', display: 'block', mt: 1 }}
+                      >
+                        ✓ Nueva imagen seleccionada
+                      </Box>
+                    )}
                   </Typography>
                 </div>
               </Box>
@@ -426,15 +533,51 @@ const TabAccount = () => {
                   </FormControl>
                 </Grid> */}
 
+                {/* Error Message */}
+                {updateError && (
+                  <Grid item xs={12}>
+                    <Alert severity="error" sx={{ mb: 2 }}>
+                      {updateError}
+                    </Alert>
+                  </Grid>
+                )}
+
+                {/* Success Message */}
+                {updateSuccess && (
+                  <Grid item xs={12}>
+                    <Alert severity="success" sx={{ mb: 2 }}>
+                      ¡Perfil actualizado exitosamente!
+                    </Alert>
+                  </Grid>
+                )}
+
                 <Grid item xs={12}>
-                  <Button variant="contained" sx={{ mr: 4 }}>
-                    Grardar
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    sx={{ mr: 4 }}
+                    disabled={isUpdating || isImageUploading}
+                    startIcon={
+                      isUpdating || isImageUploading ? (
+                        <CircularProgress size={20} />
+                      ) : null
+                    }
+                  >
+                    {isImageUploading
+                      ? 'Subiendo imagen...'
+                      : isUpdating
+                      ? 'Guardando perfil...'
+                      : 'Guardar Cambios'}
                   </Button>
                   <Button
                     type="reset"
                     variant="outlined"
                     color="secondary"
-                    onClick={() => setFormData(initialData)}
+                    onClick={() => {
+                      setFormData(initialData)
+                      handleInputImageReset()
+                    }}
+                    disabled={isUpdating || isImageUploading}
                   >
                     Restaurar
                   </Button>

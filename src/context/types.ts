@@ -1,7 +1,13 @@
 import {
+  UploadImagesResponseType,
+  UploadImagesType,
+} from '@/types/apps/imageTypes'
+import {
   CancelSubscriptionType,
   CreateSubscriptionProps,
   CreateSubscriptionType,
+  IUpdateUserProfileProps,
+  IUpdateUserProfileResponse,
   SignUpRequest,
   SignUpType,
   TriggerForgotPasswordProps,
@@ -9,19 +15,15 @@ import {
   UpdatePasswordRequest,
   UpdatePasswordType,
 } from 'src/firebase'
-import { ICloudModules, UserTypes } from 'src/types/apps/userTypes'
 import {
-  StripeProductType,
   CustomerPaymentsHistoryResponseType,
   PaymentMethodsResponseType,
+  RemoveCustomerCardType,
+  StripeProductType,
   UpdateCardRequestType,
   UpdateCardResponseType,
-  RemoveCustomerCardType,
 } from 'src/types/apps/stripeTypes'
-import {
-  UploadImagesResponseType,
-  UploadImagesType,
-} from '@/types/apps/imageTypes'
+import { ICloudModules, UserTypes } from 'src/types/apps/userTypes'
 
 export type ErrCallbackType = (err: { [key: string]: string }) => void
 
@@ -100,4 +102,7 @@ export type FirebaseValuesType = {
   uploadImages: (
     data: UploadImagesType,
   ) => Promise<UploadImagesResponseType | { error: string } | undefined>
+  updateUserProfile: (
+    data: IUpdateUserProfileProps,
+  ) => Promise<IUpdateUserProfileResponse | { error: string } | undefined>
 }

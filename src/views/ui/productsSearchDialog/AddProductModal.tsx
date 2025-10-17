@@ -471,24 +471,26 @@ const AddProductModal: React.FC<AddProductModalProps> = ({
                 />
               </Grid>
 
-              <Grid item xs={12} sm={6}>
-                <Controller
-                  name="costo"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Costo"
-                      type="number"
-                      error={!!errors.costo}
-                      helperText={errors.costo?.message}
-                      size="small"
-                      inputProps={{ min: 0, step: 0.01 }}
-                    />
-                  )}
-                />
-              </Grid>
+              {!esServicio && (
+                <Grid item xs={12} sm={6}>
+                  <Controller
+                    name="costo"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        label="Costo"
+                        type="number"
+                        error={!!errors.costo}
+                        helperText={errors.costo?.message}
+                        size="small"
+                        inputProps={{ min: 0, step: 0.01 }}
+                      />
+                    )}
+                  />
+                </Grid>
+              )}
 
               {!esServicio && (
                 <Grid item xs={12} sm={6}>

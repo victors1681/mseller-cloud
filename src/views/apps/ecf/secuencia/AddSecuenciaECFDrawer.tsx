@@ -1,27 +1,27 @@
 // ** React Imports
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 // ** MUI Imports
-import Drawer from '@mui/material/Drawer'
-import Button from '@mui/material/Button'
-import { styled } from '@mui/material/styles'
-import TextField from '@mui/material/TextField'
-import IconButton from '@mui/material/IconButton'
-import Typography from '@mui/material/Typography'
+import Autocomplete from '@mui/material/Autocomplete'
 import Box, { BoxProps } from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import Drawer from '@mui/material/Drawer'
 import FormControl from '@mui/material/FormControl'
-import FormHelperText from '@mui/material/FormHelperText'
-import Switch from '@mui/material/Switch'
 import FormControlLabel from '@mui/material/FormControlLabel'
-import Select from '@mui/material/Select'
+import FormHelperText from '@mui/material/FormHelperText'
+import IconButton from '@mui/material/IconButton'
 import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
-import Autocomplete from '@mui/material/Autocomplete'
+import Select from '@mui/material/Select'
+import { styled } from '@mui/material/styles'
+import Switch from '@mui/material/Switch'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
 
 // ** Third Party Imports
-import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useForm, Controller } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
+import * as yup from 'yup'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -30,13 +30,12 @@ import Icon from 'src/@core/components/icon'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   addSecuenciaECF,
-  updateSecuenciaECF,
   toggleSecuenciaECFAddUpdate,
+  updateSecuenciaECF,
 } from 'src/store/apps/ecf'
 
 // ** Types Imports
-import { RootState, AppDispatch } from 'src/store'
-import { SecuenciaEcfType } from 'src/types/apps/ecfType'
+import { AppDispatch, RootState } from 'src/store'
 import { tipoClienteOptions } from 'src/utils/tipoClienteOptions'
 
 interface SidebarAddSecuenciaType {
@@ -181,7 +180,7 @@ const AddSecuenciaECFDrawer = (props: SidebarAddSecuenciaType) => {
     >
       <Header>
         <Typography variant="h6">
-          {store.secuenciaEditData ? 'Editar' : 'Crear'} Secuencia ECF
+          {store.secuenciaEditData ? 'Editar' : 'Crear'} Secuencia eCF
         </Typography>
         <IconButton
           size="small"
@@ -205,22 +204,27 @@ const AddSecuenciaECFDrawer = (props: SidebarAddSecuenciaType) => {
                     typeof option === 'string' ? option : option.label
                   }
                   value={
-                    tipoClienteOptions.find((opt) => opt.value === value) || {
-                      value,
-                      label: value,
-                    }
+                    tipoClienteOptions.find((opt) => opt.value === value) ||
+                    value
                   }
                   onChange={(_, newValue) => {
                     if (typeof newValue === 'string') {
                       onChange(newValue)
-                    } else if (newValue) {
+                    } else if (newValue && typeof newValue === 'object') {
                       onChange(newValue.value)
                     } else {
                       onChange('')
                     }
                   }}
                   onInputChange={(_, newInputValue) => {
-                    onChange(newInputValue)
+                    // Only update the value when freeSolo mode is used (typing custom values)
+                    if (
+                      !tipoClienteOptions.find(
+                        (opt) => opt.label === newInputValue,
+                      )
+                    ) {
+                      onChange(newInputValue)
+                    }
                   }}
                   renderInput={(params) => (
                     <TextField

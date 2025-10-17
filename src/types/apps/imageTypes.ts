@@ -1,6 +1,6 @@
 export interface UploadImagesType {
   images: string[]
-  type?: string
+  type?: 'products' | 'profile' | 'documents'
 }
 
 export interface ImageDocument {

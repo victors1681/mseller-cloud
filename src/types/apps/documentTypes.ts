@@ -65,6 +65,7 @@ export interface DocumentType {
   num_reg: string
   noPedidoStr: string
   noPedido: number
+  secuenciaDocumento: string
   codigoVendedor: string
   tipoDocumento: TipoDocumentoEnum
   confirmado: boolean

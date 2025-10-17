@@ -1,11 +1,14 @@
 // ** React Imports
-import { createContext, useState, ReactNode } from 'react'
+import { createContext, ReactNode, useState } from 'react'
 
 // ** Next Import
 import { useRouter } from 'next/router'
 
 // ** Types
-import { FirebaseValuesType } from './types'
+import {
+  UploadImagesResponseType,
+  UploadImagesType,
+} from '@/types/apps/imageTypes'
 import {
   cancelSubscriptionFirebase,
   CancelSubscriptionType,
@@ -15,8 +18,11 @@ import {
   fetchStripeProductsFirebase,
   getCustomerPaymentMethodsFirebase,
   getCustomerPaymentsHistoryFirebase,
+  IUpdateUserProfileProps,
+  IUpdateUserProfileResponse,
   removeCustomerCardFirebase,
   updateCustomerCardFirebase,
+  updateUserProfileFirebase,
   uploadImagesFirebase,
 } from 'src/firebase'
 import {
@@ -27,10 +33,7 @@ import {
   UpdateCardRequestType,
   UpdateCardResponseType,
 } from 'src/types/apps/stripeTypes'
-import {
-  UploadImagesResponseType,
-  UploadImagesType,
-} from '@/types/apps/imageTypes'
+import { FirebaseValuesType } from './types'
 
 // ** Defaults
 const defaultProvider: FirebaseValuesType = {
@@ -43,6 +46,7 @@ const defaultProvider: FirebaseValuesType = {
   updateCustomerCard: () => Promise.resolve(undefined),
   removeCustomerCard: () => Promise.resolve(undefined),
   uploadImages: () => Promise.resolve(undefined),
+  updateUserProfile: () => Promise.resolve(undefined),
 }
 
 const FirebaseContext = createContext(defaultProvider)
@@ -103,6 +107,12 @@ const FirebaseProvider = ({ children }: Props) => {
     return uploadImagesFirebase(data)
   }
 
+  const updateUserProfile = async (
+    data: IUpdateUserProfileProps,
+  ): Promise<IUpdateUserProfileResponse | { error: string } | undefined> => {
+    return updateUserProfileFirebase(data)
+  }
+
   const values = {
     loading,
     createSubscription,
@@ -113,6 +123,7 @@ const FirebaseProvider = ({ children }: Props) => {
     updateCustomerCard,
     removeCustomerCard,
     uploadImages,
+    updateUserProfile,
   }
 
   return (

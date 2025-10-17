@@ -445,69 +445,74 @@ const ProductDetailModal = ({
             />
             <CardContent sx={{ p: { xs: 2, sm: 3 }, pt: 0 }}>
               <Grid container spacing={{ xs: 2, sm: 3 }}>
-                {product.imagenes
-                  .sort((a, b) => a.ordenVisualizacion - b.ordenVisualizacion)
-                  .map((image, index) => (
-                    <Grid item xs={6} sm={4} md={3} key={index}>
-                      <Card
-                        sx={{
-                          cursor: 'pointer',
-                          transition:
-                            'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-                          '&:hover': {
-                            transform: 'translateY(-4px)',
-                            boxShadow: theme.shadows[8],
-                          },
-                        }}
-                      >
-                        <CardMedia
-                          component="img"
-                          height="140"
-                          image={image.rutaPublica || image.ruta}
-                          alt={image.titulo || product.nombre}
-                          onClick={() =>
-                            handleImageClick(image.rutaPublica || image.ruta)
-                          }
+                {product?.imagenes?.length > 0 &&
+                  product?.imagenes
+                    ?.sort(
+                      (a, b) => a.ordenVisualizacion - b.ordenVisualizacion,
+                    )
+                    .map((image, index) => (
+                      <Grid item xs={6} sm={4} md={3} key={index}>
+                        <Card
                           sx={{
-                            objectFit: 'cover',
-                            borderRadius: 1,
+                            cursor: 'pointer',
+                            transition:
+                              'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+                            '&:hover': {
+                              transform: 'translateY(-4px)',
+                              boxShadow: theme.shadows[8],
+                            },
                           }}
-                        />
-                        {image.esImagenPredeterminada && (
-                          <Box
+                        >
+                          <CardMedia
+                            component="img"
+                            height="140"
+                            image={image.rutaPublica || image.ruta}
+                            alt={image.titulo || product.nombre}
+                            onClick={() =>
+                              handleImageClick(image.rutaPublica || image.ruta)
+                            }
                             sx={{
-                              position: 'absolute',
-                              top: 8,
-                              right: 8,
-                              backgroundColor: 'success.main',
-                              borderRadius: '50%',
-                              p: 0.5,
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
+                              objectFit: 'cover',
+                              borderRadius: 1,
                             }}
-                          >
-                            <Icon
-                              icon="mdi:star"
-                              color="white"
-                              fontSize="0.8rem"
-                            />
-                          </Box>
-                        )}
-                        {image.titulo && (
-                          <CardContent sx={{ p: 1, '&:last-child': { pb: 1 } }}>
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                              noWrap
+                          />
+                          {image.esImagenPredeterminada && (
+                            <Box
+                              sx={{
+                                position: 'absolute',
+                                top: 8,
+                                right: 8,
+                                backgroundColor: 'success.main',
+                                borderRadius: '50%',
+                                p: 0.5,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}
                             >
-                              {image.titulo}
-                            </Typography>
-                          </CardContent>
-                        )}
-                      </Card>
-                    </Grid>
-                  ))}
+                              <Icon
+                                icon="mdi:star"
+                                color="white"
+                                fontSize="0.8rem"
+                              />
+                            </Box>
+                          )}
+                          {image.titulo && (
+                            <CardContent
+                              sx={{ p: 1, '&:last-child': { pb: 1 } }}
+                            >
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                noWrap
+                              >
+                                {image.titulo}
+                              </Typography>
+                            </CardContent>
+                          )}
+                        </Card>
+                      </Grid>
+                    ))}
               </Grid>
             </CardContent>
           </InfoCard>

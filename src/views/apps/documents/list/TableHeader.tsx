@@ -37,12 +37,21 @@ interface TableHeaderProps {
   handleFilter: (val: string) => void
   handleAction: (event: SelectChangeEvent<string>, child: ReactNode) => void
   placeholder: string
+  onRefresh?: () => void
+  isRefreshing?: boolean
 }
 
 const TableHeader = (props: TableHeaderProps) => {
   // ** Props
-  const { searchValue, actionValue, selectedRows, handleFilter, handleAction } =
-    props
+  const {
+    searchValue,
+    actionValue,
+    selectedRows,
+    handleFilter,
+    handleAction,
+    onRefresh,
+    isRefreshing,
+  } = props
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
@@ -173,6 +182,27 @@ const TableHeader = (props: TableHeaderProps) => {
           placeholder={props.placeholder}
           onChange={(e) => handleFilter(e.target.value)}
         />
+        {onRefresh && (
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={onRefresh}
+            disabled={isRefreshing}
+            sx={{
+              minWidth: { xs: '100%', sm: 'auto' },
+              minHeight: 44, // Better touch target
+              px: 3,
+            }}
+            startIcon={
+              <Icon
+                icon={isRefreshing ? 'mdi:loading' : 'mdi:refresh'}
+                className={isRefreshing ? 'animate-spin' : ''}
+              />
+            }
+          >
+            Actualizar
+          </Button>
+        )}
         <PermissionGuard permission="orders.allowCreate">
           <ButtonGroup
             variant="contained"

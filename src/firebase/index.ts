@@ -351,6 +351,46 @@ export const uploadImagesFirebase = async (
   }
 }
 
+// Update User Profile Types
+export interface IUpdateUserAddress {
+  city?: string
+  country?: string
+  street?: string
+  zipCode?: string
+}
+
+export type IUpdateUserProfileProps = {
+  userId: string
+} & Partial<Pick<UserTypes, 'firstName' | 'lastName' | 'photoURL'>> & {
+    business?: {
+      name?: string
+      rnc?: string
+      website?: string
+      phone?: string
+      address?: IUpdateUserAddress
+    }
+  }
+
+export interface IUpdateUserProfileResponse {
+  success: boolean
+  message: string
+}
+
+export const updateUserProfileFirebase = async (
+  data: IUpdateUserProfileProps,
+): Promise<IUpdateUserProfileResponse | { error: string } | undefined> => {
+  try {
+    const fn = httpsCallable<
+      IUpdateUserProfileProps,
+      IUpdateUserProfileResponse
+    >(functions, 'updateUserProfile')
+    const response = await fn(data)
+    return response.data
+  } catch (err: any) {
+    return firebaseError(err)
+  }
+}
+
 type ErrorResponse = { error: string }
 
 export const isValidResponse = <T>(

@@ -714,6 +714,8 @@ const InvoiceList = ({ documentType, pageTitle }: DocumentsListProps) => {
               handleFilter={handleFilter}
               handleAction={handleSelectionAction}
               placeholder="Cliente, NoPedido"
+              onRefresh={handleRefresh}
+              isRefreshing={isRefreshing}
             />
 
             {/* Mobile Refresh Button */}

@@ -15,11 +15,14 @@ import { useMemo } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
 
 const ProductPricing = () => {
-  const { register, control } = useFormContext()
+  const { register, control, watch } = useFormContext()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
   const store = useSelector((state: RootState) => state.products)
+
+  // Watch esServicio field to conditionally hide cost field
+  const esServicio = watch('esServicio')
 
   const taxesTypeOptions = useMemo(() => {
     return store.taxes.map((unit) => ({
@@ -153,29 +156,31 @@ const ProductPricing = () => {
               )}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="costo"
-              control={control}
-              render={({ field, fieldState: { error } }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  label="Costo"
-                  placeholder="$0"
-                  type="number"
-                  error={!!error}
-                  helperText={error?.message}
-                  size={isMobile ? 'medium' : 'medium'}
-                  sx={{
-                    '& .MuiInputBase-input': {
-                      fontSize: isMobile ? '0.875rem' : '1rem',
-                    },
-                  }}
-                />
-              )}
-            />
-          </Grid>
+          {!esServicio && (
+            <Grid item xs={12} sm={6}>
+              <Controller
+                name="costo"
+                control={control}
+                render={({ field, fieldState: { error } }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label="Costo"
+                    placeholder="$0"
+                    type="number"
+                    error={!!error}
+                    helperText={error?.message}
+                    size={isMobile ? 'medium' : 'medium'}
+                    sx={{
+                      '& .MuiInputBase-input': {
+                        fontSize: isMobile ? '0.875rem' : '1rem',
+                      },
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+          )}
           <Grid item xs={12}>
             <Divider sx={{ my: isMobile ? 1 : 2 }}>
               <Typography

@@ -1,31 +1,30 @@
 // ** React Imports
-import { useState, useEffect, forwardRef, useCallback } from 'react'
+import { forwardRef, useCallback, useEffect, useState } from 'react'
 
 // ** Next Import
 import Link from 'next/link'
 
 // ** MUI Imports
-import Grid from '@mui/material/Grid'
-import Card from '@mui/material/Card'
-import { styled } from '@mui/material/styles'
-import TextField from '@mui/material/TextField'
-import CardHeader from '@mui/material/CardHeader'
-import Typography from '@mui/material/Typography'
-import { DataGrid, GridColDef, GridRowId } from '@mui/x-data-grid'
 import {
   Box,
-  debounce,
-  IconButton,
-  Tooltip,
+  Button,
   Chip,
-  Switch,
+  debounce,
   Dialog,
-  DialogTitle,
+  DialogActions,
   DialogContent,
   DialogContentText,
-  DialogActions,
-  Button,
+  DialogTitle,
+  IconButton,
+  Tooltip,
 } from '@mui/material'
+import Card from '@mui/material/Card'
+import CardHeader from '@mui/material/CardHeader'
+import Grid from '@mui/material/Grid'
+import { styled } from '@mui/material/styles'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
+import { DataGrid, GridColDef, GridRowId } from '@mui/x-data-grid'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -36,21 +35,21 @@ import format from 'date-fns/format'
 // ** Store & Actions Imports
 import { useDispatch, useSelector } from 'react-redux'
 import {
+  deleteSecuenciaECF,
   fetchSecuenciaECF,
   toggleSecuenciaECFAddUpdate,
-  deleteSecuenciaECF,
   toggleSecuenciaECFStatus,
 } from 'src/store/apps/ecf'
 
 // ** Types Imports
-import { RootState, AppDispatch } from 'src/store'
+import { AppDispatch, RootState } from 'src/store'
 import { SecuenciaEcfType } from 'src/types/apps/ecfType'
-import SecuenciaTableHeader from 'src/views/apps/ecf/secuencia/TableHeader'
 import AddSecuenciaECFDrawer from 'src/views/apps/ecf/secuencia/AddSecuenciaECFDrawer'
+import SecuenciaTableHeader from 'src/views/apps/ecf/secuencia/TableHeader'
 
 // ** Styled Components
-import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import OptionsMenu from 'src/@core/components/option-menu'
+import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import { getTipoClienteLabel } from 'src/utils/tipoClienteOptions'
 
 interface CustomInputProps {
@@ -86,7 +85,7 @@ const defaultColumns: GridColDef[] = [
           fontWeight: 600,
         }}
       >
-        {getTipoClienteLabel(row.tipoCliente)}
+        {getTipoClienteLabel(row.tipoCliente) || row.tipoCliente}
       </Typography>
     ),
   },
