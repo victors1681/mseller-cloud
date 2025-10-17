@@ -60,13 +60,6 @@ const StyledDialog = styled(Dialog)(({ theme }) => ({
   },
 }))
 
-const StyledCard = styled(Card)(({ theme }) => ({
-  border: 0,
-  boxShadow: theme.shadows[0],
-  color: theme.palette.common.white,
-  backgroundColor: theme.palette.primary.main,
-}))
-
 const InfoCard = styled(Card)(({ theme }) => ({
   border: `1px solid ${theme.palette.divider}`,
   transition: 'border 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
@@ -82,18 +75,6 @@ const StatsAvatar = styled(Avatar)(({ theme }) => ({
   boxShadow: theme.shadows[3],
   color: theme.palette.common.white,
   backgroundColor: theme.palette.primary.main,
-}))
-
-const ProductImage = styled('img')(({ theme }) => ({
-  width: '100%',
-  height: '200px',
-  objectFit: 'cover',
-  borderRadius: theme.spacing(1),
-  cursor: 'pointer',
-  transition: 'transform 0.3s ease-in-out',
-  '&:hover': {
-    transform: 'scale(1.05)',
-  },
 }))
 
 const ActionButton = styled(Button)(({ theme }) => ({
@@ -446,14 +427,15 @@ const ProductDetailModal = ({
             <CardContent sx={{ p: { xs: 2, sm: 3 }, pt: 0 }}>
               <Grid container spacing={{ xs: 2, sm: 3 }}>
                 {product?.imagenes?.length > 0 &&
-                  product?.imagenes
-                    ?.sort(
-                      (a, b) => a.ordenVisualizacion - b.ordenVisualizacion,
-                    )
+                  [...product.imagenes]
+
+                    .sort((a, b) => a.ordenVisualizacion - b.ordenVisualizacion)
+                    .filter((image) => image.tipoImagen === 'thumbnail')
                     .map((image, index) => (
                       <Grid item xs={6} sm={4} md={3} key={index}>
                         <Card
                           sx={{
+                            position: 'relative', // Add this for absolute positioning
                             cursor: 'pointer',
                             transition:
                               'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',

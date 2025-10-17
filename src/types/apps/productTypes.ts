@@ -48,7 +48,7 @@ export interface ProductImageType {
   descripcion?: string
   ordenVisualizacion: number
   esImagenPredeterminada: boolean
-  tipoImagen?: string
+  tipoImagen?: 'thumbnail' | 'original'
   fechaCreacion?: string
 }
 
