@@ -9,13 +9,42 @@ import {
   CalcularDevolucionRequest,
   DevolucionResponse,
   DocumentoResponse,
-  initialItemReturnsState,
+  initialCombinedItemReturnsState,
+  ItemReturnListItem,
+  ItemReturnsListFilters,
+  PaginatedItemReturnsListResponse,
   ProcesarDevolucionRequest,
   ProcessedReturn,
   SelectedDocument,
 } from 'src/types/apps/itemReturnsTypes'
 
 // ** Async Actions
+
+// ============================================
+// List View Actions
+// ============================================
+
+// Fetch paginated list of item returns
+export const fetchItemReturnsList = createAsyncThunk(
+  'itemReturns/fetchItemReturnsList',
+  async (filters: ItemReturnsListFilters, { rejectWithValue }) => {
+    try {
+      const response = await restClient.get<PaginatedItemReturnsListResponse>(
+        '/api/portal/Devolucion',
+        { params: filters },
+      )
+      return response.data
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Error fetching item returns list',
+      )
+    }
+  },
+)
+
+// ============================================
+// Document Processing Actions
+// ============================================
 
 // Fetch document items by document number
 export const fetchDocumentItems = createAsyncThunk(
@@ -44,12 +73,31 @@ export const calculateItemReturn = createAsyncThunk(
 // Process Item Return
 export const processItemReturn = createAsyncThunk(
   'itemReturns/processItemReturn',
-  async (request: ProcesarDevolucionRequest) => {
-    const response = await restClient.post<DevolucionResponse>(
-      '/api/portal/Devolucion',
-      request,
-    )
-    return response.data
+  async (request: ProcesarDevolucionRequest, { rejectWithValue }) => {
+    try {
+      const response = await restClient.post<DevolucionResponse>(
+        '/api/portal/Devolucion',
+        request,
+      )
+      return response.data
+    } catch (error: any) {
+      // Handle specific 400 errors with detailed messages
+      if (error.response?.status === 400) {
+        const errorMessage =
+          error.response.data?.message ||
+          error.response.data?.error ||
+          error.response.data ||
+          'Error de validación en la solicitud'
+        return rejectWithValue(errorMessage)
+      }
+
+      // Handle other errors
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        'Error al procesar la devolución'
+      return rejectWithValue(errorMessage)
+    }
   },
 )
 
@@ -68,7 +116,7 @@ export const fetchReturnHistory = createAsyncThunk(
 // ** Slice
 const itemReturnsSlice = createSlice({
   name: 'itemReturns',
-  initialState: initialItemReturnsState,
+  initialState: initialCombinedItemReturnsState,
   reducers: {
     // Set selected document
     setSelectedDocument: (
@@ -142,10 +190,17 @@ const itemReturnsSlice = createSlice({
       state.processError = null
     },
 
+    // Force reset processing state
+    resetProcessingState: (state) => {
+      state.isProcessing = false
+    },
+
     // Set filters
     setFilters: (
       state,
-      action: PayloadAction<Partial<typeof initialItemReturnsState.filters>>,
+      action: PayloadAction<
+        Partial<typeof initialCombinedItemReturnsState.filters>
+      >,
     ) => {
       state.filters = { ...state.filters, ...action.payload }
     },
@@ -159,7 +214,32 @@ const itemReturnsSlice = createSlice({
     },
 
     // Reset state
-    resetState: () => initialItemReturnsState,
+    resetState: () => initialCombinedItemReturnsState,
+
+    // ============================================
+    // List View Actions
+    // ============================================
+    setListFilters: (state, action: PayloadAction<ItemReturnsListFilters>) => {
+      state.listView.listFilters = {
+        ...state.listView.listFilters,
+        ...action.payload,
+      }
+    },
+    clearListFilters: (state) => {
+      state.listView.listFilters = {
+        pageNumber: 1,
+        pageSize: 20,
+      }
+    },
+    setSelectedListItem: (
+      state,
+      action: PayloadAction<ItemReturnListItem | null>,
+    ) => {
+      state.listView.selectedListItem = action.payload
+    },
+    clearListErrors: (state) => {
+      state.listView.listError = null
+    },
   },
   extraReducers: (builder) => {
     // Fetch document items
@@ -242,7 +322,11 @@ const itemReturnsSlice = createSlice({
       })
       .addCase(processItemReturn.rejected, (state, action) => {
         state.isProcessing = false
-        state.processError = action.error.message || 'Error processing return'
+        // Use the rejectWithValue payload if available, otherwise fallback to error message
+        state.processError =
+          (action.payload as string) ||
+          action.error.message ||
+          'Error al procesar la devolución'
       })
 
     // Fetch return history
@@ -260,6 +344,34 @@ const itemReturnsSlice = createSlice({
         state.historyError =
           action.error.message || 'Error loading return history'
       })
+
+    // ============================================
+    // List View Cases
+    // ============================================
+
+    // Fetch item returns list
+    builder
+      .addCase(fetchItemReturnsList.pending, (state) => {
+        state.listView.isLoadingList = true
+        state.listView.listError = null
+      })
+      .addCase(fetchItemReturnsList.fulfilled, (state, action) => {
+        state.listView.isLoadingList = false
+        state.listView.listData = action.payload.items
+        state.listView.totalCount = action.payload.totalCount
+        state.listView.pageNumber = action.payload.pageNumber
+        state.listView.pageSize = action.payload.pageSize
+        state.listView.totalPages = action.payload.totalPages
+        state.listView.hasPreviousPage = action.payload.hasPreviousPage
+        state.listView.hasNextPage = action.payload.hasNextPage
+      })
+      .addCase(fetchItemReturnsList.rejected, (state, action) => {
+        state.listView.isLoadingList = false
+        state.listView.listError =
+          (action.payload as string) ||
+          action.error.message ||
+          'Error loading item returns list'
+      })
   },
 })
 
@@ -272,9 +384,14 @@ export const {
   removeReturnItem,
   clearCalculations,
   clearProcessingResult,
+  resetProcessingState,
   setFilters,
   clearErrors,
   resetState,
+  setListFilters,
+  clearListFilters,
+  setSelectedListItem,
+  clearListErrors,
 } = itemReturnsSlice.actions
 
 // ** Export reducer

@@ -1,5 +1,5 @@
 // ** React Imports
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 // ** MUI Imports
 import {
@@ -40,6 +40,7 @@ interface DocumentSearchForm {
 
 interface DocumentSearchCardProps {
   onDocumentSelected?: (numeroDocumento: string) => void
+  initialDocumentNumber?: string | null
 }
 
 // ** Validation Schema
@@ -52,6 +53,7 @@ const schema = yup.object().shape({
 
 const DocumentSearchCard = ({
   onDocumentSelected,
+  initialDocumentNumber,
 }: DocumentSearchCardProps) => {
   // ** State
   const [searchHistory, setSearchHistory] = useState<string[]>([])
@@ -78,6 +80,30 @@ const DocumentSearchCard = ({
       numeroDocumento: selectedDocument?.numeroDocumento || '',
     },
   })
+
+  // ** Effects
+  useEffect(() => {
+    // Auto-populate and search if initialDocumentNumber is provided
+    if (initialDocumentNumber && !selectedDocument) {
+      setValue('numeroDocumento', initialDocumentNumber)
+      // Automatically search for the document
+      dispatch(clearErrors())
+      dispatch(fetchDocumentItems(initialDocumentNumber))
+        .unwrap()
+        .then(() => {
+          onDocumentSelected?.(initialDocumentNumber)
+        })
+        .catch((error) => {
+          console.error('Error fetching document items:', error)
+        })
+    }
+  }, [
+    initialDocumentNumber,
+    selectedDocument,
+    setValue,
+    dispatch,
+    onDocumentSelected,
+  ])
 
   // ** Handlers
   const onSubmit = useCallback(

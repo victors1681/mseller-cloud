@@ -1,6 +1,9 @@
 // ** Next Import
 import { useRouter } from 'next/router'
 
+// ** React Imports
+import { ReactNode, useEffect, useRef, useState } from 'react'
+
 // ** MUI Imports
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -13,7 +16,6 @@ import Paper from '@mui/material/Paper'
 import Popper from '@mui/material/Popper'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 import TextField from '@mui/material/TextField'
-import { ReactNode, useRef, useState } from 'react'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -66,6 +68,19 @@ const TableHeader = (props: TableHeaderProps) => {
       label: tipoDocumentoSpanishNames[TipoDocumentoEnum.QUOTE],
     },
   ]
+
+  // ** Auto-select document type based on current route
+  useEffect(() => {
+    const currentPath = router.pathname
+
+    if (currentPath.includes('/pedidos')) {
+      setSelectedIndex(0) // ORDER
+    } else if (currentPath.includes('/facturas')) {
+      setSelectedIndex(1) // INVOICE
+    } else if (currentPath.includes('/cotizacion')) {
+      setSelectedIndex(2) // QUOTE
+    }
+  }, [router.pathname])
 
   const handleCreateDocument = (documentType: string) => {
     // Add document type to URL query parameters

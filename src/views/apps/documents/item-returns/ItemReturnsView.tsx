@@ -1,5 +1,8 @@
 // ** React Imports
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+
+// ** Next Imports
+import { useRouter } from 'next/router'
 
 // ** MUI Imports
 import {
@@ -48,9 +51,15 @@ const steps = [
 ]
 
 const ItemReturnsView = () => {
+  // ** Hooks
+  const router = useRouter()
+
   // ** State
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [currentStep, setCurrentStep] = useState(0)
+  const [initialDocumentNumber, setInitialDocumentNumber] = useState<
+    string | null
+  >(null)
 
   // ** Redux
   const dispatch = useDispatch<AppDispatch>()
@@ -65,6 +74,15 @@ const ItemReturnsView = () => {
     processError,
     processingResult,
   } = useSelector((state: RootState) => state.itemReturns)
+
+  // ** Effects
+  useEffect(() => {
+    // Check for documentNumber in URL parameters
+    const { documentNumber } = router.query
+    if (documentNumber && typeof documentNumber === 'string') {
+      setInitialDocumentNumber(documentNumber)
+    }
+  }, [router.query])
 
   // ** Determine current step
   const getActiveStep = () => {
@@ -211,7 +229,10 @@ const ItemReturnsView = () => {
       <Grid item xs={12}>
         <Fade in={true} timeout={500}>
           <Box>
-            <DocumentSearchCard onDocumentSelected={handleDocumentSelected} />
+            <DocumentSearchCard
+              onDocumentSelected={handleDocumentSelected}
+              initialDocumentNumber={initialDocumentNumber}
+            />
           </Box>
         </Fade>
       </Grid>

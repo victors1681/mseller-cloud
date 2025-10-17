@@ -1,5 +1,5 @@
 // ** React Imports
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 // ** MUI Imports
 import {
@@ -27,6 +27,9 @@ import {
   Typography,
 } from '@mui/material'
 
+// ** Third Party Imports
+import toast from 'react-hot-toast'
+
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
@@ -35,7 +38,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/store'
 import {
   clearCalculations,
+  clearProcessingResult,
   processItemReturn,
+  resetProcessingState,
 } from 'src/store/apps/itemReturns'
 
 // ** Utils
@@ -65,9 +70,20 @@ const ReturnProcessingCard = ({
     processingResult,
   } = useSelector((state: RootState) => state.itemReturns)
 
+  // ** Effects
+  // Reset processCompleted when calculations change (allows retry after error)
+  useEffect(() => {
+    if (calculations && processCompleted) {
+      setProcessCompleted(false)
+    }
+  }, [calculations, processCompleted])
+
   // ** Handlers
   const handleProcessReturn = useCallback(async () => {
     if (!selectedDocument || !calculations) return
+
+    // Clear any previous errors before starting
+    dispatch(clearProcessingResult())
 
     const request: ProcesarDevolucionRequest = {
       numeroDocumento: selectedDocument.numeroDocumento,
@@ -79,9 +95,13 @@ const ReturnProcessingCard = ({
     }
 
     try {
-      await dispatch(processItemReturn(request)).unwrap()
+      console.log('Processing return with request:', request)
+      const result = await dispatch(processItemReturn(request)).unwrap()
+
+      // Success handling
       setProcessCompleted(true)
       setConfirmDialogOpen(false)
+      toast.success('Devolución procesada exitosamente')
       onProcessComplete?.(selectedDocument.numeroDocumento)
 
       // Clear calculated return after successful processing
@@ -89,20 +109,37 @@ const ReturnProcessingCard = ({
         dispatch(clearCalculations())
       }, 2000)
     } catch (error) {
-      // Error is handled by Redux
+      console.error('Error processing return:', error)
       setConfirmDialogOpen(false)
+      setProcessCompleted(false) // Reset completed state to allow retry
+
+      // Show error toast
+      const errorMessage =
+        typeof error === 'string' ? error : 'Error al procesar la devolución'
+      toast.error(errorMessage)
+
+      // Fallback: ensure processing state is reset after a short delay
+      setTimeout(() => {
+        dispatch(resetProcessingState())
+      }, 100)
     }
   }, [selectedDocument, calculations, dispatch, onProcessComplete])
 
   const handleOpenConfirmDialog = useCallback(() => {
+    // Clear any previous errors when user tries to process again
+    dispatch(clearProcessingResult())
+    setProcessCompleted(false)
     setConfirmDialogOpen(true)
-  }, [])
+  }, [dispatch])
 
   const handleCloseConfirmDialog = useCallback(() => {
     setConfirmDialogOpen(false)
   }, [])
 
   const canProcess = selectedDocument && calculations && !isProcessing
+
+  // Show process section if we have the requirements
+  const showProcessSection = selectedDocument && calculations
 
   return (
     <Card>
@@ -126,7 +163,7 @@ const ReturnProcessingCard = ({
       />
 
       <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
-        {!canProcess ? (
+        {!showProcessSection ? (
           <Alert
             severity="info"
             sx={{
@@ -166,9 +203,24 @@ const ReturnProcessingCard = ({
               <Grid item xs={12}>
                 <Alert
                   severity="error"
-                  sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+                  onClose={() => dispatch(clearProcessingResult())}
+                  sx={{
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                    '& .MuiAlert-message': {
+                      width: '100%',
+                    },
+                  }}
                 >
-                  {processError}
+                  <Typography variant="inherit" component="div">
+                    <strong>Error al procesar la devolución:</strong>
+                  </Typography>
+                  <Typography
+                    variant="inherit"
+                    component="div"
+                    sx={{ mt: 0.5 }}
+                  >
+                    {processError}
+                  </Typography>
                 </Alert>
               </Grid>
             )}
@@ -367,12 +419,14 @@ const ReturnProcessingCard = ({
                   variant="contained"
                   color="primary"
                   onClick={handleOpenConfirmDialog}
-                  disabled={isProcessing || processCompleted}
+                  disabled={isProcessing || (processCompleted && !processError)}
                   startIcon={
                     isProcessing ? (
                       <CircularProgress size={16} />
-                    ) : processCompleted ? (
+                    ) : processCompleted && !processError ? (
                       <Icon icon="mdi:check" />
+                    ) : processError ? (
+                      <Icon icon="mdi:refresh" />
                     ) : (
                       <Icon icon="mdi:send" />
                     )
@@ -384,8 +438,10 @@ const ReturnProcessingCard = ({
                 >
                   {isProcessing
                     ? 'Procesando...'
-                    : processCompleted
+                    : processCompleted && !processError
                     ? 'Procesada'
+                    : processError
+                    ? 'Reintentar'
                     : 'Procesar Devolución'}
                 </Button>
               </Box>

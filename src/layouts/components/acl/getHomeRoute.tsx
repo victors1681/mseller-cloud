@@ -3,7 +3,7 @@
  */
 const getHomeRoute = (role?: string) => {
   //if (role === 'client') return '/acl' //TODO: handle different UI
-  return '/apps/documents/list' //'/home'
+  return '/apps/documents/pedidos/?status=' //'/home'
 }
 
 export default getHomeRoute

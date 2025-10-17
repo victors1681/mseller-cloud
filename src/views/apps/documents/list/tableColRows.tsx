@@ -1,7 +1,11 @@
 import { usePermissions } from '@/hooks/usePermissions'
 import PermissionGuard from '@/views/ui/permissionGuard'
 import Box from '@mui/material/Box'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
+import Stack from '@mui/material/Stack'
 import { styled } from '@mui/material/styles'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
@@ -18,7 +22,11 @@ import {
   changeDocumentStatus,
   toggleEditDocument,
 } from 'src/store/apps/documents'
-import { DocumentStatus, DocumentType } from 'src/types/apps/documentTypes'
+import {
+  DocumentStatus,
+  DocumentType,
+  getTipoDocumentoSpanishName,
+} from 'src/types/apps/documentTypes'
 import formatCurrency from 'src/utils/formatCurrency'
 import formatDate from 'src/utils/formatDate'
 
@@ -142,6 +150,18 @@ const defaultColumns: GridColDef[] = [
       )
     },
   },
+  // {
+  //   flex: 0.15,
+  //   minWidth: 90,
+  //   field: 'tipoDocumento',
+  //   headerName: 'Documento',
+  //   hideable: true,
+  //   renderCell: ({ row }: CellType) => (
+  //     <Typography variant="body2" sx={{ textTransform: 'capitalize' }}>
+  //       {getTipoDocumentoSpanishName(row.tipoDocumento)}
+  //     </Typography>
+  //   ),
+  // },
   {
     flex: 0.1,
     minWidth: 90,
@@ -304,7 +324,15 @@ export const columns = (
       field: 'actions',
       headerName: 'Actions',
       renderCell: ({ row }: CellType) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: { xs: 0.25, sm: 0.5 },
+            flexWrap: 'nowrap',
+            minWidth: 'fit-content',
+          }}
+        >
           <Tooltip title="Aprobar">
             <PermissionGuard permission="orders.allowApprove" disabled>
               <IconButton
@@ -325,7 +353,7 @@ export const columns = (
                 sx={{
                   minWidth: 44,
                   minHeight: 44,
-                  p: 1,
+                  p: { xs: 0.75, sm: 1 },
                 }}
               >
                 <Icon icon="material-symbols:order-approve" fontSize={20} />
@@ -348,7 +376,7 @@ export const columns = (
                 sx={{
                   minWidth: 44,
                   minHeight: 44,
-                  p: 1,
+                  p: { xs: 0.75, sm: 1 },
                 }}
               >
                 <Icon
@@ -366,7 +394,7 @@ export const columns = (
               sx={{
                 minWidth: 44,
                 minHeight: 44,
-                p: 1,
+                p: { xs: 0.75, sm: 1 },
               }}
             >
               <Icon icon="mdi:eye-outline" fontSize={20} />
@@ -379,7 +407,7 @@ export const columns = (
               sx: {
                 minWidth: 44,
                 minHeight: 44,
-                p: 1,
+                p: { xs: 0.75, sm: 1 },
               },
             }}
             menuProps={{ sx: { '& .MuiMenuItem-root svg': { mr: 2 } } }}
@@ -405,4 +433,258 @@ export const columns = (
       ),
     },
   ]
+}
+
+// Mobile Card Component
+interface DocumentCardProps {
+  document: DocumentType
+  onViewCustomer?: (codigoCliente: string) => void
+  dispatch: ThunkDispatch<AppDispatch, undefined, AnyAction>
+}
+
+const StyledCard = styled(Card)(({ theme }) => ({
+  marginBottom: theme.spacing(2),
+  borderRadius: theme.spacing(2),
+  boxShadow: theme.shadows[2],
+  transition: theme.transitions.create(['box-shadow', 'transform'], {
+    duration: theme.transitions.duration.short,
+  }),
+  '&:hover': {
+    boxShadow: theme.shadows[4],
+    transform: 'translateY(-1px)',
+  },
+  '&:active': {
+    transform: 'translateY(0)',
+  },
+}))
+
+export const DocumentCard = ({
+  document,
+  onViewCustomer,
+  dispatch,
+}: DocumentCardProps) => {
+  const { hasPermission } = usePermissions()
+
+  const handleEditDocument = () => {
+    dispatch(toggleEditDocument(document))
+  }
+
+  const renderClient = () => {
+    if (document.avatarUrl) {
+      return (
+        <CustomAvatar src={document.avatarUrl} sx={{ width: 40, height: 40 }} />
+      )
+    } else {
+      return (
+        <CustomAvatar
+          skin="light"
+          sx={{ width: 40, height: 40, fontSize: '1rem' }}
+        >
+          {getInitials(document.nombreCliente || '')}
+        </CustomAvatar>
+      )
+    }
+  }
+
+  return (
+    <StyledCard>
+      <CardContent sx={{ p: 3 }}>
+        {/* Header Row */}
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="flex-start"
+          mb={2}
+        >
+          <Box flex={1}>
+            <Typography
+              variant="h6"
+              component={Link}
+              href={`/apps/documents/preview/${document.noPedidoStr}`}
+              sx={{
+                fontWeight: 700,
+                fontSize: '1.125rem',
+                color: 'primary.main',
+                textDecoration: 'none',
+                '&:hover': { textDecoration: 'underline' },
+                display: 'block',
+                mb: 0.5,
+              }}
+            >
+              #{document.noPedidoStr}
+            </Typography>
+
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ fontSize: '0.875rem' }}
+            >
+              {getTipoDocumentoSpanishName(document.tipoDocumento)} •{' '}
+              {formatDate(document.fecha)}
+            </Typography>
+          </Box>
+
+          <CustomChip
+            skin="light"
+            size="small"
+            label={orderStatusLabels[document?.procesado] || ''}
+            color={orderStatusObj[document.procesado]}
+            sx={{ textTransform: 'capitalize', ml: 1 }}
+          />
+        </Box>
+
+        {/* Client Info Row */}
+        <Box display="flex" alignItems="center" mb={2}>
+          {renderClient()}
+          <Box ml={2} flex={1}>
+            <Typography
+              variant="body1"
+              sx={{
+                fontWeight: 600,
+                color: 'primary.main',
+                cursor: 'pointer',
+                '&:hover': { textDecoration: 'underline' },
+                fontSize: '1rem',
+              }}
+              onClick={() => onViewCustomer?.(document.codigoCliente)}
+            >
+              {document.nombreCliente}
+            </Typography>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ fontSize: '0.875rem' }}
+            >
+              {document.codigoCliente} • {document.condicion.descripcion}
+            </Typography>
+          </Box>
+        </Box>
+
+        {/* Details Grid */}
+        <Grid container spacing={2} mb={2}>
+          <Grid item xs={6}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              display="block"
+            >
+              Total
+            </Typography>
+            <Typography variant="body1" fontWeight={600}>
+              {formatCurrency(document.total) || '0'}
+            </Typography>
+          </Grid>
+
+          {document.vendedor && (
+            <Grid item xs={6}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                display="block"
+              >
+                Vendedor
+              </Typography>
+              <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+                {document.vendedor.nombre}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {document.vendedor.codigo}
+              </Typography>
+            </Grid>
+          )}
+        </Grid>
+
+        {/* Action Buttons */}
+        <Stack
+          direction="row"
+          spacing={1}
+          justifyContent="flex-end"
+          flexWrap="wrap"
+          gap={1}
+        >
+          <Tooltip title="Aprobar">
+            <PermissionGuard permission="orders.allowApprove" disabled>
+              <IconButton
+                size="small"
+                color="success"
+                disabled={
+                  ![DocumentStatus.Pending, DocumentStatus.Retained].includes(
+                    document.procesado,
+                  )
+                }
+                onClick={() =>
+                  handleApproval(
+                    document.noPedidoStr,
+                    DocumentStatus.ReadyForIntegration,
+                    dispatch,
+                  )
+                }
+                sx={{ minWidth: 44, minHeight: 44 }}
+              >
+                <Icon icon="material-symbols:order-approve" fontSize={20} />
+              </IconButton>
+            </PermissionGuard>
+          </Tooltip>
+
+          <Tooltip title="Retener">
+            <PermissionGuard permission="orders.allowApprove" disabled>
+              <IconButton
+                size="small"
+                color="warning"
+                disabled={
+                  ![DocumentStatus.Pending].includes(document.procesado)
+                }
+                onClick={() =>
+                  handleApproval(
+                    document.noPedidoStr,
+                    DocumentStatus.Retained,
+                    dispatch,
+                  )
+                }
+                sx={{ minWidth: 44, minHeight: 44 }}
+              >
+                <Icon
+                  icon="fluent:document-header-dismiss-24-filled"
+                  fontSize={20}
+                />
+              </IconButton>
+            </PermissionGuard>
+          </Tooltip>
+
+          <Tooltip title="Ver Documento">
+            <IconButton
+              size="small"
+              component={Link}
+              href={`/apps/documents/preview/${document.noPedidoStr}`}
+              sx={{ minWidth: 44, minHeight: 44 }}
+            >
+              <Icon icon="mdi:eye-outline" fontSize={20} />
+            </IconButton>
+          </Tooltip>
+
+          <OptionsMenu
+            iconProps={{ fontSize: 20 }}
+            iconButtonProps={{
+              size: 'small',
+              sx: { minWidth: 44, minHeight: 44 },
+            }}
+            menuProps={{ sx: { '& .MuiMenuItem-root svg': { mr: 2 } } }}
+            options={[
+              {
+                text: 'Editar',
+                icon: <Icon icon="mdi:pencil-outline" fontSize={20} />,
+                menuItemProps: {
+                  disabled:
+                    !hasPermission('orders.allowEdit') ||
+                    document.procesado !== DocumentStatus.Pending,
+                  onClick: () => handleEditDocument(),
+                  sx: { minHeight: 44 },
+                },
+              },
+            ]}
+          />
+        </Stack>
+      </CardContent>
+    </StyledCard>
+  )
 }

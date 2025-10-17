@@ -7,10 +7,15 @@ import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import Collapse from '@mui/material/Collapse'
 import Grid from '@mui/material/Grid'
+import Hidden from '@mui/material/Hidden'
+import IconButton from '@mui/material/IconButton'
+import { useTheme } from '@mui/material/styles'
+import useMediaQuery from '@mui/material/useMediaQuery'
 
 import CardHeader from '@mui/material/CardHeader'
 import MenuItem from '@mui/material/MenuItem'
 import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
 
 import CardContent from '@mui/material/CardContent'
 import FormControl from '@mui/material/FormControl'
@@ -19,6 +24,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select'
 import { DataGrid, GridRowParams } from '@mui/x-data-grid'
 import {
   columns,
+  DocumentCard,
   orderStatusLabels,
 } from 'src/views/apps/documents/list/tableColRows'
 
@@ -28,13 +34,18 @@ import DatePicker from 'react-datepicker'
 
 // ** Store & Actions Imports
 import { useDispatch, useSelector } from 'react-redux'
-import { changeDocumentStatus, fetchData } from 'src/store/apps/documents'
+import {
+  changeDocumentStatus,
+  fetchData,
+  loadMoreData,
+} from 'src/store/apps/documents'
 
 // ** Types Imports
 import { AppDispatch, RootState } from 'src/store'
 
 import {
   DocumentStatus,
+  DocumentType,
   StatusParam,
   TipoDocumentoEnum,
 } from 'src/types/apps/documentTypes'
@@ -54,6 +65,11 @@ import { PaymentTypeAutocomplete } from 'src/views/ui/paymentTypeAutoComplete'
 import { SellerAutocomplete } from 'src/views/ui/sellerAutoComplete'
 
 import { useRouter } from 'next/router'
+
+interface DocumentsListProps {
+  documentType?: TipoDocumentoEnum
+  pageTitle?: string
+}
 
 interface CustomInputProps {
   dates: Date[]
@@ -89,13 +105,15 @@ const CustomInput = forwardRef((props: CustomInputProps, ref) => {
 })
 /* eslint-enable */
 
-const InvoiceList = () => {
+const InvoiceList = ({ documentType, pageTitle }: DocumentsListProps) => {
   // ** State
   const [dates, setDates] = useState<Date[]>([])
   const [value, setValue] = useState<string>('')
   const [actionValue, setActionValue] = useState<string>('-1')
   const [statusValue, setStatusValue] = useState<string>('0')
-  const [documentTypeValue, setDocumentTypeValue] = useState<string>('')
+  const [documentTypeValue, setDocumentTypeValue] = useState<string>(
+    documentType || '',
+  )
   const [endDateRange, setEndDateRange] = useState<any>(null)
   const [selectedRows, setSelectedRows] = useState<string[]>([])
   const [startDateRange, setStartDateRange] = useState<any>(null)
@@ -111,13 +129,26 @@ const InvoiceList = () => {
     pageSize: 20,
   })
 
+  // Scroll to top state
+  const [showScrollTop, setShowScrollTop] = useState(false)
+
+  // Pull to refresh state
+  const [isRefreshing, setIsRefreshing] = useState(false)
+
+  // Load more state for mobile
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+
   // Customer dialog state
   const [customerDialogOpen, setCustomerDialogOpen] = useState(false)
   const [selectedCustomerCode, setSelectedCustomerCode] = useState<string>('')
 
   // Filter collapse state (mobile only)
   const [filtersExpanded, setFiltersExpanded] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
+
+  // ** Hooks
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
   // Customer view handler
   const handleViewCustomer = (codigoCliente: string) => {
@@ -147,22 +178,6 @@ const InvoiceList = () => {
   const PaymentTypeParam = router?.query?.paymentType
   const LocationParam = router?.query?.location
   const { page, pageSize } = router.query
-
-  // Handle mobile detection
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 600)
-    }
-
-    // Initial check
-    handleResize()
-
-    // Add event listener
-    window.addEventListener('resize', handleResize)
-
-    // Cleanup
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
 
   useEffect(() => {
     setPaginationModel({
@@ -230,6 +245,110 @@ const InvoiceList = () => {
     selectedSellers,
     selectedPaymentType,
     selectedLocation,
+    documentTypeValue,
+  ])
+
+  // Scroll to top functionality for mobile
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400)
+    }
+
+    if (isMobile) {
+      window.addEventListener('scroll', handleScroll)
+      return () => window.removeEventListener('scroll', handleScroll)
+    }
+  }, [isMobile])
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    })
+  }
+
+  // Pull to refresh functionality
+  const handleRefresh = useCallback(async () => {
+    if (isRefreshing) return
+
+    setIsRefreshing(true)
+    try {
+      await dispatch(
+        fetchData({
+          dates,
+          query: value,
+          procesado: statusValue,
+          pageNumber: 0, // Reset to first page
+          vendedores: selectedSellers,
+          localidad: selectedLocation,
+          condicionPago: selectedPaymentType,
+          tipoDocumento: documentTypeValue,
+        }),
+      )
+      // Reset pagination to first page
+      setPaginationModel((prev) => ({ ...prev, page: 0 }))
+    } finally {
+      setIsRefreshing(false)
+    }
+  }, [
+    dispatch,
+    dates,
+    value,
+    statusValue,
+    selectedSellers,
+    selectedLocation,
+    selectedPaymentType,
+    documentTypeValue,
+    isRefreshing,
+  ])
+
+  // Load more functionality for mobile
+  const handleLoadMore = useCallback(async () => {
+    if (isLoadingMore || store.isLoading) return
+
+    const nextPage = paginationModel.page + 1
+    const currentlyLoaded = store.data.length
+    const hasMoreResults = currentlyLoaded < store.totalResults
+
+    if (!hasMoreResults) return
+
+    setIsLoadingMore(true)
+    try {
+      // The next API page to load (paginationModel tracks current loaded page)
+      const apiPageNumber = paginationModel.page + 1
+      const params = {
+        dates,
+        query: value,
+        procesado: statusValue,
+        pageNumber: apiPageNumber, // Next page to load
+        vendedores: selectedSellers,
+        localidad: selectedLocation,
+        condicionPago: selectedPaymentType,
+        tipoDocumento: documentTypeValue,
+      }
+
+      const result = await dispatch(loadMoreData(params))
+
+      // Update pagination model to track the API page we just loaded
+      setPaginationModel((prev) => ({ ...prev, page: apiPageNumber }))
+    } catch (error) {
+      console.error('Load more error:', error)
+    } finally {
+      setIsLoadingMore(false)
+    }
+  }, [
+    dispatch,
+    isLoadingMore,
+    store.isLoading,
+    store.totalResults,
+    paginationModel.page,
+    paginationModel.pageSize,
+    dates,
+    value,
+    statusValue,
+    selectedSellers,
+    selectedLocation,
+    selectedPaymentType,
     documentTypeValue,
   ])
 
@@ -425,18 +544,19 @@ const InvoiceList = () => {
         <Grid item xs={12}>
           <Card>
             <CardHeader
-              title="Documentos"
+              title={pageTitle || 'Documentos'}
               sx={{
                 '& .MuiCardHeader-title': {
                   fontSize: { xs: '1.25rem', sm: '1.5rem' },
                 },
               }}
             />
-            <CardContent sx={{ p: { xs: 2, sm: 5 } }}>
-              <Box sx={{ display: { xs: 'block', sm: 'none' }, mb: 2 }}>
+            <CardContent sx={{ p: { xs: 2, sm: 3, md: 5 } }}>
+              {/* Mobile Filter Toggle */}
+              <Box sx={{ display: { xs: 'block', md: 'none' }, mb: 3 }}>
                 <Button
                   variant="outlined"
-                  size="small"
+                  fullWidth
                   onClick={toggleFilters}
                   startIcon={
                     <Icon
@@ -448,16 +568,17 @@ const InvoiceList = () => {
                     />
                   }
                   sx={{
-                    minHeight: 44,
-                    fontSize: '0.875rem',
+                    minHeight: { xs: 48, sm: 44 },
+                    fontSize: { xs: '1rem', sm: '0.875rem' },
+                    justifyContent: 'center',
                   }}
                 >
                   {filtersExpanded ? 'Ocultar Filtros' : 'Mostrar Filtros'}
                 </Button>
               </Box>
               <Collapse in={!isMobile || filtersExpanded} timeout="auto">
-                <Grid container spacing={3}>
-                  <Grid item xs={12} sm={6} md={4}>
+                <Grid container spacing={{ xs: 2, sm: 3, md: 3 }}>
+                  <Grid item xs={12} sm={6} md={4} lg={3}>
                     <FormControl fullWidth>
                       <InputLabel id="order-status-select">
                         Estado de la orden
@@ -466,7 +587,7 @@ const InvoiceList = () => {
                       <Select
                         fullWidth
                         value={statusValue}
-                        sx={{ mb: 2 }}
+                        sx={{ mb: { xs: 1, sm: 2 } }}
                         label="Estado de la orden"
                         onChange={handleStatusValue}
                         labelId="order-status-select"
@@ -482,8 +603,8 @@ const InvoiceList = () => {
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Box sx={{ mb: 2 }}>
+                  <Grid item xs={12} sm={6} md={4} lg={3}>
+                    <Box sx={{ mb: { xs: 1, sm: 2 } }}>
                       <PaymentTypeAutocomplete
                         selectedPaymentType={selectedPaymentTypeParams}
                         multiple
@@ -491,8 +612,8 @@ const InvoiceList = () => {
                       />
                     </Box>
                   </Grid>
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Box sx={{ mb: 2 }}>
+                  <Grid item xs={12} sm={6} md={4} lg={3}>
+                    <Box sx={{ mb: { xs: 1, sm: 2 } }}>
                       <LocationAutocomplete
                         selectedLocation={
                           Array.isArray(LocationParam)
@@ -507,7 +628,7 @@ const InvoiceList = () => {
                     </Box>
                   </Grid>
 
-                  <Grid item xs={12} sm={6} md={4}>
+                  <Grid item xs={12} sm={6} md={4} lg={3}>
                     <FormControl fullWidth>
                       <InputLabel id="documentType-status-select">
                         Tipo Documento
@@ -516,7 +637,7 @@ const InvoiceList = () => {
                       <Select
                         fullWidth
                         value={documentTypeValue}
-                        sx={{ mb: 2 }}
+                        sx={{ mb: { xs: 1, sm: 2 } }}
                         label="Tipo Documento"
                         onChange={handleDocumentTypeValue}
                         labelId="documentType-status-select"
@@ -535,8 +656,8 @@ const InvoiceList = () => {
                     </FormControl>
                   </Grid>
 
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Box sx={{ mb: 2 }}>
+                  <Grid item xs={12} sm={6} md={4} lg={3}>
+                    <Box sx={{ mb: { xs: 1, sm: 2 } }}>
                       <SellerAutocomplete
                         selectedSellers={selectedSellersParams}
                         multiple
@@ -544,12 +665,12 @@ const InvoiceList = () => {
                       />
                     </Box>
                   </Grid>
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Box sx={{ mb: 2 }}>
+                  <Grid item xs={12} sm={6} md={4} lg={3}>
+                    <Box sx={{ mb: { xs: 1, sm: 2 } }}>
                       <DatePicker
                         isClearable
                         selectsRange
-                        monthsShown={2}
+                        monthsShown={isSmallMobile ? 1 : 2}
                         endDate={endDateRange}
                         selected={startDateRange}
                         startDate={startDateRange}
@@ -594,67 +715,164 @@ const InvoiceList = () => {
               handleAction={handleSelectionAction}
               placeholder="Cliente, NoPedido"
             />
-            <DataGrid
-              autoHeight
-              pagination
-              checkboxSelection
-              isRowSelectable={(params: GridRowParams) =>
-                params.row.procesado === DocumentStatus.Pending
-              }
-              rows={store.data}
-              columns={columns(dispatch, handleViewCustomer)}
-              disableRowSelectionOnClick
-              paginationModel={paginationModel}
-              onPaginationModelChange={handlePagination}
-              onRowSelectionModelChange={(rows) =>
-                setSelectedRows(rows as string[])
-              }
-              getRowId={(row) => row.noPedidoStr}
-              paginationMode="server"
-              loading={store.isLoading}
-              rowCount={store.totalResults}
-              sx={{
-                // Mobile-specific styles
-                '& .MuiDataGrid-main': {
-                  minWidth: 0,
-                },
-                '& .MuiDataGrid-columnHeaders': {
-                  minHeight: 56, // Better touch target
-                },
-                '& .MuiDataGrid-row': {
-                  minHeight: 64, // Better touch target for rows
-                },
-                '& .MuiDataGrid-cell': {
-                  padding: { xs: 1, sm: 2 },
-                  fontSize: { xs: '0.875rem', sm: '1rem' },
-                },
-                '& .MuiDataGrid-columnHeader': {
-                  padding: { xs: 1, sm: 2 },
-                  fontSize: { xs: '0.875rem', sm: '1rem' },
-                },
-                // Hide columns on mobile
-                '& .MuiDataGrid-columnHeader[data-field="seller"]': {
-                  display: { xs: 'none', md: 'flex' },
-                },
-                '& .MuiDataGrid-cell[data-field="seller"]': {
-                  display: { xs: 'none', md: 'flex' },
-                },
-                '& .MuiDataGrid-columnHeader[data-field="issuedDate"]': {
-                  display: { xs: 'none', sm: 'flex' },
-                },
-                '& .MuiDataGrid-cell[data-field="issuedDate"]': {
-                  display: { xs: 'none', sm: 'flex' },
-                },
-              }}
-              initialState={{
-                columns: {
-                  columnVisibilityModel: {
-                    seller: false, // Hidden by default on small screens
-                    issuedDate: false, // Hidden by default on small screens
+
+            {/* Mobile Refresh Button */}
+            <Hidden mdUp>
+              <Box
+                sx={{
+                  p: 2,
+                  pb: 0,
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  {store.totalResults} documento(s) encontrado(s)
+                </Typography>
+                <IconButton
+                  onClick={handleRefresh}
+                  disabled={isRefreshing || store.isLoading}
+                  size="small"
+                  sx={{
+                    minWidth: 40,
+                    minHeight: 40,
+                    bgcolor: 'action.hover',
+                    '&:hover': { bgcolor: 'action.selected' },
+                  }}
+                >
+                  <Icon
+                    icon={isRefreshing ? 'mdi:loading' : 'mdi:refresh'}
+                    fontSize="1.25rem"
+                    className={isRefreshing ? 'animate-spin' : ''}
+                  />
+                </IconButton>
+              </Box>
+            </Hidden>
+
+            {/* Desktop Table View */}
+            <Hidden mdDown>
+              <DataGrid
+                autoHeight
+                pagination
+                checkboxSelection
+                isRowSelectable={(params: GridRowParams) =>
+                  params.row.procesado === DocumentStatus.Pending
+                }
+                rows={store.data}
+                columns={columns(dispatch, handleViewCustomer)}
+                disableRowSelectionOnClick
+                paginationModel={paginationModel}
+                onPaginationModelChange={handlePagination}
+                onRowSelectionModelChange={(rows) =>
+                  setSelectedRows(rows as string[])
+                }
+                getRowId={(row) => row.noPedidoStr}
+                paginationMode="server"
+                loading={store.isLoading}
+                rowCount={store.totalResults}
+                sx={{
+                  '& .MuiDataGrid-columnHeaders': {
+                    backgroundColor: 'grey.50',
+                    borderRadius: '8px 8px 0 0',
                   },
-                },
-              }}
-            />
+                }}
+                initialState={{
+                  columns: {
+                    columnVisibilityModel: {
+                      seller: true,
+                      issuedDate: true,
+                      tipoDocumento: true,
+                    },
+                  },
+                }}
+              />
+            </Hidden>
+
+            {/* Mobile Card View */}
+            <Hidden mdUp>
+              <Box sx={{ p: { xs: 2, sm: 3 } }}>
+                {store.isLoading ? (
+                  <Box
+                    sx={{ display: 'flex', justifyContent: 'center', py: 4 }}
+                  >
+                    <Icon icon="mdi:loading" fontSize="2rem" />
+                  </Box>
+                ) : store.data.length === 0 ? (
+                  <Box sx={{ textAlign: 'center', py: 8 }}>
+                    <Icon
+                      icon="mdi:file-document-outline"
+                      fontSize="3rem"
+                      color="disabled"
+                    />
+                    <Typography
+                      variant="h6"
+                      color="text.secondary"
+                      sx={{ mt: 2 }}
+                    >
+                      No se encontraron documentos
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Intenta ajustar los filtros de búsqueda
+                    </Typography>
+                  </Box>
+                ) : (
+                  <Grid container spacing={0}>
+                    {store.data.map((document: DocumentType) => (
+                      <Grid item xs={12} key={document.noPedidoStr}>
+                        <DocumentCard
+                          document={document}
+                          onViewCustomer={handleViewCustomer}
+                          dispatch={dispatch}
+                        />
+                      </Grid>
+                    ))}
+                  </Grid>
+                )}
+
+                {/* Mobile Load More Controls */}
+                {store.data.length > 0 && store.totalResults > 0 && (
+                  <Box sx={{ mt: 3 }}>
+                    {/* Results Info */}
+                    <Box sx={{ textAlign: 'center', mb: 2 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Mostrando {store.data.length} de {store.totalResults}{' '}
+                        documentos
+                      </Typography>
+                    </Box>
+
+                    {/* Load More Button */}
+                    {store.data.length < store.totalResults ? (
+                      <Box sx={{ textAlign: 'center', mb: 2 }}>
+                        <Button
+                          variant="contained"
+                          onClick={handleLoadMore}
+                          disabled={isLoadingMore || store.isLoading}
+                          sx={{
+                            minHeight: 48,
+                            px: 4,
+                            borderRadius: 3,
+                            fontSize: '1rem',
+                          }}
+                        >
+                          {isLoadingMore || store.isLoading
+                            ? 'Cargando...'
+                            : 'Cargar más documentos'}
+                        </Button>
+                      </Box>
+                    ) : (
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ textAlign: 'center', py: 2 }}
+                      >
+                        Has visto todos los documentos
+                      </Typography>
+                    )}
+                  </Box>
+                )}
+              </Box>
+            </Hidden>
           </Card>
         </Grid>
       </Grid>

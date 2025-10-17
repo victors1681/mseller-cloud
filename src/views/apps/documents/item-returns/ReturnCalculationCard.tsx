@@ -41,9 +41,6 @@ import {
   clearCalculations,
 } from 'src/store/apps/itemReturns'
 
-// ** Custom Components
-import ProductSearchDialog from 'src/views/ui/productsSearchDialog'
-
 // ** Utils
 import { formatCurrency } from 'src/utils/formatCurrency'
 
@@ -53,7 +50,6 @@ import {
   DevolucionDetalle,
   motivosDevolucion,
 } from 'src/types/apps/itemReturnsTypes'
-import { ProductType } from 'src/types/apps/productTypes'
 
 interface ReturnCalculationForm {
   productos: DevolucionDetalle[]
@@ -84,10 +80,6 @@ const ReturnCalculationCard = ({
   disabled = false,
 }: ReturnCalculationCardProps) => {
   // ** State
-  const [productDialogOpen, setProductDialogOpen] = useState(false)
-  const [selectedProductIndex, setSelectedProductIndex] = useState<
-    number | null
-  >(null)
   const [expandedRows, setExpandedRows] = useState<number[]>([])
 
   // ** Redux
@@ -139,7 +131,7 @@ const ReturnCalculationCard = ({
       // Create products from document items
       const allProducts = documentItems.map((item) => ({
         codigoProducto: item.codigoProducto,
-        cantidad: 0, // Start with 0 so user can select what to return
+        cantidad: item.cantidadDisponible || item.cantidad, // Use available quantity, fallback to original
         motivoDevolucion: motivosDevolucion[0] || '', // Default reason
       }))
 
@@ -166,38 +158,6 @@ const ReturnCalculationCard = ({
     },
     [selectedDocument, dispatch],
   )
-
-  const handleAddProduct = useCallback(() => {
-    setSelectedProductIndex(null)
-    setProductDialogOpen(true)
-  }, [])
-
-  const handleProductSelect = useCallback(
-    (product: ProductType) => {
-      const newProduct: DevolucionDetalle = {
-        codigoProducto: product.codigo,
-        cantidad: 1,
-        motivoDevolucion: motivosDevolucion[0],
-      }
-
-      if (selectedProductIndex !== null) {
-        // Replace existing product
-        setValue(`productos.${selectedProductIndex}`, newProduct)
-      } else {
-        // Add new product
-        append(newProduct)
-      }
-
-      setProductDialogOpen(false)
-      setSelectedProductIndex(null)
-    },
-    [append, setValue, selectedProductIndex],
-  )
-
-  const handleEditProduct = useCallback((index: number) => {
-    setSelectedProductIndex(index)
-    setProductDialogOpen(true)
-  }, [])
 
   const handleRemoveProduct = useCallback(
     (index: number) => {
@@ -335,15 +295,6 @@ const ReturnCalculationCard = ({
                         </Button>
                       </>
                     )}
-                    <Button
-                      variant="outlined"
-                      onClick={handleAddProduct}
-                      startIcon={<Icon icon="mdi:plus" />}
-                      disabled={disabled || isCalculating}
-                      size="small"
-                    >
-                      Agregar Producto
-                    </Button>
                   </Box>
                 </Box>
 
@@ -465,13 +416,6 @@ const ReturnCalculationCard = ({
 
                             <TableCell align="center">
                               <Box sx={{ display: 'flex', gap: 0.5 }}>
-                                <IconButton
-                                  size="small"
-                                  onClick={() => handleEditProduct(index)}
-                                  disabled={disabled || isCalculating}
-                                >
-                                  <Icon icon="mdi:pencil" fontSize="1rem" />
-                                </IconButton>
                                 <IconButton
                                   size="small"
                                   onClick={() => handleRemoveProduct(index)}
@@ -628,15 +572,6 @@ const ReturnCalculationCard = ({
             </Grid>
           </form>
         )}
-
-        {/* Product Search Dialog */}
-        <ProductSearchDialog
-          open={productDialogOpen}
-          onClose={() => setProductDialogOpen(false)}
-          onSelectProduct={handleProductSelect}
-          title="Seleccionar Producto para Devolución"
-          maxWidth="lg"
-        />
       </CardContent>
     </Card>
   )

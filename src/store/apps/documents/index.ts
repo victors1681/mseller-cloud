@@ -68,6 +68,38 @@ export const fetchData = createAsyncThunk(
   },
 )
 
+// ** Load More Documents (for mobile infinite scroll)
+export const loadMoreData = createAsyncThunk(
+  'appDocuments/loadMoreData',
+  async (params: DataParams) => {
+    if (params.procesado === '') {
+      delete params.procesado
+    } else {
+      params.procesado = parseInt(params.procesado as string)
+    }
+
+    const response = await restClient.get<
+      any,
+      AxiosResponse<PaginatedResponse<DocumentType>>
+    >('/api/portal/Pedido', {
+      params: {
+        ...params,
+        ...getDateParam(params.dates),
+      },
+    })
+
+    return {
+      newData: response.data.data,
+      params,
+      pageNumber: response.data.pageNumber,
+      pageSize: response.data.pageSize,
+      totalPages: response.data.totalPages,
+      totalResults: response.data.totalResults,
+      isLoading: false,
+    }
+  },
+)
+
 export const deleteInvoice = createAsyncThunk(
   'appDocuments/deleteData',
   async (id: number | string, { getState, dispatch }: Redux) => {
@@ -286,6 +318,23 @@ export const appDocumentsSlice = createSlice({
       state.totalPages = action.payload.totalPages
       ;(state.totalResults = action.payload.totalResults),
         (state.isLoading = false)
+    })
+    // Handle loadMoreData states
+    builder.addCase(loadMoreData.pending, (state) => {
+      // Don't set isLoading to true for load more, use a separate loading state if needed
+    })
+    builder.addCase(loadMoreData.rejected, (state, action) => {
+      // Handle error if needed
+    })
+    builder.addCase(loadMoreData.fulfilled, (state, action) => {
+      // Append new data to existing data
+      const newData = action.payload.newData || []
+      state.data = [...state.data, ...newData]
+      state.params = action.payload.params
+      state.pageNumber = action.payload.pageNumber
+      state.pageSize = action.payload.pageSize
+      state.totalPages = action.payload.totalPages
+      state.totalResults = action.payload.totalResults
     })
     builder.addCase(fetchDocumentDetails.pending, (state, action) => {
       state.isLoadingDetails = true

@@ -35,14 +35,35 @@ const navigation = (): VerticalNavItemsType => {
           icon: 'lets-icons:order',
           children: [
             {
-              title: 'Listado',
-              icon: 'mdi:format-list-bulleted',
-              path: '/apps/documents/list',
+              title: 'Pedidos',
+              icon: 'mdi:clipboard-list-outline',
+              path: '/apps/documents/pedidos',
+            },
+            {
+              title: 'Facturas',
+              icon: 'mdi:receipt',
+              path: '/apps/documents/facturas',
+            },
+            {
+              title: 'Cotización',
+              icon: 'mdi:file-document-edit-outline',
+              path: '/apps/documents/cotizacion',
             },
             {
               title: 'Devolución',
               icon: 'mdi:keyboard-return',
-              path: '/apps/documents/item-returns',
+              children: [
+                {
+                  title: 'Listado',
+                  icon: 'mdi:history',
+                  path: '/apps/documents/item-returns/list',
+                },
+                {
+                  title: 'Nueva Devolución',
+                  icon: 'mdi:plus',
+                  path: '/apps/documents/item-returns',
+                },
+              ],
             },
           ],
         },

@@ -1,21 +1,24 @@
 // ** Next Import
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 // ** MUI Imports
-import Card from '@mui/material/Card'
 import Button from '@mui/material/Button'
+import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 
 // ** Icon Imports
+import toast from 'react-hot-toast'
+import { useDispatch } from 'react-redux'
 import Icon from 'src/@core/components/icon'
 import { useGoBack } from 'src/hooks/useGoBack'
-import { DocumentStatus, StatusParam } from 'src/types/apps/documentTypes'
-import { changeDocumentStatus } from 'src/store/apps/documents'
-import { AsyncThunkAction, Dispatch, AnyAction } from '@reduxjs/toolkit'
-import { DocumentType } from 'src/types/apps/documentTypes'
-import { useDispatch } from 'react-redux'
 import { AppDispatch } from 'src/store'
-import toast from 'react-hot-toast'
+import { changeDocumentStatus } from 'src/store/apps/documents'
+import {
+  DocumentStatus,
+  DocumentType,
+  TipoDocumentoEnum,
+} from 'src/types/apps/documentTypes'
 interface Props {
   data: DocumentType
 }
@@ -23,6 +26,7 @@ interface Props {
 const PreviewActions = ({ data }: Props) => {
   const navigation = useGoBack('/apps/documents/list', true)
   const dispatch = useDispatch<AppDispatch>()
+  const router = useRouter()
 
   const handleApproval = async (
     noPedidoStr: string,
@@ -48,6 +52,15 @@ const PreviewActions = ({ data }: Props) => {
         toast.error('Ha ocurrido un error por favor intentelo de nuevo.')
       }
     }
+  }
+
+  const handleCreateItemReturn = () => {
+    // Navigate to item returns creation page with document number as URL parameter
+    router.push(
+      `/apps/documents/item-returns?documentNumber=${encodeURIComponent(
+        data.noPedidoStr,
+      )}`,
+    )
   }
 
   return (
@@ -84,6 +97,21 @@ const PreviewActions = ({ data }: Props) => {
         >
           Editar
         </Button>
+
+        {/* Show Create Item Return button only for invoices */}
+        {data.tipoDocumento === TipoDocumentoEnum.INVOICE && (
+          <Button
+            fullWidth
+            sx={{ mb: 3.5 }}
+            color="info"
+            variant="contained"
+            onClick={handleCreateItemReturn}
+            startIcon={<Icon icon="mdi:package-variant-remove" />}
+          >
+            Crear Devolución
+          </Button>
+        )}
+
         <Button
           fullWidth
           color="success"
