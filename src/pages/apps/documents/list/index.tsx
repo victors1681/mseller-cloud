@@ -433,7 +433,7 @@ const InvoiceList = ({ documentType, pageTitle }: DocumentsListProps) => {
   const handleStatusValue = (e: SelectChangeEvent) => {
     setStatusValue(e.target.value)
     router.push({
-      pathname: `/apps/documents/list`,
+      pathname: router.pathname,
       query: {
         ...router.query,
         page: 0,
@@ -445,7 +445,7 @@ const InvoiceList = ({ documentType, pageTitle }: DocumentsListProps) => {
   const handleSellerValue = (sellers: string) => {
     setSelectedSellers(sellers)
     router.push({
-      pathname: `/apps/documents/list`,
+      pathname: router.pathname,
       query: {
         ...router.query,
         page: 0,
@@ -457,7 +457,7 @@ const InvoiceList = ({ documentType, pageTitle }: DocumentsListProps) => {
   const handlePaymentTypeValue = (paymentType: string) => {
     setSelectedPaymentType(paymentType)
     router.push({
-      pathname: `/apps/documents/list`,
+      pathname: router.pathname,
       query: {
         ...router.query,
         page: 0,
@@ -469,7 +469,7 @@ const InvoiceList = ({ documentType, pageTitle }: DocumentsListProps) => {
   const handleLocationValue = (location: string) => {
     setSelectedLocation(location)
     router.push({
-      pathname: `/apps/documents/list`,
+      pathname: router.pathname,
       query: {
         ...router.query,
         page: 0,
@@ -481,7 +481,7 @@ const InvoiceList = ({ documentType, pageTitle }: DocumentsListProps) => {
   const handleDocumentTypeValue = (e: SelectChangeEvent) => {
     setDocumentTypeValue(e.target.value)
     router.push({
-      pathname: `/apps/documents/list`,
+      pathname: router.pathname,
       query: {
         ...router.query,
         page: 0,
@@ -498,7 +498,7 @@ const InvoiceList = ({ documentType, pageTitle }: DocumentsListProps) => {
     setStartDateRange(start)
     setEndDateRange(end)
     router.push({
-      pathname: `/apps/documents/list`,
+      pathname: router.pathname,
       query: {
         ...router.query,
         page: 0,
