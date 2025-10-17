@@ -26,6 +26,9 @@ import { AppDispatch, RootState } from 'src/store'
 import { setSelectedLocalidad } from 'src/store/apps/inventory'
 import { fetchLocations } from 'src/store/apps/location'
 
+// ** Hook Imports
+import { useAuth } from 'src/hooks/useAuth'
+
 interface TableHeaderProps {
   filters: InventarioFilters
   onFilterChange: (field: keyof InventarioFilters, value: any) => void
@@ -40,6 +43,7 @@ const TableHeader = ({
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
   const locationStore = useSelector((state: RootState) => state.locations)
+  const { user } = useAuth()
 
   // ** Effects
   useEffect(() => {
@@ -58,6 +62,34 @@ const TableHeader = ({
       activa: true, // Assuming all fetched locations are active
     }),
   )
+
+  // Set default selected localidad based on user's warehouse or first available
+  useEffect(() => {
+    if (localidades.length > 0 && !selectedLocalidad && user) {
+      let defaultLocalidad: LocalidadDTO | null = null
+
+      // Try to find the user's warehouse first
+      if (user.warehouse) {
+        defaultLocalidad =
+          localidades.find(
+            (localidad) =>
+              localidad.codigo === user.warehouse ||
+              localidad.nombre
+                .toLowerCase()
+                .includes(user.warehouse.toLowerCase()),
+          ) || null
+      }
+
+      // If user's warehouse not found, select the first available localidad
+      if (!defaultLocalidad && localidades.length > 0) {
+        defaultLocalidad = localidades[0]
+      }
+
+      if (defaultLocalidad) {
+        dispatch(setSelectedLocalidad(defaultLocalidad))
+      }
+    }
+  }, [localidades, selectedLocalidad, user, dispatch])
 
   const handleLocalidadChange = (event: SelectChangeEvent<string>) => {
     const localidadId = parseInt(event.target.value)

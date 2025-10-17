@@ -134,7 +134,7 @@ export const fetchProductDetail = createAsyncThunk(
   },
 )
 
-// ** Fetch Products
+// ** Fetch Products with Load More Support
 export const fetchData = createAsyncThunk(
   'appProduct/fetchProducts',
   async (params: DataParams) => {
@@ -159,6 +159,40 @@ export const fetchData = createAsyncThunk(
       data: response.data.data,
       params,
       allData: [],
+      pageNumber: response.data.pageNumber,
+      pageSize: response.data.pageSize,
+      totalPages: response.data.totalPages,
+      totalResults: response.data.totalResults,
+      total: response.data.data.length,
+      isLoading: false,
+    }
+  },
+)
+
+// ** Load More Products (for mobile)
+export const loadMoreData = createAsyncThunk(
+  'appProduct/loadMoreProducts',
+  async (params: DataParams) => {
+    if (params.status === '') {
+      delete params.status
+    }
+    if (params.query === '') {
+      delete params.query
+    }
+    if (params.codigoProducto === '') {
+      delete params.codigoProducto
+    }
+
+    const response = await restClient.get<
+      any,
+      AxiosResponse<PaginatedResponse<ProductType>>
+    >('/api/portal/Producto', {
+      params,
+    })
+
+    return {
+      data: response.data.data,
+      params,
       pageNumber: response.data.pageNumber,
       pageSize: response.data.pageSize,
       totalPages: response.data.totalPages,
@@ -197,6 +231,7 @@ export const appProductSlice = createSlice({
     totalResults: 0,
     total: 0,
     isLoading: true,
+    isLoadingMore: false,
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -241,6 +276,25 @@ export const appProductSlice = createSlice({
     builder.addCase(addProducts.fulfilled, (state, action) => {
       // No need to update state.data here since fetchData will handle the refresh
       // The fetchData call in addProducts will update the list
+    })
+
+    // Load More Data for mobile
+    builder.addCase(loadMoreData.pending, (state, action) => {
+      state.isLoadingMore = true
+    })
+    builder.addCase(loadMoreData.rejected, (state, action) => {
+      state.isLoadingMore = false
+    })
+    builder.addCase(loadMoreData.fulfilled, (state, action) => {
+      // Append new data to existing data for load more functionality
+      state.data = [...state.data, ...action.payload.data]
+      state.params = action.payload.params
+      state.total = state.data.length
+      state.pageNumber = action.payload.pageNumber
+      state.pageSize = action.payload.pageSize
+      state.totalPages = action.payload.totalPages
+      state.totalResults = action.payload.totalResults
+      state.isLoadingMore = false
     })
   },
 })

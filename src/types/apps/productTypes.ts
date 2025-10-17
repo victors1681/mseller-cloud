@@ -35,6 +35,7 @@ export interface ProductType {
   imagenes: ProductImageType[]
   visibleTienda: boolean
   esServicio?: boolean
+  existencias?: ProductoStockDTO[]
 }
 
 export interface ProductImageType {
@@ -49,6 +50,15 @@ export interface ProductImageType {
   esImagenPredeterminada: boolean
   tipoImagen?: string
   fechaCreacion?: string
+}
+
+export interface ProductoStockDTO {
+  id: number
+  codigoProducto: string
+  localidadId: number
+  localidadNombre?: string
+  existencia: number
+  ultimaActualizacion: string
 }
 
 export interface ProductDetailType {

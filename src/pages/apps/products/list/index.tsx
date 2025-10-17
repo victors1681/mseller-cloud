@@ -7,15 +7,18 @@ import Link from 'next/link'
 // ** MUI Imports
 import { debounce } from '@mui/material'
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
+import CircularProgress from '@mui/material/CircularProgress'
 import Grid from '@mui/material/Grid'
+import Hidden from '@mui/material/Hidden'
 import IconButton from '@mui/material/IconButton'
 import { SelectChangeEvent } from '@mui/material/Select'
+import { styled, useTheme } from '@mui/material/styles'
 import TextField from '@mui/material/TextField'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
-import { styled, useTheme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { DataGrid, GridColDef, GridRowId } from '@mui/x-data-grid'
 // ** Icon Imports
@@ -26,7 +29,7 @@ import format from 'date-fns/format'
 
 // ** Store & Actions Imports
 import { useDispatch, useSelector } from 'react-redux'
-import { deleteProduct, fetchData } from 'src/store/apps/products'
+import { fetchData, loadMoreData } from 'src/store/apps/products'
 
 // ** Types Imports
 import { AppDispatch, RootState } from 'src/store'
@@ -36,7 +39,9 @@ import TableHeader from 'src/views/apps/products/list/TableHeader'
 import OptionsMenu from 'src/@core/components/option-menu'
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import { ProductType } from 'src/types/apps/productTypes'
+import ProductCard from 'src/views/apps/products/components/ProductCard'
 import PriceDisplay from 'src/views/apps/products/list/PriceDisplay'
+import ProductDetailModal from 'src/views/apps/products/list/ProductDetailModal'
 
 interface CustomInputProps {
   dates: Date[]
@@ -141,15 +146,6 @@ const defaultColumns: GridColDef[] = [
   },
 
   {
-    flex: 0.1,
-    minWidth: 80,
-    field: 'fact',
-    headerName: 'Factor',
-    renderCell: ({ row }: CellType) => (
-      <Typography variant="body2">{row.factor}</Typography>
-    ),
-  },
-  {
     flex: 0.05,
     field: 'active',
     headerName: '',
@@ -198,6 +194,11 @@ const InvoiceList = () => {
     page: 0,
     pageSize: 20,
   })
+  const [modalOpen, setModalOpen] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(
+    null,
+  )
+  const [currentPage, setCurrentPage] = useState(0)
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
@@ -265,6 +266,63 @@ const InvoiceList = () => {
     setStatusValue(e.target.value)
   }
 
+  const handleViewProduct = (product: ProductType) => {
+    setSelectedProduct(product)
+    setModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setModalOpen(false)
+    setSelectedProduct(null)
+  }
+
+  // Load More Handler for Mobile
+  const handleLoadMore = useCallback(() => {
+    const nextPage = currentPage + 1
+    setCurrentPage(nextPage)
+    dispatch(
+      loadMoreData({
+        query: value,
+        status: statusValue,
+        pageNumber: nextPage,
+        pageSize: 20,
+      }),
+    )
+  }, [dispatch, value, statusValue, currentPage])
+
+  // Reset page when search changes
+  const resetAndSearch = useCallback(
+    (searchValue: string) => {
+      setCurrentPage(0)
+      setPaginationModel({ page: 0, pageSize: 20 })
+      dispatch(
+        fetchData({
+          query: searchValue,
+          status: statusValue,
+          pageNumber: 0,
+        }),
+      )
+    },
+    [dispatch, statusValue],
+  )
+
+  // Update filter handler to reset page
+  const handleFilterMobile = useCallback(
+    (val: string) => {
+      fn.clear()
+      setValue(val)
+      if (isMobile) {
+        resetAndSearch(val)
+      } else {
+        fn(val)
+      }
+    },
+    [fn, isMobile, resetAndSearch],
+  )
+
+  // Check if there are more items to load
+  const hasMore = store.totalResults > store.data.length
+
   // Create responsive columns based on screen size
   const getColumns = (): GridColDef[] => {
     const baseColumns: GridColDef[] = []
@@ -278,7 +336,15 @@ const InvoiceList = () => {
       renderCell: ({ row }: CellType) => (
         <Typography
           variant="body2"
-          sx={{ fontSize: isSmallScreen ? '0.75rem' : 'inherit' }}
+          sx={{
+            fontSize: isSmallScreen ? '0.75rem' : 'inherit',
+            color: 'primary.main',
+            cursor: 'pointer',
+            '&:hover': {
+              textDecoration: 'underline',
+            },
+          }}
+          onClick={() => handleViewProduct(row)}
         >
           {row.codigo}
         </Typography>
@@ -422,26 +488,31 @@ const InvoiceList = () => {
       headerName: 'Acciones',
       renderCell: ({ row }: CellType) => (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Tooltip title="Ver Detalle">
+            <IconButton
+              size="small"
+              onClick={() => handleViewProduct(row)}
+              sx={{
+                minWidth: { xs: 32, sm: 'auto' },
+                minHeight: { xs: 32, sm: 'auto' },
+              }}
+            >
+              <Icon icon="mdi:eye-outline" fontSize={isSmallScreen ? 16 : 20} />
+            </IconButton>
+          </Tooltip>
           <Tooltip title="Editar">
             <IconButton
               size="small"
               component={Link}
               href={`/apps/products/add/${row.codigo}`}
+              sx={{
+                minWidth: { xs: 32, sm: 'auto' },
+                minHeight: { xs: 32, sm: 'auto' },
+              }}
             >
               <Icon icon="tabler:edit" fontSize={isSmallScreen ? 16 : 20} />
             </IconButton>
           </Tooltip>
-          {!isSmallScreen && (
-            <Tooltip title="Ver">
-              <IconButton
-                size="small"
-                disabled
-                onClick={() => dispatch(deleteProduct(row.codigo))}
-              >
-                <Icon icon="mdi:eye-outline" fontSize={20} />
-              </IconButton>
-            </Tooltip>
-          )}
         </Box>
       ),
     })
@@ -503,41 +574,134 @@ const InvoiceList = () => {
             <TableHeader
               value={value}
               selectedRows={selectedRows}
-              handleFilter={handleFilter}
+              handleFilter={isMobile ? handleFilterMobile : handleFilter}
               placeholder="Nombre o código"
             />
-            <DataGrid
-              autoHeight
-              pagination
-              rows={store.data}
-              columns={columns}
-              disableRowSelectionOnClick
-              paginationModel={paginationModel}
-              onPaginationModelChange={handlePagination}
-              onRowSelectionModelChange={(rows) => setSelectedRows(rows)}
-              getRowId={(row) => row.codigo}
-              paginationMode="server"
-              loading={store.isLoading}
-              rowCount={store.totalResults}
-              sx={{
-                '& .MuiDataGrid-columnHeaders': {
-                  fontSize: isSmallScreen ? '0.75rem' : 'inherit',
-                },
-                '& .MuiDataGrid-cell': {
-                  fontSize: isSmallScreen ? '0.75rem' : 'inherit',
-                  padding: isSmallScreen ? '4px 8px' : '8px 16px',
-                },
-                '& .MuiDataGrid-row': {
-                  minHeight: isSmallScreen ? '40px !important' : 'auto',
-                },
-                '& .MuiDataGrid-columnHeader': {
-                  padding: isSmallScreen ? '4px 8px' : '8px 16px',
-                },
-              }}
-            />
+
+            {/* Desktop DataGrid */}
+            <Hidden mdDown>
+              <DataGrid
+                autoHeight
+                pagination
+                rows={store.data}
+                columns={columns}
+                disableRowSelectionOnClick
+                paginationModel={paginationModel}
+                onPaginationModelChange={handlePagination}
+                onRowSelectionModelChange={(rows) => setSelectedRows(rows)}
+                getRowId={(row) => row.codigo}
+                paginationMode="server"
+                loading={store.isLoading}
+                rowCount={store.totalResults}
+                sx={{
+                  '& .MuiDataGrid-columnHeaders': {
+                    fontSize: isSmallScreen ? '0.75rem' : 'inherit',
+                  },
+                  '& .MuiDataGrid-cell': {
+                    fontSize: isSmallScreen ? '0.75rem' : 'inherit',
+                    padding: isSmallScreen ? '4px 8px' : '8px 16px',
+                  },
+                  '& .MuiDataGrid-row': {
+                    minHeight: isSmallScreen ? '40px !important' : 'auto',
+                  },
+                  '& .MuiDataGrid-columnHeader': {
+                    padding: isSmallScreen ? '4px 8px' : '8px 16px',
+                  },
+                }}
+              />
+            </Hidden>
+
+            {/* Mobile Cards */}
+            <Hidden mdUp>
+              <Box sx={{ p: 2 }}>
+                {store.isLoading && store.data.length === 0 ? (
+                  <Box
+                    sx={{ display: 'flex', justifyContent: 'center', py: 4 }}
+                  >
+                    <CircularProgress />
+                  </Box>
+                ) : (
+                  <>
+                    <Grid container spacing={2}>
+                      {store.data.map((product) => (
+                        <Grid item xs={12} sm={6} key={product.codigo}>
+                          <ProductCard
+                            product={product}
+                            onViewDetails={handleViewProduct}
+                          />
+                        </Grid>
+                      ))}
+                    </Grid>
+
+                    {/* Load More Button */}
+                    {hasMore && (
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          mt: 3,
+                        }}
+                      >
+                        <Button
+                          variant="outlined"
+                          size="large"
+                          onClick={handleLoadMore}
+                          disabled={store.isLoadingMore}
+                          sx={{
+                            minWidth: 200,
+                            minHeight: 48,
+                            borderRadius: 3,
+                          }}
+                        >
+                          {store.isLoadingMore ? (
+                            <>
+                              <CircularProgress size={20} sx={{ mr: 1 }} />
+                              Cargando...
+                            </>
+                          ) : (
+                            <>
+                              <Icon icon="mdi:chevron-down" fontSize="1.5rem" />
+                              Cargar Más
+                            </>
+                          )}
+                        </Button>
+                      </Box>
+                    )}
+
+                    {/* No more items message */}
+                    {!hasMore && store.data.length > 0 && (
+                      <Box sx={{ textAlign: 'center', mt: 3, py: 2 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          No hay más productos para mostrar
+                        </Typography>
+                      </Box>
+                    )}
+
+                    {/* No results message */}
+                    {store.data.length === 0 && !store.isLoading && (
+                      <Box sx={{ textAlign: 'center', py: 4 }}>
+                        <Typography variant="h6" color="text.secondary">
+                          No se encontraron productos
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Intenta modificar los filtros de búsqueda
+                        </Typography>
+                      </Box>
+                    )}
+                  </>
+                )}
+              </Box>
+            </Hidden>
           </Card>
         </Grid>
       </Grid>
+
+      {/* Product Detail Modal */}
+      <ProductDetailModal
+        open={modalOpen}
+        onClose={handleCloseModal}
+        product={selectedProduct}
+      />
     </DatePickerWrapper>
   )
 }
