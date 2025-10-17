@@ -357,13 +357,14 @@ const itemReturnsSlice = createSlice({
       })
       .addCase(fetchItemReturnsList.fulfilled, (state, action) => {
         state.listView.isLoadingList = false
-        state.listView.listData = action.payload.items
-        state.listView.totalCount = action.payload.totalCount
-        state.listView.pageNumber = action.payload.pageNumber
-        state.listView.pageSize = action.payload.pageSize
-        state.listView.totalPages = action.payload.totalPages
-        state.listView.hasPreviousPage = action.payload.hasPreviousPage
-        state.listView.hasNextPage = action.payload.hasNextPage
+        state.listView.listData = action.payload?.items || []
+        state.listView.totalCount = action.payload?.totalCount || 0
+        state.listView.pageNumber = action.payload?.pageNumber || 0
+        state.listView.pageSize = action.payload?.pageSize || 0
+        state.listView.totalPages = action.payload?.totalPages || 0
+        state.listView.hasPreviousPage =
+          action.payload?.hasPreviousPage || false
+        state.listView.hasNextPage = action.payload?.hasNextPage || false
       })
       .addCase(fetchItemReturnsList.rejected, (state, action) => {
         state.listView.isLoadingList = false

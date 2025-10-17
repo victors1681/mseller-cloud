@@ -498,12 +498,12 @@ export const cxcSlice = createSlice({
       })
       .addCase(fetchCxcList.fulfilled, (state, action) => {
         state.isLoading = false
-        state.data = action.payload.items
-        state.pageNumber = action.payload.pageNumber
-        state.pageSize = action.payload.pageSize
-        state.totalPages = action.payload.totalPages
-        state.totalResults = action.payload.totalCount
-        state.total = action.payload.totalCount
+        state.data = action.payload?.items || []
+        state.pageNumber = action.payload?.pageNumber || 0
+        state.pageSize = action.payload?.pageSize || 0
+        state.totalPages = action.payload?.totalPages || 0
+        state.totalResults = action.payload?.totalCount || 0
+        state.total = action.payload?.totalCount || 0
         state.lastUpdated = new Date().toISOString()
       })
       .addCase(fetchCxcList.rejected, (state, action) => {

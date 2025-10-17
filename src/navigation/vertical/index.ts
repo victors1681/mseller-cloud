@@ -4,73 +4,69 @@ import { VerticalNavItemsType } from 'src/@core/layouts/types'
 const navigation = (): VerticalNavItemsType => {
   return [
     {
-      title: 'Home',
+      title: 'Dashboard',
       path: '/home',
-      icon: 'mdi:home-outline',
+      icon: 'mdi:view-dashboard-outline',
     },
+
+    // === SALES & CUSTOMER OPERATIONS ===
     {
-      title: 'Transacciones',
-      icon: 'mdi:file-document-outline',
+      title: 'Ventas',
+      icon: 'mdi:point-of-sale',
       children: [
         {
-          title: 'POS',
-          icon: 'mdi:point-of-sale',
-          // This will be filtered by UserLayout based on permissions
+          title: 'Terminal POS',
+          icon: 'mdi:cash-register',
+          path: '/apps/pos',
           permission: 'pos.allowCashierAccess',
-          children: [
-            {
-              title: 'Terminal de Ventas',
-              icon: 'mdi:cash-register',
-              path: '/apps/pos',
-            },
-            {
-              title: 'Gestión de Turnos',
-              icon: 'mdi:clock-outline',
-              path: '/apps/pos/manager',
-            },
-          ],
         },
         {
-          title: 'Documentos',
-          icon: 'lets-icons:order',
-          children: [
-            {
-              title: 'Pedidos',
-              icon: 'mdi:clipboard-list-outline',
-              path: '/apps/documents/pedidos',
-            },
-            {
-              title: 'Facturas',
-              icon: 'mdi:receipt',
-              path: '/apps/documents/facturas',
-            },
-            {
-              title: 'Cotización',
-              icon: 'mdi:file-document-edit-outline',
-              path: '/apps/documents/cotizacion',
-            },
-            {
-              title: 'Devolución',
-              icon: 'mdi:keyboard-return',
-              children: [
-                {
-                  title: 'Listado',
-                  icon: 'mdi:history',
-                  path: '/apps/documents/item-returns/list',
-                },
-                {
-                  title: 'Nueva Devolución',
-                  icon: 'mdi:plus',
-                  path: '/apps/documents/item-returns',
-                },
-              ],
-            },
-          ],
+          title: 'Gestión de Turnos',
+          icon: 'mdi:clock-outline',
+          path: '/apps/pos/manager',
         },
         {
-          title: 'Transportes',
-          icon: 'mdi:truck',
-          path: '/apps/transports/list',
+          title: 'Cotizaciones',
+          icon: 'mdi:file-document-edit-outline',
+          path: '/apps/documents/cotizacion',
+        },
+        {
+          title: 'Pedidos',
+          icon: 'mdi:clipboard-list-outline',
+          path: '/apps/documents/pedidos',
+        },
+        {
+          title: 'Facturas',
+          icon: 'mdi:receipt',
+          path: '/apps/documents/facturas',
+        },
+      ],
+    },
+
+    // === CUSTOMER MANAGEMENT ===
+    {
+      title: 'Clientes',
+      icon: 'mdi:account-group',
+      children: [
+        {
+          title: 'Gestión de Clientes',
+          icon: 'mdi:account-details',
+          path: '/apps/clients/list',
+        },
+        {
+          title: 'Visitas',
+          icon: 'material-symbols:map-outline',
+          path: '/apps/visits/list',
+        },
+        {
+          title: 'Cuentas por Cobrar',
+          icon: 'mdi:account-cash-outline',
+          path: '/apps/cxc',
+        },
+        {
+          title: 'Reportes CXC',
+          icon: 'mdi:chart-line',
+          path: '/apps/cxc/reports',
         },
         {
           title: 'Cobranza',
@@ -78,32 +74,23 @@ const navigation = (): VerticalNavItemsType => {
           path: '/apps/collections/list',
         },
         {
-          title: 'Cuentas por Cobrar',
-          icon: 'mdi:account-cash-outline',
-          children: [
-            {
-              title: 'Gestión CXC',
-              icon: 'mdi:format-list-bulleted',
-              path: '/apps/cxc',
-            },
-            {
-              title: 'Reportes',
-              icon: 'mdi:chart-line',
-              path: '/apps/cxc/reports',
-            },
-          ],
-        },
-        {
-          title: 'Visitas',
-          icon: 'material-symbols:map-outline',
-          path: '/apps/visits/list',
+          title: 'Vendedores',
+          icon: 'gis:map-users',
+          path: '/apps/sellers/list',
         },
       ],
     },
+
+    // === INVENTORY & PRODUCTS ===
     {
-      title: 'Gestión Inventario',
+      title: 'Inventario',
       icon: 'mdi:warehouse',
       children: [
+        {
+          title: 'Productos',
+          icon: 'fluent-mdl2:product',
+          path: '/apps/products/list',
+        },
         {
           title: 'Conteos de Inventario',
           icon: 'mdi:clipboard-list-outline',
@@ -129,51 +116,21 @@ const navigation = (): VerticalNavItemsType => {
           icon: 'mdi:transfer-right',
           path: '/apps/inventory-management/transfers',
         },
-      ],
-    },
-    {
-      title: 'Data Maestra',
-      icon: 'bxs:data',
-      children: [
         {
-          title: 'Clientes',
-          icon: 'mdi:account-details',
-          path: '/apps/clients/list',
-        },
-        {
-          title: 'Productos',
-          icon: 'fluent-mdl2:product',
-          path: '/apps/products/list',
-        },
-        {
-          title: 'Ofertas',
-          icon: 'hugeicons-sale-tag-02',
-          path: '/apps/offers/list',
-        },
-        {
-          title: 'Condiciones Pago',
-          icon: 'mdi:account-payment',
-          path: '/apps/paymentTypes/list',
-        },
-        {
-          title: 'Sucursales',
-          icon: 'mdi:location',
-          path: '/apps/locations/list',
-        },
-        {
-          title: 'Vendedores',
-          icon: 'gis:map-users',
-          path: '/apps/sellers/list',
-        },
-        {
-          title: 'Facturas CxC',
-          icon: 'lets-icons:order',
-          path: '/apps/invoices/list',
-        },
-        {
-          title: 'Distribuidores',
-          icon: 'healthicons:truck-driver',
-          path: '/apps/drivers/list',
+          title: 'Devoluciones',
+          icon: 'mdi:keyboard-return',
+          children: [
+            {
+              title: 'Listado',
+              icon: 'mdi:history',
+              path: '/apps/documents/item-returns/list',
+            },
+            {
+              title: 'Nueva Devolución',
+              icon: 'mdi:plus',
+              path: '/apps/documents/item-returns',
+            },
+          ],
         },
         {
           title: 'Zonas de Inventario',
@@ -182,10 +139,66 @@ const navigation = (): VerticalNavItemsType => {
         },
       ],
     },
+
+    // === OPERATIONS & LOGISTICS ===
     {
-      title: 'Configuración',
-      icon: 'uil:setting',
+      title: 'Operaciones',
+      icon: 'mdi:truck-delivery',
       children: [
+        {
+          title: 'Transportes',
+          icon: 'mdi:truck',
+          path: '/apps/transports/list',
+        },
+        {
+          title: 'Distribuidores',
+          icon: 'healthicons:truck-driver',
+          path: '/apps/drivers/list',
+        },
+      ],
+    },
+
+    // === CATALOG & PRICING ===
+    {
+      title: 'Catálogo',
+      icon: 'mdi:tag-multiple',
+      children: [
+        {
+          title: 'Ofertas',
+          icon: 'hugeicons-sale-tag-02',
+          path: '/apps/offers/list',
+        },
+        {
+          title: 'Condiciones de Pago',
+          icon: 'mdi:account-payment',
+          path: '/apps/paymentTypes/list',
+        },
+      ],
+    },
+
+    // === REPORTS & ANALYTICS ===
+    {
+      title: 'Reportes',
+      icon: 'mdi:chart-line',
+      children: [
+        {
+          title: 'Facturas CxC',
+          icon: 'lets-icons:order',
+          path: '/apps/invoices/list',
+        },
+      ],
+    },
+
+    // === ADMINISTRATION ===
+    {
+      title: 'Administración',
+      icon: 'mdi:cog',
+      children: [
+        {
+          title: 'Sucursales',
+          icon: 'mdi:location',
+          path: '/apps/locations/list',
+        },
         {
           title: 'ECF',
           icon: 'mdi:file-document-edit',
@@ -219,18 +232,6 @@ const navigation = (): VerticalNavItemsType => {
         },
       ],
     },
-    // {
-    //   title: 'Second Page',
-    //   path: '/second-page',
-    //   icon: 'mdi:email-outline',
-    // },
-    // {
-    //   path: '/acl',
-    //   action: 'read',
-    //   subject: 'acl-page',
-    //   title: 'Access Control',
-    //   icon: 'mdi:shield-outline',
-    // }
   ]
 }
 
