@@ -20,7 +20,11 @@ import { addLocation } from 'src/store/apps/location'
 import locationData from './data/locations.json'
 import paymentTermData from './data/paymentType.json'
 import clientsData from './data/clients.json'
-import productsData from './data/products.json'
+import productsDataRaw from './data/products.json'
+
+// Type the imported products data correctly
+import { ProductType } from 'src/types/apps/productTypes'
+const productsData = productsDataRaw as ProductType[]
 
 import { AppDispatch, RootState } from 'src/store'
 import { useAuth } from 'src/hooks/useAuth'

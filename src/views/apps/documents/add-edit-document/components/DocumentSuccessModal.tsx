@@ -23,7 +23,7 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import Icon from 'src/@core/components/icon'
 
 // ** PDF Imports
-import { generateDocumentPDF, isClientSide } from 'src/utils/cleanPDFGenerator'
+import { EnhancedPDFGenerator } from 'src/services/pdf/client'
 
 // ** Types
 import { DocumentType } from 'src/types/apps/documentTypes'
@@ -64,17 +64,9 @@ const DocumentSuccessModal = ({
       return
     }
 
-    // Check if PDF generation is available (client-side only)
-    if (!isClientSide()) {
-      // Fallback to preview page for server-side rendering
-      if (documentId) router.push(`/apps/documents/preview/${documentId}`)
-      onClose()
-      return
-    }
-
     setIsGenerating(true)
     try {
-      await generateDocumentPDF(documentData)
+      await EnhancedPDFGenerator.downloadPDF(documentData)
     } catch (err) {
       // If PDF generation failed, fallback to preview
       if (documentId) router.push(`/apps/documents/preview/${documentId}`)

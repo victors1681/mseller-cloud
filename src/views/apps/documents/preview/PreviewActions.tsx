@@ -14,6 +14,7 @@ import CardContent from '@mui/material/CardContent'
 import toast from 'react-hot-toast'
 import { useDispatch } from 'react-redux'
 import Icon from 'src/@core/components/icon'
+import { useAuth } from 'src/hooks/useAuth'
 import { useGoBack } from 'src/hooks/useGoBack'
 import { AppDispatch } from 'src/store'
 import { changeDocumentStatus } from 'src/store/apps/documents'
@@ -24,7 +25,7 @@ import {
 } from 'src/types/apps/documentTypes'
 
 // ** PDF Generation Imports
-import { generateDocumentPDF, isClientSide } from 'src/utils/cleanPDFGenerator'
+import { EnhancedPDFGenerator } from 'src/services/pdf/client'
 interface Props {
   data: DocumentType
 }
@@ -33,24 +34,17 @@ const PreviewActions = ({ data }: Props) => {
   const navigation = useGoBack('/apps/documents/list', true)
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
+  const userData = useAuth()
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
 
   const handleGenerateAndSharePDF = async () => {
-    // Check if PDF generation is available (client-side only)
-    if (!isClientSide()) {
-      toast.error('PDF generation is not available on server side')
-      return
-    }
-
     setIsGeneratingPDF(true)
     try {
-      await generateDocumentPDF(data)
+      await EnhancedPDFGenerator.downloadPDF(data, undefined, { userData })
       toast.success('PDF generado exitosamente')
     } catch (error) {
       console.error('PDF generation failed:', error)
-      toast.error(
-        'Error al generar el PDF. Intente usar el botón "Imprimir" como alternativa.',
-      )
+      toast.error('Error al generar el PDF. Por favor intente de nuevo.')
     } finally {
       setIsGeneratingPDF(false)
     }
