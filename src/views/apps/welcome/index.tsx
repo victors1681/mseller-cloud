@@ -1,38 +1,38 @@
-import React, { useState, useEffect } from 'react'
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Button,
-  Typography,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
+  Typography,
 } from '@mui/material'
+import { useEffect, useState } from 'react'
 
-import Icon from 'src/@core/components/icon'
-import { useDispatch, useSelector } from 'react-redux'
-import { toast } from 'react-hot-toast'
 import LoadingButton from '@mui/lab/LoadingButton'
+import { toast } from 'react-hot-toast'
+import { useDispatch } from 'react-redux'
+import Icon from 'src/@core/components/icon'
 import { addLocation } from 'src/store/apps/location'
+import clientsData from './data/clients.json'
 import locationData from './data/locations.json'
 import paymentTermData from './data/paymentType.json'
-import clientsData from './data/clients.json'
 import productsDataRaw from './data/products.json'
 
 // Type the imported products data correctly
 import { ProductType } from 'src/types/apps/productTypes'
 const productsData = productsDataRaw as ProductType[]
 
-import { AppDispatch, RootState } from 'src/store'
-import { useAuth } from 'src/hooks/useAuth'
-import { addSellers, fetchSellers } from 'src/store/apps/seller'
-import { addPaymentType } from 'src/store/apps/paymentType'
-import { addClients } from 'src/store/apps/clients'
-import { addProducts } from 'src/store/apps/products'
 import { useRouter } from 'next/router'
+import { useAuth } from 'src/hooks/useAuth'
+import { AppDispatch } from 'src/store'
+import { addClients } from 'src/store/apps/clients'
+import { addPaymentType } from 'src/store/apps/paymentType'
+import { addProducts } from 'src/store/apps/products'
+import { addSellers } from 'src/store/apps/seller'
 
 const FirstSessionDialog = () => {
   const [open, setOpen] = useState(false)
