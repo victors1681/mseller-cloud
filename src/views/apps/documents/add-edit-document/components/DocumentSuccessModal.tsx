@@ -23,10 +23,7 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import Icon from 'src/@core/components/icon'
 
 // ** PDF Imports
-import {
-  generateDocumentPDF,
-  isClientSide,
-} from 'src/utils/cleanPDFGenerator'
+import { generateDocumentPDF, isClientSide } from 'src/utils/cleanPDFGenerator'
 
 // ** Types
 import { DocumentType } from 'src/types/apps/documentTypes'

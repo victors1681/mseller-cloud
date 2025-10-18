@@ -24,7 +24,7 @@ import {
 } from 'src/types/apps/documentTypes'
 
 // ** PDF Generation Imports
-import { generateDocumentPDF, generatePDFUsingPrint, isClientSide } from 'src/utils/cleanPDFGenerator'
+import { generateDocumentPDF, isClientSide } from 'src/utils/cleanPDFGenerator'
 interface Props {
   data: DocumentType
 }
@@ -48,7 +48,9 @@ const PreviewActions = ({ data }: Props) => {
       toast.success('PDF generado exitosamente')
     } catch (error) {
       console.error('PDF generation failed:', error)
-      toast.error('Error al generar el PDF. Intente usar el botón "Imprimir" como alternativa.')
+      toast.error(
+        'Error al generar el PDF. Intente usar el botón "Imprimir" como alternativa.',
+      )
     } finally {
       setIsGeneratingPDF(false)
     }
