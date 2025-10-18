@@ -114,6 +114,7 @@
     "@types/react": "^18.2.46",
     "@types/react-credit-cards": "0.8.1",
     "@types/react-datepicker": "4.11.2",
+    "@types/react-dom": "^19.2.2",
     "@types/react-draft-wysiwyg": "1.13.4",
     "@types/react-google-recaptcha": "^2.1.9",
     "@types/react-i18next": "^8.1.0",

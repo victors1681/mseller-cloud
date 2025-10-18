@@ -12,7 +12,7 @@ import {
   useTheme,
 } from '@mui/material'
 import { TransitionProps } from '@mui/material/transitions'
-import React, { forwardRef } from 'react'
+import React, { forwardRef, useState } from 'react'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -32,6 +32,7 @@ import {
   DetailsTable,
   DocumentHeader,
   DocumentInformation,
+  DocumentSuccessModal,
   OrderSummary,
 } from './components'
 
@@ -61,6 +62,10 @@ const EditDocumentDialog: React.FC<EditDocumentDialogProps> = ({ open }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
+  // Success modal state
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [savedDocumentData, setSavedDocumentData] = useState<any>(null)
+
   const {
     store,
     detailsData,
@@ -80,8 +85,16 @@ const EditDocumentDialog: React.FC<EditDocumentDialogProps> = ({ open }) => {
   const onSubmit = async (data: any) => {
     const result = await handleSubmit(data)
     if (result.success) {
-      handleClose(true) // Skip dirty check after successful submission
+      setSavedDocumentData(data)
+      setShowSuccessModal(true)
+      // Don't close immediately, wait for user action from success modal
     }
+  }
+
+  // Success modal handler
+  const handleSuccessModalClose = () => {
+    setShowSuccessModal(false)
+    handleClose(true)
   }
 
   // Protect against accidental navigation with unsaved changes
@@ -312,6 +325,19 @@ const EditDocumentDialog: React.FC<EditDocumentDialogProps> = ({ open }) => {
         onSelectCustomer={customerSearchDialog.handleSelectCustomer}
         title="Buscar y Seleccionar Cliente"
         maxWidth={isMobile ? 'sm' : 'lg'}
+      />
+
+      {/* Success Modal */}
+      <DocumentSuccessModal
+        open={showSuccessModal}
+        onClose={handleSuccessModalClose}
+        documentId={
+          store.documentEditData?.noPedidoStr || savedDocumentData?.noPedidoStr
+        }
+        documentNumber={
+          store.documentEditData?.noPedidoStr || savedDocumentData?.noPedidoStr
+        }
+        documentData={savedDocumentData || store.documentEditData}
       />
     </Dialog>
   )

@@ -1,3 +1,6 @@
+// ** React Imports
+import { useState } from 'react'
+
 // ** Next Import
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -19,6 +22,9 @@ import {
   DocumentType,
   TipoDocumentoEnum,
 } from 'src/types/apps/documentTypes'
+
+// ** PDF Generation Imports
+import { generateDocumentPDF, generatePDFUsingPrint, isClientSide } from 'src/utils/cleanPDFGenerator'
 interface Props {
   data: DocumentType
 }
@@ -27,6 +33,26 @@ const PreviewActions = ({ data }: Props) => {
   const navigation = useGoBack('/apps/documents/list', true)
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
+
+  const handleGenerateAndSharePDF = async () => {
+    // Check if PDF generation is available (client-side only)
+    if (!isClientSide()) {
+      toast.error('PDF generation is not available on server side')
+      return
+    }
+
+    setIsGeneratingPDF(true)
+    try {
+      await generateDocumentPDF(data)
+      toast.success('PDF generado exitosamente')
+    } catch (error) {
+      console.error('PDF generation failed:', error)
+      toast.error('Error al generar el PDF. Intente usar el botón "Imprimir" como alternativa.')
+    } finally {
+      setIsGeneratingPDF(false)
+    }
+  }
 
   const handleApproval = async (
     noPedidoStr: string,
@@ -85,6 +111,19 @@ const PreviewActions = ({ data }: Props) => {
           href={`/apps/documents/print/${data.noPedidoStr}`}
         >
           Imprimir
+        </Button>
+        <Button
+          fullWidth
+          sx={{ mb: 3.5 }}
+          color="primary"
+          variant="contained"
+          onClick={handleGenerateAndSharePDF}
+          disabled={isGeneratingPDF}
+          startIcon={
+            <Icon icon={isGeneratingPDF ? 'mdi:loading' : 'mdi:file-pdf-box'} />
+          }
+        >
+          {isGeneratingPDF ? 'Generando PDF...' : 'Descargar / Compartir PDF'}
         </Button>
         <Button
           fullWidth
