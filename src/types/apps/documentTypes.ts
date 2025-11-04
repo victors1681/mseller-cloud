@@ -117,6 +117,12 @@ export interface DocumentType {
   vendedor?: Vendedor
   clienteNuevo: any
   detalle: DocumentTypeDetail[]
+  qrUrl: string
+  internalTrackId?: string
+  securityCode?: string
+  signedDate?: string
+  statusEcf?: string //Estado del documento en la ECF (Electronic Commerce Framework)
+  ncfVencimiento?: any
 }
 
 export interface DocumentTypeDetail {

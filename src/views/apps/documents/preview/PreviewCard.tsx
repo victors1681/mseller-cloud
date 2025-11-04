@@ -20,6 +20,9 @@ import { useEffect } from 'react'
 
 // ** Configs
 
+// ** Custom Component Imports
+import QRCodeComponent from 'src/views/ui/qrCode'
+
 // ** Types
 import { useAuth } from 'src/hooks/useAuth'
 import {
@@ -333,6 +336,7 @@ const PreviewCard = ({ data }: Props) => {
                     </Typography>
                   )}
                 </Box>
+
                 <Box
                   sx={{
                     display: 'grid',
@@ -527,7 +531,7 @@ const PreviewCard = ({ data }: Props) => {
                           fontSize: { xs: '0.875rem', print: '0.7rem' },
                         }}
                       >
-                        NCF:
+                        {data.ncf?.substring(0, 1) === 'E' ? 'eCF:' : 'NCF:'}
                       </Typography>
                       <Typography
                         variant="body2"
@@ -1136,38 +1140,21 @@ const PreviewCard = ({ data }: Props) => {
                   </Typography>
                 </Box>
               )}
-              {(data.isc > 0 || data.adv > 0) && (
-                <Box sx={{ mt: 1 }}>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: 600,
-                      mb: 0.5,
-                      fontSize: { xs: '0.875rem', print: '0.75rem' },
-                    }}
-                  >
-                    Impuestos Especiales:
-                  </Typography>
-                  {data.isc > 0 && (
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        fontSize: { xs: '0.875rem', print: '0.75rem' },
-                      }}
-                    >
-                      ISC: {formatCurrency(data.isc)}
-                    </Typography>
-                  )}
-                  {data.adv > 0 && (
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        fontSize: { xs: '0.875rem', print: '0.75rem' },
-                      }}
-                    >
-                      ADV: {formatCurrency(data.adv)}
-                    </Typography>
-                  )}
+
+              {/* QR Code - Left side positioning */}
+              {data.qrUrl && (
+                <Box
+                  sx={{
+                    mb: 1.5,
+                    display: 'flex',
+                    justifyContent: 'flex-start',
+                  }}
+                >
+                  <QRCodeComponent
+                    url={data.qrUrl}
+                    securityCode={data.securityCode}
+                    signedDate={data.signedDate}
+                  />
                 </Box>
               )}
             </Grid>
