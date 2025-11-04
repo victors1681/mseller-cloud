@@ -89,7 +89,7 @@ const QRCodeComponent = ({
               fontWeight: 600,
             }}
           >
-            Codigo Seguridad: {securityCode}
+            Código Seguridad: {securityCode}
           </Typography>
         )}
         {signedDate && (
