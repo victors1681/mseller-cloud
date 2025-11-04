@@ -85,8 +85,7 @@ const QRCodeComponent = ({
           <Typography
             variant="caption"
             sx={{
-              fontSize: { xs: '0.75rem', print: '0.65rem' },
-              fontWeight: 600,
+              fontSize: { xs: '0.75rem', print: '0.40rem' },
             }}
           >
             Código Seguridad: {securityCode}
@@ -96,8 +95,7 @@ const QRCodeComponent = ({
           <Typography
             variant="caption"
             sx={{
-              fontSize: { xs: '0.75rem', print: '0.65rem' },
-              fontWeight: 600,
+              fontSize: { xs: '0.75rem', print: '0.40rem' },
             }}
           >
             Fecha Firma: {signedDate}
