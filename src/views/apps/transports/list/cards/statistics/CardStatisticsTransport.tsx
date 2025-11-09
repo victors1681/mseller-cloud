@@ -1,10 +1,10 @@
 // ** MUI Imports
 import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
-import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
+import CardHeader from '@mui/material/CardHeader'
+import Grid from '@mui/material/Grid'
+import Typography from '@mui/material/Typography'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -13,20 +13,33 @@ import Icon from 'src/@core/components/icon'
 import { ThemeColor } from 'src/@core/layouts/types'
 
 // ** Custom Components Imports
-import CustomAvatar from 'src/@core/components/mui/avatar'
 import { Button, Divider, IconButton } from '@mui/material'
+import CustomAvatar from 'src/@core/components/mui/avatar'
 
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from '@mui/material'
+import Link from 'next/link'
+import { useState } from 'react'
+import { useDispatch } from 'react-redux'
+import CustomChip from 'src/@core/components/mui/chip'
+import OptionsMenu from 'src/@core/components/option-menu'
+import { AppDispatch } from 'src/store'
+import {
+  fetchTransportDocsData,
+  retryEcfGeneration,
+} from 'src/store/apps/transports'
 import { DocumentoEntregaResponse } from 'src/types/apps/transportType'
 import formatDate from 'src/utils/formatDate'
 import {
   transportStatusLabels,
   transportStatusObj,
 } from 'src/utils/transportMappings'
-import CustomChip from 'src/@core/components/mui/chip'
-import Link from 'next/link'
-import React from 'react'
 import LoadingWrapper from '../../../../../ui/LoadingWrapper'
-import OptionsMenu from 'src/@core/components/option-menu'
 interface DataType {
   icon: string
   stats: string
@@ -82,6 +95,27 @@ interface Props {
 }
 
 const CardStatisticsTransport = (props: Props) => {
+  const dispatch = useDispatch<AppDispatch>()
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
+  const [retryingEcf, setRetryingEcf] = useState(false)
+
+  const handleRetryEcf = async () => {
+    if (!props.docsData?.noTransporte) return
+
+    setRetryingEcf(true)
+    try {
+      await dispatch(retryEcfGeneration(props.docsData.noTransporte)).unwrap()
+      // After successful ECF retry, reload the transport docs data
+      await dispatch(fetchTransportDocsData(props.docsData.noTransporte))
+      props.onRefresh?.() // Also call the parent refresh if available
+    } catch (error) {
+      // Error handling is done in the thunk with toast notifications
+      console.error('ECF Retry Error:', error)
+    } finally {
+      setRetryingEcf(false)
+      setConfirmDialogOpen(false)
+    }
+  }
   return (
     <Card>
       <LoadingWrapper isLoading={props.isLoading}>
@@ -107,6 +141,19 @@ const CardStatisticsTransport = (props: Props) => {
             action={
               <OptionsMenu
                 options={[
+                  {
+                    icon: (
+                      <Icon
+                        name="mdi:receipt-text-check"
+                        icon="mdi:receipt-text-check"
+                      />
+                    ),
+                    text: 'Reasignar eCF Faltantes',
+                    menuItemProps: {
+                      onClick: () => setConfirmDialogOpen(true),
+                      disabled: retryingEcf || props.isLoading,
+                    },
+                  },
                   {
                     icon: (
                       <Icon
@@ -260,6 +307,56 @@ const CardStatisticsTransport = (props: Props) => {
           </CardContent>
         </>
       </LoadingWrapper>
+
+      {/* Confirmation Dialog for ECF Retry */}
+      <Dialog
+        open={confirmDialogOpen}
+        onClose={() => !retryingEcf && setConfirmDialogOpen(false)}
+        aria-labelledby="retry-ecf-dialog-title"
+        aria-describedby="retry-ecf-dialog-description"
+      >
+        <DialogTitle id="retry-ecf-dialog-title">
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Icon icon="mdi:receipt-text-check" />
+            Reasignar ECF Faltantes
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="retry-ecf-dialog-description">
+            ¿Está seguro que desea reintentar la generación de comprobantes
+            fiscales electrónicos (ECF) para todos los documentos faltantes en
+            este transporte?
+            <br />
+            <br />
+            <strong>Transporte:</strong> {props.docsData?.noTransporte}
+            <br />
+            <strong>Distribuidor:</strong> {props.docsData?.distribuidor.nombre}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setConfirmDialogOpen(false)}
+            disabled={retryingEcf}
+            variant="outlined"
+          >
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleRetryEcf}
+            disabled={retryingEcf}
+            variant="contained"
+            startIcon={
+              retryingEcf ? (
+                <Icon icon="mdi:loading" className="animate-spin" />
+              ) : (
+                <Icon icon="mdi:receipt-text-check" />
+              )
+            }
+          >
+            {retryingEcf ? 'Procesando...' : 'Confirmar'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Card>
   )
 }

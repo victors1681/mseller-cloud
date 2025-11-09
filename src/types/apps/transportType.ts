@@ -1,9 +1,10 @@
 import { TransportStatusEnum } from 'src/utils/transportMappings'
 import { CustomerType } from './customerType'
-import { LocationType } from './locationType'
-import { SellerType } from './sellerType'
 import { DistribuidorType } from './driverType'
+import { EcfDocumentoType } from './ecfDocumentoTypes'
+import { LocationType } from './locationType'
 import { NcfType } from './ncfTypes'
+import { SellerType } from './sellerType'
 
 export interface TransportResponse {
   transportes: TransporteType[]
@@ -119,11 +120,12 @@ export interface DocumentoEntregaType {
   cliente: CustomerType
   codigoMotivoRechazo: string
   motivoRechazo: MotivoRechazo
-  ncfAutoActualizado: boolean
-  ncfFechaAutoActualizado: string
-  qrUrl?: string
-  signedDate?: string
-  statusEcf?: string
+  //ncfAutoActualizado: boolean
+  //ncfFechaAutoActualizado: string
+  // qrUrl?: string
+  // signedDate?: string
+  // statusEcf?: string
+  ecfDocumento: EcfDocumentoType
 }
 
 export interface DocumentoEntregaDetalleType {

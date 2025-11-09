@@ -1,13 +1,13 @@
 // ** React Imports
-import { useState, useEffect, forwardRef } from 'react'
+import { forwardRef, useEffect, useState } from 'react'
 
 // ** Next Import
 import Link from 'next/link'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
+import Grid from '@mui/material/Grid'
 import { styled } from '@mui/material/styles'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
@@ -20,31 +20,36 @@ import { useDispatch, useSelector } from 'react-redux'
 import { fetchTransportDocsData } from 'src/store/apps/transports'
 
 // ** Types Imports
-import { RootState, AppDispatch } from 'src/store'
 import { ThemeColor } from 'src/@core/layouts/types'
+import { AppDispatch, RootState } from 'src/store'
 import { DocumentoEntregaType } from 'src/types/apps/transportType'
 
 // ** Custom Components Imports
 import CustomChip from 'src/@core/components/mui/chip'
 
 // ** Styled Components
+import IconButton from '@mui/material/IconButton'
+import Tooltip from '@mui/material/Tooltip'
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
-import formatDate from 'src/utils/formatDate'
 import formatCurrency from 'src/utils/formatCurrency'
+import formatDate from 'src/utils/formatDate'
+import EcfDocumentModal from 'src/views/apps/transports/docs/EcfDocumentModal'
+import MapModal from 'src/views/apps/transports/docs/MapModal'
+import SignatureModal from 'src/views/apps/transports/docs/SignatureModal'
+import CardStatisticsTransport from 'src/views/apps/transports/list/cards/statistics/CardStatisticsTransport'
+import CardWidgetsDocsDeliveryOverview from 'src/views/apps/transports/list/cards/widgets/CardWidgetsDocsDeliveryOverview'
 import {
   TransportStatusEnum,
   transportDocStatusLabels,
   transportStatusObj,
 } from '../../../../utils/transportMappings'
-import CardWidgetsDocsDeliveryOverview from 'src/views/apps/transports/list/cards/widgets/CardWidgetsDocsDeliveryOverview'
-import CardStatisticsTransport from 'src/views/apps/transports/list/cards/statistics/CardStatisticsTransport'
 import DocDetailModal from './docDetailModal'
-import MapModal from 'src/views/apps/transports/docs/MapModal'
-import SignatureModal from 'src/views/apps/transports/docs/SignatureModal'
-import Tooltip from '@mui/material/Tooltip'
-import IconButton from '@mui/material/IconButton'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
+import {
+  ecfStatusLabels,
+  ecfStatusObj,
+} from '../../../../types/apps/ecfDocumentoTypes'
 
 interface InvoiceStatusObj {
   [key: string]: {
@@ -227,6 +232,9 @@ const TransportDocs = (props: TransportDocsProps) => {
     page: 0,
     pageSize: 20,
   })
+  const [ecfModalOpen, setEcfModalOpen] = useState(false)
+  const [selectedEcfDocument, setSelectedEcfDocument] = useState<any>(null)
+  const [selectedDocumentTitle, setSelectedDocumentTitle] = useState<string>('')
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
@@ -240,9 +248,50 @@ const TransportDocs = (props: TransportDocsProps) => {
     dispatch(fetchTransportDocsData(props.noTransporte))
   }
 
-
   const columns: GridColDef[] = [
     ...defaultColumns,
+    {
+      flex: 0.1,
+      minWidth: 120,
+      field: 'eCF',
+      headerName: 'eCF',
+      renderCell: ({ row }: CellType) => {
+        const statusEcf = row?.ecfDocumento?.statusEcf
+        const label = statusEcf ? ecfStatusLabels[statusEcf] || statusEcf : '-'
+        const color =
+          statusEcf && ecfStatusObj[statusEcf]
+            ? ecfStatusObj[statusEcf]
+            : 'secondary'
+
+        const handleEcfClick = () => {
+          if (statusEcf && row.ecfDocumento) {
+            setSelectedEcfDocument(row.ecfDocumento)
+            setSelectedDocumentTitle(row.noDocEntrega)
+            setEcfModalOpen(true)
+          }
+        }
+
+        return (
+          <CustomChip
+            skin="light"
+            size="small"
+            label={label}
+            color={color as any}
+            sx={{
+              textTransform: 'capitalize',
+              cursor: statusEcf ? 'pointer' : 'default',
+              '&:hover': statusEcf
+                ? {
+                    opacity: 0.8,
+                    transform: 'scale(1.02)',
+                  }
+                : {},
+            }}
+            onClick={statusEcf ? handleEcfClick : undefined}
+          />
+        )
+      },
+    },
     {
       flex: 0.1,
       minWidth: 130,
@@ -254,17 +303,34 @@ const TransportDocs = (props: TransportDocsProps) => {
           <MapModal data={[row]}></MapModal>
           <SignatureModal url={row.firmaUrl} />
 
-          <Tooltip title="Comprobante fiscal electrónico">
-            <IconButton
-              type="button"
-              size="small"
-              href={row.qrUrl ?? ""}
-              target="_black"
-              disabled={!row.qrUrl}
-            >
-              <Icon icon="material-symbols:receipt" fontSize={20} />
-            </IconButton>
-          </Tooltip>
+          {row.ecfDocumento?.qrUrl ? (
+            <Tooltip title="Ver información del comprobante fiscal">
+              <IconButton
+                type="button"
+                size="small"
+                onClick={() => {
+                  setSelectedEcfDocument(row.ecfDocumento)
+                  setSelectedDocumentTitle(row.noDocEntrega)
+                  setEcfModalOpen(true)
+                }}
+                sx={{
+                  color: 'success.main',
+                  '&:hover': {
+                    backgroundColor: 'success.light',
+                    color: 'success.dark',
+                  },
+                }}
+              >
+                <Icon icon="material-symbols:receipt" fontSize={20} />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            <Tooltip title="Comprobante fiscal no disponible">
+              <IconButton type="button" size="small" disabled>
+                <Icon icon="material-symbols:receipt" fontSize={20} />
+              </IconButton>
+            </Tooltip>
+          )}
         </Box>
       ),
     },
@@ -302,6 +368,14 @@ const TransportDocs = (props: TransportDocsProps) => {
           </Card>
         </Grid>
       </Grid>
+
+      {/* ECF Document Modal */}
+      <EcfDocumentModal
+        open={ecfModalOpen}
+        onClose={() => setEcfModalOpen(false)}
+        ecfDocumento={selectedEcfDocument}
+        documentTitle={selectedDocumentTitle}
+      />
     </DatePickerWrapper>
   )
 }

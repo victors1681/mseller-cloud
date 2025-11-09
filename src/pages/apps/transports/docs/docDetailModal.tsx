@@ -2,20 +2,13 @@
 import { useState } from 'react'
 
 // ** MUI Imports
-import Button from '@mui/material/Button'
 import Dialog from '@mui/material/Dialog'
-import IconButton from '@mui/material/IconButton'
-import Typography from '@mui/material/Typography'
-import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
+import IconButton from '@mui/material/IconButton'
 import { styled } from '@mui/material/styles'
+import Typography from '@mui/material/Typography'
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
-import Link from 'next/link'
-import {
-  DocumentoEntregaDetalleType,
-  DocumentoEntregaType,
-} from 'src/types/apps/transportType'
 import {
   Box,
   BoxProps,
@@ -23,22 +16,24 @@ import {
   CardContent,
   Divider,
   Grid,
-  Table,
-  TableBody,
-  TableCellBaseProps,
   TableCell,
-  TableRow,
+  TableCellBaseProps,
 } from '@mui/material'
-import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid'
-import formatCurrency from 'src/utils/formatCurrency'
+import { DataGrid, GridColDef } from '@mui/x-data-grid'
+import Link from 'next/link'
+import Icon from 'src/@core/components/icon'
 import CustomChip from 'src/@core/components/mui/chip'
+import {
+  DocumentoEntregaDetalleType,
+  DocumentoEntregaType,
+} from 'src/types/apps/transportType'
+import formatCurrency from 'src/utils/formatCurrency'
+import formatDate from 'src/utils/formatDate'
 import {
   TransportStatusEnum,
   transportDocStatusLabels,
-  transportStatusLabels,
   transportStatusObj,
 } from '../../../../utils/transportMappings'
-import formatDate from 'src/utils/formatDate'
 
 const LinkStyled = styled(Link)(({ theme }) => ({
   textDecoration: 'none',
@@ -245,18 +240,6 @@ const Header = ({ data }: HeaderProps) => {
             NCF:
           </Typography>
           <Typography variant="body2">{data.ncf ? data.ncf : '-'}</Typography>
-        </Box>
-
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Typography variant="body2" sx={{ mr: 2, fontWeight: 600 }}>
-            NCF Auto Asignado:
-          </Typography>
-          <Typography
-            variant="body2"
-            sx={{ fontWeight: 600, color: 'text.primary' }}
-          >
-            {data.ncfAutoActualizado ? 'SI' : 'NO'}
-          </Typography>
         </Box>
 
         <Box sx={{ display: 'flex', alignItems: 'center' }}>

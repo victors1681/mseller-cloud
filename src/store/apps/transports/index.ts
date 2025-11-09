@@ -1,21 +1,20 @@
 // ** Redux Imports
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { Dispatch } from 'redux'
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 // ** Axios Imports
-import axios, { isAxiosError } from 'axios'
+import { isAxiosError } from 'axios'
+import toast from 'react-hot-toast'
+import restClient from 'src/configs/restClient'
+import { PaginatedResponse } from 'src/types/apps/response'
 import {
   DocumentoEntregaResponse,
   DocumentoEntregaResponseAxios,
   DocumentoEntregaType,
-  PaymentTypeEnum,
   TransporteListType,
 } from 'src/types/apps/transportType'
-import { PaginatedResponse } from 'src/types/apps/response'
 import { getDateParam } from 'src/utils/getDateParam'
-import restClient from 'src/configs/restClient'
 import { TransportStatusEnum } from 'src/utils/transportMappings'
-import toast from 'react-hot-toast'
 
 export interface DataParams {
   query: string
@@ -258,6 +257,48 @@ export const fetchTransportDocsData = createAsyncThunk(
   },
 )
 
+// ** Retry ECF Generation for Transport
+export const retryEcfGeneration = createAsyncThunk(
+  'appTransport/retryEcf',
+  async (noTransporte: number | string, { rejectWithValue }) => {
+    try {
+      const response = await restClient.post(
+        `/api/portal/Transporte/ReintentarEcf?noTransporte=${noTransporte}`,
+      )
+
+      // Only show success if response is actually successful (2xx status)
+      if (response.status >= 200 && response.status < 300) {
+        toast.success('ECF regeneration initiated successfully')
+        return response.data
+      } else {
+        // Handle non-2xx responses as errors
+        const message =
+          response.data?.message ||
+          response.data?.title ||
+          'Error al reintentar generación de ECF'
+        toast.error(message)
+        return rejectWithValue(message)
+      }
+    } catch (error) {
+      if (isAxiosError(error)) {
+        // Get error message from response or use generic message
+        const message =
+          error.response?.data?.message ||
+          error.response?.data?.title ||
+          'Error al reintentar generación de ECF'
+
+        toast.error(message)
+        return rejectWithValue(message)
+      }
+
+      // Network or other non-HTTP errors
+      const message = 'Error de conexión: Verifique su conexión a internet'
+      toast.error(message)
+      return rejectWithValue(message)
+    }
+  },
+)
+
 export const apptransportslice = createSlice({
   name: 'appTransport',
   initialState: {
@@ -339,6 +380,16 @@ export const apptransportslice = createSlice({
       state.allData = action.payload.allData
       state.total = action.payload.total
       state.docsData = action.payload.docsData
+      state.isLoading = false
+    })
+
+    builder.addCase(retryEcfGeneration.pending, (state, action) => {
+      state.isLoading = true
+    })
+    builder.addCase(retryEcfGeneration.rejected, (state, action) => {
+      state.isLoading = false
+    })
+    builder.addCase(retryEcfGeneration.fulfilled, (state, action) => {
       state.isLoading = false
     })
   },
