@@ -13,6 +13,7 @@ export enum TransportStatusEnum {
   Elaborando = 12,
   ERP = 13,
   Parcial = 14,
+  ecf_procesando = 15,
 }
 
 export const transportStatusLabels: Record<
@@ -30,6 +31,7 @@ export const transportStatusLabels: Record<
   [TransportStatusEnum.Elaborando]: 'Elaborando',
   [TransportStatusEnum.ERP]: 'ERP',
   [TransportStatusEnum.Parcial]: 'Parcial',
+  [TransportStatusEnum.ecf_procesando]: 'ecf Procesando',
 }
 
 export const transportDocStatusLabels: Record<
