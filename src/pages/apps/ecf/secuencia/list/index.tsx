@@ -74,7 +74,7 @@ const defaultColumns: GridColDef[] = [
   {
     flex: 0.1,
     field: 'tipoCliente',
-    minWidth: 130,
+    minWidth: 100,
     headerName: 'Tipo Cliente',
     renderCell: ({ row }: CellType) => (
       <Typography
@@ -143,21 +143,36 @@ const defaultColumns: GridColDef[] = [
   },
   {
     flex: 0.1,
-    minWidth: 120,
-    field: 'rango',
-    headerName: 'Rango',
-    renderCell: ({ row }: CellType) => (
-      <Typography
-        noWrap
-        variant="body2"
-        sx={{
-          color: 'text.primary',
-        }}
-      >
-        {row.secuenciaIni.toLocaleString()} -{' '}
-        {row.secuenciaFin.toLocaleString()}
-      </Typography>
-    ),
+    minWidth: 180,
+    field: 'restante',
+    headerName: 'Disponible',
+    renderCell: ({ row }: CellType) => {
+      const disponible = row.secuenciaFin - row.secuencia
+      const total = row.secuenciaFin - row.secuenciaIni + 1
+      const porcentajeDisponible = (disponible / total) * 100
+      const isLowStock = porcentajeDisponible < 20
+
+      return (
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Typography
+              noWrap
+              variant="body2"
+              sx={{
+                color: isLowStock ? 'error.main' : 'text.primary',
+                fontWeight: 600,
+              }}
+            >
+              {disponible.toLocaleString()}
+            </Typography>
+            <Typography noWrap variant="caption">
+              {row.secuenciaIni.toLocaleString()}-{' '}
+              {row.secuenciaFin.toLocaleString()}
+            </Typography>
+          </Box>
+        </Box>
+      )
+    },
   },
   {
     flex: 0.1,
@@ -440,7 +455,7 @@ const SecuenciaECFList = () => {
         <Grid item xs={12}>
           <Card>
             <CardHeader
-              title="Secuencias ECF"
+              title="Secuencias eCF"
               action={
                 <OptionsMenu
                   options={[

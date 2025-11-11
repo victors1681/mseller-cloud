@@ -200,7 +200,7 @@ const navigation = (): VerticalNavItemsType => {
           path: '/apps/locations/list',
         },
         {
-          title: 'ECF',
+          title: 'eCF',
           icon: 'mdi:file-document-edit',
           children: [
             {
@@ -209,7 +209,7 @@ const navigation = (): VerticalNavItemsType => {
               path: '/apps/ecf/integration/list',
             },
             {
-              title: 'Secuencias ECF',
+              title: 'Secuencias eCF',
               icon: 'mdi:counter',
               path: '/apps/ecf/secuencia/list',
             },
