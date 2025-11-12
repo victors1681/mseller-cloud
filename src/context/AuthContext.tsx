@@ -93,18 +93,22 @@ const AuthProvider = ({ children }: Props) => {
               updateAccessToken,
             )
 
-            // Only redirect if not already on a guest page
+            // Only redirect if on a guest page or if there's a returnUrl
             const guestPages = ['/login', '/register', '/forgot-password']
             const isOnGuestPage = guestPages.some((page) =>
-              router.asPath.startsWith(page),
+              router.pathname.startsWith(page),
             )
+            const returnUrl = router.query.returnUrl as string
 
-            if (!isOnGuestPage) {
-              const returnUrl = router.query.returnUrl as string
+            // Redirect only if:
+            // 1. User is on a guest page (login/register/forgot-password), OR
+            // 2. There's a returnUrl in the query params
+            if (isOnGuestPage || returnUrl) {
               const redirectURL =
                 returnUrl && returnUrl !== '/' ? returnUrl : '/'
               await router.replace(redirectURL)
             }
+            // Otherwise, stay on the current page
           } else {
             // User is not authenticated
             setUser(null)
