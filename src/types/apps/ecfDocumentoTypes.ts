@@ -5,10 +5,20 @@
 // ============================================
 
 export enum EcfDocumentType {
-  Invoice = 'Invoice',
-  CreditNote = 'CreditNote',
-  DebitNote = 'DebitNote',
-  Cancellation = 'Cancellation',
+  // Electronic invoice (Factura Electrónica)
+  Invoice = 0,
+  // Credit note (Nota de Crédito Electrónica)
+  CreditNote = 1,
+  // Debit note (Nota de Débito Electrónica)
+  DebitNote = 2,
+  // ECF cancellation (Anulación de ECF)
+  Cancellation = 3,
+  // Minor expenses (Gastos Menores)
+  MinorExpenses = 4,
+  // Special regime (Régimen Especial)
+  SpecialRegime = 5,
+  // Governmental invoice (Factura Gubernamental)
+  Government = 6,
 }
 
 export enum TipoDocumento {
@@ -327,6 +337,58 @@ export const getEcfStatusDescription = (
   status: EcfStatusEnum | string,
 ): string => {
   return ecfStatusLabels[status] || ''
+}
+
+// TipoDocumento Enum Mappings
+export const tipoDocumentoLabels: Record<TipoDocumento | string, string> = {
+  [TipoDocumento.Invoice]: 'Factura',
+  [TipoDocumento.CreditNote]: 'Nota de Crédito',
+  [TipoDocumento.DebitNote]: 'Nota de Débito',
+  [TipoDocumento.Conduce]: 'Conduce',
+  [TipoDocumento.Order]: 'Orden',
+  [TipoDocumento.Quote]: 'Cotización',
+}
+
+export const tipoDocumentoObj: Record<TipoDocumento | string, string> = {
+  [TipoDocumento.Invoice]: 'primary',
+  [TipoDocumento.CreditNote]: 'success',
+  [TipoDocumento.DebitNote]: 'warning',
+  [TipoDocumento.Conduce]: 'info',
+  [TipoDocumento.Order]: 'secondary',
+  [TipoDocumento.Quote]: 'default',
+}
+
+// Helper function to get TipoDocumento label
+export const getTipoDocumentoLabel = (tipo: TipoDocumento | string): string => {
+  return tipoDocumentoLabels[tipo] || tipo
+}
+
+// EcfDocumentType Enum Mappings
+export const ecfDocumentTypeLabels: Record<EcfDocumentType | number, string> = {
+  [EcfDocumentType.Invoice]: 'Factura Electrónica',
+  [EcfDocumentType.CreditNote]: 'Nota de Crédito Electrónica',
+  [EcfDocumentType.DebitNote]: 'Nota de Débito Electrónica',
+  [EcfDocumentType.Cancellation]: 'Anulación de ECF',
+  [EcfDocumentType.MinorExpenses]: 'Gastos Menores',
+  [EcfDocumentType.SpecialRegime]: 'Régimen Especial',
+  [EcfDocumentType.Government]: 'Factura Gubernamental',
+}
+
+export const ecfDocumentTypeObj: Record<EcfDocumentType | number, string> = {
+  [EcfDocumentType.Invoice]: 'primary',
+  [EcfDocumentType.CreditNote]: 'success',
+  [EcfDocumentType.DebitNote]: 'warning',
+  [EcfDocumentType.Cancellation]: 'error',
+  [EcfDocumentType.MinorExpenses]: 'info',
+  [EcfDocumentType.SpecialRegime]: 'secondary',
+  [EcfDocumentType.Government]: 'default',
+}
+
+// Helper function to get EcfDocumentType label
+export const getEcfDocumentTypeLabel = (
+  tipo: EcfDocumentType | number,
+): string => {
+  return ecfDocumentTypeLabels[tipo] || tipo.toString()
 }
 
 // ============================================

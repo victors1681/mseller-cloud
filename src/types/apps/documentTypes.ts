@@ -26,6 +26,7 @@ export enum TipoDocumentoEnum {
   DEBIT_NOTE = 'debit_note',
   RETURN_ORDER = 'return_order',
   DELIVERY_NOTE = 'delivery_note',
+  INVOICE_TRANSPORT = 'invoice_transport',
 }
 
 export const tipoDocumentoSpanishNames: Record<TipoDocumentoEnum, string> = {
@@ -38,6 +39,7 @@ export const tipoDocumentoSpanishNames: Record<TipoDocumentoEnum, string> = {
   [TipoDocumentoEnum.DEBIT_NOTE]: 'Nota de Débito',
   [TipoDocumentoEnum.RETURN_ORDER]: 'Devolución',
   [TipoDocumentoEnum.DELIVERY_NOTE]: 'Nota de Entrega',
+  [TipoDocumentoEnum.INVOICE_TRANSPORT]: 'Factura de Transporte',
 }
 
 export function getTipoDocumentoSpanishName(tipo: string): string {

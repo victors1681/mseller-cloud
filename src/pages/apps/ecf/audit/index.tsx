@@ -55,8 +55,11 @@ import {
   EcfDocumentoFilters,
   EcfDocumentoType,
   EcfDocumentType,
+  ecfDocumentTypeLabels,
+  ecfDocumentTypeObj,
   EcfStatusEnum,
   ecfStatusObj,
+  getEcfDocumentTypeLabel,
   JobStatus,
   jobStatusColors,
   TipoDocumento,
@@ -174,7 +177,7 @@ const EcfAuditPage = () => {
     if (query.ncf) urlFilters.ncf = String(query.ncf)
     if (query.statusEcf) urlFilters.statusEcf = String(query.statusEcf)
     if (query.tipoDocumentoEcf)
-      urlFilters.tipoDocumentoEcf = String(
+      urlFilters.tipoDocumentoEcf = Number(
         query.tipoDocumentoEcf,
       ) as EcfDocumentType
     if (query.tipoDocumento)
@@ -311,8 +314,8 @@ const EcfAuditPage = () => {
   // ** DataGrid Columns
   const columns: GridColDef[] = [
     {
-      flex: 0.2,
-      minWidth: 120,
+      flex: 0.13,
+      minWidth: 80,
       field: 'documentoId',
       headerName: 'ID Documento',
       renderCell: ({ row }: { row: EcfDocumentoType }) => {
@@ -324,16 +327,19 @@ const EcfAuditPage = () => {
       },
     },
     {
-      flex: 0.15,
-      minWidth: 100,
+      flex: 0.2,
+      minWidth: 120,
       field: 'tipoDocumentoEcf',
       headerName: 'Tipo ECF',
       renderCell: ({ row }: { row: EcfDocumentoType }) => {
+        const label = getEcfDocumentTypeLabel(row.tipoDocumentoEcf ?? 0)
+        const color = ecfDocumentTypeObj[row.tipoDocumentoEcf ?? 0] || 'default'
+
         return (
           <Chip
             size="small"
-            label={row.tipoDocumentoEcf}
-            color="primary"
+            label={label}
+            color={color as any}
             variant="outlined"
           />
         )
@@ -640,16 +646,45 @@ const EcfAuditPage = () => {
                           >
                             <MenuItem value="">Todos</MenuItem>
                             <MenuItem value={EcfDocumentType.Invoice}>
-                              Factura
+                              {ecfDocumentTypeLabels[EcfDocumentType.Invoice]}
                             </MenuItem>
                             <MenuItem value={EcfDocumentType.CreditNote}>
-                              Nota de Crédito
+                              {
+                                ecfDocumentTypeLabels[
+                                  EcfDocumentType.CreditNote
+                                ]
+                              }
                             </MenuItem>
                             <MenuItem value={EcfDocumentType.DebitNote}>
-                              Nota de Débito
+                              {ecfDocumentTypeLabels[EcfDocumentType.DebitNote]}
                             </MenuItem>
                             <MenuItem value={EcfDocumentType.Cancellation}>
-                              Anulación
+                              {
+                                ecfDocumentTypeLabels[
+                                  EcfDocumentType.Cancellation
+                                ]
+                              }
+                            </MenuItem>
+                            <MenuItem value={EcfDocumentType.MinorExpenses}>
+                              {
+                                ecfDocumentTypeLabels[
+                                  EcfDocumentType.MinorExpenses
+                                ]
+                              }
+                            </MenuItem>
+                            <MenuItem value={EcfDocumentType.SpecialRegime}>
+                              {
+                                ecfDocumentTypeLabels[
+                                  EcfDocumentType.SpecialRegime
+                                ]
+                              }
+                            </MenuItem>
+                            <MenuItem value={EcfDocumentType.Government}>
+                              {
+                                ecfDocumentTypeLabels[
+                                  EcfDocumentType.Government
+                                ]
+                              }
                             </MenuItem>
                           </Select>
                         </FormControl>
@@ -861,12 +896,18 @@ const EcfAuditPage = () => {
                               >
                                 Cliente: {documento.codigoCliente}
                               </Typography>
-                              <Typography
-                                variant="body2"
-                                color="text.secondary"
-                              >
-                                {documento.tipoDocumentoEcf}
-                              </Typography>
+                              <Chip
+                                size="small"
+                                label={getEcfDocumentTypeLabel(
+                                  documento.tipoDocumentoEcf ?? 0,
+                                )}
+                                color={
+                                  ecfDocumentTypeObj[
+                                    documento.tipoDocumentoEcf ?? 0
+                                  ] as any
+                                }
+                                variant="outlined"
+                              />
                             </Box>
 
                             {documento.ncf && (
