@@ -1,5 +1,5 @@
 // ** React Imports
-import { ReactNode, ReactElement, useEffect } from 'react'
+import { ReactElement, ReactNode, useEffect } from 'react'
 
 // ** Next Import
 import { useRouter } from 'next/router'
@@ -23,8 +23,9 @@ const AuthGuard = (props: AuthGuardProps) => {
         return
       }
 
-      if (auth.user === null && !window.localStorage.getItem('userData')) {
-        if (router.asPath !== '/') {
+      // Only redirect if user is null and loading is complete
+      if (auth.user === null && !auth.loading) {
+        if (router.asPath !== '/' && router.asPath !== '/login') {
           router.replace({
             pathname: '/login',
             query: { returnUrl: router.asPath },
@@ -35,9 +36,10 @@ const AuthGuard = (props: AuthGuardProps) => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [router.route],
+    [router.isReady, auth.user, auth.loading],
   )
 
+  // Show fallback while loading or if user is not authenticated
   if (auth.loading || auth.user === null) {
     return fallback
   }

@@ -70,9 +70,8 @@ const AuthProvider = ({ children }: Props) => {
   const router = useRouter()
 
   useEffect(() => {
-    const returnUrl = router.query.returnUrl
-    const initAuthentication = async () => {
-      onAuthStateChanged(auth, async (user) => {
+    const initAuthentication = () => {
+      const unsubscribe = onAuthStateChanged(auth, async (user) => {
         setLoading(true)
         try {
           if (user) {
@@ -94,11 +93,39 @@ const AuthProvider = ({ children }: Props) => {
               updateAccessToken,
             )
 
-            const redirectURL =
-              returnUrl && returnUrl !== '/' ? returnUrl : router.asPath
-            await router.replace(redirectURL as string)
+            // Only redirect if not already on a guest page
+            const guestPages = ['/login', '/register', '/forgot-password']
+            const isOnGuestPage = guestPages.some((page) =>
+              router.asPath.startsWith(page),
+            )
+
+            if (!isOnGuestPage) {
+              const returnUrl = router.query.returnUrl as string
+              const redirectURL =
+                returnUrl && returnUrl !== '/' ? returnUrl : '/'
+              await router.replace(redirectURL)
+            }
           } else {
-            await handleLogout()
+            // User is not authenticated
+            setUser(null)
+            window.localStorage.removeItem('userData')
+            window.localStorage.removeItem(authConfig.storageTokenKeyName)
+
+            // Only redirect to login if not already on a guest page
+            const guestPages = ['/login', '/register', '/forgot-password']
+            const isOnGuestPage = guestPages.some((page) =>
+              router.pathname.startsWith(page),
+            )
+
+            if (!isOnGuestPage) {
+              await router.replace({
+                pathname: '/login',
+                query:
+                  router.pathname !== '/'
+                    ? { returnUrl: router.asPath }
+                    : undefined,
+              })
+            }
           }
         } catch (error) {
           console.error('Auth Error:', error)
@@ -114,14 +141,37 @@ const AuthProvider = ({ children }: Props) => {
                 console.error(`Firebase error: ${error.code}`)
             }
           }
-          await handleLogout()
+
+          // Clear auth state on error
+          setUser(null)
+          window.localStorage.removeItem('userData')
+          window.localStorage.removeItem(authConfig.storageTokenKeyName)
+
+          // Only redirect to login if not already on a guest page
+          const guestPages = ['/login', '/register', '/forgot-password']
+          const isOnGuestPage = guestPages.some((page) =>
+            router.pathname.startsWith(page),
+          )
+
+          if (!isOnGuestPage) {
+            await router.replace('/login')
+          }
         } finally {
           setLoading(false)
         }
       })
+
+      return unsubscribe
     }
 
-    initAuthentication()
+    const unsubscribe = initAuthentication()
+
+    // Cleanup subscription on unmount
+    return () => {
+      if (unsubscribe) {
+        unsubscribe()
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -150,21 +200,27 @@ const AuthProvider = ({ children }: Props) => {
   }
 
   const handleLogout = async () => {
-    await handleSignOut()
-    setUser(null)
-    window.localStorage.removeItem('userData')
-    window.localStorage.removeItem(authConfig.storageTokenKeyName)
+    setLoadingForm(true)
+    try {
+      await handleSignOut()
+      setUser(null)
+      window.localStorage.removeItem('userData')
+      window.localStorage.removeItem(authConfig.storageTokenKeyName)
 
-    // Only redirect to login if not already on a guest page
-    const guestPages = ['/login', '/register', '/forgot-password']
-    const isOnGuestPage = guestPages.some((page) =>
-      router.asPath.startsWith(page),
-    )
+      // Only redirect to login if not already on a guest page
+      const guestPages = ['/login', '/register', '/forgot-password']
+      const isOnGuestPage = guestPages.some((page) =>
+        router.pathname.startsWith(page),
+      )
 
-    if (!isOnGuestPage) {
-      router.push('/login')
+      if (!isOnGuestPage) {
+        await router.push('/login')
+      }
+    } catch (error) {
+      console.error('Logout error:', error)
+    } finally {
+      setLoadingForm(false)
     }
-    setLoadingForm(false)
   }
 
   const handleSignUp = async (

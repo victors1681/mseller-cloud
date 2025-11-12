@@ -1,5 +1,5 @@
 // ** React Imports
-import { ReactNode, ReactElement, useEffect } from 'react'
+import { ReactElement, ReactNode, useEffect } from 'react'
 
 // ** Next Import
 import { useRouter } from 'next/router'
@@ -22,23 +22,26 @@ const GuestGuard = (props: GuestGuardProps) => {
       return
     }
 
-    // Only redirect if user is actually authenticated and not loading
-    if (auth.user && !auth.loading && window.localStorage.getItem('userData')) {
-      router.replace('/')
+    // Only redirect if user is authenticated and loading is complete
+    if (auth.user && !auth.loading) {
+      const returnUrl = router.query.returnUrl as string
+      const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
+      router.replace(redirectURL)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.route, auth.user, auth.loading])
+  }, [router.isReady, auth.user, auth.loading])
 
   // Show fallback spinner while authentication is being determined
-  if (auth.loading) {
+  if (auth.loading || !router.isReady) {
     return fallback
   }
 
-  // If user is authenticated, redirect them away from guest pages
-  if (auth.user && !auth.loading) {
+  // If user is authenticated and we're done loading, show fallback while redirecting
+  if (auth.user) {
     return fallback
   }
 
+  // User is not authenticated, show the guest page (login, register, etc.)
   return <>{children}</>
 }
 
