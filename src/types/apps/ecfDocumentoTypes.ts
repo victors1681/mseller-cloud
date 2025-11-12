@@ -47,66 +47,61 @@ export enum EcfStatusEnum {
 // ============================================
 
 export interface EcfDocumentoType {
+  // Core Identifiers
   id: number
-
-  // Document Reference - Universal across all document types
   documentoId: string // NoPedidoStr, NoDocEntrega, etc.
   tipoDocumento: TipoDocumento // invoice, credit_note, debit_note, conduce, etc.
   tipoDocumentoEcf: EcfDocumentType // Invoice, CreditNote, DebitNote, Cancellation
 
-  // Business context
+  // Business Context
   codigoCliente: string
-  codigoVendedor?: string
-  localidadId?: number
-  fechaDocumento: string // ISO 8601 date string
+  codigoVendedor?: string | null
+  localidadId?: number | null
+  fechaDocumento: string // ISO 8601 datetime
 
-  // ECF Response Data (from DGII service)
-  qrUrl?: string
-  internalTrackId?: string
-  securityCode?: string
-  signedDate?: string
+  // ECF Response Data
+  ncf?: string
+  ncfDescripcion?: string | null
+  tipoeCF?: number
+  qrUrl?: string | null
+  internalTrackId?: string | null
+  securityCode?: string | null
+  signedDate?: string | null
 
-  ncf?: string // NCF assigned by DGII
-  ncfDescripcion?: string // Description of NCF type
+  // Status Tracking
+  statusEcf?: string | null
+  statusEcfUltimaActualizacion?: string | null // ISO 8601 datetime
+  dgiiResponses?: string | null // JSON string
 
-  // ECF Status tracking
-  statusEcf?: EcfStatusEnum // Uses EcfStatusEnum descriptions
-  statusEcfUltimaActualizacion?: string // ISO 8601 date string
-
-  // DGII Response History - Store all responses as JSON array
-  dgiiResponses?: string // JSON string containing array of DGII response objects
-
-  // NCF Auto-update tracking
+  // NCF Auto-update
   ncfAutoActualizado?: boolean
-  ncfFechaAutoActualizado?: string // ISO 8601 date string
+  ncfFechaAutoActualizado?: string | null // ISO 8601 datetime
 
-  // Background Job Tracking
-  jobId?: string
-  jobStatus?: JobStatus
-  jobQueuedAt?: string // ISO 8601 date string
-  jobStartedAt?: string // ISO 8601 date string
-  jobCompletedAt?: string // ISO 8601 date string
-  jobErrorMessage?: string // Long text for error details
+  // Job Tracking
+  jobId?: string | null
+  jobStatus?: JobStatus | null
+  jobQueuedAt?: string | null // ISO 8601 datetime
+  jobStartedAt?: string | null // ISO 8601 datetime
+  jobCompletedAt?: string | null // ISO 8601 datetime
+  jobErrorMessage?: string | null
   jobRetryCount?: number
-  jobRetryMaxAttempts?: number
+  jobRetryMaxAttempts?: number | null
 
-  // Document References (for credit notes, cancellations, etc.)
-  documentoReferenciadoId?: string // Original invoice for credit note
-  documentoReferenciadoEcfId?: number // FK to parent EcfDocumento
-  motivoReferencia?: string // Cancellation reason, credit note reason, etc.
+  // Document References
+  documentoReferenciadoId?: string | null
+  documentoReferenciadoEcfId?: number | null
+  motivoReferencia?: string | null
 
-  // Audit fields
+  // Audit Fields
   usuarioCreacion: string
-  fechaCreacion: string // ISO 8601 date string
-  usuarioModificacion?: string
-  fechaModificacion?: string // ISO 8601 date string
+  fechaCreacion: string // ISO 8601 datetime
+  usuarioModificacion?: string | null
+  fechaModificacion?: string | null // ISO 8601 datetime
 
-  // Additional metadata
+  // Additional
   asignacionAutomatica?: boolean
-  metadataJson?: string // For flexible additional data
-
-  // Multi-tenancy
-  businessId?: string
+  metadataJson?: string | null
+  businessId?: string | null
 
   // Navigation properties
   documentoReferenciadoEcf?: EcfDocumentoType
@@ -118,18 +113,36 @@ export interface EcfDocumentoType {
 // ============================================
 
 export interface EcfDocumentoFilters {
+  // Basic search
   search?: string
+  documentoId?: string // Partial match on document ID
+
+  // Document type filters
   tipoDocumento?: TipoDocumento
   tipoDocumentoEcf?: EcfDocumentType
-  codigoCliente?: string
-  codigoVendedor?: string
-  localidadId?: number
-  statusEcf?: string
+
+  // Business context filters
+  codigoCliente?: string // Exact match on client code
+  codigoVendedor?: string // Exact match on vendor code
+  localidadId?: number // Location/warehouse ID
+
+  // ECF specific filters
+  ncf?: string // Partial match on NCF
+  tipoeCF?: number // ECF type (31, 32, 33, etc.)
+  statusEcf?: string // ECF status
+
+  // Job and system filters
   jobStatus?: JobStatus
-  fechaDocumentoDesde?: string // ISO 8601 date string
-  fechaDocumentoHasta?: string // ISO 8601 date string
   ncfAutoActualizado?: boolean
   asignacionAutomatica?: boolean
+
+  // Date filters
+  fechaCreacionDesde?: string // ISO 8601 date (YYYY-MM-DD)
+  fechaCreacionHasta?: string // ISO 8601 date (YYYY-MM-DD)
+  fechaDocumentoDesde?: string // ISO 8601 date string
+  fechaDocumentoHasta?: string // ISO 8601 date string
+
+  // Pagination
   pageNumber?: number
   pageSize?: number
 }
@@ -143,6 +156,17 @@ export interface EcfDocumentoState {
 }
 
 export interface PaginatedEcfDocumentoResponse {
+  items: EcfDocumentoType[]
+  pageNumber: number
+  pageSize: number
+  totalCount: number
+  totalPages: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
+}
+
+// Legacy compatibility - keep for existing code
+export interface LegacyPaginatedEcfDocumentoResponse {
   data: EcfDocumentoType[]
   total: number
   pageNumber: number

@@ -11,6 +11,7 @@ import docTypeSec from 'src/store/apps/docTypeSec'
 import documents from 'src/store/apps/documents'
 import drivers from 'src/store/apps/driver'
 import ecf from 'src/store/apps/ecf'
+import ecfDocumentos from 'src/store/apps/ecf/ecfDocumentosSlice'
 import email from 'src/store/apps/email'
 import inventory from 'src/store/apps/inventory'
 import inventoryMovements from 'src/store/apps/inventoryMovements'
@@ -52,6 +53,7 @@ export const store = configureStore({
     removeData,
     offers,
     ecf,
+    ecfDocumentos,
     business,
     docTypeSec,
     pos,

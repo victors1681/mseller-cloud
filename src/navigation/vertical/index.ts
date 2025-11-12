@@ -214,6 +214,11 @@ const navigation = (): VerticalNavItemsType => {
               path: '/apps/ecf/secuencia/list',
             },
             {
+              title: 'Auditoría',
+              icon: 'mdi:file-search',
+              path: '/apps/ecf/audit',
+            },
+            {
               title: 'Empresa',
               icon: 'mdi:office-building',
               path: '/apps/ecf/business',
