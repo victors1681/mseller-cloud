@@ -3,6 +3,7 @@ import { forwardRef, useEffect, useState } from 'react'
 
 // ** Next Import
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
@@ -35,7 +36,6 @@ import formatCurrency from 'src/utils/formatCurrency'
 import formatDate from 'src/utils/formatDate'
 import EcfDocumentModal from 'src/views/apps/transports/docs/EcfDocumentModal'
 import MapModal from 'src/views/apps/transports/docs/MapModal'
-import SignatureModal from 'src/views/apps/transports/docs/SignatureModal'
 import CardStatisticsTransport from 'src/views/apps/transports/list/cards/statistics/CardStatisticsTransport'
 import CardWidgetsDocsDeliveryOverview from 'src/views/apps/transports/list/cards/widgets/CardWidgetsDocsDeliveryOverview'
 import {
@@ -239,6 +239,7 @@ const TransportDocs = (props: TransportDocsProps) => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
   const store = useSelector((state: RootState) => state.transports)
+  const router = useRouter()
 
   useEffect(() => {
     dispatch(fetchTransportDocsData(props.noTransporte))
@@ -246,6 +247,15 @@ const TransportDocs = (props: TransportDocsProps) => {
 
   const handleRefresh = () => {
     dispatch(fetchTransportDocsData(props.noTransporte))
+  }
+
+  const handlePrint = (row: DocumentoEntregaType) => {
+    // Store the document data in sessionStorage
+    sessionStorage.setItem('printTransportInvoice', JSON.stringify(row))
+
+    // Open the print page in a new window
+    const printUrl = `/apps/transports/print-invoice?doc=${row.noDocEntrega}`
+    window.open(printUrl, '_blank', 'width=1024,height=768')
   }
 
   const columns: GridColDef[] = [
@@ -301,7 +311,7 @@ const TransportDocs = (props: TransportDocsProps) => {
       renderCell: ({ row }: CellType) => (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <MapModal data={[row]}></MapModal>
-          <SignatureModal url={row.firmaUrl} />
+          {/* <SignatureModal url={row.firmaUrl} /> */}
 
           {row.ecfDocumento?.qrUrl ? (
             <Tooltip title="Ver información del comprobante fiscal">
@@ -329,6 +339,34 @@ const TransportDocs = (props: TransportDocsProps) => {
               <IconButton type="button" size="small" disabled>
                 <Icon icon="material-symbols:receipt" fontSize={20} />
               </IconButton>
+            </Tooltip>
+          )}
+
+          {row.status === TransportStatusEnum.Entregado &&
+          row.ecfDocumento?.ncf ? (
+            <Tooltip title="Imprimir factura de transporte">
+              <IconButton
+                type="button"
+                size="small"
+                onClick={() => handlePrint(row)}
+                sx={{
+                  color: 'primary.main',
+                  '&:hover': {
+                    backgroundColor: 'primary.light',
+                    color: 'primary.dark',
+                  },
+                }}
+              >
+                <Icon icon="mdi:printer" fontSize={20} />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            <Tooltip title="Imprimir disponible solo para documentos entregados con NCF">
+              <span>
+                <IconButton type="button" size="small" disabled>
+                  <Icon icon="mdi:printer" fontSize={20} />
+                </IconButton>
+              </span>
             </Tooltip>
           )}
         </Box>

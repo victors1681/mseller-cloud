@@ -5,6 +5,7 @@ import { EcfDocumentoType } from './ecfDocumentoTypes'
 import { LocationType } from './locationType'
 import { NcfType } from './ncfTypes'
 import { SellerType } from './sellerType'
+import { CondicionPagoType } from './paymentTypeTypes'
 
 export interface TransportResponse {
   transportes: TransporteType[]
@@ -126,6 +127,7 @@ export interface DocumentoEntregaType {
   // signedDate?: string
   // statusEcf?: string
   ecfDocumento: EcfDocumentoType
+  condicion?: CondicionPagoType
 }
 
 export interface DocumentoEntregaDetalleType {
