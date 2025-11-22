@@ -1,16 +1,16 @@
 // ** MUI Imports
-import Drawer from '@mui/material/Drawer'
+import Box, { BoxProps } from '@mui/material/Box'
 import Button from '@mui/material/Button'
+import Drawer from '@mui/material/Drawer'
+import IconButton from '@mui/material/IconButton'
 import { styled } from '@mui/material/styles'
 import TextField from '@mui/material/TextField'
-import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
-import Box, { BoxProps } from '@mui/material/Box'
 
 // ** Third Party Imports
-import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useForm, Controller } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
+import * as yup from 'yup'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -19,24 +19,23 @@ import Icon from 'src/@core/components/icon'
 import { useDispatch, useSelector } from 'react-redux'
 
 // ** Types Imports
-import { RootState, AppDispatch } from 'src/store'
 import {
+  FormControl,
   FormControlLabel,
   Grid,
-  Switch,
-  Select,
-  MenuItem,
-  FormControl,
   InputLabel,
   Link,
+  MenuItem,
+  Select,
+  Switch,
 } from '@mui/material'
-import toast from 'react-hot-toast'
 import { useEffect } from 'react'
+import { AppDispatch, RootState } from 'src/store'
 import {
   addECFConfiguration,
-  updateECFConfiguration,
-  toggleECFAddUpdate,
   testECFConnection,
+  toggleECFAddUpdate,
+  updateECFConfiguration,
 } from 'src/store/apps/ecf'
 import { ECFType } from 'src/types/apps/ecfType'
 
@@ -256,7 +255,6 @@ const AddECFDrawer = (props: AddECFDrawerType) => {
                   <TextField
                     {...field}
                     fullWidth
-                    type="password"
                     label="Clave API"
                     error={!!error}
                     helperText={error?.message}
