@@ -196,7 +196,7 @@ const defaultColumns: GridColDef[] = [
       <Chip
         size="small"
         label={row.entorno || 'N/A'}
-        color={row.entorno === 'PRODUCCION' ? 'success' : 'warning'}
+        color={row.entorno === 'eCF' ? 'success' : 'warning'}
         variant="outlined"
       />
     ),

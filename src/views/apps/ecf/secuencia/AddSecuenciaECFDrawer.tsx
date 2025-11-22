@@ -378,8 +378,9 @@ const AddSecuenciaECFDrawer = (props: SidebarAddSecuenciaType) => {
                   error={Boolean(errors.entorno)}
                   label="Entorno"
                 >
-                  <MenuItem value="PRODUCCION">Producción</MenuItem>
-                  <MenuItem value="CERTIFICACION">Certificación</MenuItem>
+                  <MenuItem value="eCF">Producción</MenuItem>
+                  <MenuItem value="CerteCF">Certificación</MenuItem>
+                  <MenuItem value="TesteCF">Prueba</MenuItem>
                 </Select>
               )}
             />
