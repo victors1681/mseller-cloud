@@ -1,7 +1,8 @@
-import axios, { AxiosRequestConfig } from 'axios'
+import axios, { AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios'
 import Router from 'next/router'
 import toast from 'react-hot-toast'
 import authConfig from 'src/configs/auth'
+import { refreshAccessToken } from 'src/firebase'
 import { IConfig } from 'src/types/apps/userTypes'
 
 export enum NetworkStatus {
@@ -10,6 +11,11 @@ export enum NetworkStatus {
   SUCCESS = 2,
   ERROR = 3,
 }
+
+// Flag to prevent multiple simultaneous session expiration redirects
+let isHandlingSessionExpiration = false
+// Flag to prevent infinite retry loops
+let isRefreshingToken = false
 
 const restClient = axios.create({
   headers: {
@@ -59,20 +65,89 @@ restClient.interceptors.response.use(
   (response) => {
     return response
   },
-  (error) => {
-    if (error.response.status === 401) {
+  async (error) => {
+    const originalRequest = error.config as InternalAxiosRequestConfig & {
+      _retry?: boolean
+    }
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
       console.error(
         'StatusCode:',
         error.response.status,
         error.response.statusText,
       )
-      if (typeof window !== 'undefined') {
-        toast.error('Sesión expirada o no se pudo autenticar con el servidor')
-        //window?.location.reload()
-        Router.push('/login')
+
+      // Only handle session expiration once to prevent redirect loops
+      if (typeof window !== 'undefined' && !isHandlingSessionExpiration) {
+        isHandlingSessionExpiration = true
+
+        // Try to refresh the token first
+        if (!isRefreshingToken) {
+          isRefreshingToken = true
+
+          try {
+            console.log('🔄 Attempting to refresh Firebase token...')
+            const newToken = await refreshAccessToken()
+
+            if (newToken) {
+              console.log('✅ Token refreshed successfully')
+              // Update the token in localStorage
+              window.localStorage.setItem(
+                authConfig.storageTokenKeyName,
+                newToken,
+              )
+
+              // Update the failed request with new token
+              originalRequest.headers.Authorization = `Bearer ${newToken}`
+              originalRequest._retry = true
+
+              // Reset flags
+              isRefreshingToken = false
+              isHandlingSessionExpiration = false
+
+              // Retry the original request
+              return restClient(originalRequest)
+            }
+          } catch (refreshError) {
+            console.error('❌ Token refresh failed:', refreshError)
+            isRefreshingToken = false
+          }
+        }
+
+        // If token refresh failed or wasn't attempted, log out
+        console.log('🚪 Logging out user - token refresh failed or unavailable')
+        toast.error('Sesión expirada. Por favor, inicia sesión nuevamente.')
+
+        // Clear auth data
+        window.localStorage.removeItem('userData')
+        window.localStorage.removeItem(authConfig.storageTokenKeyName)
+
+        // Get current path to save as returnUrl
+        const currentPath = Router.asPath
+        const guestPages = ['/login', '/register', '/forgot-password']
+        const isOnGuestPage = guestPages.some((page) =>
+          currentPath.startsWith(page),
+        )
+
+        // Redirect to login with returnUrl (if not already on a guest page)
+        if (!isOnGuestPage) {
+          Router.replace({
+            pathname: '/login',
+            query: currentPath !== '/' ? { returnUrl: currentPath } : undefined,
+          }).finally(() => {
+            // Reset flag after navigation completes
+            setTimeout(() => {
+              isHandlingSessionExpiration = false
+            }, 1000)
+          })
+        } else {
+          // Reset flag immediately if already on guest page
+          isHandlingSessionExpiration = false
+        }
       }
     }
-    return error
+
+    return Promise.reject(error)
   },
 )
 

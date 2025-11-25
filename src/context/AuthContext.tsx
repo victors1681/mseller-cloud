@@ -112,23 +112,33 @@ const AuthProvider = ({ children }: Props) => {
           } else {
             // User is not authenticated
             setUser(null)
-            window.localStorage.removeItem('userData')
-            window.localStorage.removeItem(authConfig.storageTokenKeyName)
 
-            // Only redirect to login if not already on a guest page
-            const guestPages = ['/login', '/register', '/forgot-password']
-            const isOnGuestPage = guestPages.some((page) =>
-              router.pathname.startsWith(page),
+            // Check if we're already handling this in restClient interceptor
+            // by checking if localStorage is already cleared
+            const hasToken = window.localStorage.getItem(
+              authConfig.storageTokenKeyName,
             )
 
-            if (!isOnGuestPage) {
-              await router.replace({
-                pathname: '/login',
-                query:
-                  router.pathname !== '/'
-                    ? { returnUrl: router.asPath }
-                    : undefined,
-              })
+            // Only clear and redirect if not already cleared (prevents race condition with restClient)
+            if (hasToken) {
+              window.localStorage.removeItem('userData')
+              window.localStorage.removeItem(authConfig.storageTokenKeyName)
+
+              // Only redirect to login if not already on a guest page
+              const guestPages = ['/login', '/register', '/forgot-password']
+              const isOnGuestPage = guestPages.some((page) =>
+                router.pathname.startsWith(page),
+              )
+
+              if (!isOnGuestPage) {
+                await router.replace({
+                  pathname: '/login',
+                  query:
+                    router.pathname !== '/'
+                      ? { returnUrl: router.asPath }
+                      : undefined,
+                })
+              }
             }
           }
         } catch (error) {
@@ -148,17 +158,26 @@ const AuthProvider = ({ children }: Props) => {
 
           // Clear auth state on error
           setUser(null)
-          window.localStorage.removeItem('userData')
-          window.localStorage.removeItem(authConfig.storageTokenKeyName)
 
-          // Only redirect to login if not already on a guest page
-          const guestPages = ['/login', '/register', '/forgot-password']
-          const isOnGuestPage = guestPages.some((page) =>
-            router.pathname.startsWith(page),
+          // Check if we're already handling this in restClient interceptor
+          const hasToken = window.localStorage.getItem(
+            authConfig.storageTokenKeyName,
           )
 
-          if (!isOnGuestPage) {
-            await router.replace('/login')
+          // Only clear and redirect if not already cleared
+          if (hasToken) {
+            window.localStorage.removeItem('userData')
+            window.localStorage.removeItem(authConfig.storageTokenKeyName)
+
+            // Only redirect to login if not already on a guest page
+            const guestPages = ['/login', '/register', '/forgot-password']
+            const isOnGuestPage = guestPages.some((page) =>
+              router.pathname.startsWith(page),
+            )
+
+            if (!isOnGuestPage) {
+              await router.replace('/login')
+            }
           }
         } finally {
           setLoading(false)
