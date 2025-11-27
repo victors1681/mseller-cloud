@@ -72,6 +72,9 @@ import { useCustomerSearchDialog } from 'src/views/ui/customerSearchDialog/useCu
 import { LocationAutocomplete } from 'src/views/ui/locationAutoComplete'
 import { SellerAutocomplete } from 'src/views/ui/sellerAutoComplete'
 
+// ** Utils Imports
+import { openPrintWindow } from 'src/utils/downloadUtils'
+
 // ** Styled Components
 const LinkStyled = styled(Link)(({ theme }) => ({
   textDecoration: 'none',
@@ -292,6 +295,98 @@ const EcfAuditPage = () => {
     dispatch(toggleDetailModal(documento))
   }
 
+  const handleExport = async () => {
+    try {
+      const exportFilters = {
+        ...filters,
+        pageNumber: 1,
+        pageSize: 2000,
+      }
+
+      // Get auth token from localStorage
+      const token = window.localStorage.getItem('accessToken')
+
+      if (!token) {
+        alert(
+          'No se encontró el token de autenticación. Por favor inicia sesión nuevamente.',
+        )
+        return
+      }
+
+      // Get userData to check for config
+      const userDataStr = window.localStorage.getItem('userData')
+      let xUrl = ''
+      let baseURL = process.env.NEXT_PUBLIC_API_URL || ''
+
+      if (userDataStr) {
+        try {
+          const userData = JSON.parse(userDataStr)
+          if (userData.config) {
+            const config = userData.config
+            if (config.testMode) {
+              xUrl = `${config.portalSandboxUrl}:${config.portalSandboxPort}`
+            } else {
+              xUrl = `${config.portalServerUrl}:${config.portalServerPort}`
+            }
+            if (config.serverUrl) {
+              baseURL = config.serverUrl
+            }
+          }
+        } catch (e) {
+          console.error('Error parsing userData:', e)
+        }
+      }
+
+      // Call the Next.js API route to generate CSV
+      const response = await fetch('/api/ecf/export-csv', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          filters: exportFilters,
+          token,
+          baseURL,
+          xUrl,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response
+          .json()
+          .catch(() => ({ message: 'Error desconocido' }))
+        throw new Error(errorData.message || 'Failed to export CSV')
+      }
+
+      // Create blob from response and download
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `auditoria-ecf-${Date.now()}.csv`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+    } catch (error: any) {
+      console.error('Error exporting data:', error)
+      alert(
+        `Error al exportar datos: ${
+          error.message || 'Por favor intente nuevamente.'
+        }`,
+      )
+    }
+  }
+
+  const handlePrint = () => {
+    const printFilters = {
+      ...filters,
+      pageNumber: 1,
+      pageSize: 2000,
+    }
+    openPrintWindow('/apps/ecf/audit/print', printFilters)
+  }
+
   const formatDate = (dateString: string | null | undefined) => {
     if (!dateString) return '-'
     try {
@@ -468,7 +563,14 @@ const EcfAuditPage = () => {
           <Card>
             <CardHeader
               title={
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 2,
+                    flexWrap: 'wrap',
+                  }}
+                >
                   <Typography variant="h6">
                     Auditoría de Documentos ECF
                   </Typography>
@@ -489,21 +591,70 @@ const EcfAuditPage = () => {
                 </Box>
               }
               action={
-                <TextField
-                  size="small"
-                  value={value}
-                  placeholder="Buscar documento..."
-                  onChange={(e) => handleFilter(e.target.value)}
-                  sx={{ minWidth: { xs: 200, sm: 300 } }}
-                  InputProps={{
-                    startAdornment: (
-                      <Icon
-                        icon="mdi:magnify"
-                        style={{ marginRight: 8, color: '#666' }}
-                      />
-                    ),
+                <Box
+                  sx={{
+                    display: 'flex',
+                    gap: 1,
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
                   }}
-                />
+                >
+                  <Hidden mdDown>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      color="info"
+                      onClick={handleExport}
+                      disabled={store.loading || store.data.length === 0}
+                      startIcon={<Icon icon="mdi:file-delimited" />}
+                    >
+                      Exportar CSV
+                    </Button>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={handlePrint}
+                      disabled={store.data.length === 0}
+                      startIcon={<Icon icon="mdi:printer" />}
+                    >
+                      Imprimir
+                    </Button>
+                  </Hidden>
+                  <Hidden mdUp>
+                    <IconButton
+                      size="small"
+                      color="info"
+                      onClick={handleExport}
+                      disabled={store.loading || store.data.length === 0}
+                      sx={{ border: '1px solid', borderColor: 'info.main' }}
+                    >
+                      <Icon icon="mdi:file-delimited" />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      onClick={handlePrint}
+                      disabled={store.data.length === 0}
+                      sx={{ border: '1px solid', borderColor: 'divider' }}
+                    >
+                      <Icon icon="mdi:printer" />
+                    </IconButton>
+                  </Hidden>
+                  <TextField
+                    size="small"
+                    value={value}
+                    placeholder="Buscar documento..."
+                    onChange={(e) => handleFilter(e.target.value)}
+                    sx={{ minWidth: { xs: 200, sm: 300 } }}
+                    InputProps={{
+                      startAdornment: (
+                        <Icon
+                          icon="mdi:magnify"
+                          style={{ marginRight: 8, color: '#666' }}
+                        />
+                      ),
+                    }}
+                  />
+                </Box>
               }
             />
 
