@@ -1,6 +1,7 @@
 import axios from 'axios'
 import type { NextApiRequest, NextApiResponse } from 'next/types'
 import { EcfDocumentoFilters } from 'src/types/apps/ecfDocumentoTypes'
+import { convertDateFiltersToISO } from 'src/utils/dateUtils'
 
 export default async function handler(
   req: NextApiRequest,
@@ -24,6 +25,9 @@ export default async function handler(
         .json({ message: 'Unauthorized - No token provided' })
     }
 
+    // Convert dates to ISO 8601 format before sending to API
+    const convertedFilters = convertDateFiltersToISO(filters)
+
     // Build the full URL
     const apiBaseURL = baseURL || process.env.NEXT_PUBLIC_API_URL || ''
     const headers: any = {
@@ -42,7 +46,7 @@ export default async function handler(
     const response = await axios.get(
       `${apiBaseURL}/portal/ConfiguracionFacturacionElectronica/ecf-documentos`,
       {
-        params: filters,
+        params: convertedFilters,
         headers,
       },
     )

@@ -11,6 +11,7 @@ import {
   EcfDocumentoType,
   PaginatedEcfDocumentoResponse,
 } from 'src/types/apps/ecfDocumentoTypes'
+import { convertDateFiltersToISO } from 'src/utils/dateUtils'
 
 interface AxiosResponse<T> {
   data: T
@@ -38,11 +39,14 @@ export const fetchEcfDocuments = createAsyncThunk<
   'ecfDocumentos/fetchData',
   async (params: EcfDocumentoFilters = {}, { rejectWithValue }) => {
     try {
+      // Convert dates to ISO 8601 format before sending to API
+      const convertedParams = convertDateFiltersToISO(params)
+
       const response = await restClient.get<
         any,
         AxiosResponse<PaginatedEcfDocumentoResponse>
       >('/api/portal/ConfiguracionFacturacionElectronica/ecf-documentos', {
-        params,
+        params: convertedParams,
       })
 
       return {
