@@ -733,6 +733,11 @@ const EcfAuditPage = () => {
                             <MenuItem value={EcfStatusEnum.ACCEPTED}>
                               Aceptado
                             </MenuItem>
+                            <MenuItem
+                              value={EcfStatusEnum.CONDITIONAL_ACCEPTED}
+                            >
+                              Aceptado
+                            </MenuItem>
                             <MenuItem value={EcfStatusEnum.REJECTED}>
                               Rechazado
                             </MenuItem>
