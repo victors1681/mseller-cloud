@@ -47,7 +47,7 @@ export const DocumentInformation: React.FC<DocumentInformationProps> = ({
                     {...field}
                     fullWidth
                     size="small"
-                    type="date"
+                    type="datetime-local"
                     disabled={isSubmitting}
                     label="Fecha"
                     error={!!error}

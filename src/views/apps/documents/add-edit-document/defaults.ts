@@ -1,4 +1,5 @@
 import { DocumentType, TipoDocumentoEnum } from 'src/types/apps/documentTypes'
+import { getLocalDateTimeString } from 'src/utils/dateUtils'
 import { NewDetailForm } from './types'
 
 export const defaultDocumentValues: Partial<DocumentType> = {
@@ -7,7 +8,7 @@ export const defaultDocumentValues: Partial<DocumentType> = {
   nombreCliente: '',
   nota: '',
   condicionPago: '1',
-  fecha: new Date().toISOString().split('T')[0],
+  fecha: getLocalDateTimeString(),
   tipoDocumento: TipoDocumentoEnum.ORDER,
   tipoPedido: '',
   confirmado: false,
@@ -22,7 +23,7 @@ export const defaultDetailFormValues: NewDetailForm = {
   descripcion: '',
   unidad: '',
   porcientoDescuento: 0,
-  porcientoImpuesto: 0
+  porcientoImpuesto: 0,
 }
 
 export const defaultDetailControlValues = {

@@ -4,6 +4,29 @@
  */
 
 /**
+ * Get current local datetime string formatted for datetime-local input
+ * @returns Local datetime string in YYYY-MM-DDTHH:mm format
+ */
+export const getLocalDateTimeString = (): string => {
+  const now = new Date()
+  const offset = now.getTimezoneOffset() * 60000
+  const localTime = new Date(now.getTime() - offset)
+  return localTime.toISOString().slice(0, 16)
+}
+
+/**
+ * Convert a UTC date to local datetime string for datetime-local input
+ * @param utcDate - Date string or Date object in UTC
+ * @returns Local datetime string in YYYY-MM-DDTHH:mm format
+ */
+export const toLocalDateTimeString = (utcDate: string | Date): string => {
+  const date = typeof utcDate === 'string' ? new Date(utcDate) : utcDate
+  const offset = date.getTimezoneOffset() * 60000
+  const localTime = new Date(date.getTime() - offset)
+  return localTime.toISOString().slice(0, 16)
+}
+
+/**
  * Converts a date string or Date object to ISO 8601 format
  * @param dateValue - Date string in YYYY-MM-DD format or Date object
  * @param endOfDay - If true, sets time to 23:59:59.999, otherwise 00:00:00

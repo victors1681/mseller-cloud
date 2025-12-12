@@ -41,7 +41,7 @@ export class DocumentService {
       condicionPago: formData.condicionPago || '',
       descuento: orderCalculations.descuentoTotal,
       fecha: formData.fecha
-        ? new Date(formData.fecha + 'T00:00:00').toISOString()
+        ? new Date(formData.fecha).toISOString()
         : new Date().toISOString(),
       porcientoDescuento: 0,
       subTotal: orderCalculations.subtotal,
@@ -123,8 +123,7 @@ export class DocumentService {
 
     // Convert date back to ISO format if needed
     if (formData.fecha) {
-      const dateObj = new Date(formData.fecha + 'T00:00:00')
-      documentUpdate.fecha = dateObj.toISOString()
+      documentUpdate.fecha = new Date(formData.fecha).toISOString()
     }
 
     console.log('Updating existing document:', documentUpdate)

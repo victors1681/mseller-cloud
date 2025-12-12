@@ -2,6 +2,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { TipoDocumentoEnum } from 'src/types/apps/documentTypes'
+import { toLocalDateTimeString } from 'src/utils/dateUtils'
 import { defaultDetailControlValues, defaultDocumentValues } from '../defaults'
 import { documentFormSchema } from '../validation'
 
@@ -49,10 +50,9 @@ export const useDocumentForm = ({
     } else if (documentEditData && !isLoadingDetails) {
       const editData = { ...documentEditData }
 
-      // Format date for DatePicker
+      // Format date for datetime-local input (convert UTC to local time)
       if (editData.fecha) {
-        const dateValue = new Date(editData.fecha).toISOString().split('T')[0]
-        editData.fecha = dateValue
+        editData.fecha = toLocalDateTimeString(editData.fecha)
       }
 
       // Ensure localidadId is set from localidad object if available
