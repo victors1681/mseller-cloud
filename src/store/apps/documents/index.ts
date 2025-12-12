@@ -39,18 +39,22 @@ export interface AxiosResponse<T> {
 export const fetchData = createAsyncThunk(
   'appDocuments/fetchData',
   async (params: DataParams) => {
-    if (params.procesado === '') {
-      delete params.procesado
-    } else {
-      params.procesado = parseInt(params.procesado as string)
+    // Create a mutable copy of params to avoid mutating the original
+    const queryParams = { ...params }
+
+    if (queryParams.procesado === '') {
+      delete queryParams.procesado
+    } else if (queryParams.procesado) {
+      queryParams.procesado = parseInt(queryParams.procesado as string)
     }
+
     const response = await restClient.get<
       any,
       AxiosResponse<PaginatedResponse<DocumentType>>
     >('/api/portal/Pedido', {
       params: {
-        ...params,
-        ...getDateParam(params.dates),
+        ...queryParams,
+        ...getDateParam(queryParams.dates),
       },
     })
 
@@ -72,10 +76,13 @@ export const fetchData = createAsyncThunk(
 export const loadMoreData = createAsyncThunk(
   'appDocuments/loadMoreData',
   async (params: DataParams) => {
-    if (params.procesado === '') {
-      delete params.procesado
-    } else {
-      params.procesado = parseInt(params.procesado as string)
+    // Create a mutable copy of params to avoid mutating the original
+    const queryParams = { ...params }
+
+    if (queryParams.procesado === '') {
+      delete queryParams.procesado
+    } else if (queryParams.procesado) {
+      queryParams.procesado = parseInt(queryParams.procesado as string)
     }
 
     const response = await restClient.get<
@@ -83,8 +90,8 @@ export const loadMoreData = createAsyncThunk(
       AxiosResponse<PaginatedResponse<DocumentType>>
     >('/api/portal/Pedido', {
       params: {
-        ...params,
-        ...getDateParam(params.dates),
+        ...queryParams,
+        ...getDateParam(queryParams.dates),
       },
     })
 
@@ -162,7 +169,14 @@ export const addNewDocument = createAsyncThunk<
 
         const state = getState()
         const params = state.documents.params || { query: '' }
-        await dispatch(fetchData(params as DataParams))
+
+        try {
+          await dispatch(fetchData(params as DataParams)).unwrap()
+          console.log('fetchData completed successfully')
+        } catch (fetchError) {
+          console.error('Error refreshing document list:', fetchError)
+          // Don't fail the creation if refresh fails
+        }
 
         return {
           success: true,
@@ -212,7 +226,16 @@ export const addUpdateDocument = createAsyncThunk<
 
         const state = getState()
         const params = state.documents.params || { query: '' }
-        await dispatch(fetchData(params as DataParams))
+
+        console.log('Dispatching fetchData with params:', params)
+
+        try {
+          await dispatch(fetchData(params as DataParams)).unwrap()
+          console.log('fetchData completed successfully')
+        } catch (fetchError) {
+          console.error('Error refreshing document list:', fetchError)
+          // Don't fail the update if refresh fails
+        }
 
         return {
           success: true,
