@@ -1,64 +1,56 @@
-import React, { useState, useEffect, useMemo } from 'react'
-import { NextPage } from 'next'
 import {
-  Box,
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  TextField,
-  Button,
-  IconButton,
-  Chip,
-  useTheme,
-  useMediaQuery,
   AppBar,
-  Toolbar,
-  Paper,
+  Box,
+  Button,
+  Card,
+  CircularProgress,
+  IconButton,
   InputAdornment,
-  Menu,
-  MenuItem,
   ListItemIcon,
   ListItemText,
-  CircularProgress,
+  Menu,
+  MenuItem,
+  TextField,
+  Toolbar,
+  Typography,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
-import Icon from 'src/@core/components/icon'
+import { NextPage } from 'next'
 import { useRouter } from 'next/router'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
+import Icon from 'src/@core/components/icon'
 
 // Redux
+import { usePOS } from '@/views/apps/pos/hook/usePOS'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/store'
-import { fetchData, fetchProductDetail } from 'src/store/apps/products'
 import { setInitialTurnoData } from 'src/store/apps/pos'
-import { usePOS } from '@/views/apps/pos/hook/usePOS'
+import { fetchData, fetchProductDetail } from 'src/store/apps/products'
 
 // Layout
 import FullscreenPOSLayout from 'src/layouts/FullscreenPOSLayout'
 
 // Components
-import {
-  POSProductGrid,
-  POSCartSummary,
-  POSCustomerSection,
-  POSAreaFilter,
-  POSQuantityDialog,
-  POSPaymentDialog,
-} from 'src/views/apps/pos/components'
 import OnlineStatusIndicator from '@/views/apps/pos/components/OnlineStatusIndicator'
+import { usePOSPersistence } from '@/views/apps/pos/hook/usePOSPersistence'
 import AbrirTurnoModal from 'src/views/apps/pos/AbrirTurnoModal'
 import CerrarTurnoModal from 'src/views/apps/pos/CerrarTurnoModal'
-import { usePOSPersistence } from '@/views/apps/pos/hook/usePOSPersistence'
+import {
+  POSAreaFilter,
+  POSCartSummary,
+  POSCustomerSection,
+  POSPaymentDialog,
+  POSProductGrid,
+  POSQuantityDialog,
+} from 'src/views/apps/pos/components'
 
 // Types
-import { ProductType } from 'src/types/apps/productTypes'
 import { CustomerType } from 'src/types/apps/customerType'
-import {
-  POSCartItem,
-  POSCustomer,
-  POSAreaFilter as AreaFilterType,
-} from 'src/types/apps/posTypes'
 import { TurnoType } from 'src/types/apps/posType'
+import { POSAreaFilter as AreaFilterType } from 'src/types/apps/posTypes'
+import { ProductType } from 'src/types/apps/productTypes'
 
 // Component Props Interface
 interface POSPageProps {
@@ -68,12 +60,14 @@ interface POSPageProps {
 }
 
 // Utils
-import { usePOSStore } from '../../../views/apps/pos/hook/usePOSStore'
-import { useBarcodeScan } from '../../../hooks/useBarcodeScan'
-import { usePermissions } from 'src/hooks/usePermissions'
-import { transformPOSDataToDocument } from '@/utils/transformPaymentData'
 import { addNewDocument } from '@/store/apps/documents'
+import { transformPOSDataToDocument } from '@/utils/transformPaymentData'
 import toast from 'react-hot-toast'
+import { usePermissions } from 'src/hooks/usePermissions'
+import { v4 as uuidV4 } from 'uuid'
+import { AuthContext } from '../../../context/AuthContext'
+import { useBarcodeScan } from '../../../hooks/useBarcodeScan'
+import { usePOSStore } from '../../../views/apps/pos/hook/usePOSStore'
 
 const StyledMainContainer = styled(Box)({
   display: 'flex',
@@ -123,6 +117,7 @@ const POSPage: NextPage<POSPageProps> = ({
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
   const { hasPermission } = usePermissions()
+  const { user } = useContext(AuthContext)
   const {
     heldCarts,
     holdCart,
@@ -364,6 +359,16 @@ const POSPage: NextPage<POSPageProps> = ({
       if (navigator.onLine) {
         // Online: transform and send to backend
         const payload = transformPOSDataToDocument(paymentData)
+
+        payload.localidadId = parseInt(user?.warehouse || '1')
+        payload.firebaseUserId = user?.userId
+        if (payload.clienteNuevo) {
+          payload.clienteNuevo.codigo = uuidV4()
+          payload.clienteNuevo.localidadId = parseInt(user?.warehouse || '1')
+          payload.clienteNuevo.vendedor = user?.sellerCode || ''
+          payload.clienteNuevo.tipoComprobante = '02'
+        }
+
         await dispatch(addNewDocument(payload)).unwrap()
         // Optionally show success toast here
       } else {

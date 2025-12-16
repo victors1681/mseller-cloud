@@ -1,14 +1,14 @@
 // src/utils/transformPaymentData.ts
 import {
-  DocumentUpdateType,
   DocumentUpdateDetail,
+  DocumentUpdateType,
   TipoDocumentoEnum,
 } from 'src/types/apps/documentTypes'
 
 export function transformPOSDataToDocument(
   paymentData: any,
 ): DocumentUpdateType {
-  const customer = paymentData.customer?.customer || {}
+  const customer = paymentData.customer?.tempData || {}
   return {
     noPedidoStr: '',
     nota: paymentData.notes || '',
@@ -50,20 +50,16 @@ export function transformPOSDataToDocument(
         promocion: item.producto.promocion || false,
       }),
     ),
-    tipoPedido: paymentData.tipoPedido || '',
-    nuevoCliente: paymentData.customer?.isNew
-      ? paymentData.customer
-      : undefined,
     tipoDocumento: paymentData.tipoDocumento || TipoDocumentoEnum.INVOICE,
     codigoCliente: customer.codigo,
     nombreCliente: customer.nombre,
     firebaseUserId: paymentData.firebaseUserId || '',
-    localidadId: customer.localidadId,
+    localidadId: customer.localidadId || '1',
     noOrden: paymentData.noOrden || '',
     avatarUrl: paymentData.avatarUrl || '',
     confirmado: paymentData.confirmado ?? true,
     codigoVendedor: customer.codigoVendedor,
-    clienteNuevo: paymentData.customer?.isNew ? customer : undefined,
+    clienteNuevo: customer ? customer : undefined,
     // New fields
     terminal: paymentData.terminal,
     secuenciaDocumento: paymentData.secuenciaDocumento,

@@ -51,8 +51,8 @@ const DocumentSuccessModal = ({
 
   const handlePrint = () => {
     if (documentId) {
-      // Navigate to print preview page
-      router.push(`/apps/documents/preview/${documentId}`)
+      // Open print preview in new tab
+      window.open(`/apps/documents/print/${documentId}`, '_blank')
     }
     onClose()
   }
@@ -158,21 +158,7 @@ const DocumentSuccessModal = ({
           Imprimir
         </Button>
 
-        <Button
-          variant="outlined"
-          startIcon={<Icon icon="mdi:download" />}
-          onClick={handleDownloadShare}
-          disabled={isGenerating}
-          fullWidth={isMobile}
-          sx={{
-            minHeight: { xs: 48, sm: 'auto' },
-            fontSize: { xs: '1rem', sm: '0.875rem' },
-          }}
-        >
-          {isGenerating ? 'Generando PDF...' : 'Descargar / Compartir'}
-        </Button>
-
-        <Button
+        {/* <Button
           variant="outlined"
           startIcon={<Icon icon="mdi:email-outline" />}
           onClick={handleEmail}
@@ -183,7 +169,7 @@ const DocumentSuccessModal = ({
           }}
         >
           Enviar por Email
-        </Button>
+        </Button> */}
 
         <Button
           variant="contained"

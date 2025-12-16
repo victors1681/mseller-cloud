@@ -1,33 +1,29 @@
-import React, { useState, useEffect } from 'react'
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Box,
-  Typography,
   Button,
-  IconButton,
-  Grid,
   Card,
   CardContent,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Divider,
+  Grid,
+  IconButton,
   List,
   ListItem,
   ListItemText,
-  CircularProgress,
-  useTheme,
+  TextField,
+  Typography,
   useMediaQuery,
+  useTheme,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
+import React, { useEffect, useState } from 'react'
 import Icon from 'src/@core/components/icon'
-import { POSCartItem, POSCustomer } from 'src/types/apps/posTypes'
 import { CondicionPagoType } from 'src/types/apps/paymentTypeTypes'
+import { POSCartItem, POSCustomer } from 'src/types/apps/posTypes'
 import formatCurrency from 'src/utils/formatCurrency'
 
 const StyledPaymentCard = styled(Card)(({ theme }) => ({
@@ -104,13 +100,13 @@ const POSPaymentDialog: React.FC<POSPaymentDialogProps> = ({
           tipo_condicion: 'CONTADO',
           descripcion: 'Pago en efectivo',
         },
-        {
-          id: 2,
-          condicionPago: 'TRANSFERENCIA',
-          dias: 0,
-          tipo_condicion: 'CONTADO',
-          descripcion: 'Transferencia bancaria',
-        },
+        // {
+        //   id: 2,
+        //   condicionPago: 'TRANSFERENCIA',
+        //   dias: 0,
+        //   tipo_condicion: 'CONTADO',
+        //   descripcion: 'Transferencia bancaria',
+        // },
         {
           id: 3,
           condicionPago: 'TARJETA',
@@ -125,13 +121,13 @@ const POSPaymentDialog: React.FC<POSPaymentDialogProps> = ({
           tipo_condicion: 'CREDITO',
           descripcion: 'Crédito a 30 días',
         },
-        {
-          id: 5,
-          condicionPago: 'CHEQUE',
-          dias: 0,
-          tipo_condicion: 'CONTADO',
-          descripcion: 'Pago con cheque',
-        },
+        // {
+        //   id: 5,
+        //   condicionPago: 'CHEQUE',
+        //   dias: 0,
+        //   tipo_condicion: 'CONTADO',
+        //   descripcion: 'Pago con cheque',
+        // },
       ]
       setPaymentTypes(mockPaymentTypes)
       setSelectedPaymentType('EFECTIVO')

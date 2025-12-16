@@ -16,6 +16,35 @@ export type InvoiceClientType = {
   companyEmail: string
 }
 
+// New customer type for document creation
+export interface ClienteNuevo {
+  id?: number
+  codigo: string
+  nombre: string
+  telefono?: string
+  celular?: string
+  contacto?: string
+  rnc?: string
+  tipoComprobante?: string
+  direccion?: string
+  sector?: string
+  ciudad?: string
+  tipoNegocio?: string
+  email?: string
+  pagina?: string
+  confirmado: boolean
+  vendedor: string
+  accionCliente?: string
+  dia: number
+  frecuencia: number
+  longitud: number
+  latitud: number
+  telefonoContacto?: string
+  nota?: string
+  secuencia: number
+  localidadId: number
+}
+
 export enum TipoDocumentoEnum {
   ORDER = 'order',
   INVOICE = 'invoice',
@@ -207,7 +236,7 @@ export interface DocumentUpdateType {
   avatarUrl?: string
   confirmado: boolean
   codigoVendedor?: string
-  clienteNuevo?: CustomerType // if defined indicates a new customer to be created
+  clienteNuevo?: ClienteNuevo // if defined indicates a new customer to be created
   // Added fields from C# model
   terminal?: string
   secuenciaDocumento?: string

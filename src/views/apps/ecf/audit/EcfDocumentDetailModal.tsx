@@ -638,11 +638,21 @@ const EcfDocumentDetailModal = () => {
                                   QR URL
                                 </Typography>
                                 <Typography
+                                  component="a"
+                                  href={response.data.qr_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
                                   variant="body2"
                                   sx={{
                                     fontFamily: 'monospace',
                                     fontSize: '0.75rem',
                                     wordBreak: 'break-all',
+                                    color: 'primary.main',
+                                    textDecoration: 'underline',
+                                    cursor: 'pointer',
+                                    '&:hover': {
+                                      color: 'primary.dark',
+                                    },
                                   }}
                                 >
                                   {response.data.qr_url}
