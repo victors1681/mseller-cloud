@@ -37,10 +37,10 @@ const ChatKitView = () => {
   const [sessionInfo, setSessionInfo] = useState<ChatKitSession | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  // ** Get workflow ID from environment variable or use default
-  const WORKFLOW_ID =
-    process.env.NEXT_PUBLIC_CHATKIT_WORKFLOW_ID ||
-    'wf_694bcfa27d008190bfea49d38cf488680c8fe335749752f0'
+  // ** Get workflow ID from user's business configuration
+  const WORKFLOW_ID = auth.user?.business?.config?.aiAgents?.find(
+    (agent) => agent.enabled && agent.workflowId,
+  )?.workflowId
 
   // ** Handlers
   const handleSessionCreated = (session: ChatKitSession) => {
@@ -72,31 +72,52 @@ const ChatKitView = () => {
         </Card>
       </Grid>
 
-      {/* Chat Component */}
-      <Grid item xs={12}>
-        <Card>
-          <CardContent
-            sx={{
-              p: { xs: 2, sm: 3 },
-              '&:last-child': { pb: { xs: 2, sm: 3 } },
-            }}
+      {/* Workflow ID Error */}
+      {!WORKFLOW_ID && (
+        <Grid item xs={12}>
+          <Alert
+            severity="error"
+            icon={<Icon icon="mdi:alert-circle-outline" />}
           >
-            <Box
+            <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+              Configuración del Agente AI no disponible
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              El ID del workflow del agente AI no está configurado en la
+              configuración del negocio. Por favor, contacte al administrador
+              para habilitar esta funcionalidad.
+            </Typography>
+          </Alert>
+        </Grid>
+      )}
+
+      {/* Chat Component */}
+      {WORKFLOW_ID && (
+        <Grid item xs={12}>
+          <Card>
+            <CardContent
               sx={{
-                height: { xs: 'calc(100vh - 120px)', sm: 'auto' },
+                p: { xs: 2, sm: 3 },
+                '&:last-child': { pb: { xs: 2, sm: 3 } },
               }}
             >
-              <ChatKitComponent
-                workflowId={WORKFLOW_ID}
-                userId={auth.user?.userId}
-                className="mseller-chatkit"
-                onSessionCreated={handleSessionCreated}
-                onError={handleError}
-              />
-            </Box>
-          </CardContent>
-        </Card>
-      </Grid>
+              <Box
+                sx={{
+                  height: { xs: 'calc(100vh - 120px)', sm: 'auto' },
+                }}
+              >
+                <ChatKitComponent
+                  workflowId={WORKFLOW_ID}
+                  userId={auth.user?.userId}
+                  className="mseller-chatkit"
+                  onSessionCreated={handleSessionCreated}
+                  onError={handleError}
+                />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      )}
 
       {/* Error Display (Mobile) */}
       {error && isMobile && (
