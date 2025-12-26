@@ -247,6 +247,7 @@ const CardStatisticsTransport = (props: Props) => {
                   <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                     <Typography variant="body2">Distribuidor</Typography>
                     <Typography variant="h6">
+                      {props.docsData?.distribuidor.codigo} -{' '}
                       {props.docsData?.distribuidor.nombre}
                     </Typography>
                   </Box>
@@ -330,7 +331,8 @@ const CardStatisticsTransport = (props: Props) => {
             <br />
             <strong>Transporte:</strong> {props.docsData?.noTransporte}
             <br />
-            <strong>Distribuidor:</strong> {props.docsData?.distribuidor.nombre}
+            <strong>Distribuidor:</strong> {props.docsData?.distribuidor.codigo}{' '}
+            - {props.docsData?.distribuidor.nombre}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

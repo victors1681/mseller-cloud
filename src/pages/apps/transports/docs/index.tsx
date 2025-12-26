@@ -114,9 +114,23 @@ const defaultColumns: GridColDef[] = [
             >
               {row.cliente.nombre}
             </Typography>
-            <Typography noWrap variant="caption">
-              {row.cliente.codigo}
-            </Typography>
+            <LinkStyled
+              href={`/apps/clients/list/?query=${row.cliente.codigo}&page=0`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.5,
+                }}
+              >
+                <Typography variant="caption">{row.cliente.codigo}</Typography>
+                <Icon icon="mdi:open-in-new" fontSize={12} />
+              </Box>
+            </LinkStyled>
           </Box>
         </Box>
       )

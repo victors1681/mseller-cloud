@@ -1,26 +1,23 @@
 // ** React Imports
-import { useState, useEffect, forwardRef, useCallback } from 'react'
+import { forwardRef, useCallback, useEffect, useState } from 'react'
 
 // ** Next Import
 import Link from 'next/link'
 
 // ** MUI Imports
-import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
-import Card from '@mui/material/Card'
-import Tooltip from '@mui/material/Tooltip'
-import { styled } from '@mui/material/styles'
-import MenuItem from '@mui/material/MenuItem'
-import TextField from '@mui/material/TextField'
-import CardHeader from '@mui/material/CardHeader'
-import IconButton from '@mui/material/IconButton'
-import InputLabel from '@mui/material/InputLabel'
-import Typography from '@mui/material/Typography'
-import FormControl from '@mui/material/FormControl'
-import CardContent from '@mui/material/CardContent'
-import Select, { SelectChangeEvent } from '@mui/material/Select'
-import { DataGrid, GridColDef, GridRowId } from '@mui/x-data-grid'
 import { debounce } from '@mui/material'
+import Box from '@mui/material/Box'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import CardHeader from '@mui/material/CardHeader'
+import Grid from '@mui/material/Grid'
+import IconButton from '@mui/material/IconButton'
+import { SelectChangeEvent } from '@mui/material/Select'
+import TextField from '@mui/material/TextField'
+import Tooltip from '@mui/material/Tooltip'
+import Typography from '@mui/material/Typography'
+import { styled } from '@mui/material/styles'
+import { DataGrid, GridColDef, GridRowId } from '@mui/x-data-grid'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
@@ -29,18 +26,17 @@ import format from 'date-fns/format'
 
 // ** Store & Actions Imports
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchData, deleteClient } from 'src/store/apps/clients'
+import { fetchData } from 'src/store/apps/clients'
 
 // ** Types Imports
-import { RootState, AppDispatch } from 'src/store'
-import { ThemeColor } from 'src/@core/layouts/types'
 import OptionsMenu from 'src/@core/components/option-menu'
+import { AppDispatch, RootState } from 'src/store'
 import TableHeader from 'src/views/apps/clients/list/TableHeader'
 
 // ** Styled Components
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
-import formatCurrency from 'src/utils/formatCurrency'
 import { CustomerType } from 'src/types/apps/customerType'
+import formatCurrency from 'src/utils/formatCurrency'
 import { SellerAutocomplete } from 'src/views/ui/sellerAutoComplete'
 
 import { useRouter } from 'next/router'
@@ -202,42 +198,64 @@ const CustomInput = forwardRef((props: CustomInputProps, ref) => {
 /* eslint-enable */
 
 const InvoiceList = () => {
-  // ** State
-  const [dates, setDates] = useState<Date[]>([])
-  const [value, setValue] = useState<string>('')
-  const [statusValue, setStatusValue] = useState<string>('')
-  const [selectedRows, setSelectedRows] = useState<GridRowId[]>([])
-  const [selectedSellers, setSelectedSellers] = useState<any>(null)
-  const [paginationModel, setPaginationModel] = useState({
-    page: 0,
-    pageSize: 20,
-  })
-  console.log(selectedSellers)
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
   const store = useSelector((state: RootState) => state.clients)
   const router = useRouter()
 
   const sellersParam = router?.query?.sellers
+  const queryParam = router?.query?.query
+  const pageParam = router?.query?.page
+  const pageSizeParam = router?.query?.pageSize
 
+  // ** State - Initialize from URL params
+  const [dates, setDates] = useState<Date[]>([])
+  const [value, setValue] = useState<string>(
+    queryParam ? decodeURIComponent(queryParam as string) : '',
+  )
+  const [statusValue, setStatusValue] = useState<string>('')
+  const [selectedRows, setSelectedRows] = useState<GridRowId[]>([])
+  const [selectedSellers, setSelectedSellers] = useState<any>(
+    sellersParam ? decodeURIComponent(sellersParam as string) : null,
+  )
+  const [paginationModel, setPaginationModel] = useState({
+    page: pageParam ? Number(pageParam) : 0,
+    pageSize: pageSizeParam ? Number(pageSizeParam) : 20,
+  })
+  const [isInitialized, setIsInitialized] = useState(false)
+
+  console.log(selectedSellers)
+
+  // Sync state with URL params when they change
   useEffect(() => {
-    if (sellersParam) {
-      setSelectedSellers(decodeURIComponent(sellersParam as string))
+    if (router.isReady) {
+      if (
+        sellersParam &&
+        selectedSellers !== decodeURIComponent(sellersParam as string)
+      ) {
+        setSelectedSellers(decodeURIComponent(sellersParam as string))
+      }
+      if (queryParam && value !== decodeURIComponent(queryParam as string)) {
+        setValue(decodeURIComponent(queryParam as string))
+      }
+      setIsInitialized(true)
     }
-  }, [sellersParam])
+  }, [sellersParam, queryParam, router.isReady])
 
-  //Initial Load
+  //Initial Load - only fetch when router is ready
   useEffect(() => {
-    dispatch(
-      fetchData({
-        dates,
-        query: value,
-        procesado: statusValue,
-        pageNumber: paginationModel.page,
-        vendedor: selectedSellers,
-      }),
-    )
-  }, [selectedSellers])
+    if (router.isReady) {
+      dispatch(
+        fetchData({
+          dates,
+          query: value,
+          procesado: statusValue,
+          pageNumber: paginationModel.page,
+          vendedor: selectedSellers,
+        }),
+      )
+    }
+  }, [selectedSellers, value, router.isReady])
 
   const handlePagination = useCallback(
     (values: any) => {
@@ -272,7 +290,7 @@ const InvoiceList = () => {
 
   const fn = useCallback(
     debounce((val: string) => {
-      setPaginationModel({ page: 1, pageSize: 20 })
+      setPaginationModel({ page: 0, pageSize: 20 })
       performRequest(val)
     }, 900),
     [],
@@ -283,8 +301,16 @@ const InvoiceList = () => {
       fn.clear()
       setValue(val)
       fn(val)
+      router.push({
+        pathname: `/apps/clients/list`,
+        query: {
+          ...router.query,
+          page: 0,
+          query: val,
+        },
+      })
     },
-    [fn],
+    [fn, router],
   )
 
   const handleStatusValue = (e: SelectChangeEvent) => {

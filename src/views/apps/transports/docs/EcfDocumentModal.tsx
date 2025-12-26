@@ -344,7 +344,54 @@ const EcfDocumentModal = ({
           <InfoRow label="ID Documento" value={ecfDocumento.documentoId} />
           <InfoRow label="Tipo Documento" value={ecfDocumento.tipoDocumento} />
           <InfoRow label="Tipo ECF" value={ecfDocumento.tipoDocumentoEcf} />
-          <InfoRow label="Código Cliente" value={ecfDocumento.codigoCliente} />
+
+          {/* Customer Code with Link */}
+          {ecfDocumento.codigoCliente && (
+            <Grid item xs={12} sm={6}>
+              <Box
+                sx={{
+                  mb: { xs: 1.5, sm: 2 },
+                  p: { xs: 1.5, sm: 0 },
+                  backgroundColor: { xs: 'action.hover', sm: 'transparent' },
+                  borderRadius: { xs: 1, sm: 0 },
+                  border: { xs: '1px solid', sm: 'none' },
+                  borderColor: { xs: 'divider', sm: 'transparent' },
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  gutterBottom
+                  sx={{
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                    fontWeight: { xs: 500, sm: 400 },
+                    mb: { xs: 0.5, sm: 1 },
+                  }}
+                >
+                  Código Cliente
+                </Typography>
+                <Link
+                  href={`/apps/clients/list/?query=${ecfDocumento.codigoCliente}&page=0`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                    fontSize: { xs: '0.875rem', sm: '1rem' },
+                    textDecoration: 'none',
+                    '&:hover': {
+                      textDecoration: 'underline',
+                    },
+                  }}
+                >
+                  {ecfDocumento.codigoCliente}
+                  <Icon icon="mdi:open-in-new" fontSize={16} />
+                </Link>
+              </Box>
+            </Grid>
+          )}
+
           <InfoRow
             label="Código Vendedor"
             value={ecfDocumento.codigoVendedor}
