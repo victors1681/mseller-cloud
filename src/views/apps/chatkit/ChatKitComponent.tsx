@@ -114,16 +114,33 @@ const ChatKitComponent = ({
         '¡Hola! Soy tu asistente virtual de MSeller.\n¿En qué puedo ayudarte hoy?',
       prompts: [
         {
-          label: 'Información del producto',
-          prompt: 'Necesito información sobre un producto específico.',
+          label: '📦 Consultar productos',
+          prompt:
+            '¿Qué productos tenemos disponibles? Muéstrame el inventario con stock bajo.',
         },
         {
-          label: 'Información de un cliente',
-          prompt: 'Quiero detalles de un cliente.',
+          label: '👥 Información de cliente',
+          prompt:
+            'Necesito ver el estado de cuenta y frecuencia de pedidos de un cliente.',
         },
         {
-          label: 'Información de un transporte',
-          prompt: 'Necesito detalles sobre un envío.',
+          label: '📊 Rendimiento de vendedor',
+          prompt:
+            '¿Cómo está el rendimiento de ventas? Muéstrame las métricas de cobro y clientes top.',
+        },
+        {
+          label: '🚚 Estado de entregas',
+          prompt:
+            'Quiero ver el estado de las entregas de hoy y el rendimiento de los choferes.',
+        },
+        {
+          label: '📋 Pedidos pendientes',
+          prompt: 'Muéstrame los pedidos pendientes de esta semana.',
+        },
+        {
+          label: '💰 Análisis de cobranza',
+          prompt:
+            '¿Qué clientes tienen saldo vencido y cuál es la tasa de cobro actual?',
         },
       ],
     },
