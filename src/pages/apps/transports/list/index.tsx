@@ -493,7 +493,7 @@ const TransportList = () => {
     setStartDateRange(start)
     setEndDateRange(end)
     router.push({
-      pathname: `/apps/documents/list`,
+      pathname: `/apps/transports/list`,
       query: {
         ...router.query,
         page: 0,
