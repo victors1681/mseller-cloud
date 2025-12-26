@@ -1,9 +1,4 @@
-import {
-  VerticalNavItemsType,
-  NavLink,
-  NavGroup,
-  NavSectionTitle,
-} from 'src/@core/layouts/types'
+import { NavLink, VerticalNavItemsType } from 'src/@core/layouts/types'
 import { Permission } from 'src/hooks/usePermissions'
 import { UserTypes } from 'src/types/apps/userTypes'
 import { isAIAgentEnabled } from './aiAgentUtils'
@@ -48,7 +43,7 @@ export const filterNavigationByPermissions = (
 
       // Handle NavLink
       const navLink = item as NavLink
-      
+
       // Check permission requirement
       if (
         navLink.permission &&

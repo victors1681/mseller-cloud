@@ -1,6 +1,6 @@
 // ** React Imports
-import { ReactNode, useMemo } from 'react'
 import Box from '@mui/material/Box'
+import { ReactNode, useMemo } from 'react'
 
 // ** MUI Imports
 import { Theme } from '@mui/material/styles'
@@ -11,34 +11,34 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import Layout from 'src/@core/layouts/Layout'
 
 // ** Navigation Imports
-import VerticalNavItems from 'src/navigation/vertical'
 import HorizontalNavItems from 'src/navigation/horizontal'
+import VerticalNavItems from 'src/navigation/vertical'
 
 // ** Utils
 import { filterNavigationByPermissions } from 'src/utils/navigationUtils'
 
 // ** Hooks
-import { usePermissions } from 'src/hooks/usePermissions'
 import { useAuth } from 'src/hooks/useAuth'
+import { usePermissions } from 'src/hooks/usePermissions'
 
 // ** Component Import
 // Uncomment the below line (according to the layout type) when using server-side menu
 // import ServerSideVerticalNavItems from './components/vertical/ServerSideNavItems'
 // import ServerSideHorizontalNavItems from './components/horizontal/ServerSideNavItems'
 
-import VerticalAppBarContent from './components/vertical/AppBarContent'
 import HorizontalAppBarContent from './components/horizontal/AppBarContent'
+import VerticalAppBarContent from './components/vertical/AppBarContent'
 
 // ** Hook Import
+import { RootState } from '@/store'
+import AddDriverDrawer from '@/views/apps/drivers/AddDriverDrawer'
+import AddLocationDrawer from '@/views/apps/locations/AddLocationDrawer'
+import AddLegacyOfferDrawer from '@/views/apps/offers/AddLegacyOfferDrawer'
+import AddPaymentTypeDrawer from '@/views/apps/paymentTypes/AddPaymentTypeDrawer'
+import AddSellerDrawer from '@/views/apps/sellers/AddSellerDrawer'
+import { useSelector } from 'react-redux'
 import { useSettings } from 'src/@core/hooks/useSettings'
 import WelcomeModal from 'src/views/apps/welcome'
-import AddPaymentTypeDrawer from '@/views/apps/paymentTypes/AddPaymentTypeDrawer'
-import { useSelector } from 'react-redux'
-import { RootState } from '@/store'
-import AddSellerDrawer from '@/views/apps/sellers/AddSellerDrawer'
-import AddLocationDrawer from '@/views/apps/locations/AddLocationDrawer'
-import AddDriverDrawer from '@/views/apps/drivers/AddDriverDrawer'
-import AddLegacyOfferDrawer from '@/views/apps/offers/AddLegacyOfferDrawer'
 
 interface Props {
   children: ReactNode
@@ -66,7 +66,11 @@ const UserLayout = ({ children, contentHeightFixed }: Props) => {
 
   // Filter navigation items based on permissions and AI agent access
   const filteredVerticalNavItems = useMemo(() => {
-    return filterNavigationByPermissions(VerticalNavItems(), hasPermission, user)
+    return filterNavigationByPermissions(
+      VerticalNavItems(),
+      hasPermission,
+      user,
+    )
   }, [hasPermission, user])
   // ** Vars for server side navigation
   // const { menuItems: verticalMenuItems } = ServerSideVerticalNavItems()
