@@ -15,7 +15,7 @@ interface SessionResponse {
 
 /**
  * API Handler for creating ChatKit sessions
- * @route POST /api/chatkit/session
+ * @route POST /api/ai-agent/session
  */
 export default async function handler(
   req: NextApiRequest,

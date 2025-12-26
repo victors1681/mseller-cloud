@@ -12,7 +12,7 @@ const navigation = (): VerticalNavItemsType => {
     // === AI ASSISTANT ===
     {
       title: 'Chat AI',
-      path: '/apps/chatkit',
+      path: '/apps/ai-agent',
       icon: 'mdi:robot-outline',
       aiAgent: 'Portal Agent',
     },

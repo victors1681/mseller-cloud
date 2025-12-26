@@ -76,7 +76,7 @@ const ChatKitComponent = ({
 
       const resolvedUserId = userId || auth.user?.userId || 'guest'
 
-      const response = await fetch('/api/chatkit/session', {
+      const response = await fetch('/api/ai-agent/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ workflowId, userId: resolvedUserId }),

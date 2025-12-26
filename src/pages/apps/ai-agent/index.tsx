@@ -1,5 +1,5 @@
 // ** React Imports
-import ChatKitView from 'src/views/apps/chatkit/ChatKitView'
+import ChatKitView from 'src/views/apps/ai-agent/ChatKitView'
 
 const ChatKitPage = () => {
   return <ChatKitView />

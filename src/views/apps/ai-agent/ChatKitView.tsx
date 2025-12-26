@@ -19,7 +19,7 @@ import {
 import Icon from 'src/@core/components/icon'
 
 // ** Components
-import ChatKitComponent from 'src/views/apps/chatkit/ChatKitComponent'
+import ChatKitComponent from 'src/views/apps/ai-agent/ChatKitComponent'
 
 // ** Types
 import { ChatKitSession } from 'src/types/apps/chatkitTypes'
