@@ -29,3 +29,71 @@ code[class*='language-'] {
     display: none;
   }
 }
+
+/* ChatKit Styles - Ensure proper display and input visibility */
+.chatkit-wrapper,
+.chatkit-container,
+.mseller-chatkit,
+openai-chatkit {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  width: 100% !important;
+  min-height: 400px !important;
+  flex: 1 !important;
+}
+
+/* Target the shadow DOM content */
+openai-chatkit::part(container),
+openai-chatkit::part(input),
+openai-chatkit::part(messages) {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* Ensure ChatKit input and text areas are visible */
+.mseller-chatkit input,
+.mseller-chatkit textarea,
+.mseller-chatkit [role='textbox'],
+.mseller-chatkit [contenteditable='true'],
+openai-chatkit input,
+openai-chatkit textarea,
+openai-chatkit [role='textbox'],
+openai-chatkit [contenteditable='true'] {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  touch-action: auto !important;
+}
+
+/* Ensure buttons and submit elements work on touch */
+.mseller-chatkit button,
+.mseller-chatkit [type='submit'],
+.mseller-chatkit [role='button'],
+openai-chatkit button,
+openai-chatkit [type='submit'],
+openai-chatkit [role='button'] {
+  pointer-events: auto !important;
+  touch-action: manipulation !important;
+  cursor: pointer !important;
+}
+
+/* ChatKit message and input containers */
+.mseller-chatkit [data-chatkit-message],
+.mseller-chatkit [data-chatkit-input],
+.mseller-chatkit form,
+openai-chatkit [data-chatkit-message],
+openai-chatkit [data-chatkit-input],
+openai-chatkit form {
+  display: flex !important;
+  visibility: visible !important;
+}
+
+/* Ensure the chat takes full height */
+.mseller-chatkit > *,
+openai-chatkit > * {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}

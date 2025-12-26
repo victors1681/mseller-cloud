@@ -5,12 +5,15 @@ import {
   NavSectionTitle,
 } from 'src/@core/layouts/types'
 import { Permission } from 'src/hooks/usePermissions'
+import { UserTypes } from 'src/types/apps/userTypes'
+import { isAIAgentEnabled } from './aiAgentUtils'
 
 type HasPermissionFn = (permission: Permission) => boolean
 
 export const filterNavigationByPermissions = (
   navItems: VerticalNavItemsType,
   hasPermission: HasPermissionFn,
+  user?: UserTypes | null,
 ): VerticalNavItemsType => {
   return navItems
     .map((item) => {
@@ -24,6 +27,7 @@ export const filterNavigationByPermissions = (
         const filteredChildren = filterNavigationByPermissions(
           item.children,
           hasPermission,
+          user,
         )
 
         // If the group has permission requirement, check it
@@ -44,11 +48,20 @@ export const filterNavigationByPermissions = (
 
       // Handle NavLink
       const navLink = item as NavLink
+      
+      // Check permission requirement
       if (
         navLink.permission &&
         !hasPermission(navLink.permission as Permission)
       ) {
         return null
+      }
+
+      // Check AI agent requirement
+      if ('aiAgent' in navLink && navLink.aiAgent) {
+        if (!user || !isAIAgentEnabled(user, navLink.aiAgent as string)) {
+          return null
+        }
       }
 
       return item

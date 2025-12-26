@@ -1,7 +1,13 @@
 // ** Types
 import { ThemeColor } from 'src/@core/layouts/types'
 export type Tiers = 'basic' | 'standard' | 'enterprise'
-
+export const AVAILABLE_AGENTS = [
+  'Portal Agent',
+  'Customer Service Agent',
+  'Sales Agent',
+  'Support Agent',
+  'Analytics Agent',
+]
 export interface UserTypes {
   userId: string
   password: string
@@ -23,7 +29,15 @@ export interface UserTypes {
   restoreIpad: boolean
   sellerCode: string
   testMode: boolean
-  type: 'seller' | 'administrator' | 'superuser' | 'driver' | 'office' | 'inventory' | 'accounting' | 'manager'
+  type:
+    | 'seller'
+    | 'administrator'
+    | 'superuser'
+    | 'driver'
+    | 'office'
+    | 'inventory'
+    | 'accounting'
+    | 'manager'
   userLevel: string
   defaultClientByRoute: boolean
   updateBankList: boolean
@@ -114,6 +128,11 @@ export interface IBusiness {
   subscriptionStatus?: string
   tier?: Tiers
 }
+interface IAIAgent {
+  enabled: boolean
+  agentName: string
+  workflowId: string
+}
 
 export interface IConfig {
   sandboxPort: string
@@ -147,4 +166,5 @@ export interface IConfig {
   enableConfirmSelector: boolean
   metadata: Array<{ [key: string]: any }>
   integrations?: IIntegration[]
+  aiAgents?: IAIAgent[]
 }

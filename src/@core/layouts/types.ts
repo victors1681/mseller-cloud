@@ -71,6 +71,7 @@ export type NavLink = {
   action?: string
   subject?: string
   permission?: string
+  aiAgent?: string
   disabled?: boolean
   badgeContent?: string
   externalLink?: boolean

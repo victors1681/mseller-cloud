@@ -1674,6 +1674,18 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@openai/chatkit-react@^1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@openai/chatkit-react/-/chatkit-react-1.4.0.tgz#b2a45dd70292bbdd3bd40c8f20c3b64b4f30766b"
+  integrity sha512-zJ5R6bDYx2OZ3ODJij3TbR6oqi0oFQJb01quXuYZqGuF+u/PpMvxUzHDG08E1QQuEbUc9YdtPeZR34oS0+LHHw==
+  dependencies:
+    "@openai/chatkit" "1.2.0"
+
+"@openai/chatkit@1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@openai/chatkit/-/chatkit-1.2.0.tgz#63aae5bcc8c6add754ee1a285538f751af58dc53"
+  integrity sha512-rPf1i74UtkAEX7VKt+Gzbz+N51Ipm2UXUtDcCW+MTPbvLDvdex3Xj0ObAScVAjnUefhBreghb7YynoWuJ9rnVw==
+
 "@parcel/watcher-android-arm64@2.5.0":
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/@parcel/watcher-android-arm64/-/watcher-android-arm64-2.5.0.tgz#e32d3dda6647791ee930556aee206fcd5ea0fb7a"

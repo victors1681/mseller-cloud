@@ -9,6 +9,14 @@ const navigation = (): VerticalNavItemsType => {
       icon: 'mdi:view-dashboard-outline',
     },
 
+    // === AI ASSISTANT ===
+    {
+      title: 'Chat AI',
+      path: '/apps/chatkit',
+      icon: 'mdi:robot-outline',
+      aiAgent: 'Portal Agent',
+    },
+
     // === SALES & CUSTOMER OPERATIONS ===
     {
       title: 'Ventas',

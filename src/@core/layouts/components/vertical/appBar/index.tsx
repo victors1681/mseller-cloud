@@ -1,8 +1,8 @@
 // ** MUI Imports
-import { styled, useTheme } from '@mui/material/styles'
-import useScrollTrigger from '@mui/material/useScrollTrigger'
 import MuiAppBar, { AppBarProps } from '@mui/material/AppBar'
+import { styled, useTheme } from '@mui/material/styles'
 import MuiToolbar, { ToolbarProps } from '@mui/material/Toolbar'
+import useScrollTrigger from '@mui/material/useScrollTrigger'
 
 // ** Type Imports
 import { LayoutProps } from 'src/@core/layouts/types'
@@ -93,7 +93,7 @@ const LayoutAppBar = (props: Props) => {
       elevation={0}
       color="default"
       className="layout-navbar"
-      sx={{ ...userAppBarStyle }}
+      sx={{ zIndex: 999, ...userAppBarStyle }}
       position={appBar === 'fixed' ? 'sticky' : 'static'}
       {...userAppBarProps}
     >

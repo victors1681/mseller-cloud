@@ -19,6 +19,7 @@ import { filterNavigationByPermissions } from 'src/utils/navigationUtils'
 
 // ** Hooks
 import { usePermissions } from 'src/hooks/usePermissions'
+import { useAuth } from 'src/hooks/useAuth'
 
 // ** Component Import
 // Uncomment the below line (according to the layout type) when using server-side menu
@@ -61,11 +62,12 @@ const UserLayout = ({ children, contentHeightFixed }: Props) => {
   // ** Hooks
   const { settings, saveSettings } = useSettings()
   const { hasPermission } = usePermissions()
+  const { user } = useAuth()
 
-  // Filter navigation items based on permissions
+  // Filter navigation items based on permissions and AI agent access
   const filteredVerticalNavItems = useMemo(() => {
-    return filterNavigationByPermissions(VerticalNavItems(), hasPermission)
-  }, [hasPermission])
+    return filterNavigationByPermissions(VerticalNavItems(), hasPermission, user)
+  }, [hasPermission, user])
   // ** Vars for server side navigation
   // const { menuItems: verticalMenuItems } = ServerSideVerticalNavItems()
   // const { menuItems: horizontalMenuItems } = ServerSideHorizontalNavItems()
