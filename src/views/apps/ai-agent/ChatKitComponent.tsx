@@ -130,8 +130,7 @@ const ChatKitComponent = ({
         },
         {
           label: '🚚 Estado de entregas',
-          prompt:
-            'Quiero ver el estado de las entregas de hoy y el rendimiento de los choferes.',
+          prompt: 'Cuales son las entregas pendientes del día de hoy?',
         },
         {
           label: '📋 Pedidos pendientes',
