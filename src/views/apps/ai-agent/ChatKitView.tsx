@@ -9,7 +9,6 @@ import {
   CardContent,
   CardHeader,
   Divider,
-  Grid,
   Typography,
   useMediaQuery,
   useTheme,
@@ -55,96 +54,106 @@ const ChatKitView = () => {
   }
 
   return (
-    <Grid container spacing={{ xs: 2, sm: 3 }}>
-      {/* Info Card (Desktop Only) */}
-
-      <Grid item xs={12}>
-        <Card>
-          <CardHeader
-            title={
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                <Icon icon="mdi:robot-outline" fontSize="1.5rem" />
-                <Typography variant="h6">Chat AI Assistant</Typography>
-              </Box>
-            }
-          />
-          <Divider />
-        </Card>
-      </Grid>
+    <Box
+      sx={{
+        position: 'fixed',
+        top: { xs: 56, sm: 64 },
+        left: { xs: 0, sm: 260 },
+        right: 0,
+        bottom: { xs: 80, sm: 60 },
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        p: { xs: 0, sm: 3 },
+        bgcolor: 'background.default',
+      }}
+    >
+      {/* Header - Desktop Only */}
+      {!isMobile && (
+        <Box sx={{ flexShrink: 0, mb: 2 }}>
+          <Card>
+            <CardHeader
+              sx={{ py: 2 }}
+              title={
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                  <Icon icon="mdi:robot-outline" fontSize="1.5rem" />
+                  <Typography variant="h6">Chat AI Assistant</Typography>
+                </Box>
+              }
+            />
+            <Divider />
+          </Card>
+        </Box>
+      )}
 
       {/* Workflow ID Error */}
       {!WORKFLOW_ID && (
-        <Grid item xs={12}>
-          <Alert
-            severity="error"
-            icon={<Icon icon="mdi:alert-circle-outline" />}
-          >
-            <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
-              Configuración del Agente AI no disponible
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              El ID del workflow del agente AI no está configurado en la
-              configuración del negocio. Por favor, contacte al administrador
-              para habilitar esta funcionalidad.
-            </Typography>
-          </Alert>
-        </Grid>
+        <Alert
+          severity="error"
+          icon={<Icon icon="mdi:alert-circle-outline" />}
+          sx={{ mb: 2, flexShrink: 0 }}
+        >
+          <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+            Configuración del Agente AI no disponible
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            El ID del workflow del agente AI no está configurado en la
+            configuración del negocio. Por favor, contacte al administrador para
+            habilitar esta funcionalidad.
+          </Typography>
+        </Alert>
+      )}
+
+      {/* Error Display */}
+      {error && (
+        <Alert severity="error" sx={{ mb: 2, flexShrink: 0 }}>
+          <Typography variant="body2">{error}</Typography>
+        </Alert>
       )}
 
       {/* Chat Component */}
       {WORKFLOW_ID && (
-        <Grid item xs={12}>
-          <Card>
-            <CardContent
+        <Card
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            minHeight: 0,
+          }}
+        >
+          <CardContent
+            sx={{
+              p: { xs: 0, sm: 2 },
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              minHeight: 0,
+              '&:last-child': { pb: { xs: 0, sm: 2 } },
+            }}
+          >
+            <Box
               sx={{
-                p: { xs: 2, sm: 3 },
-                '&:last-child': { pb: { xs: 2, sm: 3 } },
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+                minHeight: 0,
               }}
             >
-              <Box
-                sx={{
-                  height: { xs: 'calc(100vh - 120px)', sm: 'auto' },
-                }}
-              >
-                <ChatKitComponent
-                  workflowId={WORKFLOW_ID}
-                  userId={auth.user?.userId}
-                  className="mseller-chatkit"
-                  onSessionCreated={handleSessionCreated}
-                  onError={handleError}
-                />
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
+              <ChatKitComponent
+                workflowId={WORKFLOW_ID}
+                userId={auth.user?.userId}
+                className="mseller-chatkit"
+                onSessionCreated={handleSessionCreated}
+                onError={handleError}
+              />
+            </Box>
+          </CardContent>
+        </Card>
       )}
-
-      {/* Error Display (Mobile) */}
-      {error && isMobile && (
-        <Grid item xs={12}>
-          <Alert severity="error">
-            <Typography variant="body2">{error}</Typography>
-          </Alert>
-        </Grid>
-      )}
-
-      {/* Mobile Info Card */}
-      {isMobile && sessionInfo && (
-        <Grid item xs={12}>
-          <Card>
-            <CardContent>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                display="block"
-              >
-                Session: {sessionInfo.sessionId?.substring(0, 20)}...
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      )}
-    </Grid>
+    </Box>
   )
 }
 

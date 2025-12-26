@@ -76,7 +76,7 @@ const ChatKitComponent = ({
 
       const resolvedUserId = userId || auth.user?.userId || 'guest'
 
-      const response = await fetch('/api/ai-agent/session', {
+      const response = await fetch('/api/mseller-agent/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ workflowId, userId: resolvedUserId }),
@@ -205,17 +205,16 @@ const ChatKitComponent = ({
   return (
     <Box
       sx={{
-        height: '100%',
+        height: { xs: 'calc(100vh - 160px)', sm: '600px' },
         width: '100%',
         display: 'flex',
         flexDirection: 'column',
-        overflow: 'hidden',
         '& openai-chatkit': {
           display: 'flex',
           flexDirection: 'column',
           flex: 1,
+          minHeight: '400px',
           width: '100%',
-          overflow: 'hidden',
         },
       }}
     >
@@ -226,9 +225,8 @@ const ChatKitComponent = ({
           display: 'flex',
           flexDirection: 'column',
           flex: 1,
+          minHeight: '400px',
           width: '100%',
-          overflow: 'hidden',
-          minHeight: 0,
         }}
       />
     </Box>
