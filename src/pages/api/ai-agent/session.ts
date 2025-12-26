@@ -52,30 +52,25 @@ export default async function handler(
     }
 
     // Create ChatKit session via OpenAI API
-    const response = await fetch(
-      'https://api.openai.com/v1/chatkit/sessions',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'OpenAI-Beta': 'chatkit_beta=v1',
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          workflow: { id: workflowId },
-          user: userId || 'anonymous',
-        }),
+    const response = await fetch('https://api.openai.com/v1/chatkit/sessions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'OpenAI-Beta': 'chatkit_beta=v1',
+        Authorization: `Bearer ${apiKey}`,
       },
-    )
+      body: JSON.stringify({
+        workflow: { id: workflowId },
+        user: userId || 'anonymous',
+      }),
+    })
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
       console.error('OpenAI API error:', errorData)
       return res.status(response.status).json({
         error: 'OpenAI API Error',
-        message:
-          errorData.error?.message ||
-          'Failed to create ChatKit session',
+        message: errorData.error?.message || 'Failed to create ChatKit session',
       })
     }
 
