@@ -1,5 +1,6 @@
 // ** Toolkit imports
 import { configureStore } from '@reduxjs/toolkit'
+import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 
 // ** Reducers
 import business from 'src/store/apps/business'
@@ -29,6 +30,7 @@ import transports from 'src/store/apps/transports'
 import user from 'src/store/apps/user'
 import apikeys from './apps/apikeys'
 import cxc from './apps/cxc'
+import dashboard from './apps/dashboard'
 import offers from './apps/offers'
 import removeData from './apps/removeData'
 
@@ -63,6 +65,7 @@ export const store = configureStore({
     stockTransfers,
     itemReturns,
     cxc,
+    dashboard,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -72,3 +75,7 @@ export const store = configureStore({
 
 export type AppDispatch = typeof store.dispatch
 export type RootState = ReturnType<typeof store.getState>
+
+// ** Typed hooks
+export const useAppDispatch = () => useDispatch<AppDispatch>()
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
