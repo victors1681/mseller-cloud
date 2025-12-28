@@ -12,6 +12,9 @@ import {
 import {
   cancelSubscriptionFirebase,
   CancelSubscriptionType,
+  completeOnboardingFirebase,
+  CompleteOnboardingRequest,
+  CompleteOnboardingResponse,
   createSubscriptionFirebase,
   CreateSubscriptionProps,
   CreateSubscriptionType,
@@ -47,6 +50,7 @@ const defaultProvider: FirebaseValuesType = {
   removeCustomerCard: () => Promise.resolve(undefined),
   uploadImages: () => Promise.resolve(undefined),
   updateUserProfile: () => Promise.resolve(undefined),
+  completeOnboarding: () => Promise.resolve(undefined),
 }
 
 const FirebaseContext = createContext(defaultProvider)
@@ -113,6 +117,12 @@ const FirebaseProvider = ({ children }: Props) => {
     return updateUserProfileFirebase(data)
   }
 
+  const completeOnboarding = async (
+    data: CompleteOnboardingRequest,
+  ): Promise<CompleteOnboardingResponse | { error: string } | undefined> => {
+    return completeOnboardingFirebase(data)
+  }
+
   const values = {
     loading,
     createSubscription,
@@ -124,6 +134,7 @@ const FirebaseProvider = ({ children }: Props) => {
     removeCustomerCard,
     uploadImages,
     updateUserProfile,
+    completeOnboarding,
   }
 
   return (

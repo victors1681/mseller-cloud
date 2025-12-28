@@ -1,9 +1,9 @@
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle,
   List,
   ListItem,
   ListItemIcon,
@@ -12,182 +12,140 @@ import {
 } from '@mui/material'
 import { useEffect, useState } from 'react'
 
-import LoadingButton from '@mui/lab/LoadingButton'
-import { toast } from 'react-hot-toast'
-import { useDispatch } from 'react-redux'
-import Icon from 'src/@core/components/icon'
-import { addLocation } from 'src/store/apps/location'
-import clientsData from './data/clients.json'
-import locationData from './data/locations.json'
-import paymentTermData from './data/paymentType.json'
-import productsDataRaw from './data/products.json'
-
-// Type the imported products data correctly
-import { ProductType } from 'src/types/apps/productTypes'
-const productsData = productsDataRaw as ProductType[]
-
 import { useRouter } from 'next/router'
+import Icon from 'src/@core/components/icon'
+import { useFirebase } from 'src/firebase/useFirebase'
 import { useAuth } from 'src/hooks/useAuth'
-import { AppDispatch } from 'src/store'
-import { addClients } from 'src/store/apps/clients'
-import { addPaymentType } from 'src/store/apps/paymentType'
-import { addProducts } from 'src/store/apps/products'
-import { addSellers } from 'src/store/apps/seller'
 
 const FirstSessionDialog = () => {
   const [open, setOpen] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [success, setSuccess] = useState(false)
-  const dispatch = useDispatch<AppDispatch>()
   const auth = useAuth()
+  const firebase = useFirebase()
   const router = useRouter()
 
-  // Check localStorage for first session flag
+  // Check if user has seen welcome dialog
   useEffect(() => {
-    const isFirstSession = localStorage.getItem('firstSession')
-    if (!isFirstSession && auth.user?.business?.fromPortal) {
+    if (auth.user && !auth.user.hasSeenWelcome) {
       setOpen(true)
     }
-  }, [auth])
+  }, [auth.user])
 
-  const handleClose = () => {
-    localStorage.setItem('firstSession', 'false') // Save the flag in localStorage
+  const handleClose = async () => {
+    if (auth.user?.userId) {
+      try {
+        // Update Firebase to mark welcome as seen
+        await firebase.updateUserProfile({
+          userId: auth.user.userId,
+          hasSeenWelcome: true,
+        })
+
+        // Refresh user data
+        await auth.signInByToken()
+      } catch (error) {
+        console.error('Error updating welcome flag:', error)
+      }
+    }
     setOpen(false)
-    router.push('/apps/clients/list/')
   }
 
-  const areRequestSuccessful = async () => {
-    const sellerData = [
-      {
-        codigo: '1',
-        nombre: `${auth.user?.firstName.toUpperCase()} ${auth.user?.lastName.toUpperCase()}`,
-        email: auth.user?.email || '',
-        status: 'A',
-        localidad: 1,
-      },
-    ]
-
-    try {
-      await Promise.all([
-        dispatch(addLocation(locationData)),
-        dispatch(addSellers(sellerData)), // Single action for seller
-        dispatch(addPaymentType(paymentTermData)),
-      ])
-      //After the inicial data are inserted then insert
-      await Promise.all([
-        dispatch(addClients(clientsData)),
-        dispatch(addProducts(productsData)),
-      ])
-      return true
-    } catch (error) {
-      console.error('Error during requests:', error)
-      return false
-    }
+  const handleAction = (path: string) => {
+    handleClose()
+    router.push(path)
   }
-
-  const handleAccept = async () => {
-    setLoading(true)
-
-    const response = await areRequestSuccessful()
-    if (response) {
-      toast.success('Datos creados exitosamente')
-      setSuccess(true)
-    } else {
-      toast.error('Hubo un error al crear los datos')
-    }
-
-    setLoading(false)
-  }
-
-  const getIconColor = () => (success ? 'green' : 'gray')
 
   return (
-    <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>Bienvenido a MSeller</DialogTitle>
-      <DialogContent>
-        <Typography>
-          ¿Le gustaría crear informaciones de demostración?
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+      <DialogContent sx={{ textAlign: 'center', py: 6 }}>
+        <Box
+          sx={{
+            mb: 4,
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        >
+          <Icon icon="mdi:party-popper" fontSize={80} color="primary" />
+        </Box>
+
+        <Typography variant="h4" sx={{ mb: 2, fontWeight: 600 }}>
+          ¡Bienvenido a MSeller!
         </Typography>
-        <List>
-          <ListItem>
+
+        <Typography variant="body1" sx={{ mb: 4, color: 'text.secondary' }}>
+          Estamos emocionados de tenerte aquí. Comienza a gestionar tu negocio
+          de manera más eficiente.
+        </Typography>
+
+        <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
+          Primeros pasos recomendados:
+        </Typography>
+
+        <List sx={{ textAlign: 'left' }}>
+          <ListItem
+            button
+            onClick={() => handleAction('/apps/clients/list')}
+            sx={{
+              borderRadius: 1,
+              mb: 1,
+              '&:hover': { backgroundColor: 'action.hover' },
+            }}
+          >
             <ListItemIcon>
-              <Icon
-                icon="ri:building-4-line"
-                fontSize={20}
-                color={getIconColor()}
-              />
+              <Icon icon="mdi:account-plus" fontSize={24} color="primary" />
             </ListItemIcon>
-            <ListItemText primary="Localidades" />
+            <ListItemText
+              primary="Agrega tu primer cliente"
+              secondary="Comienza registrando tus clientes"
+            />
           </ListItem>
-          <ListItem>
+
+          <ListItem
+            button
+            onClick={() => handleAction('/apps/products/list')}
+            sx={{
+              borderRadius: 1,
+              mb: 1,
+              '&:hover': { backgroundColor: 'action.hover' },
+            }}
+          >
             <ListItemIcon>
-              <Icon
-                icon="ri:user-2-fill"
-                fontSize={20}
-                color={getIconColor()}
-              />
+              <Icon icon="mdi:package-variant" fontSize={24} color="success" />
             </ListItemIcon>
-            <ListItemText primary="Vendedor" />
+            <ListItemText
+              primary="Registra tus productos"
+              secondary="Crea tu catálogo de productos"
+            />
           </ListItem>
-          <ListItem>
+
+          <ListItem
+            button
+            onClick={() => handleAction('/apps/documents/facturas/')}
+            sx={{
+              borderRadius: 1,
+              '&:hover': { backgroundColor: 'action.hover' },
+            }}
+          >
             <ListItemIcon>
-              <Icon
-                icon="ri:currency-fill"
-                fontSize={20}
-                color={getIconColor()}
-              />
+              <Icon icon="mdi:file-document" fontSize={24} color="info" />
             </ListItemIcon>
-            <ListItemText primary="Condiciones de pago" />
-          </ListItem>
-          <ListItem>
-            <ListItemIcon>
-              <Icon
-                icon="ri:account-box-fill"
-                fontSize={20}
-                color={getIconColor()}
-              />
-            </ListItemIcon>
-            <ListItemText primary="Clientes" />
-          </ListItem>
-          <ListItem>
-            <ListItemIcon>
-              <Icon
-                icon="ri:barcode-box-line"
-                fontSize={20}
-                color={getIconColor()}
-              />
-            </ListItemIcon>
-            <ListItemText primary="Productos" />
-          </ListItem>
-          <ListItem>
-            <ListItemIcon>
-              <Icon
-                icon="ri:barcode-box-line"
-                fontSize={20}
-                color={getIconColor()}
-              />
-            </ListItemIcon>
-            <ListItemText primary="Ofertas" />
+            <ListItemText
+              primary="Crea tu primera factura"
+              secondary="Comienza a facturar a tus clientes"
+            />
           </ListItem>
         </List>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} disabled={loading}>
-          Cancelar
+
+      <DialogActions sx={{ px: 6, pb: 4 }}>
+        <Button onClick={handleClose} variant="outlined" size="large">
+          Cerrar
         </Button>
-        {success ? (
-          <Button onClick={handleClose} variant="contained" disabled={loading}>
-            Completado
-          </Button>
-        ) : (
-          <LoadingButton
-            variant="contained"
-            loading={loading}
-            onClick={handleAccept}
-          >
-            Proceder
-          </LoadingButton>
-        )}
+        <Button
+          onClick={() => handleAction('/apps/clients/list')}
+          variant="contained"
+          size="large"
+        >
+          Comenzar
+        </Button>
       </DialogActions>
     </Dialog>
   )

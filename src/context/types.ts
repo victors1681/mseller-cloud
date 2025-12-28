@@ -4,6 +4,8 @@ import {
 } from '@/types/apps/imageTypes'
 import {
   CancelSubscriptionType,
+  CompleteOnboardingRequest,
+  CompleteOnboardingResponse,
   CreateSubscriptionProps,
   CreateSubscriptionType,
   IUpdateUserProfileProps,
@@ -51,6 +53,7 @@ export type AuthValuesType = {
   setLoading: (value: boolean) => void
   setUser: (value: UserTypes | null) => void
   login: (params: LoginParams, errorCallback?: ErrCallbackType) => void
+  signInByToken: () => Promise<void>
   loadingForm: boolean
   accessControl?: ICloudModules
   signUp: (
@@ -105,4 +108,7 @@ export type FirebaseValuesType = {
   updateUserProfile: (
     data: IUpdateUserProfileProps,
   ) => Promise<IUpdateUserProfileResponse | { error: string } | undefined>
+  completeOnboarding: (
+    data: CompleteOnboardingRequest,
+  ) => Promise<CompleteOnboardingResponse | { error: string } | undefined>
 }

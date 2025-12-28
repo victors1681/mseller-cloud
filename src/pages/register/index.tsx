@@ -1,538 +1,592 @@
 // ** React Imports
-import { ReactNode, useRef, useState } from 'react'
+import { ReactNode, useState } from 'react'
 
 // ** Next Import
 import Link from 'next/link'
-import ReCAPTCHAV2 from 'react-google-recaptcha'
-import LoadingButton from '@mui/lab/LoadingButton'
+import { useRouter } from 'next/router'
 
+// ** MUI Components
+import LoadingButton from '@mui/lab/LoadingButton'
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import MuiCard, { CardProps } from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
 import Divider from '@mui/material/Divider'
-import Checkbox from '@mui/material/Checkbox'
-import TextField from '@mui/material/TextField'
-import InputLabel from '@mui/material/InputLabel'
-import IconButton from '@mui/material/IconButton'
-import Box, { BoxProps } from '@mui/material/Box'
 import FormControl from '@mui/material/FormControl'
-import useMediaQuery from '@mui/material/useMediaQuery'
+import FormHelperText from '@mui/material/FormHelperText'
+import IconButton from '@mui/material/IconButton'
+import InputAdornment from '@mui/material/InputAdornment'
+import InputLabel from '@mui/material/InputLabel'
 import OutlinedInput from '@mui/material/OutlinedInput'
 import { styled, useTheme } from '@mui/material/styles'
-import InputAdornment from '@mui/material/InputAdornment'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import Typography, { TypographyProps } from '@mui/material/Typography'
-import { useForm, Controller, SubmitHandler } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
+
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
-
-// ** Configs
-import themeConfig from 'src/configs/themeConfig'
 
 // ** Layout Import
 import BlankLayout from 'src/@core/layouts/BlankLayout'
 
 // ** Hooks
-import { useSettings } from 'src/@core/hooks/useSettings'
-
-// ** Demo Imports
-import FooterIllustrationsV2 from 'src/views/pages/auth/FooterIllustrationsV2'
-import Image from 'next/image'
-import CountryDropdown from './CountryDropdown'
-import TermsDialog from './TermModal'
-import Grid from '@mui/material/Grid'
-import FormHelperText from '@mui/material/FormHelperText'
 import { useAuth } from 'src/hooks/useAuth'
-import { SignUpRequest } from 'src/firebase'
+
+// ** Firebase
+import {
+  GoogleAuthProvider,
+  OAuthProvider,
+  signInWithPopup,
+} from 'firebase/auth'
+import toast from 'react-hot-toast'
+import { auth, SignUpRequest } from 'src/firebase'
+
+// ** Form Handling
+import { Controller, useForm } from 'react-hook-form'
+
+interface State {
+  password: string
+  showPassword: boolean
+}
+
+interface SimpleRegisterFormData {
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+  confirmPassword: string
+}
 
 // ** Styled Components
-const RegisterIllustrationWrapper = styled(Box)<BoxProps>(({ theme }) => ({
-  padding: theme.spacing(20),
-  paddingRight: '0 !important',
-  [theme.breakpoints.down('lg')]: {
-    padding: theme.spacing(10),
-  },
-}))
-
-const RegisterIllustration = styled('img')(({ theme }) => ({
-  maxWidth: '46rem',
-  [theme.breakpoints.down('lg')]: {
-    maxWidth: '35rem',
-  },
-}))
-
-const TreeIllustration = styled('img')(({ theme }) => ({
-  bottom: 0,
-  left: '1.875rem',
-  position: 'absolute',
-  [theme.breakpoints.down('lg')]: {
-    left: 0,
-  },
-}))
-
-const RightWrapper = styled(Box)<BoxProps>(({ theme }) => ({
-  width: '100%',
-  [theme.breakpoints.up('md')]: {
-    maxWidth: 450,
-  },
-}))
-
-const BoxWrapper = styled(Box)<BoxProps>(({ theme }) => ({
-  [theme.breakpoints.down('xl')]: {
-    width: '100%',
-  },
-  [theme.breakpoints.down('md')]: {
-    maxWidth: 400,
-  },
-}))
-
-const TypographyStyled = styled(Typography)<TypographyProps>(({ theme }) => ({
-  fontWeight: 600,
-  marginBottom: theme.spacing(1.5),
-  [theme.breakpoints.down('md')]: { mt: theme.spacing(8) },
+const Card = styled(MuiCard)<CardProps>(({ theme }) => ({
+  [theme.breakpoints.up('sm')]: { width: '28rem' },
 }))
 
 const LinkStyled = styled(Link)(({ theme }) => ({
-  display: 'flex',
   fontSize: '0.875rem',
-  alignItems: 'center',
   textDecoration: 'none',
-  justifyContent: 'center',
   color: theme.palette.primary.main,
 }))
 
-const SITE_KEY = '6LcL4oMqAAAAANTcIMhAgqjATlFR9gy4lgh33IQJ'
-
-const Register = () => {
-  // ** States
+const RegisterSimple = () => {
+  // ** State
   const [showPassword, setShowPassword] = useState<boolean>(false)
-  const [isResponseError, setResponseError] = useState<boolean>(false)
-  // ** Hooks
+  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+
+  // ** Hook
   const theme = useTheme()
-  const { settings } = useSettings()
-  const hidden = useMediaQuery(theme.breakpoints.down('md'))
-  const [captchaValid, setCaptchaValid] = useState(false)
-  const auth = useAuth()
+  const router = useRouter()
+  const authContext = useAuth()
+
+  // ** Form
   const {
-    handleSubmit,
     control,
-    formState: { errors, isSubmitting, isLoading },
-    setValue,
-    register,
+    handleSubmit,
     watch,
-  } = useForm<SignUpRequest>({ mode: 'onChange' })
+    formState: { errors },
+  } = useForm<SimpleRegisterFormData>({
+    mode: 'onBlur',
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+  })
 
-  const recaptchaRef = useRef<ReCAPTCHAV2 | null>(null)
+  const password = watch('password')
 
-  const formValues = watch()
-  const isFormFilled =
-    Object.values(formValues).every((value) => value !== '') &&
-    Object.keys(errors).length == 0
+  // ** Helper: Create SignUpRequest from user data
+  const createSignUpRequest = (
+    firstName: string,
+    lastName: string,
+    email: string,
+    password: string,
+    captchaToken: string,
+    uid?: string,
+  ): SignUpRequest => ({
+    business_name: `${firstName} ${lastName}'s Business`,
+    user_email: email,
+    user_password: password,
+    user_first_name: firstName,
+    user_last_name: lastName,
+    phone: '', // Will be filled in onboarding
+    address: '', // Will be filled in onboarding
+    country: '', // Will be filled in onboarding
+    reCaptchaToken: captchaToken,
+    terms: true,
+    ...(uid && { uid }), // Include userId only for social logins
+  })
 
-  const onSubmit: SubmitHandler<SignUpRequest> = async (data) => {
-    try {
-      if (!captchaValid) {
-        toast.error('Por favor, complete el captcha.')
-        return
-      }
+  // ** Helper: Process signup response
+  const processSignUpResponse = async (
+    response: any,
+    successMessage: string,
+    fromProvider?: boolean,
+    email?: string,
+    password?: string,
+  ) => {
+    if (response && 'error' in response) {
+      // Handle existing user gracefully
+      if (
+        response.error.includes('already exists') ||
+        response.error.includes('already in use')
+      ) {
+        toast.success(successMessage)
 
-      const response = await auth.signUp(data)
-      if (response && 'error' in response) {
+        // Sign in by token for social logins, or by credentials for email/password
+        if (fromProvider) {
+          await authContext.signInByToken()
+        }
+
+        router.push('/onboarding')
+      } else {
         toast.error(response.error)
-        recaptchaRef?.current?.reset()
-      } else if (response) {
-        //Success
-        toast.success(`Business ${response.result.businessId} created`)
-        //Auto login
-        auth.login({
-          email: data.user_email,
-          password: data.user_password,
-        })
       }
-    } catch (error) {
-      toast.error('Error intentando crear una nueva cuenta')
-      recaptchaRef?.current?.reset()
+    } else if (response) {
+      toast.success(successMessage)
+
+      // Sign in by token for social logins, or by credentials for email/password
+      if (fromProvider) {
+        await authContext.signInByToken()
+      } else if (email && password) {
+        await authContext.login({ email, password })
+      }
+
+      // // Redirect to onboarding
+      // router.push('/onboarding')
     }
   }
-  const handleCaptchaChange = (value: string | null) => {
-    setCaptchaValid(!!value)
-    value && setValue('reCaptchaToken', value)
-  }
-  // ** Vars
-  const { skin } = settings
 
-  const imageSource =
-    skin === 'bordered'
-      ? 'auth-v2-register-illustration-bordered'
-      : 'auth-v2-register-illustration'
+  // ** Handle Email/Password Registration
+  const onSubmit = async (data: SimpleRegisterFormData) => {
+    setIsLoading(true)
+    try {
+      const signUpData = createSignUpRequest(
+        data.firstName,
+        data.lastName,
+        data.email,
+        data.password,
+        'simple-registration',
+      )
+
+      const response = await authContext.signUp(signUpData)
+      await processSignUpResponse(
+        response,
+        'Cuenta creada exitosamente',
+        false, // Not from provider
+        data.email,
+        data.password,
+      )
+    } catch (error: any) {
+      console.error('Registration error:', error)
+      toast.error('Error al crear la cuenta')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // ** Helper: Handle social login popup errors
+  const handleSocialLoginError = (error: any, provider: string) => {
+    console.error(`${provider} sign-in error:`, error)
+
+    let errorMessage = `Error al iniciar sesión con ${provider}`
+    if (error.code === 'auth/popup-closed-by-user') {
+      errorMessage = 'Inicio de sesión cancelado'
+    } else if (error.code === 'auth/popup-blocked') {
+      errorMessage =
+        'Popup bloqueado. Por favor, permite popups en tu navegador'
+    }
+
+    toast.error(errorMessage)
+  }
+
+  // ** Helper: Extract name from social login
+  const extractNameParts = (
+    displayName: string,
+    email: string,
+    defaultLastName: string,
+  ) => {
+    if (displayName) {
+      const nameParts = displayName.split(' ')
+      return {
+        firstName: nameParts[0] || 'User',
+        lastName: nameParts.slice(1).join(' ') || defaultLastName,
+        fullName: displayName,
+      }
+    }
+
+    // Fallback to email prefix if no display name
+    const emailPrefix = email.split('@')[0]
+    return {
+      firstName: emailPrefix || 'User',
+      lastName: defaultLastName,
+      fullName: `${emailPrefix} ${defaultLastName}`,
+    }
+  }
+
+  // ** Handle Google Sign In
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true)
+    try {
+      const provider = new GoogleAuthProvider()
+      const result = await signInWithPopup(auth, provider)
+      console.log('provider', result)
+      if (result.user) {
+        const { firstName, lastName } = extractNameParts(
+          result.user.displayName || '',
+          result.user.email || '',
+          'Google',
+        )
+
+        const signUpData = createSignUpRequest(
+          firstName,
+          lastName,
+          result.user.email || '',
+          '', // Password not needed for social logins
+          'google-social-login',
+          result.user.uid, // Pass Firebase UID for social login
+        )
+
+        const response = await authContext.signUp(signUpData)
+        await processSignUpResponse(
+          response,
+          'Inicio de sesión exitoso con Google',
+          true, // From social provider
+        )
+      }
+    } catch (error: any) {
+      handleSocialLoginError(error, 'Google')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // ** Handle Apple Sign In
+  const handleAppleSignIn = async () => {
+    setIsLoading(true)
+    try {
+      const provider = new OAuthProvider('apple.com')
+      provider.addScope('email')
+      provider.addScope('name')
+
+      const result = await signInWithPopup(auth, provider)
+
+      if (result.user) {
+        const { firstName, lastName } = extractNameParts(
+          result.user.displayName || '',
+          result.user.email || '',
+          'Apple',
+        )
+
+        const signUpData = createSignUpRequest(
+          firstName,
+          lastName,
+          result.user.email || '',
+          '', // Password not needed for social logins
+          'apple-social-login',
+          result.user.uid, // Pass Firebase UID for social login
+        )
+
+        const response = await authContext.signUp(signUpData)
+        await processSignUpResponse(
+          response,
+          'Inicio de sesión exitoso con Apple',
+          true, // From social provider
+        )
+      }
+    } catch (error: any) {
+      handleSocialLoginError(error, 'Apple')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
-    <Box className="content-right">
-      {!hidden ? (
-        <Box
-          sx={{
-            flex: 1,
-            display: 'flex',
-            position: 'relative',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
+    <Box className="content-center">
+      <Card sx={{ zIndex: 1 }}>
+        <CardContent
+          sx={{ p: (theme) => `${theme.spacing(12, 9, 7)} !important` }}
         >
-          <RegisterIllustrationWrapper>
-            <RegisterIllustration
-              alt="register-illustration"
-              src={`/images/pages/${imageSource}-${theme.palette.mode}.png`}
-            />
-          </RegisterIllustrationWrapper>
-          <FooterIllustrationsV2
-            image={
-              <TreeIllustration alt="tree" src="/images/pages/tree-2.png" />
-            }
-          />
-        </Box>
-      ) : null}
-      <RightWrapper
-        sx={
-          skin === 'bordered' && !hidden
-            ? { borderLeft: `1px solid ${theme.palette.divider}` }
-            : {}
-        }
-      >
-        <Box
-          sx={{
-            p: 12,
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'background.paper',
-          }}
-        >
-          <BoxWrapper>
-            <Box
+          <Box
+            sx={{
+              mb: 8,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Typography
+              variant="h6"
               sx={{
-                top: 30,
-                left: 40,
-                display: 'flex',
-                position: 'absolute',
-                alignItems: 'center',
-                justifyContent: 'center',
+                lineHeight: 1,
+                fontWeight: 600,
+                fontSize: '1.5rem !important',
               }}
             >
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Image
-                  src="/images/logos/mseller-logo-dark.png"
-                  alt="logo"
-                  height="50"
-                  width="200"
-                  style={{ paddingLeft: '10px' }}
-                />
-              </Box>
-            </Box>
-            <Box sx={{ mb: 6 }}>
-              <TypographyStyled variant="h5">
-                Crear una nueva cuenta 🚀
-              </TypographyStyled>
-              <Typography variant="body2">
-                Conecta tu fuerza de ventas con tu negocio
-              </Typography>
-            </Box>
-            <form
-              noValidate
-              autoComplete="off"
-              onSubmit={handleSubmit(onSubmit)}
+              Bienvenido a MSeller
+            </Typography>
+          </Box>
+
+          <Box sx={{ mb: 6 }}>
+            <Typography variant="h5" sx={{ fontWeight: 600, mb: 1.5 }}>
+              Regístrate gratis
+            </Typography>
+            <Typography variant="body2">
+              Crea tu cuenta y comienza a vender en minutos
+            </Typography>
+          </Box>
+
+          {/* Social Login Buttons */}
+          <Box sx={{ mb: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Button
+              fullWidth
+              size="large"
+              variant="outlined"
+              onClick={handleGoogleSignIn}
+              disabled={isLoading}
+              startIcon={<Icon icon="mdi:google" />}
+              sx={{
+                borderColor: 'divider',
+                color: 'text.primary',
+                '&:hover': {
+                  borderColor: 'primary.main',
+                  backgroundColor: 'action.hover',
+                },
+              }}
             >
+              Continue with Google
+            </Button>
+
+            <Button
+              fullWidth
+              size="large"
+              variant="outlined"
+              onClick={handleAppleSignIn}
+              disabled={isLoading}
+              startIcon={<Icon icon="mdi:apple" />}
+              sx={{
+                borderColor: 'divider',
+                color: 'text.primary',
+                '&:hover': {
+                  borderColor: 'primary.main',
+                  backgroundColor: 'action.hover',
+                },
+              }}
+            >
+              Continue with Apple
+            </Button>
+          </Box>
+
+          <Divider sx={{ my: (theme) => `${theme.spacing(5)} !important` }}>
+            o
+          </Divider>
+
+          {/* Email/Password Form */}
+          <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
+            <Controller
+              name="firstName"
+              control={control}
+              rules={{
+                required: 'El nombre es obligatorio',
+              }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  autoFocus
+                  fullWidth
+                  label="Nombre"
+                  error={!!errors.firstName}
+                  helperText={errors.firstName?.message}
+                  disabled={isLoading}
+                  sx={{ mb: 4 }}
+                />
+              )}
+            />
+
+            <Controller
+              name="lastName"
+              control={control}
+              rules={{
+                required: 'El apellido es obligatorio',
+              }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label="Apellido"
+                  error={!!errors.lastName}
+                  helperText={errors.lastName?.message}
+                  disabled={isLoading}
+                  sx={{ mb: 4 }}
+                />
+              )}
+            />
+
+            <Controller
+              name="email"
+              control={control}
+              rules={{
+                required: 'El correo electrónico es obligatorio',
+                pattern: {
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  message: 'Correo electrónico inválido',
+                },
+              }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  type="email"
+                  label="Correo Electrónico"
+                  error={!!errors.email}
+                  helperText={errors.email?.message}
+                  disabled={isLoading}
+                  sx={{ mb: 4 }}
+                />
+              )}
+            />
+
+            <FormControl fullWidth sx={{ mb: 4 }}>
+              <InputLabel
+                htmlFor="auth-register-password"
+                error={!!errors.password}
+              >
+                Contraseña
+              </InputLabel>
               <Controller
-                name="business_name"
+                name="password"
                 control={control}
-                defaultValue=""
-                rules={{ required: 'Nombre de negocio es obligatorio' }}
-                render={({ field }) => (
-                  <TextField
-                    fullWidth
-                    label="Nombre de su negocio"
-                    placeholder="Mi negocio SRL"
-                    {...field}
-                    error={!!errors.business_name}
-                    disabled={isSubmitting}
-                    helperText={
-                      errors.business_name
-                        ? (errors.business_name.message as string)
-                        : ''
-                    }
-                    sx={{ mb: 4 }}
-                  />
-                )}
-              />
-
-              <Controller
-                name="phone"
-                control={control}
-                defaultValue=""
-                rules={{ required: 'Teléfono es obligatorio' }}
-                render={({ field }) => (
-                  <TextField
-                    fullWidth
-                    label="Teléfono"
-                    placeholder="809-000-0000"
-                    disabled={isSubmitting}
-                    {...register('phone', {
-                      required: 'Phone number is required',
-                      pattern: {
-                        value: /^\d{3}-?\d{3}-?\d{4}$/,
-                        message: 'El número telefónico debe ser: 000-000-0000',
-                      },
-                    })}
-                    {...field}
-                    error={!!errors.phone}
-                    helperText={
-                      errors.phone ? (errors.phone.message as string) : ''
-                    }
-                    sx={{ mb: 4 }}
-                  />
-                )}
-              />
-
-              <Controller
-                name="address"
-                control={control}
-                defaultValue=""
-                rules={{ required: 'Dirección es obligatoria' }}
-                render={({ field }) => (
-                  <TextField
-                    fullWidth
-                    disabled={isSubmitting}
-                    label="Dirección"
-                    {...field}
-                    error={!!errors.address}
-                    helperText={
-                      errors.address ? (errors.address.message as string) : ''
-                    }
-                    sx={{ mb: 4 }}
-                  />
-                )}
-              />
-
-              <CountryDropdown
-                name="country"
-                control={control}
-                disabled={isSubmitting}
-                error={
-                  errors?.country ? (errors.country.message as string) : ''
-                }
-              />
-
-              <Divider sx={{ my: 5 }}>Datos del usuario</Divider>
-
-              <Grid container spacing={2}>
-                <Grid item xs={6}>
-                  <Controller
-                    name="user_first_name"
-                    control={control}
-                    defaultValue=""
-                    rules={{ required: 'Nombre es obligatorio' }}
-                    render={({ field }) => (
-                      <TextField
-                        fullWidth
-                        disabled={isSubmitting}
-                        label="Nombre"
-                        {...field}
-                        error={!!errors.user_first_name}
-                        helperText={
-                          errors.user_first_name
-                            ? (errors.user_first_name.message as string)
-                            : ''
-                        }
-                        sx={{ mb: 4 }}
-                      />
-                    )}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <Controller
-                    name="user_last_name"
-                    control={control}
-                    defaultValue=""
-                    rules={{ required: 'Apellido es obligatorio' }}
-                    render={({ field }) => (
-                      <TextField
-                        fullWidth
-                        disabled={isSubmitting}
-                        label="Apellido"
-                        {...field}
-                        error={!!errors.user_last_name}
-                        helperText={
-                          errors.user_last_name
-                            ? (errors.user_last_name.message as string)
-                            : ''
-                        }
-                        sx={{ mb: 4 }}
-                      />
-                    )}
-                  />
-                </Grid>
-              </Grid>
-
-              <Controller
-                name="user_email"
-                control={control}
-                defaultValue=""
                 rules={{
-                  required: 'Correo electrónico es obligatorio',
-                  pattern: {
-                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-                    message: 'Correo electrónico no válido',
+                  required: 'La contraseña es obligatoria',
+                  minLength: {
+                    value: 6,
+                    message: 'La contraseña debe tener al menos 6 caracteres',
                   },
                 }}
                 render={({ field }) => (
-                  <TextField
-                    fullWidth
-                    disabled={isSubmitting}
-                    label="Correo electrónico"
+                  <OutlinedInput
                     {...field}
-                    error={!!errors.user_email}
-                    helperText={
-                      errors.user_email
-                        ? (errors.user_email.message as string)
-                        : ''
+                    label="Contraseña"
+                    id="auth-register-password"
+                    error={!!errors.password}
+                    type={showPassword ? 'text' : 'password'}
+                    disabled={isLoading}
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <IconButton
+                          edge="end"
+                          onClick={() => setShowPassword(!showPassword)}
+                          onMouseDown={(e) => e.preventDefault()}
+                        >
+                          <Icon
+                            icon={
+                              showPassword
+                                ? 'mdi:eye-outline'
+                                : 'mdi:eye-off-outline'
+                            }
+                          />
+                        </IconButton>
+                      </InputAdornment>
                     }
-                    sx={{ mb: 4 }}
                   />
                 )}
               />
+              {errors.password && (
+                <FormHelperText error>{errors.password.message}</FormHelperText>
+              )}
+            </FormControl>
 
-              <FormControl fullWidth sx={{ mb: 4 }}>
-                <InputLabel htmlFor="user_password">Contraseña</InputLabel>
-                <Controller
-                  name="user_password"
-                  control={control}
-                  defaultValue=""
-                  rules={{
-                    required: 'Contraseña es obligatoria',
-                    minLength: {
-                      value: 6,
-                      message: 'La contraseña debe tener al menos 6 caracteres',
-                    },
-                    pattern: {
-                      value: /[!@#$%^&*(),.?":{}|<>]/,
-                      message:
-                        'La contraseña debe contener al menos un carácter especial',
-                    },
-                  }}
-                  render={({ field }) => (
-                    <OutlinedInput
-                      {...field}
-                      disabled={isSubmitting}
-                      id="user_password"
-                      type={showPassword ? 'text' : 'password'}
-                      label="Contraseña" // label here for accessibility
-                      error={!!errors.user_password}
-                      endAdornment={
-                        <InputAdornment position="end">
-                          <IconButton
-                            edge="end"
-                            onClick={() => setShowPassword(!showPassword)}
-                          >
-                            <Icon
-                              icon={
-                                showPassword
-                                  ? 'mdi:eye-outline'
-                                  : 'mdi:eye-off-outline'
-                              }
-                            />
-                          </IconButton>
-                        </InputAdornment>
-                      }
-                    />
-                  )}
-                />
-                <FormHelperText
-                  sx={{
-                    color: errors.user_password
-                      ? theme.palette.error.main
-                      : 'inherit',
-                  }}
-                >
-                  {errors.user_password
-                    ? (errors.user_password?.message as string)
-                    : ''}
-                </FormHelperText>
-              </FormControl>
-
+            <FormControl fullWidth sx={{ mb: 4 }}>
+              <InputLabel
+                htmlFor="auth-register-confirm-password"
+                error={!!errors.confirmPassword}
+              >
+                Confirmar Contraseña
+              </InputLabel>
               <Controller
-                name="terms"
+                name="confirmPassword"
                 control={control}
-                defaultValue={false}
                 rules={{
+                  required: 'Confirma tu contraseña',
                   validate: (value) =>
-                    value || 'Debe aceptar los términos y condiciones',
+                    value === password || 'Las contraseñas no coinciden',
                 }}
                 render={({ field }) => (
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        {...field}
-                        disabled={isSubmitting}
-                        checked={field.value}
-                        onChange={(e) => field.onChange(e.target.checked)}
-                      />
+                  <OutlinedInput
+                    {...field}
+                    label="Confirmar Contraseña"
+                    id="auth-register-confirm-password"
+                    error={!!errors.confirmPassword}
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    disabled={isLoading}
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <IconButton
+                          edge="end"
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
+                          onMouseDown={(e) => e.preventDefault()}
+                        >
+                          <Icon
+                            icon={
+                              showConfirmPassword
+                                ? 'mdi:eye-outline'
+                                : 'mdi:eye-off-outline'
+                            }
+                          />
+                        </IconButton>
+                      </InputAdornment>
                     }
-                    label={<TermsDialog />}
                   />
                 )}
               />
-              {errors.terms && (
+              {errors.confirmPassword && (
                 <FormHelperText error>
-                  {errors?.terms ? (errors.terms?.message as string) : ''}
+                  {errors.confirmPassword.message}
                 </FormHelperText>
               )}
+            </FormControl>
 
-              {/* Google reCAPTCHA */}
-              <Box sx={{ mt: 3, pb: 3, textAlign: 'center' }}>
-                <ReCAPTCHAV2
-                  ref={recaptchaRef}
-                  sitekey={SITE_KEY}
-                  onChange={handleCaptchaChange}
-                />
-                {!captchaValid && (
-                  <FormHelperText error>
-                    Por favor, complete el captcha.
-                  </FormHelperText>
-                )}
-              </Box>
+            <LoadingButton
+              fullWidth
+              size="large"
+              type="submit"
+              variant="contained"
+              loading={isLoading}
+              sx={{ mb: 7 }}
+            >
+              Crear cuenta
+            </LoadingButton>
 
-              <LoadingButton
-                fullWidth
-                size="large"
-                type="submit"
-                variant="contained"
-                sx={{ mb: 7 }}
-                loading={isLoading}
-                disabled={!isFormFilled || !captchaValid}
-              >
-                Crear nueva cuenta
-              </LoadingButton>
-              <Typography
-                variant="body2"
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <LinkStyled href="/login">
-                  <Icon icon="mdi:chevron-left" />
-                  <span>Regresar al inicio de sesión</span>
-                </LinkStyled>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+              }}
+            >
+              <Typography variant="body2" sx={{ mr: 2 }}>
+                ¿Ya tienes una cuenta?
               </Typography>
-            </form>
-          </BoxWrapper>
-        </Box>
-      </RightWrapper>
+              <Typography variant="body2">
+                <LinkStyled href="/login">Inicia sesión</LinkStyled>
+              </Typography>
+            </Box>
+          </form>
+        </CardContent>
+      </Card>
     </Box>
   )
 }
 
-Register.getLayout = (page: ReactNode) => <BlankLayout>{page}</BlankLayout>
+RegisterSimple.getLayout = (page: ReactNode) => (
+  <BlankLayout>{page}</BlankLayout>
+)
 
-Register.guestGuard = true
+RegisterSimple.guestGuard = true
 
-export default Register
+export default RegisterSimple

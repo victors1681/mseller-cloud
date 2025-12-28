@@ -1,26 +1,23 @@
 // ** React Imports
-import { useState, ReactNode, MouseEvent } from 'react'
+import { ReactNode, useState } from 'react'
 
 // ** Next Imports
 import Link from 'next/link'
 
 // ** MUI Components
-import Alert from '@mui/material/Alert'
-import Button from '@mui/material/Button'
-import Divider from '@mui/material/Divider'
-import Checkbox from '@mui/material/Checkbox'
-import TextField from '@mui/material/TextField'
-import InputLabel from '@mui/material/InputLabel'
-import IconButton from '@mui/material/IconButton'
+import LoadingButton from '@mui/lab/LoadingButton'
 import Box, { BoxProps } from '@mui/material/Box'
+import Checkbox from '@mui/material/Checkbox'
 import FormControl from '@mui/material/FormControl'
-import useMediaQuery from '@mui/material/useMediaQuery'
+import FormHelperText from '@mui/material/FormHelperText'
+import IconButton from '@mui/material/IconButton'
+import InputAdornment from '@mui/material/InputAdornment'
+import InputLabel from '@mui/material/InputLabel'
 import OutlinedInput from '@mui/material/OutlinedInput'
 import { styled, useTheme } from '@mui/material/styles'
-import FormHelperText from '@mui/material/FormHelperText'
-import InputAdornment from '@mui/material/InputAdornment'
+import TextField from '@mui/material/TextField'
 import Typography, { TypographyProps } from '@mui/material/Typography'
-import LoadingButton from '@mui/lab/LoadingButton'
+import useMediaQuery from '@mui/material/useMediaQuery'
 
 import MuiFormControlLabel, {
   FormControlLabelProps,
@@ -30,14 +27,14 @@ import MuiFormControlLabel, {
 import Icon from 'src/@core/components/icon'
 
 // ** Third Party Imports
-import * as yup from 'yup'
-import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { Controller, useForm } from 'react-hook-form'
+import * as yup from 'yup'
 
 // ** Hooks
-import { useAuth } from 'src/hooks/useAuth'
 import useBgColor from 'src/@core/hooks/useBgColor'
 import { useSettings } from 'src/@core/hooks/useSettings'
+import { useAuth } from 'src/hooks/useAuth'
 
 // ** Configs
 import themeConfig from 'src/configs/themeConfig'
@@ -46,9 +43,8 @@ import themeConfig from 'src/configs/themeConfig'
 import BlankLayout from 'src/@core/layouts/BlankLayout'
 
 // ** Demo Imports
-import FooterIllustrationsV2 from 'src/views/pages/auth/FooterIllustrationsV2'
-import Image from 'next/image'
 import RandomBg from '@/views/ui/randombg/RandomBg'
+import Image from 'next/image'
 
 // ** Styled Components
 const LoginIllustrationWrapper = styled(Box)<BoxProps>(({ theme }) => ({
@@ -207,7 +203,7 @@ const LoginPage = () => {
             </Box>
             <Box sx={{ mb: 6 }}>
               <TypographyStyled variant="h5">
-                Bienvenido a {themeConfig.templateName}! 👋🏻
+                Bienvenido a {themeConfig.templateName}!
               </TypographyStyled>
               <Typography variant="body2">
                 Por favor, inicia sesión en tu cuenta.

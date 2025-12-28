@@ -6,6 +6,7 @@ import * as firebase from 'firebase/app'
 import {
   browserLocalPersistence,
   browserSessionPersistence,
+  connectAuthEmulator,
   getAuth,
   setPersistence,
   signInWithEmailAndPassword,
@@ -53,7 +54,7 @@ if (isEmulator) {
     console.log('🚀 Initializing Firebase Emulators...')
 
     // Initialize emulators before any Firebase operations
-    //connectAuthEmulator(auth, `http://${LOCAL_HOST}:9099`)
+    connectAuthEmulator(auth, `http://${LOCAL_HOST}:9099`)
     connectFunctionsEmulator(functions, LOCAL_HOST, 9999)
     connectFirestoreEmulator(db, LOCAL_HOST, 8081)
     // connectFirestoreEmulator(storage, LOCAL_HOST, 9199)
@@ -118,6 +119,23 @@ export const signInByEmail = async (
   }
 }
 
+export const signInByToken = async (): Promise<UserTypes | undefined> => {
+  try {
+    if (!auth.currentUser) {
+      throw new Error('No authenticated user')
+    }
+
+    // Refresh token to get updated claims
+    await auth.currentUser.getIdToken(true)
+
+    // Fetch updated user profile
+    return await getAllCurrentProfile()
+  } catch (error: any) {
+    console.error('Error refreshing user data:', error)
+    throw new Error(error.message)
+  }
+}
+
 export const handleSignOut = async () => {
   try {
     await signOut(auth)
@@ -145,6 +163,7 @@ export type SignUpRequest = {
   country: string // Country where the business is located
   reCaptchaToken: string
   terms: boolean
+  userId?: string // Firebase UID for social login (Google, Apple)
 }
 
 export const signUpFirebase = async (
@@ -361,6 +380,7 @@ export interface IUpdateUserAddress {
 
 export type IUpdateUserProfileProps = {
   userId: string
+  hasSeenWelcome?: boolean
 } & Partial<Pick<UserTypes, 'firstName' | 'lastName' | 'photoURL'>> & {
     business?: {
       name?: string
@@ -384,6 +404,42 @@ export const updateUserProfileFirebase = async (
       IUpdateUserProfileProps,
       IUpdateUserProfileResponse
     >(functions, 'updateUserProfile')
+    const response = await fn(data)
+    return response.data
+  } catch (err: any) {
+    return firebaseError(err)
+  }
+}
+
+export interface CompleteOnboardingRequest {
+  userId: string
+  onboardingData: {
+    businessName: string
+    phone: string
+    street: string
+    city: string
+    country: string
+    rnc?: string
+    businessType: string
+    industry: string
+    setupOption: 'new' | 'sample' | 'upload' | null
+  }
+  hasCompletedOnboarding: boolean
+}
+
+export interface CompleteOnboardingResponse {
+  success: boolean
+  message: string
+}
+
+export const completeOnboardingFirebase = async (
+  data: CompleteOnboardingRequest,
+): Promise<CompleteOnboardingResponse | { error: string } | undefined> => {
+  try {
+    const fn = httpsCallable<
+      CompleteOnboardingRequest,
+      CompleteOnboardingResponse
+    >(functions, 'completeOnboarding')
     const response = await fn(data)
     return response.data
   } catch (err: any) {

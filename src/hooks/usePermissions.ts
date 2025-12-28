@@ -1,6 +1,11 @@
 import { useContext } from 'react'
 import { AuthContext } from 'src/context/AuthContext'
 
+// ** Utils
+import authConfig from 'src/configs/auth'
+import { UserType } from 'src/types/apps/userTypes'
+import { isAdministratorFromToken } from 'src/utils/jwtUtils'
+
 export type CloudAccessPermissions = {
   collections: Record<string, any>
   masterdata: Record<string, any>
@@ -52,6 +57,12 @@ export type Permission =
   | 'transports.allowForceClose'
   | 'visits'
 
+/**
+ * Custom hook for managing user permissions
+ *
+ * Administrators automatically bypass all permission checks.
+ * The hook checks both JWT token and user context for administrator status.
+ */
 export const usePermissions = () => {
   const { user } = useContext(AuthContext)
 
@@ -91,6 +102,17 @@ export const usePermissions = () => {
   }
 
   const hasPermission = (permission: Permission): boolean => {
+    // Check if user is administrator - bypass all permissions
+    const token = window.localStorage.getItem(authConfig.storageTokenKeyName)
+    if (token && isAdministratorFromToken(token)) {
+      return true
+    }
+
+    // Check if user type from context is administrator
+    if (user && user.type === UserType.Administrator) {
+      return true
+    }
+
     // Support nested permissions with dot notation
     const keys = permission.split('.')
     let current: any = permissions

@@ -1,6 +1,22 @@
 // ** Types
 import { ThemeColor } from 'src/@core/layouts/types'
-export type Tiers = 'basic' | 'standard' | 'enterprise'
+
+// ** Tier Types
+export const validTiers = ['free', 'standard', 'enterprise'] as const
+export type Tiers = (typeof validTiers)[number]
+
+// ** User Type Enum
+export enum UserType {
+  Seller = 'seller',
+  Administrator = 'administrator',
+  Superuser = 'superuser',
+  Driver = 'driver',
+  Office = 'office',
+  Inventory = 'inventory',
+  Accounting = 'accounting',
+  Manager = 'manager',
+}
+
 export const AVAILABLE_AGENTS = [
   'Portal Agent',
   'Customer Service Agent',
@@ -29,15 +45,7 @@ export interface UserTypes {
   restoreIpad: boolean
   sellerCode: string
   testMode: boolean
-  type:
-    | 'seller'
-    | 'administrator'
-    | 'superuser'
-    | 'driver'
-    | 'office'
-    | 'inventory'
-    | 'accounting'
-    | 'manager'
+  type: UserType
   userLevel: string
   defaultClientByRoute: boolean
   updateBankList: boolean
@@ -45,6 +53,10 @@ export interface UserTypes {
   disabled: boolean
   fcmToken: string
   cloudAccess: ICloudModules
+  // ** Onboarding & Verification Fields
+  hasCompletedOnboarding?: boolean
+  hasSeenWelcome?: boolean
+  isEmailVerified?: boolean
 }
 
 export interface ICloudModules {

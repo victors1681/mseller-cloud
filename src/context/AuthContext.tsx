@@ -23,6 +23,7 @@ import {
   getAllCurrentProfile,
   handleSignOut,
   signInByEmail,
+  signInByToken,
   signUpFirebase,
   SignUpRequest,
   SignUpType,
@@ -44,6 +45,7 @@ const defaultProvider: AuthValuesType = {
   setUser: () => null,
   setLoading: () => Boolean,
   login: () => Promise.resolve(),
+  signInByToken: () => Promise.resolve(),
   logout: () => Promise.resolve(),
   loadingForm: false,
   signUp: () => Promise.resolve(undefined),
@@ -93,6 +95,24 @@ const AuthProvider = ({ children }: Props) => {
               updateAccessToken,
             )
 
+            // Check if user needs to complete onboarding
+            const needsOnboarding = !userData.hasCompletedOnboarding
+            const onOnboardingPage = router.pathname === '/onboarding'
+
+            // If user needs onboarding and not on onboarding page, redirect
+            if (needsOnboarding && !onOnboardingPage) {
+              await router.replace('/onboarding')
+              setLoading(false)
+              return
+            }
+
+            // If user completed onboarding but is on onboarding page, redirect to home
+            if (!needsOnboarding && onOnboardingPage) {
+              await router.replace('/')
+              setLoading(false)
+              return
+            }
+
             // Only redirect if on a guest page or if there's a returnUrl
             const guestPages = ['/login', '/register', '/forgot-password']
             const isOnGuestPage = guestPages.some((page) =>
@@ -103,7 +123,8 @@ const AuthProvider = ({ children }: Props) => {
             // Redirect only if:
             // 1. User is on a guest page (login/register/forgot-password), OR
             // 2. There's a returnUrl in the query params
-            if (isOnGuestPage || returnUrl) {
+            // AND user has completed onboarding
+            if ((isOnGuestPage || returnUrl) && !needsOnboarding) {
               const redirectURL =
                 returnUrl && returnUrl !== '/' ? returnUrl : '/'
               await router.replace(redirectURL)
@@ -222,6 +243,18 @@ const AuthProvider = ({ children }: Props) => {
     }
   }
 
+  const handleSignInByToken = async () => {
+    try {
+      const userData = await signInByToken()
+      if (userData) {
+        setUser(userData)
+      }
+    } catch (error) {
+      console.error('Error refreshing user data:', error)
+      throw error
+    }
+  }
+
   const handleLogout = async () => {
     setLoadingForm(true)
     try {
@@ -288,6 +321,7 @@ const AuthProvider = ({ children }: Props) => {
     setUser,
     setLoading,
     login: handleLogin,
+    signInByToken: handleSignInByToken,
     logout: handleLogout,
     loadingForm,
     accessControl: user?.cloudAccess,

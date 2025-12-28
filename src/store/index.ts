@@ -32,6 +32,7 @@ import apikeys from './apps/apikeys'
 import cxc from './apps/cxc'
 import dashboard from './apps/dashboard'
 import offers from './apps/offers'
+import onboarding from './apps/onboarding'
 import removeData from './apps/removeData'
 
 export const store = configureStore({
@@ -66,6 +67,7 @@ export const store = configureStore({
     itemReturns,
     cxc,
     dashboard,
+    onboarding,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
