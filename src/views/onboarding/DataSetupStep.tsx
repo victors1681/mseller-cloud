@@ -58,7 +58,7 @@ const DataSetupStep = ({ value, onChange }: Props) => {
     {
       value: 'new' as const,
       icon: 'mdi:rocket-launch-outline',
-      title: 'Configuración Nueva',
+      title: 'Configuración Básica',
       description: 'Comenzar con una configuración limpia y datos básicos',
       color: theme.palette.primary.main,
     },
