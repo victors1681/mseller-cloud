@@ -65,7 +65,7 @@ const DataSetupStep = ({ value, onChange }: Props) => {
     {
       value: 'advanced' as const,
       icon: 'mdi:api',
-      title: 'Configuración Nueva',
+      title: 'Configuración Avanzada',
       description: 'Comenzar en modo avanzado listo para integraciones',
       color: theme.palette.primary.main,
     },
