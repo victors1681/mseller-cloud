@@ -56,7 +56,24 @@ const DashboardTransportActivity = ({ data }: Props) => {
         }}
       />
       <CardContent sx={{ maxHeight: { xs: 500, sm: 400 }, overflow: 'auto' }}>
-        {data.map((driver, index) => (
+        {data.length === 0 ? (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              py: 6,
+              textAlign: 'center',
+            }}
+          >
+            <Icon icon="mdi:truck-delivery" fontSize={48} color={theme.palette.text.secondary} />
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+              No hay actividad de transporte
+            </Typography>
+          </Box>
+        ) : (
+          data.map((driver, index) => (
           <Box
             key={driver.driverId}
             sx={{
@@ -445,7 +462,7 @@ const DashboardTransportActivity = ({ data }: Props) => {
               </Box>
             )}
           </Box>
-        ))}
+        )))}
       </CardContent>
     </Card>
   )

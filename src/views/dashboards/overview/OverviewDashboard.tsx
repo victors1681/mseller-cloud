@@ -140,7 +140,7 @@ const OverviewDashboard = () => {
       dispatch(fetchRevenueData(combinedFilters)),
       dispatch(fetchTopProducts(combinedFilters)),
       dispatch(fetchTopSellers(combinedFilters)),
-      dispatch(fetchRecentActivity()),
+      dispatch(fetchRecentActivity(20)),
       dispatch(fetchOrdersByStatus(combinedFilters)),
       dispatch(fetchTransportActivity(combinedFilters)),
     ])
@@ -335,9 +335,7 @@ const OverviewDashboard = () => {
       {/* Charts Section */}
       <Grid container spacing={{ xs: 2, sm: 3 }} sx={{ mb: { xs: 2, sm: 3 } }}>
         <Grid item xs={12} lg={8}>
-          {revenueData.length > 0 && (
-            <DashboardRevenueChart data={revenueData} />
-          )}
+          <DashboardRevenueChart data={revenueData} />
         </Grid>
         <Grid item xs={12} lg={4}>
           {ordersByStatus && <DashboardOrdersDonut data={ordersByStatus} />}
@@ -347,26 +345,20 @@ const OverviewDashboard = () => {
       {/* Lists Section */}
       <Grid container spacing={{ xs: 2, sm: 3 }} sx={{ mb: { xs: 2, sm: 3 } }}>
         <Grid item xs={12} lg={6}>
-          {topProducts.length > 0 && (
-            <DashboardTopProducts data={topProducts} />
-          )}
+          <DashboardTopProducts data={topProducts} />
         </Grid>
         <Grid item xs={12} lg={6}>
-          {topSellers.length > 0 && <DashboardTopSellers data={topSellers} />}
+          <DashboardTopSellers data={topSellers} />
         </Grid>
       </Grid>
 
       {/* Activity Section */}
       <Grid container spacing={{ xs: 2, sm: 3 }}>
         <Grid item xs={12} lg={6}>
-          {recentActivity.length > 0 && (
-            <DashboardRecentActivity data={recentActivity} />
-          )}
+          <DashboardRecentActivity data={recentActivity} />
         </Grid>
         <Grid item xs={12} lg={6}>
-          {transportActivity.length > 0 && (
-            <DashboardTransportActivity data={transportActivity} />
-          )}
+          <DashboardTransportActivity data={transportActivity} />
         </Grid>
       </Grid>
     </Box>

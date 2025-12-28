@@ -1,6 +1,9 @@
 // ** React Imports
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 
+// ** API Client
+import restClient from 'src/configs/restClient'
+
 // ** Types
 import {
   DashboardFilters,
@@ -8,263 +11,46 @@ import {
   DashboardStats,
   OrdersByStatus,
   RecentActivity,
+  RecentActivityAPI,
   RevenueData,
+  RevenueDataAPI,
   TopProduct,
+  TopProductAPI,
   TopSeller,
+  TopSellerAPI,
   TransportActivity,
+  TransportActivityAPI,
 } from 'src/types/apps/dashboardTypes'
 
-// ** Mock Data
-const mockStats: DashboardStats = {
-  totalOrders: 1245,
-  ordersGrowth: 15.5,
-  totalRevenue: 125000.5,
-  revenueGrowth: 23.2,
-  totalCollections: 98000.25,
-  collectionsGrowth: 12.8,
-  pendingCollections: 27000.25,
-  activeDrivers: 24,
-  driversGrowth: 8.5,
-  activeSellers: 45,
-  sellersGrowth: 12.3,
-  totalProducts: 350,
-  lowStockProducts: 28,
-  activeTransports: 18,
-  completedToday: 156,
+// Helper function to map month abbreviation
+const getMonthAbbr = (date: string): string => {
+  const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+  const d = new Date(date)
+  return months[d.getMonth()]
 }
 
-const mockRevenueData: RevenueData[] = [
-  { month: 'Ene', revenue: 45000, collections: 38000 },
-  { month: 'Feb', revenue: 52000, collections: 45000 },
-  { month: 'Mar', revenue: 48000, collections: 42000 },
-  { month: 'Abr', revenue: 61000, collections: 55000 },
-  { month: 'May', revenue: 58000, collections: 52000 },
-  { month: 'Jun', revenue: 65000, collections: 58000 },
-  { month: 'Jul', revenue: 72000, collections: 65000 },
-  { month: 'Ago', revenue: 68000, collections: 61000 },
-  { month: 'Sep', revenue: 75000, collections: 68000 },
-  { month: 'Oct', revenue: 82000, collections: 75000 },
-  { month: 'Nov', revenue: 88000, collections: 80000 },
-  { month: 'Dic', revenue: 95000, collections: 85000 },
-]
-
-const mockTopProducts: TopProduct[] = [
-  {
-    id: 'prod-1',
-    name: 'Coca Cola 2.5L',
-    sales: 450,
-    revenue: 22500,
-    trend: 15.5,
-  },
-  { id: 'prod-2', name: 'Pepsi 2L', sales: 380, revenue: 19000, trend: 12.3 },
-  {
-    id: 'prod-3',
-    name: 'Agua Mineral 500ml',
-    sales: 520,
-    revenue: 10400,
-    trend: -5.2,
-  },
-  {
-    id: 'prod-4',
-    name: 'Cerveza Presidente 355ml',
-    sales: 290,
-    revenue: 17400,
-    trend: 8.7,
-  },
-  {
-    id: 'prod-5',
-    name: 'Galletas Saladas 200g',
-    sales: 310,
-    revenue: 9300,
-    trend: 18.9,
-  },
-]
-
-const mockTopSellers: TopSeller[] = [
-  {
-    id: 'seller-1',
-    name: 'Juan Pérez',
-    orders: 125,
-    revenue: 65000,
-    collections: 52000,
-  },
-  {
-    id: 'seller-2',
-    name: 'María García',
-    orders: 110,
-    revenue: 58000,
-    collections: 48000,
-  },
-  {
-    id: 'seller-3',
-    name: 'Carlos Rodríguez',
-    orders: 95,
-    revenue: 48000,
-    collections: 42000,
-  },
-  {
-    id: 'seller-4',
-    name: 'Ana Martínez',
-    orders: 88,
-    revenue: 45000,
-    collections: 38000,
-  },
-  {
-    id: 'seller-5',
-    name: 'Luis Sánchez',
-    orders: 82,
-    revenue: 42000,
-    collections: 36000,
-  },
-]
-
-const mockRecentActivity: RecentActivity[] = [
-  {
-    id: 'act-1',
-    type: 'order',
-    description:
-      'Nueva orden #1234 creada por Juan Pérez - Cliente: Colmado El Buen Precio',
-    timestamp: new Date(Date.now() - 10 * 60000).toISOString(),
-    status: 'success',
-  },
-  {
-    id: 'act-2',
-    type: 'collection',
-    description:
-      'Cobro de $5,000 registrado por María García - Cliente: Super 24',
-    timestamp: new Date(Date.now() - 25 * 60000).toISOString(),
-    status: 'success',
-  },
-  {
-    id: 'act-3',
-    type: 'transport',
-    description: 'Ruta iniciada por Carlos Rodríguez - 12 entregas pendientes',
-    timestamp: new Date(Date.now() - 45 * 60000).toISOString(),
-    status: 'info',
-  },
-  {
-    id: 'act-4',
-    type: 'product',
-    description:
-      'Alerta: Stock bajo de Coca Cola 2.5L - Solo quedan 15 unidades',
-    timestamp: new Date(Date.now() - 65 * 60000).toISOString(),
-    status: 'warning',
-  },
-  {
-    id: 'act-5',
-    type: 'order',
-    description:
-      'Orden #1233 completada y entregada - Cliente: Mini Market Central',
-    timestamp: new Date(Date.now() - 85 * 60000).toISOString(),
-    status: 'success',
-  },
-  {
-    id: 'act-6',
-    type: 'collection',
-    description: 'Cobro pendiente de $3,500 - Cliente: Colmado La Española',
-    timestamp: new Date(Date.now() - 120 * 60000).toISOString(),
-    status: 'warning',
-  },
-  {
-    id: 'act-7',
-    type: 'transport',
-    description: 'Entrega fallida - Cliente no disponible en dirección',
-    timestamp: new Date(Date.now() - 150 * 60000).toISOString(),
-    status: 'error',
-  },
-  {
-    id: 'act-8',
-    type: 'order',
-    description: 'Nueva orden #1232 procesada - 25 productos en total',
-    timestamp: new Date(Date.now() - 180 * 60000).toISOString(),
-    status: 'success',
-  },
-]
-
-const mockOrdersByStatus: OrdersByStatus = {
-  pending: 45,
-  processing: 78,
-  completed: 1020,
-  cancelled: 12,
+// Helper to determine activity status from type
+const getActivityStatus = (type: string): 'success' | 'warning' | 'error' | 'info' => {
+  const typeMap: Record<string, 'success' | 'warning' | 'error' | 'info'> = {
+    order: 'success',
+    payment: 'success',
+    collection: 'success',
+    delivery: 'info',
+    transport: 'info',
+    product: 'warning',
+    error: 'error',
+  }
+  return typeMap[type.toLowerCase()] || 'info'
 }
 
-const mockTransportActivity: TransportActivity[] = [
-  {
-    driverId: 'driver-1',
-    driverName: 'Carlos Rodríguez',
-    activeRoutes: 3,
-    completedToday: 12,
-    pendingDeliveries: 8,
-    status: 'active',
-    deliveryStats: {
-      delivered: 28,
-      notDelivered: 3,
-      deliveredAnotherDay: 5,
-      partialDelivery: 2,
-      returned: 1,
-    },
-  },
-  {
-    driverId: 'driver-2',
-    driverName: 'Pedro Gómez',
-    activeRoutes: 2,
-    completedToday: 15,
-    pendingDeliveries: 5,
-    status: 'active',
-    deliveryStats: {
-      delivered: 32,
-      notDelivered: 2,
-      deliveredAnotherDay: 4,
-      partialDelivery: 1,
-      returned: 0,
-    },
-  },
-  {
-    driverId: 'driver-3',
-    driverName: 'José Ramírez',
-    activeRoutes: 0,
-    completedToday: 18,
-    pendingDeliveries: 0,
-    status: 'idle',
-    deliveryStats: {
-      delivered: 35,
-      notDelivered: 1,
-      deliveredAnotherDay: 3,
-      partialDelivery: 0,
-      returned: 0,
-    },
-  },
-  {
-    driverId: 'driver-4',
-    driverName: 'Miguel Torres',
-    activeRoutes: 4,
-    completedToday: 10,
-    pendingDeliveries: 12,
-    status: 'active',
-    deliveryStats: {
-      delivered: 25,
-      notDelivered: 4,
-      deliveredAnotherDay: 6,
-      partialDelivery: 3,
-      returned: 2,
-    },
-  },
-  {
-    driverId: 'driver-5',
-    driverName: 'Rafael López',
-    activeRoutes: 0,
-    completedToday: 0,
-    pendingDeliveries: 0,
-    status: 'offline',
-    deliveryStats: {
-      delivered: 15,
-      notDelivered: 2,
-      deliveredAnotherDay: 1,
-      partialDelivery: 0,
-      returned: 1,
-    },
-  },
-]
+// Helper to normalize activity type
+const normalizeActivityType = (type: string): 'order' | 'collection' | 'transport' | 'product' => {
+  const normalized = type.toLowerCase()
+  if (normalized.includes('order')) return 'order'
+  if (normalized.includes('payment') || normalized.includes('collection')) return 'collection'
+  if (normalized.includes('delivery') || normalized.includes('transport')) return 'transport'
+  return 'product'
+}
 
 const initialState: DashboardState = {
   stats: null,
@@ -278,14 +64,15 @@ const initialState: DashboardState = {
   error: null,
 }
 
-// Async thunks with mock data
+// Async thunks with real API calls
 export const fetchDashboardStats = createAsyncThunk(
   'dashboard/fetchStats',
   async (filters: DashboardFilters, { rejectWithValue }) => {
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 800))
-      return mockStats
+      const response = await restClient.get<DashboardStats>('/api/portal/Dashboard/stats', {
+        params: filters,
+      })
+      return response.data
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || 'Error fetching dashboard stats',
@@ -298,8 +85,16 @@ export const fetchRevenueData = createAsyncThunk(
   'dashboard/fetchRevenue',
   async (filters: DashboardFilters, { rejectWithValue }) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 600))
-      return mockRevenueData
+      const response = await restClient.get<RevenueDataAPI[]>('/api/portal/Dashboard/revenue', {
+        params: filters,
+      })
+      // Transform API response to frontend format
+      const transformedData: RevenueData[] = response.data.map((item) => ({
+        month: getMonthAbbr(item.date),
+        revenue: item.revenue,
+        collections: item.collections,
+      }))
+      return transformedData
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || 'Error fetching revenue data',
@@ -310,10 +105,20 @@ export const fetchRevenueData = createAsyncThunk(
 
 export const fetchTopProducts = createAsyncThunk(
   'dashboard/fetchTopProducts',
-  async (filters: DashboardFilters, { rejectWithValue }) => {
+  async (filters: DashboardFilters & { limit?: number }, { rejectWithValue }) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      return mockTopProducts
+      const response = await restClient.get<TopProductAPI[]>('/api/portal/Dashboard/top-products', {
+        params: { ...filters, limit: filters.limit || 5 },
+      })
+      // Transform API response to frontend format
+      const transformedData: TopProduct[] = response.data.map((item) => ({
+        id: item.productId,
+        name: item.productName,
+        sales: item.quantity,
+        revenue: item.revenue,
+        trend: 0, // API doesn't provide trend yet, default to 0
+      }))
+      return transformedData
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || 'Error fetching top products',
@@ -324,10 +129,21 @@ export const fetchTopProducts = createAsyncThunk(
 
 export const fetchTopSellers = createAsyncThunk(
   'dashboard/fetchTopSellers',
-  async (filters: DashboardFilters, { rejectWithValue }) => {
+  async (filters: DashboardFilters & { limit?: number }, { rejectWithValue }) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      return mockTopSellers
+      const response = await restClient.get<TopSellerAPI[]>('/api/portal/Dashboard/top-sellers', {
+        params: { ...filters, limit: filters.limit || 5 },
+      })
+      // Transform API response to frontend format
+      const transformedData: TopSeller[] = response.data.map((item) => ({
+        id: item.sellerId,
+        name: item.sellerName,
+        orders: item.orders,
+        revenue: item.revenue,
+        collections: 0, // API doesn't provide collections yet, default to 0
+        avatar: undefined,
+      }))
+      return transformedData
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || 'Error fetching top sellers',
@@ -338,10 +154,20 @@ export const fetchTopSellers = createAsyncThunk(
 
 export const fetchRecentActivity = createAsyncThunk(
   'dashboard/fetchActivity',
-  async (_, { rejectWithValue }) => {
+  async (limit: number = 20, { rejectWithValue }) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 400))
-      return mockRecentActivity
+      const response = await restClient.get<RecentActivityAPI[]>('/api/portal/Dashboard/recent-activity', {
+        params: { limit },
+      })
+      // Transform API response to frontend format
+      const transformedData: RecentActivity[] = response.data.map((item, index) => ({
+        id: `activity-${index}`,
+        type: normalizeActivityType(item.type),
+        description: item.description,
+        timestamp: item.timestamp,
+        status: getActivityStatus(item.type),
+      }))
+      return transformedData
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || 'Error fetching recent activity',
@@ -354,8 +180,10 @@ export const fetchOrdersByStatus = createAsyncThunk(
   'dashboard/fetchOrdersStatus',
   async (filters: DashboardFilters, { rejectWithValue }) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      return mockOrdersByStatus
+      const response = await restClient.get<OrdersByStatus>('/api/portal/Dashboard/orders-status', {
+        params: filters,
+      })
+      return response.data
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || 'Error fetching orders status',
@@ -368,8 +196,26 @@ export const fetchTransportActivity = createAsyncThunk(
   'dashboard/fetchTransport',
   async (filters: DashboardFilters, { rejectWithValue }) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      return mockTransportActivity
+      const response = await restClient.get<TransportActivityAPI[]>('/api/portal/Dashboard/transport-activity', {
+        params: filters,
+      })
+      // Transform API response to frontend format with placeholder values for missing fields
+      const transformedData: TransportActivity[] = response.data.map((item) => ({
+        driverId: item.driverId,
+        driverName: item.driverName,
+        activeRoutes: item.status === 'active' ? 1 : 0,
+        completedToday: item.deliveries,
+        pendingDeliveries: 0, // API doesn't provide this yet
+        status: (item.status as 'active' | 'idle' | 'offline') || 'idle',
+        deliveryStats: {
+          delivered: item.deliveries,
+          notDelivered: 0,
+          deliveredAnotherDay: 0,
+          partialDelivery: 0,
+          returned: 0,
+        },
+      }))
+      return transformedData
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || 'Error fetching transport activity',

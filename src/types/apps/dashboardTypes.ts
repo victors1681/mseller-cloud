@@ -20,10 +20,25 @@ export interface DashboardStats {
   completedToday: number
 }
 
+// API Response Types
+export interface RevenueDataAPI {
+  date: string
+  revenue: number
+  collections: number
+}
+
+// Frontend Display Type (with month abbreviation)
 export interface RevenueData {
   month: string
   revenue: number
   collections: number
+}
+
+export interface TopProductAPI {
+  productId: string
+  productName: string
+  quantity: number
+  revenue: number
 }
 
 export interface TopProduct {
@@ -34,6 +49,13 @@ export interface TopProduct {
   trend: number
 }
 
+export interface TopSellerAPI {
+  sellerId: string
+  sellerName: string
+  orders: number
+  revenue: number
+}
+
 export interface TopSeller {
   id: string
   name: string
@@ -41,6 +63,13 @@ export interface TopSeller {
   revenue: number
   collections: number
   avatar?: string
+}
+
+export interface RecentActivityAPI {
+  timestamp: string
+  type: string
+  description: string
+  user: string
 }
 
 export interface RecentActivity {
@@ -56,6 +85,13 @@ export interface OrdersByStatus {
   processing: number
   completed: number
   cancelled: number
+}
+
+export interface TransportActivityAPI {
+  driverId: string
+  driverName: string
+  deliveries: number
+  status: string
 }
 
 export interface TransportActivity {

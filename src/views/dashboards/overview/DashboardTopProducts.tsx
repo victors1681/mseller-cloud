@@ -34,7 +34,24 @@ const DashboardTopProducts = ({ data }: Props) => {
         }}
       />
       <CardContent>
-        {data.map((product, index) => (
+        {data.length === 0 ? (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              py: 6,
+              textAlign: 'center',
+            }}
+          >
+            <Icon icon="mdi:package-variant-closed" fontSize={48} color={theme.palette.text.secondary} />
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+              No hay productos para mostrar
+            </Typography>
+          </Box>
+        ) : (
+          data.map((product, index) => (
           <Box
             key={product.id}
             sx={{
@@ -171,7 +188,8 @@ const DashboardTopProducts = ({ data }: Props) => {
               }}
             />
           </Box>
-        ))}
+        ))
+        )}
       </CardContent>
     </Card>
   )

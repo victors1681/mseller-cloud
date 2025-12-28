@@ -83,7 +83,24 @@ const DashboardTopSellers = ({ data }: Props) => {
         }}
       />
       <CardContent>
-        {data.map((seller, index) => (
+        {data.length === 0 ? (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              py: 6,
+              textAlign: 'center',
+            }}
+          >
+            <Icon icon="mdi:account-group" fontSize={48} color={theme.palette.text.secondary} />
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+              No hay vendedores para mostrar
+            </Typography>
+          </Box>
+        ) : (
+          data.map((seller, index) => (
           <Box
             key={seller.id}
             sx={{
@@ -264,7 +281,8 @@ const DashboardTopSellers = ({ data }: Props) => {
               </Box>
             </Box>
           </Box>
-        ))}
+          ))
+        )}
       </CardContent>
     </Card>
   )

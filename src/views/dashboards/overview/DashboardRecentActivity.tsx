@@ -83,7 +83,24 @@ const DashboardRecentActivity = ({ data }: Props) => {
         }}
       />
       <CardContent sx={{ maxHeight: { xs: 500, sm: 400 }, overflow: 'auto' }}>
-        {data.map((activity, index) => (
+        {data.length === 0 ? (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              py: 6,
+              textAlign: 'center',
+            }}
+          >
+            <Icon icon="mdi:timeline-clock" fontSize={48} color={theme.palette.text.secondary} />
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+              No hay actividad reciente
+            </Typography>
+          </Box>
+        ) : (
+          data.map((activity, index) => (
           <Box
             key={activity.id}
             sx={{
@@ -160,7 +177,7 @@ const DashboardRecentActivity = ({ data }: Props) => {
               </Box>
             </Box>
           </Box>
-        ))}
+        )))}
       </CardContent>
     </Card>
   )
