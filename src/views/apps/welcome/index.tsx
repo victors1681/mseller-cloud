@@ -25,7 +25,7 @@ const FirstSessionDialog = () => {
 
   // Check if user has seen welcome dialog
   useEffect(() => {
-    if (auth.user && !auth.user.hasSeenWelcome) {
+    if (auth.user && !auth.user.business?.hasSeenWelcome) {
       setOpen(true)
     }
   }, [auth.user])

@@ -53,9 +53,7 @@ export interface UserTypes {
   disabled: boolean
   fcmToken: string
   cloudAccess: ICloudModules
-  // ** Onboarding & Verification Fields
-  hasCompletedOnboarding?: boolean
-  hasSeenWelcome?: boolean
+  // ** Verification Fields
   isEmailVerified?: boolean
 }
 
@@ -139,6 +137,9 @@ export interface IBusiness {
   subscriptionId?: string
   subscriptionStatus?: string
   tier?: Tiers
+  // ** Onboarding
+  hasCompletedOnboarding?: boolean
+  hasSeenWelcome?: boolean
 }
 interface IAIAgent {
   enabled: boolean

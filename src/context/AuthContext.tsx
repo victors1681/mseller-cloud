@@ -96,7 +96,7 @@ const AuthProvider = ({ children }: Props) => {
             )
 
             // Check if user needs to complete onboarding
-            const needsOnboarding = !userData.hasCompletedOnboarding
+            const needsOnboarding = !userData.business?.hasCompletedOnboarding
             const onOnboardingPage = router.pathname === '/onboarding'
 
             // If user needs onboarding and not on onboarding page, redirect

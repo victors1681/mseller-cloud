@@ -28,7 +28,7 @@ const OnboardingGuard = (props: OnboardingGuardProps) => {
     }
 
     // Check if user has completed onboarding
-    if (auth.user && !auth.user.hasCompletedOnboarding) {
+    if (auth.user && !auth.user.business?.hasCompletedOnboarding) {
       // If user is already on onboarding page, don't redirect
       if (router.pathname === '/onboarding') {
         return
@@ -37,7 +37,7 @@ const OnboardingGuard = (props: OnboardingGuardProps) => {
       // If user hasn't completed onboarding and is trying to access protected pages
       // Redirect to onboarding
       router.replace('/onboarding')
-    } else if (auth.user && auth.user.hasCompletedOnboarding) {
+    } else if (auth.user && auth.user.business?.hasCompletedOnboarding) {
       // If user has completed onboarding but is on onboarding page
       // Redirect to home
       if (router.pathname === '/onboarding') {
@@ -54,7 +54,7 @@ const OnboardingGuard = (props: OnboardingGuardProps) => {
   // If user hasn't completed onboarding and not on onboarding page, show fallback
   if (
     auth.user &&
-    !auth.user.hasCompletedOnboarding &&
+    !auth.user.business?.hasCompletedOnboarding &&
     router.pathname !== '/onboarding'
   ) {
     return fallback
