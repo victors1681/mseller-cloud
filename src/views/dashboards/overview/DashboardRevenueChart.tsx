@@ -22,6 +22,9 @@ interface Props {
 const DashboardRevenueChart = ({ data }: Props) => {
   const theme = useTheme()
 
+  // Ensure data is an array and has valid values
+  const validData = Array.isArray(data) ? data : []
+
   const options: ApexOptions = {
     chart: {
       parentHeightOffset: 0,
@@ -53,7 +56,7 @@ const DashboardRevenueChart = ({ data }: Props) => {
       },
     },
     xaxis: {
-      categories: data.map((d) => d.month),
+      categories: validData.map((d) => d.month || 'N/A'),
       labels: {
         style: {
           fontSize: '14px',
@@ -104,11 +107,11 @@ const DashboardRevenueChart = ({ data }: Props) => {
   const series = [
     {
       name: 'Pedidos',
-      data: data.map((d) => d.revenue),
+      data: validData.map((d) => d.revenue || 0),
     },
     {
       name: 'Cobros',
-      data: data.map((d) => d.collections),
+      data: validData.map((d) => d.collections || 0),
     },
   ]
 

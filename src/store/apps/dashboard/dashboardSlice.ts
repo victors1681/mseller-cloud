@@ -38,7 +38,12 @@ const getMonthAbbr = (date: string): string => {
     'Nov',
     'Dic',
   ]
+
+  if (!date) return 'N/A'
+
   const d = new Date(date)
+  if (isNaN(d.getTime())) return 'N/A'
+
   return months[d.getMonth()]
 }
 
@@ -115,7 +120,7 @@ export const fetchRevenueData = createAsyncThunk(
       )
       // Transform API response to frontend format
       const transformedData: RevenueData[] = response.data.map((item) => ({
-        month: getMonthAbbr(item.date),
+        month: item.date,
         revenue: item.revenue,
         collections: item.collections,
       }))

@@ -20,6 +20,14 @@ interface Props {
 const DashboardOrdersDonut = ({ data }: Props) => {
   const theme = useTheme()
 
+  // Ensure data exists with default values
+  const validData = data || {
+    pending: 0,
+    processing: 0,
+    completed: 0,
+    cancelled: 0,
+  }
+
   const options: ApexOptions = {
     chart: {
       fontFamily: theme.typography.fontFamily,
@@ -75,10 +83,10 @@ const DashboardOrdersDonut = ({ data }: Props) => {
               color: theme.palette.text.secondary,
               formatter: () => {
                 const total =
-                  data.pending +
-                  data.processing +
-                  data.completed +
-                  data.cancelled
+                  (validData.pending || 0) +
+                  (validData.processing || 0) +
+                  (validData.completed || 0) +
+                  (validData.cancelled || 0)
                 return total.toString()
               },
             },
@@ -104,7 +112,12 @@ const DashboardOrdersDonut = ({ data }: Props) => {
     ],
   }
 
-  const series = [data.pending, data.processing, data.completed, data.cancelled]
+  const series = [
+    validData.pending || 0,
+    validData.processing || 0,
+    validData.completed || 0,
+    validData.cancelled || 0,
+  ]
 
   return (
     <Card sx={{ height: '100%' }}>
