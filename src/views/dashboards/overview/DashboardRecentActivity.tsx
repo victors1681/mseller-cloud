@@ -94,90 +94,95 @@ const DashboardRecentActivity = ({ data }: Props) => {
               textAlign: 'center',
             }}
           >
-            <Icon icon="mdi:timeline-clock" fontSize={48} color={theme.palette.text.secondary} />
+            <Icon
+              icon="mdi:timeline-clock"
+              fontSize={48}
+              color={theme.palette.text.secondary}
+            />
             <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
               No hay actividad reciente
             </Typography>
           </Box>
         ) : (
           data.map((activity, index) => (
-          <Box
-            key={activity.id}
-            sx={{
-              display: 'flex',
-              mb: index !== data.length - 1 ? 3 : 0,
-              pb: index !== data.length - 1 ? 3 : 0,
-              borderBottom:
-                index !== data.length - 1
-                  ? `1px solid ${theme.palette.divider}`
-                  : 'none',
-            }}
-          >
             <Box
+              key={activity.id}
               sx={{
-                width: { xs: 36, sm: 40 },
-                height: { xs: 36, sm: 40 },
-                minWidth: { xs: 36, sm: 40 },
                 display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 1,
-                backgroundColor: `${getActivityColor(activity.status)}15`,
-                mr: { xs: 2, sm: 3 },
+                mb: index !== data.length - 1 ? 3 : 0,
+                pb: index !== data.length - 1 ? 3 : 0,
+                borderBottom:
+                  index !== data.length - 1
+                    ? `1px solid ${theme.palette.divider}`
+                    : 'none',
               }}
             >
-              <Icon
-                icon={getActivityIcon(activity.type)}
-                fontSize={22}
-                style={{ color: getActivityColor(activity.status) }}
-              />
-            </Box>
-            <Box sx={{ flex: 1, minWidth: 0 }}>
-              <Typography
-                variant="body2"
-                sx={{
-                  mb: 1,
-                  fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical',
-                }}
-              >
-                {activity.description}
-              </Typography>
               <Box
                 sx={{
+                  width: { xs: 36, sm: 40 },
+                  height: { xs: 36, sm: 40 },
+                  minWidth: { xs: 36, sm: 40 },
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 1,
-                  flexWrap: 'wrap',
+                  justifyContent: 'center',
+                  borderRadius: 1,
+                  backgroundColor: `${getActivityColor(activity.status)}15`,
+                  mr: { xs: 2, sm: 3 },
                 }}
               >
-                <Chip
-                  size="small"
-                  label={getStatusLabel(activity.status)}
-                  sx={{
-                    height: { xs: 18, sm: 20 },
-                    fontSize: { xs: '0.7rem', sm: '0.75rem' },
-                    backgroundColor: `${getActivityColor(activity.status)}15`,
-                    color: getActivityColor(activity.status),
-                  }}
+                <Icon
+                  icon={getActivityIcon(activity.type)}
+                  fontSize={22}
+                  style={{ color: getActivityColor(activity.status) }}
                 />
+              </Box>
+              <Box sx={{ flex: 1, minWidth: 0 }}>
                 <Typography
-                  variant="caption"
+                  variant="body2"
                   sx={{
-                    color: 'text.secondary',
-                    fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                    mb: 1,
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
                   }}
                 >
-                  {formatTime(activity.timestamp)}
+                  {activity.description}
                 </Typography>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <Chip
+                    size="small"
+                    label={getStatusLabel(activity.status)}
+                    sx={{
+                      height: { xs: 18, sm: 20 },
+                      fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                      backgroundColor: `${getActivityColor(activity.status)}15`,
+                      color: getActivityColor(activity.status),
+                    }}
+                  />
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: 'text.secondary',
+                      fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                    }}
+                  >
+                    {formatTime(activity.timestamp)}
+                  </Typography>
+                </Box>
               </Box>
             </Box>
-          </Box>
-        )))}
+          ))
+        )}
       </CardContent>
     </Card>
   )

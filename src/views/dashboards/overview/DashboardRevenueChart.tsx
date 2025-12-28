@@ -103,7 +103,7 @@ const DashboardRevenueChart = ({ data }: Props) => {
 
   const series = [
     {
-      name: 'Ingresos',
+      name: 'Pedidos',
       data: data.map((d) => d.revenue),
     },
     {
@@ -115,7 +115,7 @@ const DashboardRevenueChart = ({ data }: Props) => {
   return (
     <Card sx={{ height: '100%' }}>
       <CardHeader
-        title="Ingresos vs Cobros"
+        title="Pedidos vs Cobros"
         subheader="Tendencia mensual"
         sx={{
           '& .MuiCardHeader-title': {

@@ -12,6 +12,7 @@ import Icon from 'src/@core/components/icon'
 
 // ** Types
 import { TopProduct } from 'src/types/apps/dashboardTypes'
+import formattedNumber from '../../../utils/formattedNumber'
 
 interface Props {
   data: TopProduct[]
@@ -45,150 +46,155 @@ const DashboardTopProducts = ({ data }: Props) => {
               textAlign: 'center',
             }}
           >
-            <Icon icon="mdi:package-variant-closed" fontSize={48} color={theme.palette.text.secondary} />
+            <Icon
+              icon="mdi:package-variant-closed"
+              fontSize={48}
+              color={theme.palette.text.secondary}
+            />
             <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
               No hay productos para mostrar
             </Typography>
           </Box>
         ) : (
           data.map((product, index) => (
-          <Box
-            key={product.id}
-            sx={{
-              mb: index !== data.length - 1 ? 4 : 0,
-              pb: index !== data.length - 1 ? 4 : 0,
-              borderBottom:
-                index !== data.length - 1
-                  ? `1px solid ${theme.palette.divider}`
-                  : 'none',
-            }}
-          >
             <Box
+              key={product.id}
               sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                mb: 2,
+                mb: index !== data.length - 1 ? 4 : 0,
+                pb: index !== data.length - 1 ? 4 : 0,
+                borderBottom:
+                  index !== data.length - 1
+                    ? `1px solid ${theme.palette.divider}`
+                    : 'none',
               }}
             >
               <Box
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
-                  flex: 1,
-                  minWidth: 0,
+                  justifyContent: 'space-between',
+                  mb: 2,
                 }}
               >
                 <Box
                   sx={{
-                    width: { xs: 36, sm: 40 },
-                    height: { xs: 36, sm: 40 },
-                    minWidth: { xs: 36, sm: 40 },
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: 1,
-                    backgroundColor: theme.palette.primary.main,
-                    color: 'common.white',
-                    mr: { xs: 2, sm: 3 },
-                    fontSize: { xs: '1rem', sm: '1.125rem' },
-                    fontWeight: 600,
+                    flex: 1,
+                    minWidth: 0,
                   }}
                 >
-                  {index + 1}
+                  <Box
+                    sx={{
+                      width: { xs: 36, sm: 40 },
+                      height: { xs: 36, sm: 40 },
+                      minWidth: { xs: 36, sm: 40 },
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: 1,
+                      backgroundColor: theme.palette.primary.main,
+                      color: 'common.white',
+                      mr: { xs: 2, sm: 3 },
+                      fontSize: { xs: '1rem', sm: '1.125rem' },
+                      fontWeight: 600,
+                    }}
+                  >
+                    {index + 1}
+                  </Box>
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        fontWeight: 600,
+                        mb: 0.5,
+                        fontSize: { xs: '0.875rem', sm: '1rem' },
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {product.name}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: 'text.secondary',
+                        fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                      }}
+                    >
+                      {formattedNumber(product.sales)}
+                    </Typography>
+                  </Box>
                 </Box>
-                <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Box
+                  sx={{
+                    textAlign: 'right',
+                    minWidth: { xs: 80, sm: 100 },
+                    ml: 2,
+                  }}
+                >
                   <Typography
-                    variant="body1"
+                    variant="h6"
                     sx={{
                       fontWeight: 600,
                       mb: 0.5,
-                      fontSize: { xs: '0.875rem', sm: '1rem' },
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
+                      fontSize: { xs: '1rem', sm: '1.25rem' },
                     }}
                   >
-                    {product.name}
+                    ${product.revenue.toLocaleString()}
                   </Typography>
-                  <Typography
-                    variant="body2"
+                  <Box
                     sx={{
-                      color: 'text.secondary',
-                      fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'flex-end',
                     }}
                   >
-                    {product.sales} unidades
-                  </Typography>
-                </Box>
-              </Box>
-              <Box
-                sx={{
-                  textAlign: 'right',
-                  minWidth: { xs: 80, sm: 100 },
-                  ml: 2,
-                }}
-              >
-                <Typography
-                  variant="h6"
-                  sx={{
-                    fontWeight: 600,
-                    mb: 0.5,
-                    fontSize: { xs: '1rem', sm: '1.25rem' },
-                  }}
-                >
-                  ${product.revenue.toLocaleString()}
-                </Typography>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'flex-end',
-                  }}
-                >
-                  <Icon
-                    icon={
-                      product.trend >= 0
-                        ? 'mdi:trending-up'
-                        : 'mdi:trending-down'
-                    }
-                    fontSize={18}
-                    style={{
-                      color:
+                    <Icon
+                      icon={
                         product.trend >= 0
-                          ? theme.palette.success.main
-                          : theme.palette.error.main,
-                    }}
-                  />
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      ml: 0.5,
-                      color: product.trend >= 0 ? 'success.main' : 'error.main',
-                      fontWeight: 600,
-                      fontSize: { xs: '0.7rem', sm: '0.75rem' },
-                    }}
-                  >
-                    {Math.abs(product.trend)}%
-                  </Typography>
+                          ? 'mdi:trending-up'
+                          : 'mdi:trending-down'
+                      }
+                      fontSize={18}
+                      style={{
+                        color:
+                          product.trend >= 0
+                            ? theme.palette.success.main
+                            : theme.palette.error.main,
+                      }}
+                    />
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        ml: 0.5,
+                        color:
+                          product.trend >= 0 ? 'success.main' : 'error.main',
+                        fontWeight: 600,
+                        fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                      }}
+                    >
+                      {Math.abs(product.trend)}%
+                    </Typography>
+                  </Box>
                 </Box>
               </Box>
-            </Box>
-            <LinearProgress
-              variant="determinate"
-              value={(product.sales / maxSales) * 100}
-              sx={{
-                height: 6,
-                borderRadius: 3,
-                backgroundColor: theme.palette.action.hover,
-                '& .MuiLinearProgress-bar': {
+              <LinearProgress
+                variant="determinate"
+                value={(product.sales / maxSales) * 100}
+                sx={{
+                  height: 6,
                   borderRadius: 3,
-                  backgroundColor: theme.palette.primary.main,
-                },
-              }}
-            />
-          </Box>
-        ))
+                  backgroundColor: theme.palette.action.hover,
+                  '& .MuiLinearProgress-bar': {
+                    borderRadius: 3,
+                    backgroundColor: theme.palette.primary.main,
+                  },
+                }}
+              />
+            </Box>
+          ))
         )}
       </CardContent>
     </Card>

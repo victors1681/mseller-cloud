@@ -35,10 +35,11 @@ export interface RevenueData {
 }
 
 export interface TopProductAPI {
-  productId: string
-  productName: string
-  quantity: number
+  id: string
+  name: string
+  sales: number
   revenue: number
+  trend: number
 }
 
 export interface TopProduct {
@@ -50,10 +51,11 @@ export interface TopProduct {
 }
 
 export interface TopSellerAPI {
-  sellerId: string
-  sellerName: string
+  id: string
+  name: string
   orders: number
   revenue: number
+  collections: number
 }
 
 export interface TopSeller {
@@ -92,8 +94,17 @@ export interface TransportActivityAPI {
   driverName: string
   deliveries: number
   status: string
+  pendingDeliveries: number
+  deliveryStats: TransportDeliveryStatsAPI
 }
 
+export interface TransportDeliveryStatsAPI {
+  delivered: number
+  notDelivered: number
+  deliveredAnotherDay: number
+  partialDelivery: number
+  returned: number
+}
 export interface TransportActivity {
   driverId: string
   driverName: string

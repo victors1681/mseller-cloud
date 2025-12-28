@@ -24,13 +24,28 @@ import {
 
 // Helper function to map month abbreviation
 const getMonthAbbr = (date: string): string => {
-  const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+  const months = [
+    'Ene',
+    'Feb',
+    'Mar',
+    'Abr',
+    'May',
+    'Jun',
+    'Jul',
+    'Ago',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dic',
+  ]
   const d = new Date(date)
   return months[d.getMonth()]
 }
 
 // Helper to determine activity status from type
-const getActivityStatus = (type: string): 'success' | 'warning' | 'error' | 'info' => {
+const getActivityStatus = (
+  type: string,
+): 'success' | 'warning' | 'error' | 'info' => {
   const typeMap: Record<string, 'success' | 'warning' | 'error' | 'info'> = {
     order: 'success',
     payment: 'success',
@@ -44,11 +59,15 @@ const getActivityStatus = (type: string): 'success' | 'warning' | 'error' | 'inf
 }
 
 // Helper to normalize activity type
-const normalizeActivityType = (type: string): 'order' | 'collection' | 'transport' | 'product' => {
+const normalizeActivityType = (
+  type: string,
+): 'order' | 'collection' | 'transport' | 'product' => {
   const normalized = type.toLowerCase()
   if (normalized.includes('order')) return 'order'
-  if (normalized.includes('payment') || normalized.includes('collection')) return 'collection'
-  if (normalized.includes('delivery') || normalized.includes('transport')) return 'transport'
+  if (normalized.includes('payment') || normalized.includes('collection'))
+    return 'collection'
+  if (normalized.includes('delivery') || normalized.includes('transport'))
+    return 'transport'
   return 'product'
 }
 
@@ -69,9 +88,12 @@ export const fetchDashboardStats = createAsyncThunk(
   'dashboard/fetchStats',
   async (filters: DashboardFilters, { rejectWithValue }) => {
     try {
-      const response = await restClient.get<DashboardStats>('/api/portal/Dashboard/stats', {
-        params: filters,
-      })
+      const response = await restClient.get<DashboardStats>(
+        '/api/portal/Dashboard/stats',
+        {
+          params: filters,
+        },
+      )
       return response.data
     } catch (error: any) {
       return rejectWithValue(
@@ -85,9 +107,12 @@ export const fetchRevenueData = createAsyncThunk(
   'dashboard/fetchRevenue',
   async (filters: DashboardFilters, { rejectWithValue }) => {
     try {
-      const response = await restClient.get<RevenueDataAPI[]>('/api/portal/Dashboard/revenue', {
-        params: filters,
-      })
+      const response = await restClient.get<RevenueDataAPI[]>(
+        '/api/portal/Dashboard/revenue',
+        {
+          params: filters,
+        },
+      )
       // Transform API response to frontend format
       const transformedData: RevenueData[] = response.data.map((item) => ({
         month: getMonthAbbr(item.date),
@@ -105,16 +130,22 @@ export const fetchRevenueData = createAsyncThunk(
 
 export const fetchTopProducts = createAsyncThunk(
   'dashboard/fetchTopProducts',
-  async (filters: DashboardFilters & { limit?: number }, { rejectWithValue }) => {
+  async (
+    filters: DashboardFilters & { limit?: number },
+    { rejectWithValue },
+  ) => {
     try {
-      const response = await restClient.get<TopProductAPI[]>('/api/portal/Dashboard/top-products', {
-        params: { ...filters, limit: filters.limit || 5 },
-      })
+      const response = await restClient.get<TopProductAPI[]>(
+        '/api/portal/Dashboard/top-products',
+        {
+          params: { ...filters, limit: filters.limit || 5 },
+        },
+      )
       // Transform API response to frontend format
       const transformedData: TopProduct[] = response.data.map((item) => ({
-        id: item.productId,
-        name: item.productName,
-        sales: item.quantity,
+        id: item.id,
+        name: item.name,
+        sales: item.sales,
         revenue: item.revenue,
         trend: 0, // API doesn't provide trend yet, default to 0
       }))
@@ -129,15 +160,21 @@ export const fetchTopProducts = createAsyncThunk(
 
 export const fetchTopSellers = createAsyncThunk(
   'dashboard/fetchTopSellers',
-  async (filters: DashboardFilters & { limit?: number }, { rejectWithValue }) => {
+  async (
+    filters: DashboardFilters & { limit?: number },
+    { rejectWithValue },
+  ) => {
     try {
-      const response = await restClient.get<TopSellerAPI[]>('/api/portal/Dashboard/top-sellers', {
-        params: { ...filters, limit: filters.limit || 5 },
-      })
+      const response = await restClient.get<TopSellerAPI[]>(
+        '/api/portal/Dashboard/top-sellers',
+        {
+          params: { ...filters, limit: filters.limit || 5 },
+        },
+      )
       // Transform API response to frontend format
       const transformedData: TopSeller[] = response.data.map((item) => ({
-        id: item.sellerId,
-        name: item.sellerName,
+        id: item.id,
+        name: item.name,
         orders: item.orders,
         revenue: item.revenue,
         collections: 0, // API doesn't provide collections yet, default to 0
@@ -156,17 +193,22 @@ export const fetchRecentActivity = createAsyncThunk(
   'dashboard/fetchActivity',
   async (limit: number = 20, { rejectWithValue }) => {
     try {
-      const response = await restClient.get<RecentActivityAPI[]>('/api/portal/Dashboard/recent-activity', {
-        params: { limit },
-      })
+      const response = await restClient.get<RecentActivityAPI[]>(
+        '/api/portal/Dashboard/recent-activity',
+        {
+          params: { limit },
+        },
+      )
       // Transform API response to frontend format
-      const transformedData: RecentActivity[] = response.data.map((item, index) => ({
-        id: `activity-${index}`,
-        type: normalizeActivityType(item.type),
-        description: item.description,
-        timestamp: item.timestamp,
-        status: getActivityStatus(item.type),
-      }))
+      const transformedData: RecentActivity[] = response.data.map(
+        (item, index) => ({
+          id: `activity-${index}`,
+          type: normalizeActivityType(item.type),
+          description: item.description,
+          timestamp: item.timestamp,
+          status: getActivityStatus(item.type),
+        }),
+      )
       return transformedData
     } catch (error: any) {
       return rejectWithValue(
@@ -180,9 +222,12 @@ export const fetchOrdersByStatus = createAsyncThunk(
   'dashboard/fetchOrdersStatus',
   async (filters: DashboardFilters, { rejectWithValue }) => {
     try {
-      const response = await restClient.get<OrdersByStatus>('/api/portal/Dashboard/orders-status', {
-        params: filters,
-      })
+      const response = await restClient.get<OrdersByStatus>(
+        '/api/portal/Dashboard/orders-status',
+        {
+          params: filters,
+        },
+      )
       return response.data
     } catch (error: any) {
       return rejectWithValue(
@@ -196,25 +241,30 @@ export const fetchTransportActivity = createAsyncThunk(
   'dashboard/fetchTransport',
   async (filters: DashboardFilters, { rejectWithValue }) => {
     try {
-      const response = await restClient.get<TransportActivityAPI[]>('/api/portal/Dashboard/transport-activity', {
-        params: filters,
-      })
-      // Transform API response to frontend format with placeholder values for missing fields
-      const transformedData: TransportActivity[] = response.data.map((item) => ({
-        driverId: item.driverId,
-        driverName: item.driverName,
-        activeRoutes: item.status === 'active' ? 1 : 0,
-        completedToday: item.deliveries,
-        pendingDeliveries: 0, // API doesn't provide this yet
-        status: (item.status as 'active' | 'idle' | 'offline') || 'idle',
-        deliveryStats: {
-          delivered: item.deliveries,
-          notDelivered: 0,
-          deliveredAnotherDay: 0,
-          partialDelivery: 0,
-          returned: 0,
+      const response = await restClient.get<TransportActivityAPI[]>(
+        '/api/portal/Dashboard/transport-activity',
+        {
+          params: filters,
         },
-      }))
+      )
+      // Transform API response to frontend format with placeholder values for missing fields
+      const transformedData: TransportActivity[] = response.data.map(
+        (item) => ({
+          driverId: item.driverId,
+          driverName: item.driverName,
+          activeRoutes: item.status === 'active' ? 1 : 0,
+          completedToday: item.deliveries,
+          pendingDeliveries: 0, // API doesn't provide this yet
+          status: (item.status as 'active' | 'idle' | 'offline') || 'idle',
+          deliveryStats: {
+            delivered: item.deliveryStats.delivered,
+            notDelivered: item.deliveryStats.notDelivered,
+            deliveredAnotherDay: item.deliveryStats.deliveredAnotherDay,
+            partialDelivery: item.deliveryStats.partialDelivery,
+            returned: item.deliveryStats.returned,
+          },
+        }),
+      )
       return transformedData
     } catch (error: any) {
       return rejectWithValue(
