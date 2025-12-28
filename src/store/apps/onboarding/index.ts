@@ -3,6 +3,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
 // ** Axios Imports
 import toast from 'react-hot-toast'
+import restClient from 'src/configs/restClient'
 
 // ** Types
 export interface OnboardingConfigRequest {
@@ -42,27 +43,12 @@ export const configureOnboarding = createAsyncThunk(
   'onboarding/configure',
   async (data: OnboardingConfigRequest, { rejectWithValue }) => {
     try {
-      // TODO: Replace with actual API endpoint when backend is ready
-      // Simulating API call for now
-      await new Promise((resolve) => setTimeout(resolve, 3000))
+      const response = await restClient.post<OnboardingConfigResponse>(
+        '/api/portal/onboarding/configure',
+        data,
+      )
 
-      // Simulated successful response
-      const response: OnboardingConfigResponse = {
-        success: true,
-        message: 'Onboarding configured successfully',
-        data: {
-          configured: true,
-          timestamp: new Date().toISOString(),
-        },
-      }
-
-      // TODO: Uncomment when API is ready
-      // const response = await restClient.post<OnboardingConfigResponse>(
-      //   '/api/portal/onboarding/configure',
-      //   data
-      // )
-
-      return response
+      return response.data
     } catch (error: any) {
       const message =
         error.response?.data?.message || 'Error configuring onboarding'

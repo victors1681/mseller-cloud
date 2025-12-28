@@ -148,7 +148,7 @@ const App = (props: ExtendedAppProps) => {
                   return (
                     <ThemeComponent settings={settings}>
                       <Guard authGuard={authGuard} guestGuard={guestGuard}>
-                        <OnboardingGuard fallback={<Spinner />}>
+                        <OnboardingGuard fallback={<Spinner />} authGuard={authGuard}>
                           <AclGuard
                             aclAbilities={aclAbilities}
                             guestGuard={guestGuard}

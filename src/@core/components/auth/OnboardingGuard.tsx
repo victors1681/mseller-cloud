@@ -10,15 +10,21 @@ import { useAuth } from 'src/hooks/useAuth'
 interface OnboardingGuardProps {
   children: ReactNode
   fallback: ReactElement | null
+  authGuard?: boolean
 }
 
 const OnboardingGuard = (props: OnboardingGuardProps) => {
-  const { children, fallback } = props
+  const { children, fallback, authGuard = true } = props
   const auth = useAuth()
   const router = useRouter()
 
   useEffect(() => {
     if (!router.isReady) {
+      return
+    }
+
+    // Skip onboarding checks for public pages or print pages
+    if (!authGuard || /print/.test(router.pathname)) {
       return
     }
 
@@ -45,6 +51,11 @@ const OnboardingGuard = (props: OnboardingGuardProps) => {
       }
     }
   }, [router.isReady, router.pathname, auth.user, auth.loading])
+
+  // Skip checks for public pages or print pages
+  if (!authGuard || /print/.test(router.pathname)) {
+    return <>{children}</>
+  }
 
   // Show fallback while checking authentication
   if (auth.loading) {

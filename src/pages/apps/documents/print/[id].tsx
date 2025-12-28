@@ -7,7 +7,6 @@ import {
 } from 'next/types'
 
 // ** Third Party Imports
-import axios from 'axios'
 
 // ** Demo Components Imports
 import Print from 'src/views/apps/documents/print/PrintPage'

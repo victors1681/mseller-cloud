@@ -98,7 +98,7 @@ const Onboarding = () => {
     rnc: '',
     businessType: '',
     industry: '',
-    setupOption: null,
+    setupOption: 'sample',
   })
 
   // ** Hooks

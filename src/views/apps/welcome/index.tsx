@@ -140,7 +140,7 @@ const FirstSessionDialog = () => {
           Cerrar
         </Button>
         <Button
-          onClick={() => handleAction('/apps/clients/list')}
+          onClick={() => handleAction('/apps/documents/facturas/')}
           variant="contained"
           size="large"
         >

@@ -14,8 +14,8 @@ import Typography from '@mui/material/Typography'
 import Icon from 'src/@core/components/icon'
 
 interface Props {
-  value: 'new' | 'sample' | 'upload' | null
-  onChange: (value: 'new' | 'sample' | 'upload') => void
+  value: 'new' | 'sample' | 'upload' | 'advanced' | null
+  onChange: (value: 'new' | 'sample' | 'upload' | 'advanced') => void
 }
 
 interface OptionCardProps {
@@ -46,29 +46,39 @@ const DataSetupStep = ({ value, onChange }: Props) => {
 
   const options = [
     {
-      value: 'new' as const,
-      icon: 'mdi:rocket-launch-outline',
-      title: 'Configuración Nueva',
-      description: 'Comenzar con una configuración limpia y personalizada',
-      color: theme.palette.primary.main,
-    },
-    {
       value: 'sample' as const,
       icon: 'mdi:database-outline',
-      title: 'Datos de Ejemplo',
+      title: 'Datos de Ejemplo (Recomendado)',
       description: 'Iniciar con datos de muestra para explorar el sistema',
       color: theme.palette.success.main,
     },
     {
-      value: 'upload' as const,
-      icon: 'mdi:cloud-upload-outline',
-      title: 'Subir Mi Información',
-      description: 'Importar tus datos existentes desde archivos',
-      color: theme.palette.info.main,
+      value: 'new' as const,
+      icon: 'mdi:rocket-launch-outline',
+      title: 'Configuración Nueva',
+      description: 'Comenzar con una configuración limpia y datos básicos',
+      color: theme.palette.primary.main,
     },
+    {
+      value: 'advanced' as const,
+      icon: 'mdi:api',
+      title: 'Configuración Nueva',
+      description: 'Comenzar en modo avanzado listo para integraciones',
+      color: theme.palette.primary.main,
+    },
+
+    // {
+    //   value: 'upload' as const,
+    //   icon: 'mdi:cloud-upload-outline',
+    //   title: 'Subir Mi Información',
+    //   description: 'Importar tus datos existentes desde archivos',
+    //   color: theme.palette.info.main,
+    // },
   ]
 
-  const handleOptionClick = (optionValue: 'new' | 'sample' | 'upload') => {
+  const handleOptionClick = (
+    optionValue: 'new' | 'sample' | 'upload' | 'advanced',
+  ) => {
     onChange(optionValue)
     setShowStartFromScratch(false)
   }
@@ -131,19 +141,6 @@ const DataSetupStep = ({ value, onChange }: Props) => {
           </OptionCard>
         ))}
       </Box>
-
-      {value && !showStartFromScratch && (
-        <Box sx={{ mt: 2, textAlign: 'center' }}>
-          <Button
-            variant="text"
-            color="secondary"
-            onClick={() => setShowStartFromScratch(true)}
-            startIcon={<Icon icon="mdi:refresh" />}
-          >
-            ¿Cambió de opinión? Empezar desde cero
-          </Button>
-        </Box>
-      )}
 
       {showStartFromScratch && (
         <Box
