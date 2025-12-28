@@ -13,9 +13,12 @@ import Typography from '@mui/material/Typography'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
+// ** Types
+import { SetupOption } from 'src/types/apps/onboardingTypes'
+
 interface Props {
-  value: 'new' | 'sample' | 'upload' | 'advanced' | null
-  onChange: (value: 'new' | 'sample' | 'upload' | 'advanced') => void
+  value: SetupOption | null
+  onChange: (value: SetupOption) => void
 }
 
 interface OptionCardProps {
@@ -76,9 +79,7 @@ const DataSetupStep = ({ value, onChange }: Props) => {
     // },
   ]
 
-  const handleOptionClick = (
-    optionValue: 'new' | 'sample' | 'upload' | 'advanced',
-  ) => {
+  const handleOptionClick = (optionValue: SetupOption) => {
     onChange(optionValue)
     setShowStartFromScratch(false)
   }

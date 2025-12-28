@@ -38,22 +38,12 @@ import { useAuth } from 'src/hooks/useAuth'
 import { useAppDispatch, useAppSelector } from 'src/store'
 import { configureOnboarding } from 'src/store/apps/onboarding'
 
+// ** Types
+import { OnboardingData } from 'src/types/apps/onboardingTypes'
+
 // ** Firebase
 import toast from 'react-hot-toast'
 import { auth as firebase_auth } from 'src/firebase'
-
-// ** Types
-export interface OnboardingData {
-  businessName: string
-  phone: string
-  street: string
-  city: string
-  country: string
-  rnc?: string
-  businessType: string
-  industry: string
-  setupOption: 'new' | 'sample' | 'upload' | null
-}
 
 const steps = [
   'Nombre del Negocio',

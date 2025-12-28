@@ -19,6 +19,7 @@ import {
   httpsCallable,
 } from 'firebase/functions'
 import { axiosSetClientUrl } from 'src/configs/restClient'
+import { SetupOption } from 'src/types/apps/onboardingTypes'
 import {
   CustomerPaymentsHistoryResponseType,
   PaymentMethodsResponseType,
@@ -422,7 +423,7 @@ export interface CompleteOnboardingRequest {
     rnc?: string
     businessType: string
     industry: string
-    setupOption: 'new' | 'sample' | 'upload' | null
+    setupOption: SetupOption | null
   }
   hasCompletedOnboarding: boolean
 }

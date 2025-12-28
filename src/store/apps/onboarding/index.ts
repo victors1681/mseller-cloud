@@ -6,6 +6,8 @@ import toast from 'react-hot-toast'
 import restClient from 'src/configs/restClient'
 
 // ** Types
+import { SetupOption } from 'src/types/apps/onboardingTypes'
+
 export interface OnboardingConfigRequest {
   businessName: string
   phone: string
@@ -15,7 +17,7 @@ export interface OnboardingConfigRequest {
   rnc?: string
   businessType: string
   industry: string
-  setupOption: 'new' | 'sample' | 'upload' | null
+  setupOption: SetupOption | null
 }
 
 export interface OnboardingConfigResponse {
