@@ -28,6 +28,9 @@ import Icon from 'src/@core/components/icon'
 // ** Layout Import
 import BlankLayout from 'src/@core/layouts/BlankLayout'
 
+// ** Demo Imports
+import FooterIllustrationsV2 from 'src/views/pages/auth/FooterIllustrationsV2'
+
 // ** Hooks
 import { useAuth } from 'src/hooks/useAuth'
 
@@ -320,16 +323,11 @@ const RegisterSimple = () => {
               justifyContent: 'center',
             }}
           >
-            <Typography
-              variant="h6"
-              sx={{
-                lineHeight: 1,
-                fontWeight: 600,
-                fontSize: '1.5rem !important',
-              }}
-            >
-              Bienvenido a MSeller
-            </Typography>
+            <img
+              src="/images/logos/mseller-logo.svg"
+              alt="MSeller Logo"
+              style={{ height: '36px', width: 'auto' }}
+            />
           </Box>
 
           <Box sx={{ mb: 6 }}>
@@ -585,6 +583,7 @@ const RegisterSimple = () => {
           </form>
         </CardContent>
       </Card>
+      <FooterIllustrationsV2 />
     </Box>
   )
 }

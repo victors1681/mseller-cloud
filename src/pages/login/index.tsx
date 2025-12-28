@@ -6,8 +6,10 @@ import Link from 'next/link'
 
 // ** MUI Components
 import LoadingButton from '@mui/lab/LoadingButton'
-import Box, { BoxProps } from '@mui/material/Box'
+import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
+import MuiCard, { CardProps } from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
 import Checkbox from '@mui/material/Checkbox'
 import Divider from '@mui/material/Divider'
 import FormControl from '@mui/material/FormControl'
@@ -18,7 +20,7 @@ import InputLabel from '@mui/material/InputLabel'
 import OutlinedInput from '@mui/material/OutlinedInput'
 import { styled, useTheme } from '@mui/material/styles'
 import TextField from '@mui/material/TextField'
-import Typography, { TypographyProps } from '@mui/material/Typography'
+import Typography from '@mui/material/Typography'
 import useMediaQuery from '@mui/material/useMediaQuery'
 
 import MuiFormControlLabel, {
@@ -54,51 +56,11 @@ import themeConfig from 'src/configs/themeConfig'
 import BlankLayout from 'src/@core/layouts/BlankLayout'
 
 // ** Demo Imports
-import RandomBg from '@/views/ui/randombg/RandomBg'
-import Image from 'next/image'
+import FooterIllustrationsV2 from 'src/views/pages/auth/FooterIllustrationsV2'
 
 // ** Styled Components
-const LoginIllustrationWrapper = styled(Box)<BoxProps>(({ theme }) => ({
-  padding: theme.spacing(20),
-  paddingRight: '0 !important',
-  [theme.breakpoints.down('lg')]: {
-    padding: theme.spacing(10),
-  },
-}))
-
-const LoginIllustration = styled('img')(({ theme }) => ({
-  backgroundImage:
-    'url(https://source.unsplash.com/collection/962362/desktop-and-tech)',
-  backgroundRepeat: 'no-repeat',
-  backgroundSize: 'cover',
-  backgroundPosition: 'center',
-
-  maxWidth: '48rem',
-  [theme.breakpoints.down('lg')]: {
-    maxWidth: '35rem',
-  },
-}))
-
-const RightWrapper = styled(Box)<BoxProps>(({ theme }) => ({
-  width: '100%',
-  [theme.breakpoints.up('md')]: {
-    maxWidth: 450,
-  },
-}))
-
-const BoxWrapper = styled(Box)<BoxProps>(({ theme }) => ({
-  [theme.breakpoints.down('xl')]: {
-    width: '100%',
-  },
-  [theme.breakpoints.down('md')]: {
-    maxWidth: 400,
-  },
-}))
-
-const TypographyStyled = styled(Typography)<TypographyProps>(({ theme }) => ({
-  fontWeight: 600,
-  marginBottom: theme.spacing(1.5),
-  [theme.breakpoints.down('md')]: { mt: theme.spacing(8) },
+const Card = styled(MuiCard)<CardProps>(({ theme }) => ({
+  [theme.breakpoints.up('sm')]: { width: '28rem' },
 }))
 
 const LinkStyled = styled(Link)(({ theme }) => ({
@@ -235,212 +197,190 @@ const LoginPage = () => {
       : 'auth-v2-login-illustration'
 
   return (
-    <Box className="content-right">
-      {!hidden ? <RandomBg /> : null}
-      <RightWrapper
-        sx={
-          skin === 'bordered' && !hidden
-            ? { borderLeft: `1px solid ${theme.palette.divider}` }
-            : {}
-        }
-      >
-        <Box
-          sx={{
-            p: 12,
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'background.paper',
-          }}
+    <Box className="content-center">
+      <Card sx={{ zIndex: 1 }}>
+        <CardContent
+          sx={{ p: (theme) => `${theme.spacing(12, 9, 7)} !important` }}
         >
-          <BoxWrapper>
+          <Box
+            sx={{
+              mb: 8,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <img
+              src="/images/logos/mseller-logo.svg"
+              alt="MSeller Logo"
+              style={{ height: '36px', width: 'auto' }}
+            />
+          </Box>
+          <Box sx={{ mb: 6 }}>
+            <Typography variant="h5" sx={{ fontWeight: 600, mb: 1.5 }}>
+              Bienvenido a {themeConfig.templateName}!
+            </Typography>
+            <Typography variant="body2">
+              Por favor, inicia sesión en tu cuenta.
+            </Typography>
+          </Box>
+          <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
+            <FormControl fullWidth sx={{ mb: 4 }}>
+              <Controller
+                name="email"
+                control={control}
+                rules={{ required: true }}
+                render={({ field: { value, onChange, onBlur } }) => (
+                  <TextField
+                    autoFocus
+                    label="Email"
+                    value={value}
+                    onBlur={onBlur}
+                    onChange={onChange}
+                    error={Boolean(errors.email)}
+                    placeholder="correo eléctronico"
+                    disabled={auth.loadingForm}
+                  />
+                )}
+              />
+              {errors.email && (
+                <FormHelperText sx={{ color: 'error.main' }}>
+                  {errors.email.message}
+                </FormHelperText>
+              )}
+            </FormControl>
+            <FormControl fullWidth>
+              <InputLabel
+                htmlFor="auth-login-v2-password"
+                error={Boolean(errors.password)}
+                disabled={auth.loadingForm}
+              >
+                Contraseña
+              </InputLabel>
+              <Controller
+                name="password"
+                control={control}
+                rules={{ required: true }}
+                render={({ field: { value, onChange, onBlur } }) => (
+                  <OutlinedInput
+                    value={value}
+                    onBlur={onBlur}
+                    label="Contraseña"
+                    onChange={onChange}
+                    id="auth-login-v2-password"
+                    error={Boolean(errors.password)}
+                    type={showPassword ? 'text' : 'password'}
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <IconButton
+                          edge="end"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          <Icon
+                            icon={
+                              showPassword
+                                ? 'mdi:eye-outline'
+                                : 'mdi:eye-off-outline'
+                            }
+                            fontSize={20}
+                          />
+                        </IconButton>
+                      </InputAdornment>
+                    }
+                  />
+                )}
+              />
+              {errors.password && (
+                <FormHelperText sx={{ color: 'error.main' }} id="">
+                  {errors.password.message}
+                </FormHelperText>
+              )}
+            </FormControl>
             <Box
               sx={{
-                top: 30,
-                left: 40,
+                mb: 4,
                 display: 'flex',
-                position: 'absolute',
                 alignItems: 'center',
+                flexWrap: 'wrap',
+                justifyContent: 'space-between',
+              }}
+            >
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                  />
+                }
+                label="Recuerdame"
+              />
+              <LinkStyled href="/forgot-password">
+                Olvidó su contraseña?
+              </LinkStyled>
+            </Box>
+            <LoadingButton
+              fullWidth
+              size="large"
+              type="submit"
+              variant="contained"
+              sx={{ mb: 7 }}
+              loading={auth.loadingForm}
+            >
+              Iniciar Sesión
+            </LoadingButton>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                flexWrap: 'wrap',
                 justifyContent: 'center',
               }}
             >
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Image
-                  src="/images/logos/mseller-logo-dark.png"
-                  alt="logo"
-                  height="50"
-                  width="200"
-                  style={{ paddingLeft: '10px' }}
-                />
-              </Box>
-            </Box>
-            <Box sx={{ mb: 6 }}>
-              <TypographyStyled variant="h5">
-                Bienvenido a {themeConfig.templateName}!
-              </TypographyStyled>
+              <Typography variant="body2" sx={{ mr: 2 }}>
+                Nuevo usuario?
+              </Typography>
               <Typography variant="body2">
-                Por favor, inicia sesión en tu cuenta.
+                <LinkStyled href="/register">Crear una cuenta</LinkStyled>
               </Typography>
             </Box>
-            <form
-              noValidate
-              autoComplete="off"
-              onSubmit={handleSubmit(onSubmit)}
+            <Divider sx={{ my: (theme) => `${theme.spacing(5)} !important` }}>
+              o
+            </Divider>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexDirection: 'column',
+                gap: 2,
+              }}
             >
-              <FormControl fullWidth sx={{ mb: 4 }}>
-                <Controller
-                  name="email"
-                  control={control}
-                  rules={{ required: true }}
-                  render={({ field: { value, onChange, onBlur } }) => (
-                    <TextField
-                      autoFocus
-                      label="Email"
-                      value={value}
-                      onBlur={onBlur}
-                      onChange={onChange}
-                      error={Boolean(errors.email)}
-                      placeholder="correo eléctronico"
-                      disabled={auth.loadingForm}
-                    />
-                  )}
-                />
-                {errors.email && (
-                  <FormHelperText sx={{ color: 'error.main' }}>
-                    {errors.email.message}
-                  </FormHelperText>
-                )}
-              </FormControl>
-              <FormControl fullWidth>
-                <InputLabel
-                  htmlFor="auth-login-v2-password"
-                  error={Boolean(errors.password)}
-                  disabled={auth.loadingForm}
-                >
-                  Contraseña
-                </InputLabel>
-                <Controller
-                  name="password"
-                  control={control}
-                  rules={{ required: true }}
-                  render={({ field: { value, onChange, onBlur } }) => (
-                    <OutlinedInput
-                      value={value}
-                      onBlur={onBlur}
-                      label="Contraseña"
-                      onChange={onChange}
-                      id="auth-login-v2-password"
-                      error={Boolean(errors.password)}
-                      type={showPassword ? 'text' : 'password'}
-                      endAdornment={
-                        <InputAdornment position="end">
-                          <IconButton
-                            edge="end"
-                            onMouseDown={(e) => e.preventDefault()}
-                            onClick={() => setShowPassword(!showPassword)}
-                          >
-                            <Icon
-                              icon={
-                                showPassword
-                                  ? 'mdi:eye-outline'
-                                  : 'mdi:eye-off-outline'
-                              }
-                              fontSize={20}
-                            />
-                          </IconButton>
-                        </InputAdornment>
-                      }
-                    />
-                  )}
-                />
-                {errors.password && (
-                  <FormHelperText sx={{ color: 'error.main' }} id="">
-                    {errors.password.message}
-                  </FormHelperText>
-                )}
-              </FormControl>
-              <Box
-                sx={{
-                  mb: 4,
-                  display: 'flex',
-                  alignItems: 'center',
-                  flexWrap: 'wrap',
-                  justifyContent: 'space-between',
-                }}
-              >
-                <FormControlLabel
-                  label="Recuerdame"
-                  control={
-                    <Checkbox
-                      checked={rememberMe}
-                      onChange={(e) => setRememberMe(e.target.checked)}
-                    />
-                  }
-                />
-                <LinkStyled href="/forgot-password">
-                  Olvidó su contraseña?
-                </LinkStyled>
-              </Box>
-              <LoadingButton
+              <Button
                 fullWidth
                 size="large"
-                type="submit"
-                variant="contained"
-                sx={{ mb: 7 }}
-                loading={auth.loadingForm}
-              >
-                Iniciar Sesión
-              </LoadingButton>
-              <Box
+                variant="outlined"
                 sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  flexWrap: 'wrap',
-                  justifyContent: 'center',
-                }}
-              >
-                <Typography variant="body2" sx={{ mr: 2 }}>
-                  Nuevo usuario?
-                </Typography>
-                <Typography variant="body2">
-                  <LinkStyled href="/register">Crear una cuenta</LinkStyled>
-                </Typography>
-              </Box>
-              <Divider sx={{ my: (theme) => `${theme.spacing(5)} !important` }}>
-                o
-              </Divider>
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 2,
-                }}
-              >
-                <Button
-                  variant="outlined"
-                  sx={{
-                    flex: 1,
+                  borderColor: '#db4437',
+                  color: '#db4437',
+                  '&:hover': {
                     borderColor: '#db4437',
-                    color: '#db4437',
-                    '&:hover': {
-                      borderColor: '#db4437',
-                      backgroundColor: 'rgba(219, 68, 55, 0.04)',
-                    },
-                  }}
-                  onClick={handleGoogleSignIn}
-                  disabled={isSocialLoading || auth.loadingForm}
-                  startIcon={<Icon icon="mdi:google" />}
-                >
-                  Google
-                </Button>
-                {/* TODO: Apple Sign-In will be configured in the future */}
-                {/*
+                    backgroundColor: 'rgba(219, 68, 55, 0.04)',
+                  },
+                }}
+                onClick={handleGoogleSignIn}
+                disabled={isSocialLoading || auth.loadingForm}
+                startIcon={<Icon icon="mdi:google" />}
+              >
+                Google
+              </Button>
+              {/* TODO: Apple Sign-In will be configured in the future */}
+              {/*
                 <Button
+                  fullWidth
+                  size='large'
                   variant="outlined"
                   sx={{
-                    flex: 1,
                     borderColor: (theme) =>
                       theme.palette.mode === 'light' ? '#000' : '#fff',
                     color: (theme) =>
@@ -461,11 +401,11 @@ const LoginPage = () => {
                   Apple
                 </Button>
                 */}
-              </Box>
-            </form>
-          </BoxWrapper>
-        </Box>
-      </RightWrapper>
+            </Box>
+          </form>
+        </CardContent>
+      </Card>
+      <FooterIllustrationsV2 />
     </Box>
   )
 }
