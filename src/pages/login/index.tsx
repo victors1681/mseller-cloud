@@ -7,7 +7,9 @@ import Link from 'next/link'
 // ** MUI Components
 import LoadingButton from '@mui/lab/LoadingButton'
 import Box, { BoxProps } from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Checkbox from '@mui/material/Checkbox'
+import Divider from '@mui/material/Divider'
 import FormControl from '@mui/material/FormControl'
 import FormHelperText from '@mui/material/FormHelperText'
 import IconButton from '@mui/material/IconButton'
@@ -30,6 +32,15 @@ import Icon from 'src/@core/components/icon'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Controller, useForm } from 'react-hook-form'
 import * as yup from 'yup'
+
+// ** Firebase
+import {
+  GoogleAuthProvider,
+  // OAuthProvider, // TODO: Uncomment when Apple Sign-In is configured
+  signInWithPopup,
+} from 'firebase/auth'
+import toast from 'react-hot-toast'
+import { auth as firebaseAuth } from 'src/firebase'
 
 // ** Hooks
 import useBgColor from 'src/@core/hooks/useBgColor'
@@ -123,6 +134,7 @@ interface FormData {
 const LoginPage = () => {
   const [rememberMe, setRememberMe] = useState<boolean>(true)
   const [showPassword, setShowPassword] = useState<boolean>(false)
+  const [isSocialLoading, setIsSocialLoading] = useState<boolean>(false)
 
   // ** Hooks
   const auth = useAuth()
@@ -154,7 +166,69 @@ const LoginPage = () => {
       })
     })
   }
+  // ** Handle Google Sign In
+  const handleGoogleSignIn = async () => {
+    setIsSocialLoading(true)
+    try {
+      const provider = new GoogleAuthProvider()
+      const result = await signInWithPopup(firebaseAuth, provider)
 
+      if (result.user) {
+        // User authenticated with Google, refresh profile
+        await auth.signInByToken()
+        toast.success('Inicio de sesión exitoso con Google')
+      }
+    } catch (error: any) {
+      console.error('Google sign in error:', error)
+
+      if (error.code === 'auth/popup-closed-by-user') {
+        toast.error('Inicio de sesión cancelado')
+      } else if (
+        error.code === 'auth/account-exists-with-different-credential'
+      ) {
+        toast.error('Ya existe una cuenta con este correo usando otro método')
+      } else {
+        toast.error('Error al iniciar sesión con Google')
+      }
+    } finally {
+      setIsSocialLoading(false)
+    }
+  }
+
+  // ** Handle Apple Sign In
+  // TODO: Apple Sign-In will be configured in the future
+  /*
+  const handleAppleSignIn = async () => {
+    setIsSocialLoading(true)
+    try {
+      const provider = new OAuthProvider('apple.com')
+      provider.addScope('email')
+      provider.addScope('name')
+
+      const result = await signInWithPopup(firebaseAuth, provider)
+
+      if (result.user) {
+        // User authenticated with Apple, refresh profile
+        await auth.signInByToken()
+        toast.success('Inicio de sesión exitoso con Apple')
+      }
+    } catch (error: any) {
+      console.error('Apple sign in error:', error)
+
+      if (error.code === 'auth/popup-closed-by-user') {
+        toast.error('Inicio de sesión cancelado')
+      } else if (
+        error.code === 'auth/account-exists-with-different-credential'
+      ) {
+        toast.error('Ya existe una cuenta con este correo usando otro método')
+      } else {
+        toast.error('Error al iniciar sesión con Apple')
+      }
+    } finally {
+      setIsSocialLoading(false)
+    }
+  }
+  */
   const imageSource =
     skin === 'bordered'
       ? 'auth-v2-login-illustration-bordered'
@@ -333,41 +407,61 @@ const LoginPage = () => {
                   <LinkStyled href="/register">Crear una cuenta</LinkStyled>
                 </Typography>
               </Box>
-              {/* <Divider sx={{ my: theme => `${theme.spacing(5)} !important` }}>or</Divider> */}
-              {/* <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <IconButton
-                  href='/'
-                  component={Link}
-                  sx={{ color: '#497ce2' }}
-                  onClick={(e: MouseEvent<HTMLElement>) => e.preventDefault()}
+              <Divider sx={{ my: (theme) => `${theme.spacing(5)} !important` }}>
+                o
+              </Divider>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 2,
+                }}
+              >
+                <Button
+                  variant="outlined"
+                  sx={{
+                    flex: 1,
+                    borderColor: '#db4437',
+                    color: '#db4437',
+                    '&:hover': {
+                      borderColor: '#db4437',
+                      backgroundColor: 'rgba(219, 68, 55, 0.04)',
+                    },
+                  }}
+                  onClick={handleGoogleSignIn}
+                  disabled={isSocialLoading || auth.loadingForm}
+                  startIcon={<Icon icon="mdi:google" />}
                 >
-                  <Icon icon='mdi:facebook' />
-                </IconButton>
-                <IconButton
-                  href='/'
-                  component={Link}
-                  sx={{ color: '#1da1f2' }}
-                  onClick={(e: MouseEvent<HTMLElement>) => e.preventDefault()}
+                  Google
+                </Button>
+                {/* TODO: Apple Sign-In will be configured in the future */}
+                {/*
+                <Button
+                  variant="outlined"
+                  sx={{
+                    flex: 1,
+                    borderColor: (theme) =>
+                      theme.palette.mode === 'light' ? '#000' : '#fff',
+                    color: (theme) =>
+                      theme.palette.mode === 'light' ? '#000' : '#fff',
+                    '&:hover': {
+                      borderColor: (theme) =>
+                        theme.palette.mode === 'light' ? '#000' : '#fff',
+                      backgroundColor: (theme) =>
+                        theme.palette.mode === 'light'
+                          ? 'rgba(0, 0, 0, 0.04)'
+                          : 'rgba(255, 255, 255, 0.04)',
+                    },
+                  }}
+                  onClick={handleAppleSignIn}
+                  disabled={isSocialLoading || auth.loadingForm}
+                  startIcon={<Icon icon="mdi:apple" />}
                 >
-                  <Icon icon='mdi:twitter' />
-                </IconButton>
-                <IconButton
-                  href='/'
-                  component={Link}
-                  onClick={(e: MouseEvent<HTMLElement>) => e.preventDefault()}
-                  sx={{ color: theme => (theme.palette.mode === 'light' ? '#272727' : 'grey.300') }}
-                >
-                  <Icon icon='mdi:github' />
-                </IconButton>
-                <IconButton
-                  href='/'
-                  component={Link}
-                  sx={{ color: '#db4437' }}
-                  onClick={(e: MouseEvent<HTMLElement>) => e.preventDefault()}
-                >
-                  <Icon icon='mdi:google' />
-                </IconButton>
-              </Box> */}
+                  Apple
+                </Button>
+                */}
+              </Box>
             </form>
           </BoxWrapper>
         </Box>

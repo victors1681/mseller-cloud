@@ -34,7 +34,7 @@ import { useAuth } from 'src/hooks/useAuth'
 // ** Firebase
 import {
   GoogleAuthProvider,
-  OAuthProvider,
+  // OAuthProvider, // TODO: Uncomment when Apple Sign-In is configured
   signInWithPopup,
 } from 'firebase/auth'
 import toast from 'react-hot-toast'
@@ -85,7 +85,7 @@ const RegisterSimple = () => {
     watch,
     formState: { errors },
   } = useForm<SimpleRegisterFormData>({
-    mode: 'onBlur',
+    mode: 'onSubmit',
     defaultValues: {
       firstName: '',
       lastName: '',
@@ -264,6 +264,8 @@ const RegisterSimple = () => {
   }
 
   // ** Handle Apple Sign In
+  // TODO: Apple Sign-In will be configured in the future
+  /*
   const handleAppleSignIn = async () => {
     setIsLoading(true)
     try {
@@ -302,6 +304,7 @@ const RegisterSimple = () => {
       setIsLoading(false)
     }
   }
+  */
 
   return (
     <Box className="content-center">
@@ -348,17 +351,19 @@ const RegisterSimple = () => {
               disabled={isLoading}
               startIcon={<Icon icon="mdi:google" />}
               sx={{
-                borderColor: 'divider',
-                color: 'text.primary',
+                borderColor: '#db4437',
+                color: '#db4437',
                 '&:hover': {
-                  borderColor: 'primary.main',
-                  backgroundColor: 'action.hover',
+                  borderColor: '#db4437',
+                  backgroundColor: 'rgba(219, 68, 55, 0.04)',
                 },
               }}
             >
               Continue with Google
             </Button>
 
+            {/* TODO: Apple Sign-In will be configured in the future */}
+            {/*
             <Button
               fullWidth
               size="large"
@@ -377,6 +382,7 @@ const RegisterSimple = () => {
             >
               Continue with Apple
             </Button>
+            */}
           </Box>
 
           <Divider sx={{ my: (theme) => `${theme.spacing(5)} !important` }}>
