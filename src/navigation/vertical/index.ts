@@ -67,6 +67,11 @@ const navigation = (): VerticalNavItemsType => {
           path: '/apps/visits/list',
         },
         {
+          title: 'Comunicación WhatsApp',
+          icon: 'mdi:whatsapp',
+          path: '/apps/communication',
+        },
+        {
           title: 'Cuentas por Cobrar',
           icon: 'mdi:account-cash-outline',
           path: '/apps/cxc',
