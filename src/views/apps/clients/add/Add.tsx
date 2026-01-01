@@ -162,7 +162,7 @@ const AddCustomer = ({ id }: AddCustomerProps) => {
       telefono1: '',
       ciudad: '',
       email: '',
-      contacto: '',
+      contacto: [],
       rnc: '',
 
       // Financial Information

@@ -79,7 +79,7 @@ const SidebarLeft = (props: SidebarLeftType) => {
     UnassignedContactList[]
   >([])
   const [activeTab, setActiveTab] = useState<number>(0)
-  const [channelFilter, setChannelFilter] = useState<ChannelType | null>(null)
+  const [channelFilter, setChannelFilter] = useState<ChannelType | ''>('')
 
   // ** Fetch data when tab changes
   useEffect(() => {
@@ -104,7 +104,7 @@ const SidebarLeft = (props: SidebarLeftType) => {
       })
 
       // Apply channel filter
-      if (channelFilter !== null) {
+      if (channelFilter !== '') {
         filteredConvs = filteredConvs.filter(
           (conv) => conv.channelType === channelFilter,
         )
@@ -123,7 +123,7 @@ const SidebarLeft = (props: SidebarLeftType) => {
       let filteredConvs = store.conversations
 
       // Apply channel filter even without search query
-      if (channelFilter !== null) {
+      if (channelFilter !== '') {
         filteredConvs = filteredConvs.filter(
           (conv) => conv.channelType === channelFilter,
         )
@@ -487,7 +487,7 @@ const SidebarLeft = (props: SidebarLeftType) => {
             fullWidth
             size="small"
           >
-            <ToggleButton value={null}>
+            <ToggleButton value={''}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Icon icon="mdi:message" fontSize={18} />
                 <span>Todos</span>

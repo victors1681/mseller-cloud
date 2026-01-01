@@ -14,12 +14,16 @@ const proxy = httpProxy.createProxyServer()
 // Handle proxy errors
 proxy.on('error', (err, req, res) => {
   console.error('SignalR Proxy error:', err)
-  if (!res.headersSent) {
+  // Check if res is a ServerResponse (HTTP) and not a Socket (WebSocket)
+  if ('headersSent' in res && !res.headersSent) {
     ;(res as any).writeHead(500, { 'Content-Type': 'application/json' })
+    ;(res as any).end(
+      JSON.stringify({ error: 'Proxy error', message: err.message }),
+    )
+  } else if ('destroy' in res) {
+    // For WebSocket connections (Socket), just destroy the connection
+    ;(res as any).destroy()
   }
-  ;(res as any).end(
-    JSON.stringify({ error: 'Proxy error', message: err.message }),
-  )
 })
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {

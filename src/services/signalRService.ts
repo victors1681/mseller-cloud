@@ -203,10 +203,10 @@ class SignalRService {
     this.connection.on('MessageStatusChanged', (data: any) => {
       // Transform PascalCase to camelCase
       const transformedData: MessageStatusChangedEvent = {
+        businessId: data.BusinessId || '',
         messageId: data.MessageId,
         conversationId: data.ConversationId,
         newStatus: data.NewStatus,
-        timestamp: data.Timestamp,
       }
 
       this.dispatch?.(
@@ -222,7 +222,6 @@ class SignalRService {
       // Transform PascalCase to camelCase
       const transformedData: MessageReadEvent = {
         messageId: data.MessageId,
-        conversationId: data.ConversationId,
         readAt: data.ReadAt,
       }
 
@@ -241,7 +240,7 @@ class SignalRService {
       const transformedData: UserTypingEvent = {
         conversationId: data.ConversationId,
         isTyping: data.IsTyping,
-        timestamp: data.Timestamp,
+        connectionId: data.ConnectionId || '',
       }
 
       this.dispatch?.(
