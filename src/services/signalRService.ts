@@ -90,10 +90,16 @@ class SignalRService {
       if (this.reconnectAttempts < this.maxReconnectAttempts) {
         this.reconnectAttempts++
         const delay = Math.min(5000 * this.reconnectAttempts, 30000)
-        console.log(`Retrying connection in ${delay / 1000}s (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`)
+        console.log(
+          `Retrying connection in ${delay / 1000}s (attempt ${
+            this.reconnectAttempts
+          }/${this.maxReconnectAttempts})`,
+        )
         setTimeout(() => this.startConnection(), delay)
       } else {
-        console.error('Max reconnection attempts reached. Real-time features will be disabled.')
+        console.error(
+          'Max reconnection attempts reached. Real-time features will be disabled.',
+        )
       }
     }
   }
@@ -106,7 +112,10 @@ class SignalRService {
 
     // Connection lifecycle events
     this.connection.onclose((error: Error | undefined) => {
-      console.warn('SignalR Connection closed:', error?.message || 'Unknown reason')
+      console.warn(
+        'SignalR Connection closed:',
+        error?.message || 'Unknown reason',
+      )
       this.dispatch?.(setConnectionStatus(false))
 
       // Don't attempt to reconnect on 404 errors
@@ -158,8 +167,12 @@ class SignalRService {
 
       // Show browser notification if not focused
       if (!document.hasFocus()) {
-        const channelName = transformedMessage.channelType === 1 ? 'WhatsApp' : 'SMS'
-        this.showNotification(`New ${channelName} Message`, transformedMessage.messageContent)
+        const channelName =
+          transformedMessage.channelType === 1 ? 'WhatsApp' : 'SMS'
+        this.showNotification(
+          `New ${channelName} Message`,
+          transformedMessage.messageContent,
+        )
       }
     })
 
@@ -187,25 +200,22 @@ class SignalRService {
     })
 
     // Message Status Changed Event
-    this.connection.on(
-      'MessageStatusChanged',
-      (data: any) => {
-        // Transform PascalCase to camelCase
-        const transformedData: MessageStatusChangedEvent = {
-          messageId: data.MessageId,
-          conversationId: data.ConversationId,
-          newStatus: data.NewStatus,
-          timestamp: data.Timestamp,
-        }
+    this.connection.on('MessageStatusChanged', (data: any) => {
+      // Transform PascalCase to camelCase
+      const transformedData: MessageStatusChangedEvent = {
+        messageId: data.MessageId,
+        conversationId: data.ConversationId,
+        newStatus: data.NewStatus,
+        timestamp: data.Timestamp,
+      }
 
-        this.dispatch?.(
-          updateMessageStatus({
-            messageId: transformedData.messageId,
-            status: transformedData.newStatus,
-          }),
-        )
-      },
-    )
+      this.dispatch?.(
+        updateMessageStatus({
+          messageId: transformedData.messageId,
+          status: transformedData.newStatus,
+        }),
+      )
+    })
 
     // Message Read Event
     this.connection.on('MessageRead', (data: any) => {
