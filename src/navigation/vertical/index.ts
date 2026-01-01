@@ -67,8 +67,8 @@ const navigation = (): VerticalNavItemsType => {
           path: '/apps/visits/list',
         },
         {
-          title: 'Comunicación WhatsApp',
-          icon: 'mdi:whatsapp',
+          title: 'Mensajería',
+          icon: 'mdi:message-text',
           path: '/apps/communication',
         },
         {
@@ -211,6 +211,11 @@ const navigation = (): VerticalNavItemsType => {
           title: 'Sucursales',
           icon: 'mdi:location',
           path: '/apps/locations/list',
+        },
+        {
+          title: 'Comunicación',
+          icon: 'mdi:message-settings',
+          path: '/apps/communication/config',
         },
         {
           title: 'eCF',

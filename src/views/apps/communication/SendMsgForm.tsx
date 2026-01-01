@@ -52,7 +52,7 @@ const SendMsgForm = ({ onSendMessage, disabled = false }: SendMsgFormProps) => {
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         onKeyPress={handleKeyPress}
-        placeholder="Type a message..."
+        placeholder="Escriba un mensaje..."
         disabled={disabled}
         sx={{
           '& .MuiOutlinedInput-root': {

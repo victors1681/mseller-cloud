@@ -70,17 +70,30 @@ class SignalRService {
 
     try {
       await this.connection.start()
-      console.log('SignalR Connected')
+      console.log('SignalR Connected successfully')
       this.dispatch?.(setConnectionStatus(true))
       this.reconnectAttempts = 0
-    } catch (err) {
+    } catch (err: any) {
       console.error('SignalR Connection Error:', err)
       this.dispatch?.(setConnectionStatus(false))
 
-      // Retry connection
+      // Check if it's a 404 error (hub not found)
+      if (err?.message?.includes('404') || err?.statusCode === 404) {
+        console.warn(
+          'SignalR Hub not found (404). The communication hub may not be configured on the backend. Real-time features will be disabled.',
+        )
+        // Don't retry on 404 - the hub doesn't exist
+        return
+      }
+
+      // Retry connection for other errors
       if (this.reconnectAttempts < this.maxReconnectAttempts) {
         this.reconnectAttempts++
-        setTimeout(() => this.startConnection(), 5000)
+        const delay = Math.min(5000 * this.reconnectAttempts, 30000)
+        console.log(`Retrying connection in ${delay / 1000}s (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`)
+        setTimeout(() => this.startConnection(), delay)
+      } else {
+        console.error('Max reconnection attempts reached. Real-time features will be disabled.')
       }
     }
   }
@@ -93,11 +106,21 @@ class SignalRService {
 
     // Connection lifecycle events
     this.connection.onclose((error: Error | undefined) => {
-      console.error('SignalR Connection closed:', error)
+      console.warn('SignalR Connection closed:', error?.message || 'Unknown reason')
       this.dispatch?.(setConnectionStatus(false))
 
-      // Attempt to reconnect
-      setTimeout(() => this.startConnection(), 5000)
+      // Don't attempt to reconnect on 404 errors
+      if (error?.message?.includes('404')) {
+        console.warn('Not attempting to reconnect - hub endpoint not found')
+        return
+      }
+
+      // Attempt to reconnect for other errors
+      if (this.reconnectAttempts < this.maxReconnectAttempts) {
+        const delay = Math.min(5000 * (this.reconnectAttempts + 1), 30000)
+        console.log(`Will attempt to reconnect in ${delay / 1000}s...`)
+        setTimeout(() => this.startConnection(), delay)
+      }
     })
 
     this.connection.onreconnecting((error: Error | undefined) => {
@@ -123,6 +146,7 @@ class SignalRService {
         direction: message.Direction,
         status: message.Status,
         messageContent: message.MessageContent,
+        channelType: message.ChannelType || 1, // Default to WhatsApp if not provided
         sentAt: message.SentAt,
         deliveredAt: message.DeliveredAt || null,
         readAt: message.ReadAt || null,
@@ -134,7 +158,8 @@ class SignalRService {
 
       // Show browser notification if not focused
       if (!document.hasFocus()) {
-        this.showNotification('New WhatsApp Message', transformedMessage.messageContent)
+        const channelName = transformedMessage.channelType === 1 ? 'WhatsApp' : 'SMS'
+        this.showNotification(`New ${channelName} Message`, transformedMessage.messageContent)
       }
     })
 
@@ -145,6 +170,7 @@ class SignalRService {
         messageId: data.MessageId,
         conversationId: data.ConversationId,
         isUnassignedContact: data.IsUnassignedContact,
+        channelType: data.ChannelType || 1, // Default to WhatsApp if not provided
         timestamp: data.Timestamp,
         messageContent: data.MessageContent,
       }
@@ -263,6 +289,7 @@ class SignalRService {
   async sendMessage(
     conversationId: number,
     messageContent: string,
+    channelType?: number,
   ): Promise<SendMessageResult> {
     if (
       !this.connection ||
@@ -276,6 +303,7 @@ class SignalRService {
         'SendMessage',
         conversationId,
         messageContent,
+        channelType || 1, // Default to WhatsApp (1) if not provided
       )
 
       // Backend returns full message object, not SendMessageResult

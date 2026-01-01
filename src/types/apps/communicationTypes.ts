@@ -1,8 +1,24 @@
-// ** Types for Communication (WhatsApp) Module
+// ** Types for Communication Module (WhatsApp & SMS)
 
 // ============================================
 // Enums
 // ============================================
+export enum ChannelType {
+  WhatsApp = 1,
+  SMS = 2,
+}
+
+// Helper functions for channel type
+export const getChannelIcon = (channelType: ChannelType): string => {
+  return channelType === ChannelType.WhatsApp
+    ? 'mdi:whatsapp'
+    : 'mdi:message-text'
+}
+
+export const getChannelName = (channelType: ChannelType): string => {
+  return channelType === ChannelType.WhatsApp ? 'WhatsApp' : 'SMS'
+}
+
 export enum MessageDirection {
   Inbound = 'Inbound',
   Outbound = 'Outbound',
@@ -44,6 +60,7 @@ export interface MessageList {
   direction: MessageDirection
   status: MessageStatus
   messageContent: string
+  channelType: ChannelType
   sentAt: string
   deliveredAt: string | null
   readAt: string | null
@@ -62,6 +79,7 @@ export interface ConversationList {
   lastMessageAt: string
   unreadCount: number
   status: ConversationStatus
+  channelType: ChannelType
   isUnassigned: boolean
 }
 
@@ -80,7 +98,8 @@ export interface UnassignedContactList {
 export interface ContactDetails {
   contactoId: number
   nombreContacto: string
-  phoneNumber: string
+  phoneNumber: string // For SMS
+  phoneNumberWhatsApp?: string // For WhatsApp (optional, separate from SMS)
   email: string | null
   clienteCodigo: string | null
   isAssigned: boolean
@@ -101,7 +120,8 @@ export interface CommunicationConfig {
 export interface SendMessageRequest {
   toContactoId: number
   messageContent: string
-  attachmentUrl?: string | null
+  channelType?: ChannelType
+  attachmentUrls?: string[]
 }
 
 export interface SendMessageResponse {
@@ -114,7 +134,8 @@ export interface AssignContactRequest {
 
 export interface UpdateContactRequest {
   nombreContacto: string
-  phoneNumber: string
+  phoneNumber: string // For SMS
+  phoneNumberWhatsApp?: string // For WhatsApp (optional)
   email?: string | null
 }
 
@@ -133,7 +154,9 @@ export interface NewMessageEvent {
   messageId: number
   conversationId: number
   isUnassignedContact: boolean
+  channelType: ChannelType
   timestamp: string
+  messageContent?: string
 }
 
 export interface MessageStatusChangedEvent {
@@ -182,6 +205,7 @@ export interface CommunicationState {
 export interface ConversationFilters {
   status?: ConversationStatus
   search?: string
+  channelType?: ChannelType
   pageNumber?: number
   pageSize?: number
 }
@@ -210,4 +234,43 @@ export interface SidebarLeftType {
   leftSidebarOpen: boolean
   handleLeftSidebarToggle: () => void
   onSelectConversation: (conversation: ConversationList) => void
+}
+
+// ============================================
+// Configuration Interfaces
+// ============================================
+export interface CommunicationConfig {
+  id: number
+  businessId: string
+  twilioAccountSid: string
+  twilioAuthToken: string
+  twilioWhatsAppNumber: string
+  twilioSmsNumber: string
+  twilioWebhookSecret: string
+  whatsAppEnabled: boolean
+  smsEnabled: boolean
+  isActive: boolean
+  fechaCreacion: string
+  fechaModificacion: string
+}
+
+export interface CommunicationConfigForm {
+  twilioAccountSid: string
+  twilioAuthToken: string
+  twilioWhatsAppNumber: string
+  twilioSmsNumber: string
+  twilioWebhookSecret: string
+  whatsAppEnabled: boolean
+  smsEnabled: boolean
+  isActive: boolean
+}
+
+export interface CommunicationConfigState {
+  config: CommunicationConfig | null
+  loading: boolean
+  saving: boolean
+  deleting: boolean
+  error: string | null
+  mode: 'create' | 'edit'
+  successMessage: string | null
 }

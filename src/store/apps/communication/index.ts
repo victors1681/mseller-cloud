@@ -39,10 +39,15 @@ export const fetchConversations = createAsyncThunk(
   'communication/fetchConversations',
   async (filters: ConversationFilters = {}, { rejectWithValue }) => {
     try {
-      const params = {
+      const params: any = {
         pageNumber: filters.pageNumber || 1,
         pageSize: filters.pageSize || 50,
         status: filters.status || 'Active',
+      }
+
+      // Add channelType filter if specified
+      if (filters.channelType !== undefined) {
+        params.channelType = filters.channelType
       }
 
       const response = await restClient.get<

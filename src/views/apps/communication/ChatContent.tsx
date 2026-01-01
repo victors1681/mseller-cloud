@@ -18,7 +18,11 @@ import ChatLog from './ChatLog'
 import SendMsgForm from './SendMsgForm'
 
 // ** Types
-import { ChatContentType } from 'src/types/apps/communicationTypes'
+import {
+  ChatContentType,
+  getChannelIcon,
+  getChannelName,
+} from 'src/types/apps/communicationTypes'
 
 // ** Redux
 import { useAppDispatch, useAppSelector } from 'src/store'
@@ -83,6 +87,7 @@ const ChatContent = (props: ChatContentType) => {
       const result = await signalRService.sendMessage(
         store.selectedConversation.conversationId,
         message,
+        store.selectedConversation.channelType, // Pass the conversation's channel type
       )
 
       if (!result.success) {
@@ -154,13 +159,31 @@ const ChatContent = (props: ChatContentType) => {
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                   {store.selectedConversation.phoneNumber}
                 </Typography>
+                <Chip
+                  icon={
+                    <Icon
+                      icon={getChannelIcon(
+                        store.selectedConversation.channelType,
+                      )}
+                      fontSize={14}
+                    />
+                  }
+                  label={getChannelName(store.selectedConversation.channelType)}
+                  size="small"
+                  color={
+                    store.selectedConversation.channelType === 1
+                      ? 'success'
+                      : 'info'
+                  }
+                  sx={{ height: 20 }}
+                />
                 {store.selectedConversation.isUnassigned && (
                   <Chip label="Unassigned" size="small" color="warning" />
                 )}
                 {store.isConnected && (
                   <Chip
                     icon={<Icon icon="mdi:check-circle" fontSize={14} />}
-                    label="Connected"
+                    label="Conectado"
                     size="small"
                     color="success"
                     sx={{ height: 20 }}
@@ -187,7 +210,7 @@ const ChatContent = (props: ChatContentType) => {
 
         <Box
           sx={{
-            height: 'calc(100% - 8.875rem)',
+            height: 'calc(95% - 8.875rem)',
             backgroundColor: (theme) =>
               theme.palette.mode === 'light'
                 ? '#f5f5f5'

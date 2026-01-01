@@ -16,17 +16,29 @@ import ListItemText from '@mui/material/ListItemText'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 import TextField from '@mui/material/TextField'
+import ToggleButton from '@mui/material/ToggleButton'
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Typography from '@mui/material/Typography'
+import Alert from '@mui/material/Alert'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
 // ** Types
 import {
+  ChannelType,
   ConversationList,
   SidebarLeftType,
   UnassignedContactList,
+  getChannelIcon,
 } from 'src/types/apps/communicationTypes'
+
+// ** Redux
+import { useAppDispatch } from 'src/store'
+import {
+  fetchConversations,
+  fetchUnassignedContacts,
+} from 'src/store/apps/communication'
 
 // ** Utils
 
@@ -55,6 +67,9 @@ const SidebarLeft = (props: SidebarLeftType) => {
     onSelectConversation,
   } = props
 
+  // ** Hooks
+  const dispatch = useAppDispatch()
+
   // ** State
   const [query, setQuery] = useState<string>('')
   const [filteredConversations, setFilteredConversations] = useState<
@@ -64,17 +79,36 @@ const SidebarLeft = (props: SidebarLeftType) => {
     UnassignedContactList[]
   >([])
   const [activeTab, setActiveTab] = useState<number>(0)
+  const [channelFilter, setChannelFilter] = useState<ChannelType | null>(null)
+
+  // ** Fetch data when tab changes
+  useEffect(() => {
+    if (activeTab === 0) {
+      // Active conversations tab
+      dispatch(fetchConversations({ channelType: channelFilter || undefined }))
+    } else {
+      // Unassigned contacts tab
+      dispatch(fetchUnassignedContacts())
+    }
+  }, [activeTab, dispatch, channelFilter])
 
   useEffect(() => {
     if (query) {
       const searchQuery = query.toLowerCase()
-      const filteredConvs = store.conversations.filter((conversation) => {
+      let filteredConvs = store.conversations.filter((conversation) => {
         return (
           conversation.contactName.toLowerCase().includes(searchQuery) ||
           conversation.phoneNumber.includes(searchQuery) ||
           conversation.lastMessage.toLowerCase().includes(searchQuery)
         )
       })
+
+      // Apply channel filter
+      if (channelFilter !== null) {
+        filteredConvs = filteredConvs.filter(
+          (conv) => conv.channelType === channelFilter,
+        )
+      }
 
       const filteredUnass = store.unassignedContacts.filter((contact) => {
         return (
@@ -86,10 +120,19 @@ const SidebarLeft = (props: SidebarLeftType) => {
       setFilteredConversations(filteredConvs)
       setFilteredUnassigned(filteredUnass)
     } else {
-      setFilteredConversations(store.conversations)
+      let filteredConvs = store.conversations
+
+      // Apply channel filter even without search query
+      if (channelFilter !== null) {
+        filteredConvs = filteredConvs.filter(
+          (conv) => conv.channelType === channelFilter,
+        )
+      }
+
+      setFilteredConversations(filteredConvs)
       setFilteredUnassigned(store.unassignedContacts)
     }
-  }, [query, store.conversations, store.unassignedContacts])
+  }, [query, store.conversations, store.unassignedContacts, channelFilter])
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue)
@@ -190,12 +233,24 @@ const SidebarLeft = (props: SidebarLeftType) => {
                       },
                     }}
                     primary={
-                      <Typography
-                        noWrap
-                        sx={{ fontWeight: 500, fontSize: '0.875rem' }}
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
                       >
-                        {conversation.contactName}
-                      </Typography>
+                        <Typography
+                          noWrap
+                          sx={{
+                            fontWeight: 500,
+                            fontSize: '0.875rem',
+                            flex: 1,
+                          }}
+                        >
+                          {conversation.contactName}
+                        </Typography>
+                        <Icon
+                          icon={getChannelIcon(conversation.channelType)}
+                          fontSize={14}
+                        />
+                      </Box>
                     }
                     secondary={
                       <Typography
@@ -392,8 +447,18 @@ const SidebarLeft = (props: SidebarLeftType) => {
         }}
       >
         <Typography variant="h6" sx={{ mb: 3 }}>
-          WhatsApp Messages
+          Mensajes
         </Typography>
+
+        {/* Connection Status */}
+        {!store.isConnected && (
+          <Alert severity="warning" sx={{ mb: 2 }}>
+            <Typography variant="caption">
+              Real-time updates disabled. Please refresh manually.
+            </Typography>
+          </Alert>
+        )}
+
         <TextField
           fullWidth
           size="small"
@@ -410,6 +475,38 @@ const SidebarLeft = (props: SidebarLeftType) => {
             ),
           }}
         />
+
+        {/* Channel Filter */}
+        <Box sx={{ mt: 2 }}>
+          <ToggleButtonGroup
+            value={channelFilter}
+            exclusive
+            onChange={(event, newChannel) => {
+              setChannelFilter(newChannel)
+            }}
+            fullWidth
+            size="small"
+          >
+            <ToggleButton value={null}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Icon icon="mdi:message" fontSize={18} />
+                <span>Todos</span>
+              </Box>
+            </ToggleButton>
+            <ToggleButton value={ChannelType.WhatsApp}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Icon icon="mdi:whatsapp" fontSize={18} />
+                <span>WhatsApp</span>
+              </Box>
+            </ToggleButton>
+            <ToggleButton value={ChannelType.SMS}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Icon icon="mdi:message-text" fontSize={18} />
+                <span>SMS</span>
+              </Box>
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
       </Box>
 
       <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth">

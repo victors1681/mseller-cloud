@@ -41,7 +41,11 @@ const CommunicationApp = () => {
     // Initialize SignalR connection with auth token from localStorage
     const token = window.localStorage.getItem('accessToken')
     if (token) {
-      signalRService.initialize(token, dispatch)
+      // Initialize SignalR but don't block on it
+      signalRService.initialize(token, dispatch).catch((err) => {
+        console.warn('SignalR initialization failed:', err.message)
+        // Continue without real-time features
+      })
     }
 
     // Fetch initial data
@@ -77,9 +81,8 @@ const CommunicationApp = () => {
         position: 'relative',
         backgroundColor: 'background.paper',
         boxShadow: theme.shadows[6],
-        ...(mdAbove
-          ? { height: 'calc(100vh - 13rem)' }
-          : { height: 'calc(100vh - 10rem)' }),
+        height: { xs: 'calc(100vh - 10rem)', md: 'calc(100vh - 13rem)' },
+        minHeight: { xs: '500px', md: '600px' },
       }}
     >
       <SidebarLeft
