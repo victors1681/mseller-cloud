@@ -3,6 +3,18 @@ import { NcfType } from './ncfTypes'
 import { CondicionPagoType } from './paymentTypeTypes'
 import { SellerType } from './sellerType'
 
+export interface ClienteContacto {
+  id: number
+  nombreContacto: string
+  phoneNumberWhatsApp: string | null
+  phoneNumber: string | null
+  email: string | null
+  cargo?: string | null
+  esContactoPrincipal: boolean
+  isActive?: boolean
+  notasInternas?: string | null
+}
+
 export interface CustomerType {
   codigo: string
   nombre: string
@@ -31,12 +43,11 @@ export interface CustomerType {
   bloqueoPorVencimiento: boolean
   descuentoProntoPago: number
   tipoCliente: string
-  contacto: any
+  contactos: ClienteContacto[]
 
   // New fields
   estado?: string
   codigoPostal?: string
-  contactoWhatsApp?: string
   preferenciasDeContacto?: string
   idiomaPreferido?: string
   notas?: string

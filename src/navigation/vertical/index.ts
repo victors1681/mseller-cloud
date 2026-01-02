@@ -67,6 +67,11 @@ const navigation = (): VerticalNavItemsType => {
           path: '/apps/visits/list',
         },
         {
+          title: 'Mensajería',
+          icon: 'mdi:message-text',
+          path: '/apps/communication',
+        },
+        {
           title: 'Cuentas por Cobrar',
           icon: 'mdi:account-cash-outline',
           path: '/apps/cxc',
@@ -206,6 +211,11 @@ const navigation = (): VerticalNavItemsType => {
           title: 'Sucursales',
           icon: 'mdi:location',
           path: '/apps/locations/list',
+        },
+        {
+          title: 'Comunicación',
+          icon: 'mdi:message-settings',
+          path: '/apps/communication/config',
         },
         {
           title: 'eCF',

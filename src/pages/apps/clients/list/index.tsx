@@ -37,6 +37,7 @@ import TableHeader from 'src/views/apps/clients/list/TableHeader'
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
 import { CustomerType } from 'src/types/apps/customerType'
 import formatCurrency from 'src/utils/formatCurrency'
+import InitiateMessageModal from 'src/views/apps/communication/InitiateMessageModal'
 import { SellerAutocomplete } from 'src/views/ui/sellerAutoComplete'
 
 import { useRouter } from 'next/router'
@@ -224,6 +225,13 @@ const InvoiceList = () => {
   })
   const [isInitialized, setIsInitialized] = useState(false)
 
+  // ** Message Modal State
+  const [messageModalOpen, setMessageModalOpen] = useState(false)
+  const [selectedClient, setSelectedClient] = useState<{
+    code: string
+    name: string
+  } | null>(null)
+
   console.log(selectedSellers)
 
   // Sync state with URL params when they change
@@ -333,6 +341,16 @@ const InvoiceList = () => {
     window.open(url, '_blank')
   }
 
+  const handleOpenMessageModal = (clientCode: string, clientName: string) => {
+    setSelectedClient({ code: clientCode, name: clientName })
+    setMessageModalOpen(true)
+  }
+
+  const handleCloseMessageModal = () => {
+    setMessageModalOpen(false)
+    setSelectedClient(null)
+  }
+
   const columns: GridColDef[] = [
     ...defaultColumns,
     {
@@ -343,6 +361,14 @@ const InvoiceList = () => {
       headerName: 'Actions',
       renderCell: ({ row }: CellType) => (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Tooltip title="Enviar Mensaje">
+            <IconButton
+              size="small"
+              onClick={() => handleOpenMessageModal(row.codigo, row.nombre)}
+            >
+              <Icon icon="tabler:message-circle" fontSize={20} />
+            </IconButton>
+          </Tooltip>
           <Tooltip
             title={`Geolocalidad Lat:${row.geoLocalizacion?.latitud} Lon: ${row.geoLocalizacion?.longitud}`}
           >
@@ -454,6 +480,16 @@ const InvoiceList = () => {
           </Card>
         </Grid>
       </Grid>
+
+      {/* Message Modal */}
+      {selectedClient && (
+        <InitiateMessageModal
+          open={messageModalOpen}
+          onClose={handleCloseMessageModal}
+          clientCode={selectedClient.code}
+          clientName={selectedClient.name}
+        />
+      )}
     </DatePickerWrapper>
   )
 }

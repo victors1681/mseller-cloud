@@ -3,14 +3,11 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
 import Divider from '@mui/material/Divider'
-import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from 'src/store'
+import { useSelector } from 'react-redux'
+import { RootState } from 'src/store'
 
 // Component Imports
 
-import { fetchLocations } from '@/store/apps/location'
-import { fetchPaymentType } from '@/store/apps/paymentType'
-import { fetchSellers } from '@/store/apps/seller'
 import CustomAutocomplete from '@/views/ui/customAutocomplete'
 import InputLabelTooltip from '@/views/ui/inputLabelTooltip'
 import {
@@ -22,29 +19,15 @@ import {
   Select,
   TextField,
 } from '@mui/material'
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
 
 const ProductPricing = () => {
   const { control } = useFormContext()
-  const dispatch = useDispatch<AppDispatch>()
   const store = useSelector((state: RootState) => state.clients)
   const sellerStore = useSelector((state: RootState) => state.sellers)
   const locationStore = useSelector((state: RootState) => state.locations)
   const paymentTypeStore = useSelector((state: RootState) => state.paymentTypes)
-
-  useEffect(() => {
-    if (sellerStore.data.length === 0) {
-      dispatch(fetchSellers())
-    }
-    if (locationStore.data.length === 0) {
-      dispatch(fetchLocations())
-    }
-
-    if (paymentTypeStore.data.length === 0) {
-      dispatch(fetchPaymentType())
-    }
-  }, [])
 
   const sellersOptions = useMemo(() => {
     return sellerStore.data.map((unit) => ({
@@ -65,7 +48,7 @@ const ProductPricing = () => {
       label: unit.descripcion,
       value: unit.condicionPago,
     }))
-  }, [store])
+  }, [paymentTypeStore])
 
   const classificationsOpts = useMemo(() => {
     return store.customerDetail.classifications.map((unit) => ({
@@ -105,10 +88,10 @@ const ProductPricing = () => {
               label={
                 <InputLabelTooltip
                   title="Condicion de Pago"
-                  description="Si está activado, el sistema bloqueará automáticamente las ventas o toma de pedidos al cliente cuando tenga facturas vencidas"
+                  description="Define los términos de pago del cliente (Contado, Crédito 30 días, etc.)"
                 />
               }
-              placeholder="Almacen 1 - Localidad 1"
+              placeholder="Seleccione condición de pago"
             />
           </Grid>
           <Grid item xs={12}>

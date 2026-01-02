@@ -8,6 +8,8 @@ import calendar from 'src/store/apps/calendar'
 import chat from 'src/store/apps/chat'
 import clients from 'src/store/apps/clients'
 import collections from 'src/store/apps/collections'
+import communication from 'src/store/apps/communication'
+import communicationConfig from 'src/store/apps/communicationConfig'
 import docTypeSec from 'src/store/apps/docTypeSec'
 import documents from 'src/store/apps/documents'
 import drivers from 'src/store/apps/driver'
@@ -51,6 +53,8 @@ export const store = configureStore({
     drivers,
     locations,
     collections,
+    communication,
+    communicationConfig,
     invoices,
     apikeys,
     removeData,

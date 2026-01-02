@@ -72,7 +72,7 @@ const ClientInformation = ({ id }: { id: string }) => {
           }}
         />
         <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
-          <LoadingWrapper isLoading={store.isLoading}>
+          <LoadingWrapper isLoading={store.isLoading && !isNewCustomer}>
             <Grid container spacing={{ xs: 3, sm: 4, md: 5 }} className="mbe-5">
               <Grid item xs={12} sm={6} md={4}>
                 <Box
@@ -214,38 +214,6 @@ const ClientInformation = ({ id }: { id: string }) => {
                       {...field}
                       fullWidth
                       label="Correo Electrónico"
-                      error={!!error}
-                      helperText={error?.message}
-                      size={isSmallMobile ? 'small' : 'medium'}
-                    />
-                  )}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6} md={4}>
-                <Controller
-                  name="contacto"
-                  control={control}
-                  render={({ field, fieldState: { error } }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Persona de contacto"
-                      error={!!error}
-                      helperText={error?.message}
-                      size={isSmallMobile ? 'small' : 'medium'}
-                    />
-                  )}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6} md={4}>
-                <Controller
-                  name="contactoWhatsApp"
-                  control={control}
-                  render={({ field, fieldState: { error } }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="WhatsApp"
                       error={!!error}
                       helperText={error?.message}
                       size={isSmallMobile ? 'small' : 'medium'}
