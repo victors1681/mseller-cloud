@@ -50,16 +50,8 @@ import ReactHotToast from 'src/@core/styles/libs/react-hot-toast'
 // ** Utils Imports
 import { createEmotionCache } from 'src/@core/utils/create-emotion-cache'
 
-// ** Prismjs Styles
-import 'prismjs'
-import 'prismjs/components/prism-jsx'
-import 'prismjs/components/prism-tsx'
-import 'prismjs/themes/prism-tomorrow.css'
-
 // ** React Perfect Scrollbar Style
 import 'react-perfect-scrollbar/dist/css/styles.css'
-
-import 'src/iconify-bundle/icons-bundle-react'
 
 // ** Global css styles
 import { configureRestClient } from 'src/configs/restClient'
