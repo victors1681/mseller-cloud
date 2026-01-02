@@ -1,18 +1,17 @@
 // ** Redux Imports
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { Dispatch } from 'redux'
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 // ** Axios Imports
-import axios from 'axios'
+import { AppDispatch, RootState } from '@/store'
+import toast from 'react-hot-toast'
+import restClient from 'src/configs/restClient'
 import {
   ClientDetailType,
   CustomerDetailState,
   CustomerType,
 } from 'src/types/apps/customerType'
 import { PaginatedResponse } from 'src/types/apps/response'
-import restClient from 'src/configs/restClient'
-import { AppDispatch, RootState } from '@/store'
-import toast from 'react-hot-toast'
 
 interface DataParams {
   query: string
@@ -61,22 +60,22 @@ export const addOrUpdateCustomer = createAsyncThunk<
       )
 
       if (response.status === 200) {
-        toast.success('Producto actualizado exitosamente')
+        toast.success('Cliente actualizado exitosamente')
 
         return {
           success: true,
           data: response.data.data,
-          message: 'Producto actualizado exitosamente',
+          message: 'Cliente actualizado exitosamente',
         }
       }
 
       return rejectWithValue({
-        message: response?.data?.message || 'Error actualizando producto',
+        message: response?.data?.message || 'Error actualizando cliente',
       })
     } catch (error) {
-      console.error('Update product error:', error)
+      console.error('Update client error:', error)
       return rejectWithValue({
-        message: 'Error inesperado actualizando producto',
+        message: 'Error inesperado actualizando cliente',
       })
     }
   },
@@ -109,7 +108,7 @@ export const fetchCustomer = createAsyncThunk(
         isLoading: false,
       }
     } catch (error) {
-      throw new Error('Error al obtener el detalle del producto')
+      throw new Error('Error al obtener el detalle del cliente')
     }
   },
 )

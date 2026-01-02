@@ -9,7 +9,10 @@ export interface ClienteContacto {
   phoneNumberWhatsApp: string | null
   phoneNumber: string | null
   email: string | null
+  cargo?: string | null
   esContactoPrincipal: boolean
+  isActive?: boolean
+  notasInternas?: string | null
 }
 
 export interface CustomerType {
@@ -40,12 +43,11 @@ export interface CustomerType {
   bloqueoPorVencimiento: boolean
   descuentoProntoPago: number
   tipoCliente: string
-  contacto: ClienteContacto[]
+  contactos: ClienteContacto[]
 
   // New fields
   estado?: string
   codigoPostal?: string
-  contactoWhatsApp?: string
   preferenciasDeContacto?: string
   idiomaPreferido?: string
   notas?: string

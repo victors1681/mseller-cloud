@@ -6,6 +6,7 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 // Component Imports
 import ClientHeader from '@/views/apps/clients/add/ClientAddHeader'
 import ClientConfig from '@/views/apps/clients/add/ClientConfig'
+import ClientContacts from '@/views/apps/clients/add/ClientContacts'
 import ClientInformation from '@/views/apps/clients/add/ClientInformation'
 import ClientRoute from '@/views/apps/clients/add/ClientRoute'
 
@@ -22,6 +23,9 @@ import toast from 'react-hot-toast'
 
 // Import statements
 import { useFormNavWarning } from '@/hooks/useFormNavWarning'
+import { fetchLocations } from '@/store/apps/location'
+import { fetchPaymentType } from '@/store/apps/paymentType'
+import { fetchSellers } from '@/store/apps/seller'
 import { CustomerType } from '@/types/apps/customerType'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
@@ -76,13 +80,15 @@ const clientSchema = yup.object().shape({
   // Email validation
   email: yup.string().nullable().email('Correo electrónico inválido'),
 
-  condicion: yup.string().required('La condición de precio es requerida'),
+  condicion: yup.string().required('La condición de pago es requerida'),
   // Numbers with specific ranges
   condicionPrecio: yup
     .number()
     .integer('Debe ser un número entero')
     .min(1, 'Mínimo 1')
-    .max(5, 'Máximo 5'),
+    .max(5, 'Máximo 5')
+    .optional()
+    .default(1),
 
   rutaVenta: yup
     .number()
@@ -136,11 +142,39 @@ const clientSchema = yup.object().shape({
   // Optional new fields
   estado: yup.string().nullable(),
   codigoPostal: yup.string().nullable(),
-  contactoWhatsApp: yup.string().nullable().optional(),
   preferenciasDeContacto: yup.string().nullable(),
   idiomaPreferido: yup.string().nullable(),
   notas: yup.string().nullable(),
   pais: yup.string().nullable(),
+
+  // Contacts validation
+  contactos: yup
+    .array()
+    .of(
+      yup.object().shape({
+        id: yup.number().required(),
+        nombreContacto: yup
+          .string()
+          .required('El nombre del contacto es requerido'),
+        phoneNumberWhatsApp: yup.string().nullable(),
+        phoneNumber: yup.string().nullable(),
+        email: yup.string().nullable().email('Email inválido'),
+        cargo: yup.string().nullable(),
+        esContactoPrincipal: yup.boolean().required(),
+        isActive: yup.boolean(),
+        notasInternas: yup.string().nullable(),
+      }),
+    )
+    .test(
+      'at-least-one-phone',
+      'Al menos un contacto debe tener un número de teléfono',
+      function (contacts) {
+        if (!contacts || contacts.length === 0) return true
+        return contacts.every(
+          (contact) => contact.phoneNumberWhatsApp || contact.phoneNumber,
+        )
+      },
+    ),
 })
 
 interface AddCustomerProps {
@@ -162,7 +196,7 @@ const AddCustomer = ({ id }: AddCustomerProps) => {
       telefono1: '',
       ciudad: '',
       email: '',
-      contacto: [],
+      contactos: [],
       rnc: '',
 
       // Financial Information
@@ -176,7 +210,7 @@ const AddCustomer = ({ id }: AddCustomerProps) => {
       codigoVendedor: '',
       rutaVenta: 0,
       clasificacion: '',
-      condicionPrecio: 0,
+      condicionPrecio: 1,
 
       // Status and Controls
       status: 'A',
@@ -197,7 +231,6 @@ const AddCustomer = ({ id }: AddCustomerProps) => {
 
       estado: '',
       codigoPostal: '',
-      contactoWhatsApp: '',
       preferenciasDeContacto: '',
       idiomaPreferido: '',
       notas: '',
@@ -220,9 +253,30 @@ const AddCustomer = ({ id }: AddCustomerProps) => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
   const store = useSelector((state: RootState) => state.clients)
+  const sellerStore = useSelector((state: RootState) => state.sellers)
+  const locationStore = useSelector((state: RootState) => state.locations)
+  const paymentTypeStore = useSelector((state: RootState) => state.paymentTypes)
+
+  // Fetch required data
+  useEffect(() => {
+    if (sellerStore.data.length === 0) {
+      dispatch(fetchSellers())
+    }
+    if (locationStore.data.length === 0) {
+      dispatch(fetchLocations())
+    }
+    if (paymentTypeStore.data.length === 0) {
+      dispatch(fetchPaymentType())
+    }
+  }, [
+    dispatch,
+    sellerStore.data.length,
+    locationStore.data.length,
+    paymentTypeStore.data.length,
+  ])
 
   useEffect(() => {
-    if (id) {
+    if (id && id !== 'new') {
       dispatch(fetchCustomer(id))
     }
   }, [id, dispatch])
@@ -232,6 +286,57 @@ const AddCustomer = ({ id }: AddCustomerProps) => {
       methods.reset(store.customerDetail.client)
     }
   }, [methods, store.customerDetail])
+
+  // Set default values for new customer
+  useEffect(() => {
+    const isNewCustomer = !id || id === 'new'
+
+    if (isNewCustomer) {
+      const currentVendedor = methods.getValues('codigoVendedor')
+      const currentLocalidad = methods.getValues('localidadId')
+      const currentCondicion = methods.getValues('condicion')
+
+      // Set default vendedor (first one)
+      if (
+        sellerStore.data.length > 0 &&
+        (!currentVendedor || currentVendedor === '')
+      ) {
+        methods.setValue('codigoVendedor', sellerStore.data[0].codigo, {
+          shouldValidate: true,
+        })
+      }
+
+      // Set default localidad (first one)
+      if (
+        locationStore.data.length > 0 &&
+        (!currentLocalidad || currentLocalidad === 0)
+      ) {
+        methods.setValue('localidadId', locationStore.data[0].id || 0, {
+          shouldValidate: true,
+        })
+      }
+
+      // Set default condicion de pago (first one with dias = 0)
+      if (
+        paymentTypeStore.data.length > 0 &&
+        (!currentCondicion || currentCondicion === '')
+      ) {
+        const defaultPayment =
+          paymentTypeStore.data.find((p) => p.dias === 0) ||
+          paymentTypeStore.data[0]
+        methods.setValue('condicion', defaultPayment.condicionPago, {
+          shouldValidate: true,
+        })
+      }
+    }
+  }, [
+    id,
+    store.customerDetail,
+    sellerStore.data,
+    locationStore.data,
+    paymentTypeStore.data,
+    methods,
+  ])
 
   // Handle form submission
   const onSubmit = async (data: CustomerType) => {
@@ -252,7 +357,7 @@ const AddCustomer = ({ id }: AddCustomerProps) => {
   }
 
   return (
-    <LoadingWrapper isLoading={store.isLoading}>
+    <LoadingWrapper isLoading={store.isLoading && id !== 'new'}>
       <FormProvider {...methods}>
         <form onSubmit={methods.handleSubmit(onSubmit)}>
           <Grid
@@ -274,6 +379,11 @@ const AddCustomer = ({ id }: AddCustomerProps) => {
               <Grid container spacing={{ xs: 3, sm: 4, md: 6 }}>
                 <Grid item xs={12}>
                   <ClientInformation id={id} />
+                </Grid>
+
+                {/* Contacts Section */}
+                <Grid item xs={12}>
+                  <ClientContacts />
                 </Grid>
 
                 {/* Route and Settings - Stack on mobile */}
