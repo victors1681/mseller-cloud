@@ -17,10 +17,17 @@ const config = {
   // Production optimizations
   swcMinify: true,
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
+    removeConsole:
+      process.env.NODE_ENV === 'production'
+        ? { exclude: ['error', 'warn'] }
+        : false,
   },
   experimental: {
-    optimizePackageImports: ['@mui/material', '@mui/icons-material', '@iconify/react'],
+    optimizePackageImports: [
+      '@mui/material',
+      '@mui/icons-material',
+      '@iconify/react',
+    ],
   },
   webpack: (config, { isServer }) => {
     config.resolve.alias = {

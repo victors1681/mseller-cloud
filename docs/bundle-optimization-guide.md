@@ -3,6 +3,7 @@
 ## Changes Applied
 
 ### 1. ✅ Removed Icon Bundle (~500-600KB saved)
+
 **Before:** All Material Design Icons were bundled (28,330 lines in `icons-bundle-react.js`)
 **After:** Icons now load dynamically via `@iconify/react`
 
@@ -11,11 +12,13 @@
 - **Expected savings: 500-600KB from initial bundle**
 
 ### 2. ✅ Removed Global Prism.js (~50-100KB saved)
+
 **Before:** Syntax highlighting library loaded globally
 **After:** Only load Prism.js on pages that need code highlighting
 
 - Removed from `_app.tsx`
 - Add back to specific pages if needed:
+
 ```typescript
 import 'prismjs'
 import 'prismjs/components/prism-jsx'
@@ -23,7 +26,9 @@ import 'prismjs/themes/prism-tomorrow.css'
 ```
 
 ### 3. ✅ Added Production Optimizations
+
 **Added to `next.config.js`:**
+
 - `swcMinify: true` - Faster minification with SWC
 - Remove console logs in production (except errors/warnings)
 - Package import optimization for MUI and Iconify
@@ -34,9 +39,11 @@ import 'prismjs/themes/prism-tomorrow.css'
   - Common chunk for shared code
 
 ### 4. ✅ Added Bundle Analyzer
+
 **New command:** `yarn build:analyze`
 
 This will generate visual reports showing:
+
 - What's in each bundle chunk
 - Size of each dependency
 - Which pages share which code
@@ -46,12 +53,15 @@ This will generate visual reports showing:
 ### Immediate Actions:
 
 1. **Run Bundle Analyzer:**
+
 ```bash
 yarn build:analyze
 ```
+
 This opens a visual report in your browser showing exact bundle composition.
 
 2. **Test the App:**
+
 - Icons should still work (loaded dynamically)
 - Check pages that might have used Prism.js for syntax highlighting
 - Verify all functionality works
@@ -59,6 +69,7 @@ This opens a visual report in your browser showing exact bundle composition.
 ### Further Optimizations (High Impact):
 
 #### A. Dynamic Redux Store (~200-300KB potential savings)
+
 Currently all Redux slices load upfront. Implement lazy loading:
 
 ```typescript
@@ -73,6 +84,7 @@ const ClientsPage = dynamic(() => import('./ClientsList'), {
 ```
 
 #### B. Component Code Splitting
+
 Large pages should use dynamic imports:
 
 ```typescript
@@ -80,19 +92,24 @@ Large pages should use dynamic imports:
 import ClientConfig from '@/views/apps/clients/add/ClientConfig'
 
 // Use:
-const ClientConfig = dynamic(() => import('@/views/apps/clients/add/ClientConfig'), {
-  loading: () => <CircularProgress />,
-  ssr: false, // if component has client-only code
-})
+const ClientConfig = dynamic(
+  () => import('@/views/apps/clients/add/ClientConfig'),
+  {
+    loading: () => <CircularProgress />,
+    ssr: false, // if component has client-only code
+  },
+)
 ```
 
 **Recommended for:**
+
 - Heavy form components
 - Chart/visualization components
 - Modal/dialog content
 - Admin-only pages
 
 #### C. MUI Tree Shaking
+
 Import only needed components:
 
 ```typescript
@@ -105,6 +122,7 @@ import Card from '@mui/material/Card'
 ```
 
 #### D. Consider Lazy Routes
+
 For admin/settings pages used less frequently:
 
 ```typescript
@@ -117,11 +135,13 @@ export default dynamic(() => import('@/views/admin/SettingsView'), {
 ### Monitoring
 
 **Target Bundle Sizes:**
+
 - Initial Load JS: **< 500KB** (currently 1.17MB)
 - Per-page JS: **< 200KB**
 - Shared chunks: **< 300KB**
 
 **After these optimizations, expect:**
+
 - **First Load JS: ~600-700KB** (down from 1.17MB)
 - **40-50% reduction** in initial bundle size
 
@@ -137,6 +157,7 @@ export default dynamic(() => import('@/views/admin/SettingsView'), {
 ## Bundle Analyzer Report
 
 After running `yarn build:analyze`, look for:
+
 1. **Largest chunks** - candidates for code splitting
 2. **Duplicate dependencies** - can be deduplicated
 3. **Unused code** - can be removed
@@ -153,6 +174,7 @@ After running `yarn build:analyze`, look for:
 ## Rollback
 
 If issues occur:
+
 1. Restore icon bundle: Add back `import 'src/iconify-bundle/icons-bundle-react'` to `_app.tsx`
 2. Restore Prism.js: Add back imports if code highlighting breaks
 3. Revert next.config.js changes
