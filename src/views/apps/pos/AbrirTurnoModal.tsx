@@ -78,7 +78,7 @@ const schema = yup.object().shape({
   codigoVendedor: yup
     .string()
     .required('Código de vendedor es requerido')
-    .min(2, 'Mínimo 2 caracteres'),
+    .min(1, 'Mínimo 1 caracter'),
   idDispositivo: yup
     .string()
     .required('ID de dispositivo es requerido')
