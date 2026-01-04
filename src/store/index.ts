@@ -36,6 +36,7 @@ import dashboard from './apps/dashboard'
 import offers from './apps/offers'
 import onboarding from './apps/onboarding'
 import removeData from './apps/removeData'
+import reports from './apps/reports'
 
 export const store = configureStore({
   reducer: {
@@ -72,6 +73,7 @@ export const store = configureStore({
     cxc,
     dashboard,
     onboarding,
+    reports,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

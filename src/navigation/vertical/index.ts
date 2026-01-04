@@ -62,6 +62,11 @@ const navigation = (): VerticalNavItemsType => {
           path: '/apps/clients/list',
         },
         {
+          title: 'Facturas CxC',
+          icon: 'lets-icons:order',
+          path: '/apps/invoices/list',
+        },
+        {
           title: 'Visitas',
           icon: 'material-symbols:map-outline',
           path: '/apps/visits/list',
@@ -195,9 +200,9 @@ const navigation = (): VerticalNavItemsType => {
       icon: 'mdi:chart-line',
       children: [
         {
-          title: 'Facturas CxC',
-          icon: 'lets-icons:order',
-          path: '/apps/invoices/list',
+          title: 'Plantillas de Reportes',
+          icon: 'mdi:file-document-multiple',
+          path: '/apps/reports',
         },
       ],
     },
