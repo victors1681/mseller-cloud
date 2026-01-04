@@ -204,6 +204,11 @@ const navigation = (): VerticalNavItemsType => {
           icon: 'mdi:file-document-multiple',
           path: '/apps/reports',
         },
+        {
+          title: 'Plantillas de Documentos',
+          icon: 'mdi:file-cog-outline',
+          path: '/apps/settings/templates',
+        },
       ],
     },
 

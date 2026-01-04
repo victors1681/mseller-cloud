@@ -20,9 +20,10 @@ import Icon from 'src/@core/components/icon'
 
 // ** Hooks
 import { useAuth } from 'src/hooks/useAuth'
+import { useConfiguredPDFOperations } from 'src/hooks/useConfiguredPDFOperations'
 
 // ** PDF Generator
-import { EnhancedPDFGenerator, usePDFOperations } from 'src/services/pdf/client'
+import { EnhancedPDFGenerator } from 'src/services/pdf/client'
 
 // ** Types
 import { DocumentType } from 'src/types/apps/documentTypes'
@@ -46,7 +47,7 @@ const PDFActionsCard: React.FC<PDFActionsCardProps> = ({
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
 
-  // Using the custom hook
+  // Using the configured PDF operations hook (automatically uses configured templates)
   const {
     downloadPDF,
     openPDF,
@@ -54,7 +55,7 @@ const PDFActionsCard: React.FC<PDFActionsCardProps> = ({
     downloadHighQuality,
     downloadLandscape,
     downloadMobileOptimized,
-  } = usePDFOperations()
+  } = useConfiguredPDFOperations()
 
   /**
    * Handle PDF operations with loading states

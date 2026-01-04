@@ -53,6 +53,7 @@ import {
   fetchReportTemplates,
   setFilters,
 } from 'src/store/apps/reports'
+import { saveConfiguration } from 'src/store/apps/settings/templateConfigSlice'
 
 // ** Type Imports
 import {
@@ -181,6 +182,40 @@ const ReportsListView = () => {
     }
   }
 
+  // ** Handle Set as Default
+  const handleSetAsDefault = async (
+    templateId: number,
+    tipoDocumento: number,
+  ) => {
+    try {
+      await dispatch(
+        saveConfiguration({
+          tipoDocumento,
+          plantillaId: templateId,
+          activo: true,
+        }),
+      ).unwrap()
+
+      toast.success('Plantilla configurada como predeterminada exitosamente')
+      loadReports()
+    } catch (error: any) {
+      // If configuration already exists, the error message will indicate that
+      if (
+        error &&
+        typeof error === 'string' &&
+        error.includes('already exists')
+      ) {
+        toast.error(
+          'Ya existe una configuración. Use la página de configuración de plantillas para actualizar.',
+        )
+      } else {
+        toast.error(
+          error || 'Error al configurar la plantilla como predeterminada',
+        )
+      }
+    }
+  }
+
   // ** Handle Preview
   const handlePreview = async (id: number, name: string) => {
     setPreviewLoading(true)
@@ -245,16 +280,28 @@ const ReportsListView = () => {
             <CardHeader
               title="Plantillas de Reportes"
               action={
-                <Button
-                  variant="contained"
-                  startIcon={<Icon icon="mdi:plus" />}
-                  onClick={() => setCreateModalOpen(true)}
-                  sx={{
-                    minHeight: { xs: 44, sm: 'auto' },
-                  }}
-                >
-                  Nueva Plantilla
-                </Button>
+                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                  <Button
+                    variant="outlined"
+                    startIcon={<Icon icon="mdi:cog-outline" />}
+                    onClick={() => router.push('/apps/settings/templates')}
+                    sx={{
+                      minHeight: { xs: 44, sm: 'auto' },
+                    }}
+                  >
+                    Configurar Plantillas
+                  </Button>
+                  <Button
+                    variant="contained"
+                    startIcon={<Icon icon="mdi:plus" />}
+                    onClick={() => setCreateModalOpen(true)}
+                    sx={{
+                      minHeight: { xs: 44, sm: 'auto' },
+                    }}
+                  >
+                    Nueva Plantilla
+                  </Button>
+                </Box>
               }
             />
             {isLoading && <LinearProgress />}
@@ -481,6 +528,7 @@ const ReportsListView = () => {
                                 e.stopPropagation()
                                 handlePreview(template.id, template.nombre)
                               }}
+                              title="Vista previa"
                             >
                               <Icon icon="mdi:eye-outline" />
                             </IconButton>
@@ -488,8 +536,22 @@ const ReportsListView = () => {
                               size="small"
                               onClick={(e) => {
                                 e.stopPropagation()
+                                handleSetAsDefault(
+                                  template.id,
+                                  template.tipoDocumento,
+                                )
+                              }}
+                              title="Establecer como predeterminada"
+                            >
+                              <Icon icon="mdi:star-outline" />
+                            </IconButton>
+                            <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                e.stopPropagation()
                                 handleViewDetail(template.id)
                               }}
+                              title="Editar"
                             >
                               <Icon icon="mdi:pencil-outline" />
                             </IconButton>
@@ -500,6 +562,7 @@ const ReportsListView = () => {
                                 handleDelete(template.id)
                               }}
                               disabled={isProcessing || template.isGlobal}
+                              title="Eliminar"
                             >
                               <Icon icon="mdi:delete-outline" />
                             </IconButton>
@@ -553,6 +616,9 @@ const ReportsListView = () => {
                       onView={() => handleViewDetail(template.id)}
                       onPreview={() =>
                         handlePreview(template.id, template.nombre)
+                      }
+                      onSetAsDefault={() =>
+                        handleSetAsDefault(template.id, template.tipoDocumento)
                       }
                       onDelete={() => handleDelete(template.id)}
                       isDeleting={isProcessing}

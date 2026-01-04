@@ -23,7 +23,9 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import Icon from 'src/@core/components/icon'
 
 // ** PDF Imports
-import { EnhancedPDFGenerator } from 'src/services/pdf/client'
+
+// ** Hooks
+import { useConfiguredPDFOperations } from 'src/hooks/useConfiguredPDFOperations'
 
 // ** Types
 import { DocumentType } from 'src/types/apps/documentTypes'
@@ -49,6 +51,9 @@ const DocumentSuccessModal = ({
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [isGenerating, setIsGenerating] = useState(false)
 
+  // Use configured PDF operations hook for automatic template selection
+  const { downloadPDF } = useConfiguredPDFOperations()
+
   const handlePrint = () => {
     if (documentId) {
       // Open print preview in new tab
@@ -66,8 +71,10 @@ const DocumentSuccessModal = ({
 
     setIsGenerating(true)
     try {
-      await EnhancedPDFGenerator.downloadPDF(documentData)
+      // Use configured PDF operations - automatically uses configured template
+      await downloadPDF(documentData)
     } catch (err) {
+      console.error('PDF generation error:', err)
       // If PDF generation failed, fallback to preview
       if (documentId) router.push(`/apps/documents/preview/${documentId}`)
     } finally {

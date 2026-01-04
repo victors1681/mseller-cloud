@@ -37,7 +37,7 @@ import offers from './apps/offers'
 import onboarding from './apps/onboarding'
 import removeData from './apps/removeData'
 import reports from './apps/reports'
-
+import templateConfig from './apps/settings/templateConfigSlice'
 export const store = configureStore({
   reducer: {
     user,
@@ -74,6 +74,7 @@ export const store = configureStore({
     dashboard,
     onboarding,
     reports,
+    templateConfig,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

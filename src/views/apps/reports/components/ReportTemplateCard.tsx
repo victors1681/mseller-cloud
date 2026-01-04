@@ -29,6 +29,7 @@ interface Props {
   template: PlantillaReporte
   onView: () => void
   onPreview?: () => void
+  onSetAsDefault?: () => void
   onDelete: () => void
   isDeleting: boolean
 }
@@ -37,6 +38,7 @@ const ReportTemplateCard: FC<Props> = ({
   template,
   onView,
   onPreview,
+  onSetAsDefault,
   onDelete,
   isDeleting,
 }) => {
@@ -115,14 +117,24 @@ const ReportTemplateCard: FC<Props> = ({
             onClick={(e) => e.stopPropagation()}
           >
             {onPreview && (
-              <IconButton size="small" onClick={onPreview}>
+              <IconButton size="small" onClick={onPreview} title="Vista previa">
                 <Icon icon="mdi:eye-outline" fontSize={20} />
+              </IconButton>
+            )}
+            {onSetAsDefault && (
+              <IconButton
+                size="small"
+                onClick={onSetAsDefault}
+                title="Establecer como predeterminada"
+              >
+                <Icon icon="mdi:star-outline" fontSize={20} />
               </IconButton>
             )}
             <IconButton
               size="small"
               onClick={onView}
               disabled={template.isGlobal}
+              title="Editar"
             >
               <Icon icon="mdi:pencil-outline" fontSize={20} />
             </IconButton>
@@ -130,6 +142,7 @@ const ReportTemplateCard: FC<Props> = ({
               size="small"
               onClick={onDelete}
               disabled={isDeleting || template.isGlobal}
+              title="Eliminar"
             >
               <Icon icon="mdi:delete-outline" fontSize={20} />
             </IconButton>
