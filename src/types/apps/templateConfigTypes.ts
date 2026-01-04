@@ -1,11 +1,11 @@
 // ** Types for Template Configuration System
 
+import { TipoDocumentoEnum } from './documentTypes'
 import { TipoDocumentoNumerico } from './reportsTypes'
-import { TipoDocumentoEnum, tipoDocumentoSpanishNames } from './documentTypes'
 
 // Re-export for convenience
-export { TipoDocumentoNumerico } from './reportsTypes'
 export { TipoDocumentoEnum, tipoDocumentoSpanishNames } from './documentTypes'
+export { TipoDocumentoNumerico } from './reportsTypes'
 
 // ============================================
 // Mapping Functions
@@ -15,7 +15,7 @@ export { TipoDocumentoEnum, tipoDocumentoSpanishNames } from './documentTypes'
  * Map TipoDocumentoEnum (string) to TipoDocumentoNumerico (number)
  */
 export const mapDocumentTypeToNumerico = (
-  documentType: TipoDocumentoEnum | string
+  documentType: TipoDocumentoEnum | string,
 ): TipoDocumentoNumerico => {
   const mapping: Record<TipoDocumentoEnum, TipoDocumentoNumerico> = {
     [TipoDocumentoEnum.ORDER]: TipoDocumentoNumerico.Pedido,
@@ -30,14 +30,16 @@ export const mapDocumentTypeToNumerico = (
     [TipoDocumentoEnum.INVOICE_TRANSPORT]: TipoDocumentoNumerico.Factura, // Fallback
   }
 
-  return mapping[documentType as TipoDocumentoEnum] || TipoDocumentoNumerico.Pedido
+  return (
+    mapping[documentType as TipoDocumentoEnum] || TipoDocumentoNumerico.Pedido
+  )
 }
 
 /**
  * Map TipoDocumentoNumerico (number) to TipoDocumentoEnum (string)
  */
 export const mapNumericoToDocumentType = (
-  tipoNumerico: TipoDocumentoNumerico
+  tipoNumerico: TipoDocumentoNumerico,
 ): TipoDocumentoEnum => {
   const mapping: Record<TipoDocumentoNumerico, TipoDocumentoEnum> = {
     [TipoDocumentoNumerico.Pedido]: TipoDocumentoEnum.ORDER,

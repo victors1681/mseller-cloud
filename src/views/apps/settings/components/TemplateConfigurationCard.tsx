@@ -96,7 +96,11 @@ const TemplateConfigurationCard: FC<Props> = ({ item, onConfigure }) => {
         </Box>
 
         <Typography variant="h6" sx={{ mb: 1 }}>
-          {tipoDocumentoSpanishNames[item.documentType as keyof typeof tipoDocumentoSpanishNames]}
+          {
+            tipoDocumentoSpanishNames[
+              item.documentType as keyof typeof tipoDocumentoSpanishNames
+            ]
+          }
         </Typography>
 
         {item.templateName ? (

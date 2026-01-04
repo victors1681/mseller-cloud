@@ -234,7 +234,12 @@ const TemplateConfigurationModal: FC<Props> = ({
             }}
           >
             <Typography variant="h6">
-              Configurar Plantilla: {tipoDocumentoSpanishNames[mapNumericoToDocumentType(tipoDocumento)]}
+              Configurar Plantilla:{' '}
+              {
+                tipoDocumentoSpanishNames[
+                  mapNumericoToDocumentType(tipoDocumento)
+                ]
+              }
             </Typography>
             <IconButton onClick={onClose} size="small">
               <Icon icon="mdi:close" />
