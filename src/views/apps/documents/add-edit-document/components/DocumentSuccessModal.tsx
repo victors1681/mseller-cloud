@@ -1,6 +1,4 @@
 // ** React Imports
-
-// ** React Imports
 import { useState } from 'react'
 
 // ** Next Imports
@@ -22,10 +20,8 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
-// ** PDF Imports
-
-// ** Hooks
-import { useConfiguredPDFOperations } from 'src/hooks/useConfiguredPDFOperations'
+// ** Components
+import { DocumentRendererModal } from 'src/views/ui/documentRenderer'
 
 // ** Types
 import { DocumentType } from 'src/types/apps/documentTypes'
@@ -49,47 +45,11 @@ const DocumentSuccessModal = ({
   const router = useRouter()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
-  const [isGenerating, setIsGenerating] = useState(false)
-
-  // Use configured PDF operations hook for automatic template selection
-  const { downloadPDF } = useConfiguredPDFOperations()
+  const [showPrintModal, setShowPrintModal] = useState(false)
 
   const handlePrint = () => {
-    if (documentId) {
-      // Open print preview in new tab
-      window.open(`/apps/documents/print/${documentId}`, '_blank')
-    }
-    onClose()
-  }
-
-  const handleDownloadShare = async () => {
-    if (!documentData) {
-      if (documentId) router.push(`/apps/documents/preview/${documentId}`)
-      onClose()
-      return
-    }
-
-    setIsGenerating(true)
-    try {
-      // Use configured PDF operations - automatically uses configured template
-      await downloadPDF(documentData)
-    } catch (err) {
-      console.error('PDF generation error:', err)
-      // If PDF generation failed, fallback to preview
-      if (documentId) router.push(`/apps/documents/preview/${documentId}`)
-    } finally {
-      setIsGenerating(false)
-      onClose()
-    }
-  }
-
-  const handleEmail = () => {
-    // Since email sharing isn't available in the clean generator,
-    // just redirect to the preview page where user can access all options
-    if (documentId) {
-      router.push(`/apps/documents/preview/${documentId}`)
-    }
-    onClose()
+    // Use new DocumentRenderer component for auto-print
+    setShowPrintModal(true)
   }
 
   const handleCloseModal = () => {
@@ -97,75 +57,76 @@ const DocumentSuccessModal = ({
   }
 
   return (
-    <Dialog
-      open={open}
-      onClose={handleCloseModal}
-      maxWidth="sm"
-      fullWidth
-      fullScreen={isMobile}
-    >
-      <DialogTitle sx={{ textAlign: 'center', pb: 2 }}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 2,
-          }}
-        >
+    <>
+      <Dialog
+        open={open}
+        onClose={handleCloseModal}
+        maxWidth="sm"
+        fullWidth
+        fullScreen={isMobile}
+      >
+        <DialogTitle sx={{ textAlign: 'center', pb: 2 }}>
           <Box
             sx={{
-              backgroundColor: 'success.main',
-              borderRadius: '50%',
-              width: 64,
-              height: 64,
               display: 'flex',
+              flexDirection: 'column',
               alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
+              gap: 2,
             }}
           >
-            <Icon icon="mdi:check" fontSize="2rem" />
-          </Box>
-          <Typography variant="h5" component="h2">
-            ¡Documento Creado Exitosamente!
-          </Typography>
-          {documentNumber && (
-            <Typography variant="body2" color="text.secondary">
-              Documento #{documentNumber}
+            <Box
+              sx={{
+                backgroundColor: 'success.main',
+                borderRadius: '50%',
+                width: 64,
+                height: 64,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+              }}
+            >
+              <Icon icon="mdi:check" fontSize="2rem" />
+            </Box>
+            <Typography variant="h5" component="h2">
+              ¡Documento Creado Exitosamente!
             </Typography>
-          )}
-        </Box>
-      </DialogTitle>
+            {documentNumber && (
+              <Typography variant="body2" color="text.secondary">
+                Documento #{documentNumber}
+              </Typography>
+            )}
+          </Box>
+        </DialogTitle>
 
-      <DialogContent sx={{ textAlign: 'center', pb: 1 }}>
-        <Typography variant="body1" color="text.secondary">
-          El documento ha sido guardado correctamente. ¿Qué desea hacer a
-          continuación?
-        </Typography>
-      </DialogContent>
+        <DialogContent sx={{ textAlign: 'center', pb: 1 }}>
+          <Typography variant="body1" color="text.secondary">
+            El documento ha sido guardado correctamente. ¿Qué desea hacer a
+            continuación?
+          </Typography>
+        </DialogContent>
 
-      <DialogActions
-        sx={{
-          flexDirection: { xs: 'column', sm: 'row' },
-          gap: { xs: 1, sm: 2 },
-          p: 3,
-        }}
-      >
-        <Button
-          variant="outlined"
-          startIcon={<Icon icon="mdi:printer" />}
-          onClick={handlePrint}
-          fullWidth={isMobile}
+        <DialogActions
           sx={{
-            minHeight: { xs: 48, sm: 'auto' },
-            fontSize: { xs: '1rem', sm: '0.875rem' },
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: { xs: 1, sm: 2 },
+            p: 3,
           }}
         >
-          Imprimir
-        </Button>
+          <Button
+            variant="outlined"
+            startIcon={<Icon icon="mdi:printer" />}
+            onClick={handlePrint}
+            fullWidth={isMobile}
+            sx={{
+              minHeight: { xs: 48, sm: 'auto' },
+              fontSize: { xs: '1rem', sm: '0.875rem' },
+            }}
+          >
+            Imprimir
+          </Button>
 
-        {/* <Button
+          {/* <Button
           variant="outlined"
           startIcon={<Icon icon="mdi:email-outline" />}
           onClick={handleEmail}
@@ -178,20 +139,39 @@ const DocumentSuccessModal = ({
           Enviar por Email
         </Button> */}
 
-        <Button
-          variant="contained"
-          startIcon={<Icon icon="mdi:close" />}
-          onClick={handleCloseModal}
-          fullWidth={isMobile}
-          sx={{
-            minHeight: { xs: 48, sm: 'auto' },
-            fontSize: { xs: '1rem', sm: '0.875rem' },
+          <Button
+            variant="contained"
+            startIcon={<Icon icon="mdi:close" />}
+            onClick={handleCloseModal}
+            fullWidth={isMobile}
+            sx={{
+              minHeight: { xs: 48, sm: 'auto' },
+              fontSize: { xs: '1rem', sm: '0.875rem' },
+            }}
+          >
+            Cerrar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Document Print Modal */}
+      {showPrintModal && documentNumber && (
+        <DocumentRendererModal
+          open={showPrintModal}
+          onClose={() => setShowPrintModal(false)}
+          documentNo={documentNumber}
+          tipoDocumento={(documentData?.tipoDocumento ?? 0) as any}
+          autoPrint={true}
+          showPreview={false}
+          onPrintCompleted={() => {
+            setShowPrintModal(false)
           }}
-        >
-          Cerrar
-        </Button>
-      </DialogActions>
-    </Dialog>
+          onPrintCancelled={() => {
+            setShowPrintModal(false)
+          }}
+        />
+      )}
+    </>
   )
 }
 

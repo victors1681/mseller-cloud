@@ -94,7 +94,11 @@ export class DocumentService {
       ).unwrap()
 
       if (response.success) {
-        return { success: true }
+        // Return the complete response including the document data from API
+        return {
+          success: true,
+          data: response.data, // Contains noPedidoStr and other document info
+        }
       } else {
         toast.error(response.message || 'Error creando el documento')
         return { success: false, error: response.message }
@@ -134,7 +138,11 @@ export class DocumentService {
       ).unwrap()
 
       if (response.success) {
-        return { success: true }
+        // Return the complete response including the document data from API
+        return {
+          success: true,
+          data: response.data || documentEditData, // Use API response or fallback to existing data
+        }
       } else {
         toast.error(response.message || 'Error actualizando el documento')
         return { success: false, error: response.message }

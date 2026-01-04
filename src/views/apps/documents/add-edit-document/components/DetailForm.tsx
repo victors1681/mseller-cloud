@@ -1,16 +1,16 @@
-import React from 'react'
-import { Controller, Control } from 'react-hook-form'
 import {
-  Grid,
-  Card,
-  CardHeader,
-  CardContent,
-  TextField,
-  IconButton,
-  Button,
   Box,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Grid,
+  IconButton,
+  TextField,
   Typography,
 } from '@mui/material'
+import React from 'react'
+import { Control, Controller } from 'react-hook-form'
 import Icon from 'src/@core/components/icon'
 import { NewDetailForm } from '../types'
 
@@ -219,10 +219,14 @@ export const DetailForm: React.FC<DetailFormProps> = ({
               <Box
                 sx={{
                   p: 1.5,
-                  backgroundColor: 'grey.50',
+                  backgroundColor: (theme) =>
+                    theme.palette.mode === 'light'
+                      ? 'grey.50'
+                      : 'background.default',
                   borderRadius: 1,
                   border: '1px solid',
-                  borderColor: 'grey.300',
+                  borderColor: (theme) =>
+                    theme.palette.mode === 'light' ? 'grey.300' : 'divider',
                 }}
               >
                 <Typography

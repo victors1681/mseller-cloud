@@ -33,6 +33,8 @@ export const useEditDocument = (open: boolean) => {
   const [selectedCustomerData, setSelectedCustomerData] =
     useState<SelectedCustomerData | null>(null)
   const [hasBeenReset, setHasBeenReset] = useState(false)
+  const [hasBeenSaved, setHasBeenSaved] = useState(false)
+  const [savedDetailsCount, setSavedDetailsCount] = useState(0)
 
   // Get document type from query parameter
   const createDocumentType = router.query.createDocumentType as string
@@ -197,21 +199,29 @@ export const useEditDocument = (open: boolean) => {
     }
   }, [open, store.documentEditData?.noPedidoStr, store.isCreateMode, dispatch])
 
-  // Reset the hasBeenReset flag when user starts making changes
+  // Reset the hasBeenReset and hasBeenSaved flags when user starts making changes
   useEffect(() => {
+    // Only reset flags if forms are actually dirty or details have changed from saved state
+    const detailsHaveChanged = hasBeenSaved
+      ? detailsData.length !== savedDetailsCount
+      : detailsData.length > 0
+
     if (
-      hasBeenReset &&
+      (hasBeenReset || hasBeenSaved) &&
       (mainForm.formState.isDirty ||
         detailForm.formState.isDirty ||
-        detailsData.length > 0)
+        detailsHaveChanged)
     ) {
       setHasBeenReset(false)
+      setHasBeenSaved(false)
     }
   }, [
     hasBeenReset,
+    hasBeenSaved,
     mainForm.formState.isDirty,
     detailForm.formState.isDirty,
     detailsData.length,
+    savedDetailsCount,
   ])
 
   // Effect to log calculation changes (for debugging)
@@ -268,6 +278,15 @@ export const useEditDocument = (open: boolean) => {
         selectedCustomerData,
         userPhotoURL: auth.user?.photoURL,
       })
+
+      // Mark forms as pristine after successful save
+      if (result.success) {
+        setHasBeenSaved(true)
+        setSavedDetailsCount(detailsData.length)
+        // Reset forms with current values to mark as not dirty
+        mainForm.reset(mainForm.getValues())
+        detailForm.reset(detailForm.getValues())
+      }
     } else {
       result = await documentService.updateDocument({
         formData: data,
@@ -275,20 +294,13 @@ export const useEditDocument = (open: boolean) => {
         detailsData,
         orderCalculations,
       })
-    }
 
-    // Reset form state after successful operation
-    if (result?.success) {
-      // Reset forms FIRST to clear isDirty immediately
-      resetFormState()
-
-      // Then clear query parameter on successful creation
-      if (store.isCreateMode && createDocumentType) {
-        const { createDocumentType: _, ...queryWithoutDocType } = router.query
-        router.push({
-          pathname: router.pathname,
-          query: queryWithoutDocType,
-        })
+      // Mark forms as pristine after successful update
+      if (result.success) {
+        setHasBeenSaved(true)
+        setSavedDetailsCount(detailsData.length)
+        mainForm.reset(mainForm.getValues())
+        detailForm.reset(detailForm.getValues())
       }
     }
 
@@ -297,13 +309,16 @@ export const useEditDocument = (open: boolean) => {
 
   const handleClose = useCallback(
     (skipDirtyCheck: boolean = false) => {
-      // Check if form is dirty (has unsaved changes) only if not skipping
+      // Check if form has unsaved changes using computed isDirty property
       if (!skipDirtyCheck) {
-        const isMainFormDirty = mainForm.formState.isDirty
-        const isDetailFormDirty = detailForm.formState.isDirty
-        const hasUnsavedChanges =
-          isMainFormDirty || isDetailFormDirty || detailsData.length > 0
-        if (hasUnsavedChanges) {
+        const currentIsDirty =
+          hasBeenReset || hasBeenSaved
+            ? false
+            : mainForm.formState.isDirty ||
+              detailsData.length > 0 ||
+              detailForm.formState.isDirty
+
+        if (currentIsDirty) {
           const confirmClose = window.confirm(
             '¿Estás seguro de que quieres cerrar? Los cambios no guardados se perderán.',
           )
@@ -332,11 +347,13 @@ export const useEditDocument = (open: boolean) => {
     [
       dispatch,
       resetFormState,
-      detailsData,
+      detailsData.length,
       createDocumentType,
       router,
       mainForm.formState.isDirty,
       detailForm.formState.isDirty,
+      hasBeenReset,
+      hasBeenSaved,
     ],
   )
 
@@ -349,12 +366,13 @@ export const useEditDocument = (open: boolean) => {
     newDetailForm,
     selectedCustomerData,
 
-    // Form state - if we just reset, don't consider it dirty until user makes changes
-    isDirty: hasBeenReset
-      ? false
-      : mainForm.formState.isDirty ||
-        detailsData.length > 0 ||
-        detailForm.formState.isDirty,
+    // Form state - if we just reset or saved, don't consider it dirty until user makes changes
+    isDirty:
+      hasBeenReset || hasBeenSaved
+        ? false
+        : mainForm.formState.isDirty ||
+          detailsData.length > 0 ||
+          detailForm.formState.isDirty,
 
     // Calculations
     orderCalculations,

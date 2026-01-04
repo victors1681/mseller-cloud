@@ -218,6 +218,11 @@ const navigation = (): VerticalNavItemsType => {
       icon: 'mdi:cog',
       children: [
         {
+          title: 'Empresa',
+          icon: 'mdi:office-building',
+          path: '/apps/ecf/business',
+        },
+        {
           title: 'Sucursales',
           icon: 'mdi:location',
           path: '/apps/locations/list',
@@ -245,11 +250,6 @@ const navigation = (): VerticalNavItemsType => {
               title: 'Auditoría',
               icon: 'mdi:file-search',
               path: '/apps/ecf/audit',
-            },
-            {
-              title: 'Empresa',
-              icon: 'mdi:office-building',
-              path: '/apps/ecf/business',
             },
           ],
         },
