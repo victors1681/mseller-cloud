@@ -208,7 +208,7 @@ const MediaLibraryDialog = ({
         </DialogTitle>
 
         <DialogContent sx={{ p: { xs: 2, sm: 3 } }}>
-        {/* Filters, View Toggle, and Upload Button */}
+          {/* Filters, View Toggle, and Upload Button */}
           <Grid container spacing={2} sx={{ mb: 3 }}>
             <Grid item xs={12} sm={7} md={8}>
               <TextField
@@ -243,13 +243,21 @@ const MediaLibraryDialog = ({
               </FormControl>
             </Grid>
             <Grid item xs={6} sm={2} md={2}>
-              <Box sx={{ display: 'flex', gap: 0.5, height: '100%', minHeight: { xs: 44, sm: 56 } }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: 0.5,
+                  height: '100%',
+                  minHeight: { xs: 44, sm: 56 },
+                }}
+              >
                 <IconButton
                   onClick={() => setViewMode('grid')}
                   color={viewMode === 'grid' ? 'primary' : 'default'}
                   sx={{
                     border: '1px solid',
-                    borderColor: viewMode === 'grid' ? 'primary.main' : 'divider',
+                    borderColor:
+                      viewMode === 'grid' ? 'primary.main' : 'divider',
                     borderRadius: 1,
                     flex: 1,
                   }}
@@ -261,7 +269,8 @@ const MediaLibraryDialog = ({
                   color={viewMode === 'list' ? 'primary' : 'default'}
                   sx={{
                     border: '1px solid',
-                    borderColor: viewMode === 'list' ? 'primary.main' : 'divider',
+                    borderColor:
+                      viewMode === 'list' ? 'primary.main' : 'divider',
                     borderRadius: 1,
                     flex: 1,
                   }}
@@ -358,7 +367,9 @@ const MediaLibraryDialog = ({
                     ))}
                   </Grid>
                 ) : (
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  <Box
+                    sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}
+                  >
                     {store.data.map((media) => (
                       <Box
                         key={media.id}
@@ -369,13 +380,17 @@ const MediaLibraryDialog = ({
                           gap: 2,
                           p: 1.5,
                           border: '1px solid',
-                          borderColor: store.selectedMedia.some((item) => item.id === media.id)
+                          borderColor: store.selectedMedia.some(
+                            (item) => item.id === media.id,
+                          )
                             ? 'primary.main'
                             : 'divider',
                           borderRadius: 1,
                           cursor: 'pointer',
                           transition: 'all 0.2s',
-                          backgroundColor: store.selectedMedia.some((item) => item.id === media.id)
+                          backgroundColor: store.selectedMedia.some(
+                            (item) => item.id === media.id,
+                          )
                             ? 'action.hover'
                             : 'transparent',
                           '&:hover': {
@@ -385,7 +400,9 @@ const MediaLibraryDialog = ({
                         }}
                       >
                         <Checkbox
-                          checked={store.selectedMedia.some((item) => item.id === media.id)}
+                          checked={store.selectedMedia.some(
+                            (item) => item.id === media.id,
+                          )}
                           onClick={(e) => e.stopPropagation()}
                         />
                         <Box
@@ -411,7 +428,8 @@ const MediaLibraryDialog = ({
                             {media.title || 'Sin título'}
                           </Typography>
                           <Typography variant="caption" color="text.secondary">
-                            {(media.metadata?.size / 1024).toFixed(1)} KB · {media.metadata?.width} x {media.metadata?.height}
+                            {(media.metadata?.size / 1024).toFixed(1)} KB ·{' '}
+                            {media.metadata?.width} x {media.metadata?.height}
                           </Typography>
                         </Box>
                       </Box>
