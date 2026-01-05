@@ -22,6 +22,7 @@ import inventoryZones from 'src/store/apps/inventoryZones'
 import invoices from 'src/store/apps/invoices'
 import itemReturns from 'src/store/apps/itemReturns'
 import locations from 'src/store/apps/location'
+import media from 'src/store/apps/media'
 import paymentTypes from 'src/store/apps/paymentType'
 import permissions from 'src/store/apps/permissions'
 import pos from 'src/store/apps/pos'
@@ -75,6 +76,7 @@ export const store = configureStore({
     onboarding,
     reports,
     templateConfig,
+    media,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

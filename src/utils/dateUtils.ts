@@ -16,11 +16,36 @@ export const getLocalDateTimeString = (): string => {
 
 /**
  * Convert a UTC date to local datetime string for datetime-local input
- * @param utcDate - Date string or Date object in UTC
+ * @param utcDate - Date string, Date object, or Firestore Timestamp in UTC
  * @returns Local datetime string in YYYY-MM-DDTHH:mm format
  */
-export const toLocalDateTimeString = (utcDate: string | Date): string => {
-  const date = typeof utcDate === 'string' ? new Date(utcDate) : utcDate
+export const toLocalDateTimeString = (utcDate: string | Date | any): string => {
+  if (!utcDate) return ''
+
+  let date: Date
+
+  // Handle Firestore Timestamp (object with seconds property)
+  if (typeof utcDate === 'object' && utcDate.seconds !== undefined) {
+    date = new Date(utcDate.seconds * 1000)
+  }
+  // Handle ISO string
+  else if (typeof utcDate === 'string') {
+    date = new Date(utcDate)
+  }
+  // Handle Date object
+  else if (utcDate instanceof Date) {
+    date = utcDate
+  }
+  // Fallback: try to convert
+  else {
+    date = new Date(utcDate)
+  }
+
+  // Validate date
+  if (isNaN(date.getTime())) {
+    return ''
+  }
+
   const offset = date.getTimezoneOffset() * 60000
   const localTime = new Date(date.getTime() - offset)
   return localTime.toISOString().slice(0, 16)

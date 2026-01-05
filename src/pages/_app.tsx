@@ -1,5 +1,5 @@
 // ** React Imports
-import { ReactNode } from 'react'
+import { ReactNode, useEffect } from 'react'
 // ** Next Imports
 import type { NextPage } from 'next'
 import type { AppProps } from 'next/app'
@@ -30,6 +30,7 @@ import AclGuard from 'src/@core/components/auth/AclGuard'
 import AuthGuard from 'src/@core/components/auth/AuthGuard'
 import GuestGuard from 'src/@core/components/auth/GuestGuard'
 import OnboardingGuard from 'src/@core/components/auth/OnboardingGuard'
+import ErrorBoundary from 'src/@core/components/error-boundary'
 import ThemeComponent from 'src/@core/theme/ThemeComponent'
 import UserLayout from 'src/layouts/UserLayout'
 
@@ -98,6 +99,28 @@ configureRestClient()
 // ** Configure JSS & ClassName
 const App = (props: ExtendedAppProps) => {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
+
+  // Handle chunk loading errors
+  useEffect(() => {
+    const handleError = (event: ErrorEvent) => {
+      // Check if it's a chunk loading error
+      if (
+        event.message.includes('Loading chunk') ||
+        event.message.includes('ChunkLoadError') ||
+        event.message.includes('Failed to fetch')
+      ) {
+        console.warn('Chunk loading error detected, reloading page...')
+        window.location.reload()
+      }
+    }
+
+    window.addEventListener('error', handleError)
+
+    return () => {
+      window.removeEventListener('error', handleError)
+    }
+  }, [])
+
   // Variables
   const contentHeightFixed = Component.contentHeightFixed ?? false
   const getLayout = /print/.test(props.router.route)
@@ -130,42 +153,44 @@ const App = (props: ExtendedAppProps) => {
           <meta name="viewport" content="initial-scale=1, width=device-width" />
         </Head>
 
-        <AuthProvider>
-          <FirebaseProvider>
-            <SettingsProvider
-              {...(setConfig ? { pageSettings: setConfig() } : {})}
-            >
-              <SettingsConsumer>
-                {({ settings }) => {
-                  return (
-                    <ThemeComponent settings={settings}>
-                      <Guard authGuard={authGuard} guestGuard={guestGuard}>
-                        <OnboardingGuard
-                          fallback={<Spinner />}
-                          authGuard={authGuard}
-                        >
-                          <AclGuard
-                            aclAbilities={aclAbilities}
-                            guestGuard={guestGuard}
+        <ErrorBoundary>
+          <AuthProvider>
+            <FirebaseProvider>
+              <SettingsProvider
+                {...(setConfig ? { pageSettings: setConfig() } : {})}
+              >
+                <SettingsConsumer>
+                  {({ settings }) => {
+                    return (
+                      <ThemeComponent settings={settings}>
+                        <Guard authGuard={authGuard} guestGuard={guestGuard}>
+                          <OnboardingGuard
+                            fallback={<Spinner />}
                             authGuard={authGuard}
                           >
-                            {getLayout(<Component {...pageProps} />)}
-                          </AclGuard>
-                        </OnboardingGuard>
-                      </Guard>
-                      <ReactHotToast>
-                        <Toaster
-                          position={settings.toastPosition}
-                          toastOptions={{ className: 'react-hot-toast' }}
-                        />
-                      </ReactHotToast>
-                    </ThemeComponent>
-                  )
-                }}
-              </SettingsConsumer>
-            </SettingsProvider>
-          </FirebaseProvider>
-        </AuthProvider>
+                            <AclGuard
+                              aclAbilities={aclAbilities}
+                              guestGuard={guestGuard}
+                              authGuard={authGuard}
+                            >
+                              {getLayout(<Component {...pageProps} />)}
+                            </AclGuard>
+                          </OnboardingGuard>
+                        </Guard>
+                        <ReactHotToast>
+                          <Toaster
+                            position={settings.toastPosition}
+                            toastOptions={{ className: 'react-hot-toast' }}
+                          />
+                        </ReactHotToast>
+                      </ThemeComponent>
+                    )
+                  }}
+                </SettingsConsumer>
+              </SettingsProvider>
+            </FirebaseProvider>
+          </AuthProvider>
+        </ErrorBoundary>
       </CacheProvider>
     </Provider>
   )

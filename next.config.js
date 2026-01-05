@@ -22,13 +22,9 @@ const config = {
         ? { exclude: ['error', 'warn'] }
         : false,
   },
-  // experimental: {
-  //   optimizePackageImports: [
-  //     '@mui/material',
-  //     '@mui/icons-material',
-  //     '@iconify/react',
-  //   ],
-  // },
+  experimental: {
+    optimizePackageImports: ['@mui/material', '@mui/icons-material'],
+  },
   webpack: (config, { isServer }) => {
     config.resolve.alias = {
       ...config.resolve.alias,
@@ -36,6 +32,15 @@ const config = {
         __dirname,
         './node_modules/apexcharts-clevision',
       ),
+    }
+
+    // Better error handling for chunk loading
+    if (!isServer) {
+      config.output = {
+        ...config.output,
+        // Ensure proper chunk loading
+        chunkLoadingGlobal: 'webpackChunk',
+      }
     }
 
     // Optimize for production
@@ -47,35 +52,27 @@ const config = {
           cacheGroups: {
             default: false,
             vendors: false,
-            // Vendor chunk for node_modules
-            vendor: {
-              name: 'vendor',
+            // Framework chunk (React, Next, etc.)
+            framework: {
+              name: 'framework',
               chunks: 'all',
-              test: /node_modules/,
-              priority: 20,
-            },
-            // Common chunk for shared code
-            common: {
-              name: 'common',
-              minChunks: 2,
-              chunks: 'all',
-              priority: 10,
-              reuseExistingChunk: true,
+              test: /[\\/]node_modules[\\/](react|react-dom|next)[\\/]/,
+              priority: 40,
               enforce: true,
             },
-            // MUI chunk
+            // MUI and Emotion
             mui: {
               name: 'mui',
               test: /[\\/]node_modules[\\/](@mui|@emotion)[\\/]/,
               chunks: 'all',
               priority: 30,
+              enforce: true,
             },
-            // Redux chunk
-            redux: {
-              name: 'redux',
-              test: /[\\/]node_modules[\\/](@reduxjs|redux|react-redux)[\\/]/,
-              chunks: 'all',
-              priority: 30,
+            // Other vendors
+            vendors: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              priority: 20,
             },
           },
         },

@@ -355,12 +355,7 @@ const AddProduct = ({ id }: AddProductProps) => {
                   <ProductInformation />
                 </Grid>
                 <Grid item xs={12}>
-                  <ImageGallery />
-                </Grid>
-                <Grid item xs={12}>
-                  <DropzoneWrapper>
-                    <ProductImage />
-                  </DropzoneWrapper>
+                  <ProductImage />
                 </Grid>
                 <Grid item xs={12}>
                   <ProductInventory />
