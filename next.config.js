@@ -22,13 +22,13 @@ const config = {
         ? { exclude: ['error', 'warn'] }
         : false,
   },
-  experimental: {
-    optimizePackageImports: [
-      '@mui/material',
-      '@mui/icons-material',
-      '@iconify/react',
-    ],
-  },
+  // experimental: {
+  //   optimizePackageImports: [
+  //     '@mui/material',
+  //     '@mui/icons-material',
+  //     '@iconify/react',
+  //   ],
+  // },
   webpack: (config, { isServer }) => {
     config.resolve.alias = {
       ...config.resolve.alias,
