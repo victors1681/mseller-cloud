@@ -21,8 +21,11 @@ import {
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import Icon from 'src/@core/components/icon'
-import { CondicionPagoType } from 'src/types/apps/paymentTypeTypes'
+import { AppDispatch, RootState } from 'src/store'
+import { fetchPaymentType } from 'src/store/apps/paymentType'
+import { EstadoPago, TipoPago } from 'src/types/apps/documentTypes'
 import { POSCartItem, POSCustomer } from 'src/types/apps/posTypes'
 import formatCurrency from 'src/utils/formatCurrency'
 
@@ -73,9 +76,17 @@ const POSPaymentDialog: React.FC<POSPaymentDialogProps> = ({
 }) => {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const dispatch = useDispatch<AppDispatch>()
+
+  // Get payment types from Redux store
+  const paymentTypesFromStore = useSelector(
+    (state: RootState) => state.paymentTypes.data,
+  )
+  const isLoadingFromStore = useSelector(
+    (state: RootState) => state.paymentTypes.isLoading,
+  )
 
   const [selectedPaymentType, setSelectedPaymentType] = useState<string>('')
-  const [paymentTypes, setPaymentTypes] = useState<CondicionPagoType[]>([])
   const [amountReceived, setAmountReceived] = useState<string>(
     totals.total.toString(),
   )
@@ -84,57 +95,24 @@ const POSPaymentDialog: React.FC<POSPaymentDialogProps> = ({
 
   useEffect(() => {
     if (open) {
-      loadPaymentTypes()
+      // Load payment types if not already loaded
+      if (!paymentTypesFromStore || paymentTypesFromStore.length === 0) {
+        dispatch(fetchPaymentType({ query: '', pageNumber: 1 }))
+      }
       setAmountReceived(totals.total.toString())
     }
-  }, [open, totals.total])
+  }, [open, totals.total, paymentTypesFromStore, dispatch])
 
-  const loadPaymentTypes = async () => {
-    try {
-      // TODO: Replace with actual API call
-      const mockPaymentTypes: CondicionPagoType[] = [
-        {
-          id: 1,
-          condicionPago: 'EFECTIVO',
-          dias: 0,
-          tipo_condicion: 'CONTADO',
-          descripcion: 'Pago en efectivo',
-        },
-        // {
-        //   id: 2,
-        //   condicionPago: 'TRANSFERENCIA',
-        //   dias: 0,
-        //   tipo_condicion: 'CONTADO',
-        //   descripcion: 'Transferencia bancaria',
-        // },
-        {
-          id: 3,
-          condicionPago: 'TARJETA',
-          dias: 0,
-          tipo_condicion: 'CONTADO',
-          descripcion: 'Tarjeta de crédito/débito',
-        },
-        {
-          id: 4,
-          condicionPago: 'CREDITO_30',
-          dias: 30,
-          tipo_condicion: 'CREDITO',
-          descripcion: 'Crédito a 30 días',
-        },
-        // {
-        //   id: 5,
-        //   condicionPago: 'CHEQUE',
-        //   dias: 0,
-        //   tipo_condicion: 'CONTADO',
-        //   descripcion: 'Pago con cheque',
-        // },
-      ]
-      setPaymentTypes(mockPaymentTypes)
-      setSelectedPaymentType('EFECTIVO')
-    } catch (error) {
-      console.error('Error loading payment types:', error)
+  // Auto-select first payment type when data loads
+  useEffect(() => {
+    if (
+      paymentTypesFromStore &&
+      paymentTypesFromStore.length > 0 &&
+      !selectedPaymentType
+    ) {
+      setSelectedPaymentType(paymentTypesFromStore[0].condicionPago)
     }
-  }
+  }, [paymentTypesFromStore, selectedPaymentType])
 
   const getPaymentIcon = (paymentType: string): string => {
     switch (paymentType) {
@@ -156,12 +134,43 @@ const POSPaymentDialog: React.FC<POSPaymentDialogProps> = ({
     return Math.max(0, received - totals.total)
   }
 
+  // Map condicionPago to TipoPago enum
+  const mapCondicionPagoToTipoPago = (condicionPago: string): number => {
+    const upperCondicion = condicionPago.toUpperCase()
+    if (
+      upperCondicion.includes('EFECTIVO') ||
+      upperCondicion.includes('CASH')
+    ) {
+      return TipoPago.Efectivo
+    }
+    if (
+      upperCondicion.includes('TARJETA') ||
+      upperCondicion.includes('CREDITO')
+    ) {
+      return TipoPago.Credito
+    }
+    if (upperCondicion.includes('DEBITO')) {
+      return TipoPago.Debito
+    }
+    if (
+      upperCondicion.includes('TRANSFERENCIA') ||
+      upperCondicion.includes('TRANSFER')
+    ) {
+      return TipoPago.Transferencia
+    }
+    if (upperCondicion.includes('CHEQUE') || upperCondicion.includes('CHECK')) {
+      return TipoPago.Cheque
+    }
+    // Default to efectivo
+    return TipoPago.Efectivo
+  }
+
   const isValidPayment = (): boolean => {
     if (!selectedPaymentType) return false
     //if (!customer) return false // use customer MOST
 
     const received = parseFloat(amountReceived) || 0
-    const selectedType = paymentTypes.find(
+    const selectedType = paymentTypesFromStore?.find(
       (pt) => pt.condicionPago === selectedPaymentType,
     )
 
@@ -180,18 +189,28 @@ const POSPaymentDialog: React.FC<POSPaymentDialogProps> = ({
   const handleProcessPayment = () => {
     if (!isValidPayment()) return
 
+    const selectedType = paymentTypesFromStore?.find(
+      (pt) => pt.condicionPago === selectedPaymentType,
+    )
+    const amountReceivedNum = parseFloat(amountReceived)
+    const changeAmount = calculateChange()
+
     const paymentData = {
       customer,
       cart,
       totals,
-      paymentType: paymentTypes.find(
-        (pt) => pt.condicionPago === selectedPaymentType,
-      ),
-      amountReceived: parseFloat(amountReceived),
-      change: calculateChange(),
+      paymentType: selectedType,
+      paymentTypes: paymentTypesFromStore,
+      amountReceived: amountReceivedNum,
+      change: changeAmount,
       notes,
       paymentReference,
       timestamp: new Date().toISOString(),
+      // POS specific fields
+      tipoPago: mapCondicionPagoToTipoPago(selectedPaymentType),
+      estadoPago: EstadoPago.Paid,
+      montoRecibido: amountReceivedNum,
+      montoDevuelto: changeAmount,
     }
 
     onProcessPayment(paymentData)
@@ -346,46 +365,59 @@ const POSPaymentDialog: React.FC<POSPaymentDialogProps> = ({
               Método de Pago
             </Typography>
 
-            <Grid container spacing={2}>
-              {paymentTypes.map((paymentType) => (
-                <Grid item xs={6} sm={4} md={6} key={paymentType.id}>
-                  <StyledPaymentCard
-                    className={
-                      selectedPaymentType === paymentType.condicionPago
-                        ? 'selected'
-                        : ''
-                    }
-                    onClick={() =>
-                      !isProcessing &&
-                      setSelectedPaymentType(paymentType.condicionPago)
-                    }
-                    sx={{
-                      pointerEvents: isProcessing ? 'none' : 'auto',
-                      opacity: isProcessing ? 0.6 : 1,
-                    }}
-                  >
-                    <CardContent sx={{ textAlign: 'center', py: 2 }}>
-                      <Icon
-                        icon={getPaymentIcon(paymentType.condicionPago)}
-                        fontSize={32}
-                        color={
-                          selectedPaymentType === paymentType.condicionPago
-                            ? theme.palette.primary.main
-                            : theme.palette.text.secondary
-                        }
-                      />
-                      <Typography
-                        variant="caption"
-                        display="block"
-                        sx={{ mt: 1 }}
-                      >
-                        {paymentType.descripcion}
-                      </Typography>
-                    </CardContent>
-                  </StyledPaymentCard>
-                </Grid>
-              ))}
-            </Grid>
+            {isLoadingFromStore ? (
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  py: 4,
+                }}
+              >
+                <CircularProgress size={32} />
+              </Box>
+            ) : (
+              <Grid container spacing={2}>
+                {paymentTypesFromStore?.map((paymentType) => (
+                  <Grid item xs={6} sm={4} md={6} key={paymentType.id}>
+                    <StyledPaymentCard
+                      className={
+                        selectedPaymentType === paymentType.condicionPago
+                          ? 'selected'
+                          : ''
+                      }
+                      onClick={() =>
+                        !isProcessing &&
+                        setSelectedPaymentType(paymentType.condicionPago)
+                      }
+                      sx={{
+                        pointerEvents: isProcessing ? 'none' : 'auto',
+                        opacity: isProcessing ? 0.6 : 1,
+                      }}
+                    >
+                      <CardContent sx={{ textAlign: 'center', py: 2 }}>
+                        <Icon
+                          icon={getPaymentIcon(paymentType.condicionPago)}
+                          fontSize={32}
+                          color={
+                            selectedPaymentType === paymentType.condicionPago
+                              ? theme.palette.primary.main
+                              : theme.palette.text.secondary
+                          }
+                        />
+                        <Typography
+                          variant="caption"
+                          display="block"
+                          sx={{ mt: 1 }}
+                        >
+                          {paymentType.descripcion}
+                        </Typography>
+                      </CardContent>
+                    </StyledPaymentCard>
+                  </Grid>
+                ))}
+              </Grid>
+            )}
 
             {/* Payment Details */}
             <Box sx={{ mt: 3 }}>

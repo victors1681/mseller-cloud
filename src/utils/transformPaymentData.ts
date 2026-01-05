@@ -2,6 +2,7 @@
 import {
   DocumentUpdateDetail,
   DocumentUpdateType,
+  EstadoPago,
   TipoDocumentoEnum,
 } from 'src/types/apps/documentTypes'
 
@@ -9,13 +10,41 @@ export function transformPOSDataToDocument(
   paymentData: any,
 ): DocumentUpdateType {
   const customer = paymentData.customer?.tempData || {}
+  const existingCustomer = paymentData.customer?.customer
+  const isNewCustomer = paymentData.customer?.isNew
+
+  // Determine condicionPago based on customer or default to first non-credit payment type
+  let condicionPago = ''
+
+  // If existing customer has a payment condition, use it
+  if (existingCustomer?.condicionPago && !isNewCustomer) {
+    condicionPago = existingCustomer.condicionPago.condicionPago
+  } else {
+    // For new customers or customers without payment condition, use first payment type with dias = 0
+    console.log('PaymentTypes received:', paymentData.paymentTypes)
+    const defaultPaymentType = paymentData.paymentTypes?.find(
+      (pt: any) => pt.dias === 0,
+    )
+    console.log('Found default payment type with dias=0:', defaultPaymentType)
+
+    if (defaultPaymentType) {
+      condicionPago = defaultPaymentType.condicionPago
+    } else {
+      // Log warning if no payment type with dias = 0 found
+      console.warn(
+        'No payment type with dias = 0 found in paymentTypes list. Using fallback.',
+      )
+      console.log('Fallback paymentType:', paymentData.paymentType)
+      condicionPago = paymentData.paymentType?.condicionPago || '00'
+    }
+  }
+
+  console.log('Final condicionPago to be used:', condicionPago)
+
   return {
     noPedidoStr: '',
     nota: paymentData.notes || '',
-    condicionPago:
-      customer.condicionPago?.condicionPago ||
-      paymentData.paymentType?.condicionPago ||
-      '',
+    condicionPago: condicionPago,
     fecha: paymentData.timestamp || new Date().toISOString(),
     descuento: paymentData.totals?.descuentoTotal || 0,
     porcientoDescuento: 0, // If available, map it
@@ -60,12 +89,12 @@ export function transformPOSDataToDocument(
     confirmado: paymentData.confirmado ?? true,
     codigoVendedor: customer.codigoVendedor,
     clienteNuevo: customer ? customer : undefined,
-    // New fields
+    // POS specific fields
     terminal: paymentData.terminal,
     secuenciaDocumento: paymentData.secuenciaDocumento,
-    estadoPago: paymentData.estadoPago,
+    estadoPago: paymentData.estadoPago ?? EstadoPago.Paid,
     tipoPago: paymentData.tipoPago,
-    moneda: paymentData.moneda,
+    moneda: paymentData.moneda || 'DOP',
     dispositivo: paymentData.dispositivo,
     impresion: paymentData.impresion ?? 0,
     fechaImpresion: paymentData.fechaImpresion,
@@ -74,8 +103,8 @@ export function transformPOSDataToDocument(
     razonCancelacion: paymentData.razonCancelacion,
     reembolsada: paymentData.reembolsada ?? false,
     fechaReembolso: paymentData.fechaReembolso,
-    montoRecibido: paymentData.montoRecibido,
-    montoDevuelto: paymentData.montoDevuelto,
+    montoRecibido: paymentData.montoRecibido || paymentData.amountReceived,
+    montoDevuelto: paymentData.montoDevuelto || paymentData.change || 0,
     esVentaPOS: true,
   }
 }

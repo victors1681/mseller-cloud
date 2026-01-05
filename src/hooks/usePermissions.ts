@@ -103,9 +103,11 @@ export const usePermissions = () => {
 
   const hasPermission = (permission: Permission): boolean => {
     // Check if user is administrator - bypass all permissions
-    const token = window.localStorage.getItem(authConfig.storageTokenKeyName)
-    if (token && isAdministratorFromToken(token)) {
-      return true
+    if (typeof window !== 'undefined') {
+      const token = window.localStorage.getItem(authConfig.storageTokenKeyName)
+      if (token && isAdministratorFromToken(token)) {
+        return true
+      }
     }
 
     // Check if user type from context is administrator
