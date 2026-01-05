@@ -775,7 +775,10 @@ const InvoiceList = ({ documentType, pageTitle }: DocumentsListProps) => {
                 rowCount={store.totalResults}
                 sx={{
                   '& .MuiDataGrid-columnHeaders': {
-                    backgroundColor: 'grey.50',
+                    backgroundColor: (theme) =>
+                      theme.palette.mode === 'light'
+                        ? 'grey.50'
+                        : 'background.default',
                     borderRadius: '8px 8px 0 0',
                   },
                 }}

@@ -210,11 +210,26 @@ const LoginPage = () => {
               justifyContent: 'center',
             }}
           >
-            <img
-              src="/images/logos/mseller-logo.svg"
-              alt="MSeller Logo"
-              style={{ height: '36px', width: 'auto' }}
-            />
+            <Box
+              component="a"
+              href="https://mseller.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{
+                cursor: 'pointer',
+                display: 'inline-flex',
+                transition: 'transform 0.2s',
+                '&:hover': {
+                  transform: 'scale(1.05)',
+                },
+              }}
+            >
+              <img
+                src="/images/logos/mseller-logo.svg"
+                alt="MSeller Logo"
+                style={{ height: '36px', width: 'auto' }}
+              />
+            </Box>
           </Box>
           <Box sx={{ mb: 6 }}>
             <Typography variant="h5" sx={{ fontWeight: 600, mb: 1.5 }}>
@@ -401,6 +416,31 @@ const LoginPage = () => {
                   Apple
                 </Button>
                 */}
+            </Box>
+            <Box sx={{ mt: 4, textAlign: 'center' }}>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: 'text.secondary',
+                }}
+              >
+                ¿Necesitas ayuda?{' '}
+                <Box
+                  component="a"
+                  href="https://mseller.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{
+                    color: 'primary.main',
+                    textDecoration: 'none',
+                    '&:hover': {
+                      textDecoration: 'underline',
+                    },
+                  }}
+                >
+                  Visita mseller.app
+                </Box>
+              </Typography>
             </Box>
           </form>
         </CardContent>

@@ -14,7 +14,6 @@ import CardContent from '@mui/material/CardContent'
 import toast from 'react-hot-toast'
 import { useDispatch } from 'react-redux'
 import Icon from 'src/@core/components/icon'
-import { useAuth } from 'src/hooks/useAuth'
 import { useGoBack } from 'src/hooks/useGoBack'
 import { AppDispatch } from 'src/store'
 import { changeDocumentStatus } from 'src/store/apps/documents'
@@ -24,8 +23,9 @@ import {
   TipoDocumentoEnum,
 } from 'src/types/apps/documentTypes'
 
-// ** PDF Generation Imports
-import { EnhancedPDFGenerator } from 'src/services/pdf/client'
+// ** Document Renderer Component
+import { DocumentRendererModal } from 'src/views/ui/documentRenderer'
+
 interface Props {
   data: DocumentType
 }
@@ -34,20 +34,10 @@ const PreviewActions = ({ data }: Props) => {
   const navigation = useGoBack('/apps/documents/list', true)
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
-  const userData = useAuth()
-  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
+  const [showPrintModal, setShowPrintModal] = useState(false)
 
-  const handleGenerateAndSharePDF = async () => {
-    setIsGeneratingPDF(true)
-    try {
-      await EnhancedPDFGenerator.downloadPDF(data, undefined, { userData })
-      toast.success('PDF generado exitosamente')
-    } catch (error) {
-      console.error('PDF generation failed:', error)
-      toast.error('Error al generar el PDF. Por favor intente de nuevo.')
-    } finally {
-      setIsGeneratingPDF(false)
-    }
+  const handlePrint = () => {
+    setShowPrintModal(true)
   }
 
   const handleApproval = async (
@@ -99,27 +89,13 @@ const PreviewActions = ({ data }: Props) => {
         </Button>
         <Button
           fullWidth
-          target="_blank"
           sx={{ mb: 3.5 }}
-          component={Link}
           color="secondary"
           variant="outlined"
-          href={`/apps/documents/print/${data.noPedidoStr}`}
+          onClick={handlePrint}
+          startIcon={<Icon icon="mdi:printer" />}
         >
           Imprimir
-        </Button>
-        <Button
-          fullWidth
-          sx={{ mb: 3.5 }}
-          color="primary"
-          variant="contained"
-          onClick={handleGenerateAndSharePDF}
-          disabled={isGeneratingPDF}
-          startIcon={
-            <Icon icon={isGeneratingPDF ? 'mdi:loading' : 'mdi:file-pdf-box'} />
-          }
-        >
-          {isGeneratingPDF ? 'Generando PDF...' : 'Descargar / Compartir PDF'}
         </Button>
         <Button
           fullWidth
@@ -181,6 +157,16 @@ const PreviewActions = ({ data }: Props) => {
           Retener
         </Button>
       </CardContent>
+
+      {/* Document Print Modal */}
+      <DocumentRendererModal
+        open={showPrintModal}
+        onClose={() => setShowPrintModal(false)}
+        documentNo={data.noPedidoStr}
+        tipoDocumento={data.tipoDocumento as any}
+        autoPrint={true}
+        showPreview={false}
+      />
     </Card>
   )
 }

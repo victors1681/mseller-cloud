@@ -45,6 +45,7 @@ import {
   POSProductGrid,
   POSQuantityDialog,
 } from 'src/views/apps/pos/components'
+import { DocumentRendererModal } from 'src/views/ui/documentRenderer'
 
 // Types
 import { CustomerType } from 'src/types/apps/customerType'
@@ -67,6 +68,7 @@ import { usePermissions } from 'src/hooks/usePermissions'
 import { v4 as uuidV4 } from 'uuid'
 import { AuthContext } from '../../../context/AuthContext'
 import { useBarcodeScan } from '../../../hooks/useBarcodeScan'
+import { TipoDocumentoNumerico } from '../../../types/apps/reportsTypes'
 import { usePOSStore } from '../../../views/apps/pos/hook/usePOSStore'
 
 const StyledMainContainer = styled(Box)({
@@ -117,7 +119,7 @@ const POSPage: NextPage<POSPageProps> = ({
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
   const { hasPermission } = usePermissions()
-  const { user } = useContext(AuthContext)
+  const { user, loading: authLoading } = useContext(AuthContext)
   const {
     heldCarts,
     holdCart,
@@ -143,14 +145,34 @@ const POSPage: NextPage<POSPageProps> = ({
 
   const [activeHeldCartId, setActiveHeldCartId] = useState<string | null>(null)
 
-  // Check POS access permission on client side only
+  // Check POS access permission on client side only - wait for auth to load
   useEffect(() => {
-    if (!hasPermission('pos.allowCashierAccess')) {
+    if (!authLoading && !hasPermission('pos.allowCashierAccess')) {
       router.push('/401') // Redirect to unauthorized page
     }
-  }, [hasPermission, router])
+  }, [hasPermission, router, authLoading])
 
-  // Don't render anything if user doesn't have permission
+  // Don't render anything while loading auth or if user doesn't have permission
+  if (authLoading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100vh',
+          flexDirection: 'column',
+          gap: 2,
+        }}
+      >
+        <CircularProgress size={40} />
+        <Typography variant="h6" color="text.secondary">
+          Cargando...
+        </Typography>
+      </Box>
+    )
+  }
+
   if (!hasPermission('pos.allowCashierAccess')) {
     return null
   }
@@ -185,6 +207,8 @@ const POSPage: NextPage<POSPageProps> = ({
   )
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false)
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null)
+  const [showPrintModal, setShowPrintModal] = useState(false)
+  const [savedDocumentNo, setSavedDocumentNo] = useState<string | null>(null)
 
   // Filtered products based on search and area
   const filteredProducts = useMemo(() => {
@@ -362,19 +386,48 @@ const POSPage: NextPage<POSPageProps> = ({
 
         payload.localidadId = parseInt(user?.warehouse || '1')
         payload.firebaseUserId = user?.userId
-        if (payload.clienteNuevo) {
-          payload.clienteNuevo.codigo = uuidV4()
-          payload.clienteNuevo.localidadId = parseInt(user?.warehouse || '1')
-          payload.clienteNuevo.vendedor = user?.sellerCode || ''
-          payload.clienteNuevo.tipoComprobante = '02'
+
+        // Handle customer data based on type
+        if (paymentData.customer?.isNew) {
+          // New customer - add clienteNuevo object
+          if (payload.clienteNuevo) {
+            payload.clienteNuevo.codigo = uuidV4()
+            payload.clienteNuevo.localidadId = parseInt(user?.warehouse || '1')
+            payload.clienteNuevo.vendedor = user?.sellerCode || ''
+            payload.clienteNuevo.tipoComprobante = '02'
+
+            // Set condicionPago to first payment type with dias = 0
+            console.log(
+              'POS: Looking for payment type with dias = 0 from:',
+              paymentData.paymentTypes,
+            )
+            const defaultPaymentType = paymentData.paymentTypes?.find(
+              (pt: any) => pt.dias === 0,
+            )
+            payload.condicionPago = defaultPaymentType?.condicionPago || '00' // Default
+            console.log('POS: Found payment type:', defaultPaymentType)
+          }
+        } else if (paymentData.customer?.customer) {
+          // Existing customer - set codigoCliente and remove clienteNuevo
+          payload.codigoCliente = paymentData.customer.customer.codigo
+          payload.nombreCliente = paymentData.customer.customer.nombre
+          delete payload.clienteNuevo
+        } else {
+          // Cliente Mostrador - remove clienteNuevo
+          delete payload.clienteNuevo
         }
 
-        await dispatch(addNewDocument(payload)).unwrap()
-        // Optionally show success toast here
+        const result = await dispatch(addNewDocument(payload)).unwrap()
+
+        // Extract document number from response and trigger print
+        if (result?.data?.noPedidoStr) {
+          setSavedDocumentNo(result.data.noPedidoStr)
+          setShowPrintModal(true)
+        }
       } else {
         // Offline: save order locally
         await savePendingOrder(cart, customer)
-        // Optionally show offline saved toast here
+        toast.success('Venta guardada localmente')
       }
       clearCart()
       setCustomer(null)
@@ -720,6 +773,29 @@ const POSPage: NextPage<POSPageProps> = ({
       {/* POS Turno Modals */}
       <AbrirTurnoModal />
       <CerrarTurnoModal />
+
+      {/* Print Receipt Modal */}
+      {showPrintModal && savedDocumentNo && (
+        <DocumentRendererModal
+          open={showPrintModal}
+          onClose={() => {
+            setShowPrintModal(false)
+            setSavedDocumentNo(null)
+          }}
+          documentNo={savedDocumentNo}
+          tipoDocumento={TipoDocumentoNumerico.Recibo}
+          autoPrint={true}
+          showPreview={false}
+          onPrintCompleted={() => {
+            setShowPrintModal(false)
+            setSavedDocumentNo(null)
+          }}
+          onPrintCancelled={() => {
+            setShowPrintModal(false)
+            setSavedDocumentNo(null)
+          }}
+        />
+      )}
     </StyledMainContainer>
   )
 }

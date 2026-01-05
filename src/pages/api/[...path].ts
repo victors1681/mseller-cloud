@@ -41,7 +41,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
             Authorization: req.headers.authorization,
           },
         })
-        res.status(200).json(response.data)
+
+        // Handle different content types
+        const contentType = response.headers['content-type']
+        if (contentType && contentType.includes('text/html')) {
+          res.setHeader('Content-Type', 'text/html')
+          res.status(200).send(response.data)
+        } else {
+          res.status(200).json(response.data)
+        }
         break
       case 'POST':
         const postResponse = await axios.post(fullPath, req.body, {
@@ -88,14 +96,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
         `${error.request.path}`,
         `Request to: ${axios.defaults.baseURL}`,
       )
-      return res
-        .status(error.response?.status || 500)
-        .json({
-          message:
-            error.response?.data?.message ||
-            error.response?.data?.error ||
-            error.message,
-        })
+      return res.status(error.response?.status || 500).json({
+        message:
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          error.message,
+      })
     }
 
     if (error.code === 'ECONNRESET' || error.code === 'ECONNABORTED') {

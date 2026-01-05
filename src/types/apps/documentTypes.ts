@@ -258,21 +258,18 @@ export interface DocumentUpdateType {
 
 // TODO: Replace these with actual definitions as needed
 export enum EstadoPago {
-  Paid = 'Paid',
-  Pending = 'Pending',
-  Refunded = 'Refunded',
-  Cancelled = 'Cancelled',
+  Paid = 0,
+  Pending = 1,
+  Refunded = 2,
+  Cancelled = 3,
 }
 
 export enum TipoPago {
-  Cash = 'Cash',
-  CreditCard = 'CreditCard',
-  DebitCard = 'DebitCard',
-  BankTransfer = 'BankTransfer',
-  MobilePayment = 'MobilePayment',
-  Check = 'Check',
-  Voucher = 'Voucher',
-  Split = 'Split',
+  Efectivo = 0,
+  Cheque = 1,
+  Transferencia = 2,
+  Credito = 3,
+  Debito = 4,
 }
 
 export interface Condicion {

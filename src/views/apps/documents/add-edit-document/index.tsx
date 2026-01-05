@@ -85,9 +85,12 @@ const EditDocumentDialog: React.FC<EditDocumentDialogProps> = ({ open }) => {
   const onSubmit = async (data: any) => {
     const result = await handleSubmit(data)
     if (result.success) {
-      setSavedDocumentData(data)
+      // Use result.data if available (contains document number from API response)
+      // Otherwise fall back to the form data
+      setSavedDocumentData(result.data || data)
       setShowSuccessModal(true)
       // Don't close immediately, wait for user action from success modal
+      // The isDirty flag is now automatically handled by hasBeenSaved in useEditDocument
     }
   }
 

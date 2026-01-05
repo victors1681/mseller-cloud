@@ -15,8 +15,8 @@ import { DocumentType } from 'src/types/apps/documentTypes'
 
 // ** Demo Components Imports
 import restClient from 'src/configs/restClient'
+import DocumentPreviewCard from 'src/views/apps/documents/preview/DocumentPreviewCard'
 import PreviewActions from 'src/views/apps/documents/preview/PreviewActions'
-import PreviewCard from 'src/views/apps/documents/preview/PreviewCard'
 
 interface DocumentPreviewProps {
   id: string
@@ -49,7 +49,7 @@ const InvoicePreview = ({ id }: DocumentPreviewProps) => {
       <>
         <Grid container spacing={6}>
           <Grid item xl={9} md={8} xs={12}>
-            <PreviewCard data={data} />
+            <DocumentPreviewCard data={data} />
           </Grid>
           <Grid item xl={3} md={4} xs={12}>
             <PreviewActions data={data} />

@@ -62,6 +62,11 @@ const navigation = (): VerticalNavItemsType => {
           path: '/apps/clients/list',
         },
         {
+          title: 'Facturas CxC',
+          icon: 'lets-icons:order',
+          path: '/apps/invoices/list',
+        },
+        {
           title: 'Visitas',
           icon: 'material-symbols:map-outline',
           path: '/apps/visits/list',
@@ -195,9 +200,14 @@ const navigation = (): VerticalNavItemsType => {
       icon: 'mdi:chart-line',
       children: [
         {
-          title: 'Facturas CxC',
-          icon: 'lets-icons:order',
-          path: '/apps/invoices/list',
+          title: 'Plantillas de Reportes',
+          icon: 'mdi:file-document-multiple',
+          path: '/apps/reports',
+        },
+        {
+          title: 'Plantillas de Documentos',
+          icon: 'mdi:file-cog-outline',
+          path: '/apps/settings/templates',
         },
       ],
     },
@@ -207,6 +217,11 @@ const navigation = (): VerticalNavItemsType => {
       title: 'Administración',
       icon: 'mdi:cog',
       children: [
+        {
+          title: 'Empresa',
+          icon: 'mdi:office-building',
+          path: '/apps/ecf/business',
+        },
         {
           title: 'Sucursales',
           icon: 'mdi:location',
@@ -235,11 +250,6 @@ const navigation = (): VerticalNavItemsType => {
               title: 'Auditoría',
               icon: 'mdi:file-search',
               path: '/apps/ecf/audit',
-            },
-            {
-              title: 'Empresa',
-              icon: 'mdi:office-building',
-              path: '/apps/ecf/business',
             },
           ],
         },

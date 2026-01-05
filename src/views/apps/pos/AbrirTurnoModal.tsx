@@ -17,6 +17,7 @@ import {
   Paper,
   TextField,
   Typography,
+  useTheme,
 } from '@mui/material'
 
 // ** Third Party Imports
@@ -103,6 +104,7 @@ const AbrirTurnoModal = ({ allowToClose = false }: AbrirTurnoModalProps) => {
   const posStore = useSelector((state: RootState) => state.pos)
   const { user } = useAuth()
   const router = useRouter()
+  const theme = useTheme()
 
   // ** Clock State
   const [currentDateTime, setCurrentDateTime] = useState(new Date())
@@ -146,7 +148,8 @@ const AbrirTurnoModal = ({ allowToClose = false }: AbrirTurnoModalProps) => {
       const response = await dispatch(abrirTurno(data)).unwrap()
 
       if (response.success) {
-        handleClose()
+        // Force close the modal on success
+        dispatch(toggleAbrirTurnoModal(null))
         reset()
       } else {
         toast.error(response.message || 'Error abriendo turno')
@@ -204,9 +207,12 @@ const AbrirTurnoModal = ({ allowToClose = false }: AbrirTurnoModalProps) => {
               mx: 2,
               mb: 3,
               textAlign: 'center',
-              backgroundColor: 'grey.200',
+              backgroundColor:
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.05)'
+                  : 'grey.200',
               color: 'text.primary',
-              border: '0px solid',
+              border: '1px solid',
               borderColor: 'divider',
             }}
           >

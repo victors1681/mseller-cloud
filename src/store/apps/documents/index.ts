@@ -180,8 +180,8 @@ export const addNewDocument = createAsyncThunk<
 
         return {
           success: true,
-          data: response.data.data,
-          message: 'Documento creado exitosamente',
+          data: response.data, // API returns document info directly in response.data
+          message: response.data.message || 'Documento creado exitosamente',
         }
       }
 
