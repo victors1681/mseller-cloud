@@ -48,7 +48,7 @@ const DocumentPreviewCard = ({ data }: DocumentPreviewCardProps) => {
           `/api/portal/PlantillaReporte/documento/${data.noPedidoStr}/html`,
           {
             params: {
-              tipoDocumento: mapDocumentTypeToNumerico(data.tipoDocumento)
+              tipoDocumento: mapDocumentTypeToNumerico(data.tipoDocumento),
             },
             responseType: 'text',
             headers: {
