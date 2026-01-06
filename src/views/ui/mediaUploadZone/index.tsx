@@ -123,6 +123,7 @@ const MediaUploadZone = ({
 
         const response = await uploadImages({
           images: base64Images,
+          filenames: currentFiles.map((file) => file.name),
           type: uploadType as any,
         })
 

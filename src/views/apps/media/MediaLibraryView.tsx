@@ -46,6 +46,7 @@ import {
 } from 'src/store/apps/media'
 
 // ** Components
+import AutoLinkDialog from 'src/views/apps/media/components/AutoLinkDialog'
 import MediaCard from 'src/views/apps/media/components/MediaCard'
 import LoadingWrapper from 'src/views/ui/LoadingWrapper'
 import MediaUploadZone from 'src/views/ui/mediaUploadZone'
@@ -72,6 +73,7 @@ const MediaLibraryView = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false)
+  const [autoLinkDialogOpen, setAutoLinkDialogOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null)
   const [editTitle, setEditTitle] = useState('')
   const [editDescription, setEditDescription] = useState('')
@@ -337,19 +339,29 @@ const MediaLibraryView = () => {
                     borderRadius: 1,
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: 2,
                   }}
                 >
                   <Typography variant="body2" color="primary.dark">
                     {store.selectedMedia.length} seleccionados
                   </Typography>
-                  <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                     <Button
                       size="small"
                       onClick={() => dispatch(clearSelection())}
                       color="primary"
                     >
                       Limpiar
+                    </Button>
+                    <Button
+                      size="small"
+                      onClick={() => setAutoLinkDialogOpen(true)}
+                      color="primary"
+                      variant="contained"
+                      startIcon={<Icon icon="mdi:link-variant" />}
+                    >
+                      Auto-Vincul Limpiar
                     </Button>
                     <Tooltip
                       title={
@@ -439,7 +451,7 @@ const MediaLibraryView = () => {
                               onEdit={handleEdit}
                               onDelete={handleDeleteClick}
                               onView={handleView}
-                              selectionMode={false}
+                              selectionMode={true}
                             />
                           </Grid>
                         ))}
@@ -879,6 +891,17 @@ const MediaLibraryView = () => {
           <Button onClick={() => setPreviewDialogOpen(false)}>Cerrar</Button>
         </DialogActions>
       </Dialog>
+
+      {/* Auto-Link Dialog */}
+      <AutoLinkDialog
+        open={autoLinkDialogOpen}
+        onClose={() => setAutoLinkDialogOpen(false)}
+        selectedMedia={store.selectedMedia}
+        onSuccess={() => {
+          dispatch(fetchMediaList(store.filters))
+          dispatch(clearSelection())
+        }}
+      />
     </>
   )
 }

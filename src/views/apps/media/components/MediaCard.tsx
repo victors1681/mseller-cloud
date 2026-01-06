@@ -86,6 +86,12 @@ const MediaCard = ({
         '&:hover': {
           boxShadow: theme.shadows[8],
           transform: 'translateY(-2px)',
+          '& .action-buttons': {
+            opacity: 1,
+          },
+          '& .selection-checkbox': {
+            opacity: 1,
+          },
         },
         height: '100%',
         display: 'flex',
@@ -96,16 +102,21 @@ const MediaCard = ({
       {/* Selection Checkbox */}
       {selectionMode && (
         <Box
+          className="selection-checkbox"
           sx={{
             position: 'absolute',
             top: 8,
             left: 8,
             zIndex: 2,
+            opacity: selected ? 1 : 0,
+            transition: 'opacity 0.2s ease',
           }}
+          onClick={(e) => e.stopPropagation()}
         >
           <Checkbox
             checked={selected}
             onChange={() => onSelect && onSelect(media)}
+            onClick={(e) => e.stopPropagation()}
             sx={{
               backgroundColor: 'rgba(255, 255, 255, 0.9)',
               borderRadius: 1,
@@ -118,48 +129,49 @@ const MediaCard = ({
       )}
 
       {/* Actions */}
-      {!selectionMode && (
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 8,
-            right: 8,
-            zIndex: 2,
-            display: 'flex',
-            gap: 0.5,
-          }}
-        >
-          {onEdit && (
-            <IconButton
-              size="small"
-              onClick={handleEdit}
-              sx={{
-                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 1)',
-                },
-              }}
-            >
-              <Icon icon="mdi:pencil-outline" fontSize={18} />
-            </IconButton>
-          )}
-          {onDelete && usedByCount === 0 && (
-            <IconButton
-              size="small"
-              onClick={handleDelete}
-              sx={{
-                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                color: 'error.main',
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 1)',
-                },
-              }}
-            >
-              <Icon icon="mdi:delete-outline" fontSize={18} />
-            </IconButton>
-          )}
-        </Box>
-      )}
+      <Box
+        className="action-buttons"
+        sx={{
+          position: 'absolute',
+          top: 8,
+          right: 8,
+          zIndex: 2,
+          display: 'flex',
+          gap: 0.5,
+          opacity: 0,
+          transition: 'opacity 0.2s ease',
+        }}
+      >
+        {onEdit && (
+          <IconButton
+            size="small"
+            onClick={handleEdit}
+            sx={{
+              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 1)',
+              },
+            }}
+          >
+            <Icon icon="mdi:pencil-outline" fontSize={18} />
+          </IconButton>
+        )}
+        {onDelete && usedByCount === 0 && (
+          <IconButton
+            size="small"
+            onClick={handleDelete}
+            sx={{
+              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+              color: 'error.main',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 1)',
+              },
+            }}
+          >
+            <Icon icon="mdi:delete-outline" fontSize={18} />
+          </IconButton>
+        )}
+      </Box>
 
       {/* Image Preview */}
       <Box
