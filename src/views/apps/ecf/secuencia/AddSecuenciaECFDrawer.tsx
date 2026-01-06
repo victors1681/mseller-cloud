@@ -78,7 +78,7 @@ const schema = yup.object().shape({
     .number()
     .required('Secuencia actual es requerida')
     .min(1, 'Debe ser mayor a 0'),
-  vencimiento: yup.string().required('Fecha de vencimiento es requerida'),
+  vencimiento: yup.string(),
   entorno: yup.string().required('Entorno es requerido'),
 })
 
@@ -127,7 +127,10 @@ const AddSecuenciaECFDrawer = (props: SidebarAddSecuenciaType) => {
       setValue('secuenciaIni', editData.secuenciaIni)
       setValue('secuenciaFin', editData.secuenciaFin)
       setValue('secuencia', editData.secuencia)
-      setValue('vencimiento', editData.vencimiento.split('T')[0]) // Format for date input
+      setValue(
+        'vencimiento',
+        editData.vencimiento ? editData.vencimiento.split('T')[0] : '',
+      ) // Format for date input
       setValue('habilitado', editData.habilitado)
       setValue('entorno', editData.entorno || '')
       setValue('esElectronico', editData.esElectronico)
@@ -141,7 +144,9 @@ const AddSecuenciaECFDrawer = (props: SidebarAddSecuenciaType) => {
 
     const formattedData = {
       ...data,
-      vencimiento: new Date(data.vencimiento).toISOString(),
+      vencimiento: data.vencimiento
+        ? new Date(data.vencimiento).toISOString()
+        : null,
       businessId: store.secuenciaEditData?.businessId || '',
       vendedor: store.secuenciaEditData?.vendedor || 'MSELLER', // Default vendedor value
     }

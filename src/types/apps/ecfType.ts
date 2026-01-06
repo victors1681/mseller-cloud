@@ -44,7 +44,7 @@ export interface SecuenciaEcfType {
   secuenciaFin: number
   secuencia: number
   vendedor: string
-  vencimiento: string
+  vencimiento?: string
   businessId: string
   habilitado: boolean
   entorno: string | null
