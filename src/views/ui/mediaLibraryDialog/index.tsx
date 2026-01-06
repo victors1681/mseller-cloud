@@ -239,6 +239,7 @@ const MediaLibraryDialog = ({
                   <MenuItem value={MediaType.Products}>Productos</MenuItem>
                   <MenuItem value={MediaType.Profile}>Perfil</MenuItem>
                   <MenuItem value={MediaType.Documents}>Documentos</MenuItem>
+                  <MenuItem value={MediaType.Logo}>Logos</MenuItem>
                 </Select>
               </FormControl>
             </Grid>

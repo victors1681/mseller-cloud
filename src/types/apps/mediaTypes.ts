@@ -9,6 +9,7 @@ export enum MediaType {
   Products = 'products',
   Profile = 'profile',
   Documents = 'documents',
+  Logo = 'logo',
 }
 
 export enum MediaViewMode {

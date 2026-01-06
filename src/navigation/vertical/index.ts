@@ -224,7 +224,7 @@ const navigation = (): VerticalNavItemsType => {
         {
           title: 'Empresa',
           icon: 'mdi:office-building',
-          path: '/apps/ecf/business',
+          path: '/apps/business',
         },
         {
           title: 'Sucursales',
