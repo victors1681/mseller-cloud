@@ -3,6 +3,14 @@ import {
   UploadImagesType,
 } from '@/types/apps/imageTypes'
 import {
+  BulkDeleteRequest,
+  BulkDeleteResponse,
+  MediaFilters,
+  PaginatedMediaResponse,
+  UpdateMediaMetadataRequest,
+  UsageReference,
+} from '@/types/apps/mediaTypes'
+import {
   CancelSubscriptionType,
   CompleteOnboardingRequest,
   CompleteOnboardingResponse,
@@ -111,4 +119,24 @@ export type FirebaseValuesType = {
   completeOnboarding: (
     data: CompleteOnboardingRequest,
   ) => Promise<CompleteOnboardingResponse | { error: string } | undefined>
+
+  // Media Library Functions
+  listMedia: (
+    filters: MediaFilters,
+  ) => Promise<PaginatedMediaResponse | { error: string } | undefined>
+  updateMediaMetadata: (
+    data: UpdateMediaMetadataRequest,
+  ) => Promise<{ success: boolean } | { error: string } | undefined>
+  deleteMedia: (
+    mediaId: string,
+  ) => Promise<{ success: boolean } | { error: string } | undefined>
+  bulkDeleteMedia: (
+    data: BulkDeleteRequest,
+  ) => Promise<BulkDeleteResponse | { error: string } | undefined>
+  addUsageReference: (
+    data: UsageReference,
+  ) => Promise<{ success: boolean } | { error: string } | undefined>
+  removeUsageReference: (
+    data: UsageReference,
+  ) => Promise<{ success: boolean } | { error: string } | undefined>
 }

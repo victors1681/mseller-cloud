@@ -2,6 +2,14 @@ import {
   UploadImagesResponseType,
   UploadImagesType,
 } from '@/types/apps/imageTypes'
+import {
+  BulkDeleteRequest,
+  BulkDeleteResponse,
+  MediaFilters,
+  PaginatedMediaResponse,
+  UpdateMediaMetadataRequest,
+  UsageReference,
+} from '@/types/apps/mediaTypes'
 import * as firebase from 'firebase/app'
 import {
   browserLocalPersistence,
@@ -441,6 +449,100 @@ export const completeOnboardingFirebase = async (
       CompleteOnboardingRequest,
       CompleteOnboardingResponse
     >(functions, 'completeOnboarding')
+    const response = await fn(data)
+    return response.data
+  } catch (err: any) {
+    return firebaseError(err)
+  }
+}
+
+// ============================================
+// Media Library Functions
+// ============================================
+
+export const listMediaFirebase = async (
+  filters: MediaFilters,
+): Promise<PaginatedMediaResponse | { error: string } | undefined> => {
+  try {
+    const fn = httpsCallable<MediaFilters, PaginatedMediaResponse>(
+      functions,
+      'listMedia',
+    )
+    const response = await fn(filters)
+    return response.data
+  } catch (err: any) {
+    return firebaseError(err)
+  }
+}
+
+export const updateMediaMetadataFirebase = async (
+  data: UpdateMediaMetadataRequest,
+): Promise<{ success: boolean } | { error: string } | undefined> => {
+  try {
+    const fn = httpsCallable<UpdateMediaMetadataRequest, { success: boolean }>(
+      functions,
+      'updateMediaMetadata',
+    )
+    const response = await fn(data)
+    return response.data
+  } catch (err: any) {
+    return firebaseError(err)
+  }
+}
+
+export const deleteMediaFirebase = async (
+  mediaId: string,
+): Promise<{ success: boolean } | { error: string } | undefined> => {
+  try {
+    const fn = httpsCallable<{ mediaId: string }, { success: boolean }>(
+      functions,
+      'deleteMedia',
+    )
+    const response = await fn({ mediaId })
+    return response.data
+  } catch (err: any) {
+    return firebaseError(err)
+  }
+}
+
+export const bulkDeleteMediaFirebase = async (
+  data: BulkDeleteRequest,
+): Promise<BulkDeleteResponse | { error: string } | undefined> => {
+  try {
+    const fn = httpsCallable<BulkDeleteRequest, BulkDeleteResponse>(
+      functions,
+      'bulkDeleteMedia',
+    )
+    const response = await fn(data)
+    return response.data
+  } catch (err: any) {
+    return firebaseError(err)
+  }
+}
+
+export const addUsageReferenceFirebase = async (
+  data: UsageReference,
+): Promise<{ success: boolean } | { error: string } | undefined> => {
+  try {
+    const fn = httpsCallable<UsageReference, { success: boolean }>(
+      functions,
+      'addUsageReference',
+    )
+    const response = await fn(data)
+    return response.data
+  } catch (err: any) {
+    return firebaseError(err)
+  }
+}
+
+export const removeUsageReferenceFirebase = async (
+  data: UsageReference,
+): Promise<{ success: boolean } | { error: string } | undefined> => {
+  try {
+    const fn = httpsCallable<UsageReference, { success: boolean }>(
+      functions,
+      'removeUsageReference',
+    )
     const response = await fn(data)
     return response.data
   } catch (err: any) {

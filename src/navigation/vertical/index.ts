@@ -50,7 +50,11 @@ const navigation = (): VerticalNavItemsType => {
         },
       ],
     },
-
+    {
+      title: 'Biblioteca de Medios',
+      icon: 'mdi:folder-multiple-image',
+      path: '/apps/media',
+    },
     // === CUSTOMER MANAGEMENT ===
     {
       title: 'Clientes',

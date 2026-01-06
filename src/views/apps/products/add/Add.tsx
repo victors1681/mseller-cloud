@@ -3,8 +3,6 @@ import { useMediaQuery, useTheme } from '@mui/material'
 import Grid from '@mui/material/Grid'
 
 // Component Imports
-import DropzoneWrapper from '@/@core/styles/libs/react-dropzone'
-import ImageGallery from '@/views/apps/products/add/ImageGallery'
 import ProductAddHeader from 'src/views/apps/products/add/ProductAddHeader'
 import ProductImage from 'src/views/apps/products/add/ProductImage'
 import ProductInformation from 'src/views/apps/products/add/ProductInformation'
@@ -355,12 +353,7 @@ const AddProduct = ({ id }: AddProductProps) => {
                   <ProductInformation />
                 </Grid>
                 <Grid item xs={12}>
-                  <ImageGallery />
-                </Grid>
-                <Grid item xs={12}>
-                  <DropzoneWrapper>
-                    <ProductImage />
-                  </DropzoneWrapper>
+                  <ProductImage />
                 </Grid>
                 <Grid item xs={12}>
                   <ProductInventory />

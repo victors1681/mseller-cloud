@@ -10,6 +10,16 @@ import {
   UploadImagesType,
 } from '@/types/apps/imageTypes'
 import {
+  BulkDeleteRequest,
+  BulkDeleteResponse,
+  MediaFilters,
+  PaginatedMediaResponse,
+  UpdateMediaMetadataRequest,
+  UsageReference,
+} from '@/types/apps/mediaTypes'
+import {
+  addUsageReferenceFirebase,
+  bulkDeleteMediaFirebase,
   cancelSubscriptionFirebase,
   CancelSubscriptionType,
   completeOnboardingFirebase,
@@ -18,13 +28,17 @@ import {
   createSubscriptionFirebase,
   CreateSubscriptionProps,
   CreateSubscriptionType,
+  deleteMediaFirebase,
   fetchStripeProductsFirebase,
   getCustomerPaymentMethodsFirebase,
   getCustomerPaymentsHistoryFirebase,
   IUpdateUserProfileProps,
   IUpdateUserProfileResponse,
+  listMediaFirebase,
   removeCustomerCardFirebase,
+  removeUsageReferenceFirebase,
   updateCustomerCardFirebase,
+  updateMediaMetadataFirebase,
   updateUserProfileFirebase,
   uploadImagesFirebase,
 } from 'src/firebase'
@@ -51,6 +65,12 @@ const defaultProvider: FirebaseValuesType = {
   uploadImages: () => Promise.resolve(undefined),
   updateUserProfile: () => Promise.resolve(undefined),
   completeOnboarding: () => Promise.resolve(undefined),
+  listMedia: () => Promise.resolve(undefined),
+  updateMediaMetadata: () => Promise.resolve(undefined),
+  deleteMedia: () => Promise.resolve(undefined),
+  bulkDeleteMedia: () => Promise.resolve(undefined),
+  addUsageReference: () => Promise.resolve(undefined),
+  removeUsageReference: () => Promise.resolve(undefined),
 }
 
 const FirebaseContext = createContext(defaultProvider)
@@ -123,6 +143,42 @@ const FirebaseProvider = ({ children }: Props) => {
     return completeOnboardingFirebase(data)
   }
 
+  const listMedia = async (
+    filters: MediaFilters,
+  ): Promise<PaginatedMediaResponse | { error: string } | undefined> => {
+    return listMediaFirebase(filters)
+  }
+
+  const updateMediaMetadata = async (
+    data: UpdateMediaMetadataRequest,
+  ): Promise<{ success: boolean } | { error: string } | undefined> => {
+    return updateMediaMetadataFirebase(data)
+  }
+
+  const deleteMedia = async (
+    mediaId: string,
+  ): Promise<{ success: boolean } | { error: string } | undefined> => {
+    return deleteMediaFirebase(mediaId)
+  }
+
+  const bulkDeleteMedia = async (
+    data: BulkDeleteRequest,
+  ): Promise<BulkDeleteResponse | { error: string } | undefined> => {
+    return bulkDeleteMediaFirebase(data)
+  }
+
+  const addUsageReference = async (
+    data: UsageReference,
+  ): Promise<{ success: boolean } | { error: string } | undefined> => {
+    return addUsageReferenceFirebase(data)
+  }
+
+  const removeUsageReference = async (
+    data: UsageReference,
+  ): Promise<{ success: boolean } | { error: string } | undefined> => {
+    return removeUsageReferenceFirebase(data)
+  }
+
   const values = {
     loading,
     createSubscription,
@@ -135,6 +191,12 @@ const FirebaseProvider = ({ children }: Props) => {
     uploadImages,
     updateUserProfile,
     completeOnboarding,
+    listMedia,
+    updateMediaMetadata,
+    deleteMedia,
+    bulkDeleteMedia,
+    addUsageReference,
+    removeUsageReference,
   }
 
   return (

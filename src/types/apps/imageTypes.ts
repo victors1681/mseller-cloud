@@ -1,5 +1,6 @@
 export interface UploadImagesType {
   images: string[]
+  filenames?: string[] // Original filenames for auto-link
   type?: 'products' | 'profile' | 'documents'
 }
 
@@ -14,6 +15,7 @@ export interface ImageDocument {
   thumbnailFile: string
   originalUrl: string
   thumbnailUrl: string
+  originalFilename?: string // Original filename from user upload (for auto-link)
   createdAt: any
   metadata: {
     size: number
