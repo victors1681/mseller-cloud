@@ -25,6 +25,7 @@ import { DocumentRendererModal } from 'src/views/ui/documentRenderer'
 
 // ** Types
 import { DocumentType } from 'src/types/apps/documentTypes'
+import { mapDocumentTypeToNumerico } from '../../../../../services/templateConfigService'
 
 // ** Type Imports
 interface DocumentSuccessModalProps {
@@ -160,7 +161,11 @@ const DocumentSuccessModal = ({
           open={showPrintModal}
           onClose={() => setShowPrintModal(false)}
           documentNo={documentNumber}
-          tipoDocumento={(documentData?.tipoDocumento ?? 0) as any}
+          tipoDocumento={
+            mapDocumentTypeToNumerico(
+              documentData?.tipoDocumento || 'invoice',
+            ) as any
+          }
           autoPrint={true}
           showPreview={false}
           onPrintCompleted={() => {

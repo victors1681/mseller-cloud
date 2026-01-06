@@ -16,6 +16,7 @@ import restClient from 'src/configs/restClient'
 
 // ** Types
 import { DocumentType } from 'src/types/apps/documentTypes'
+import { mapDocumentTypeToNumerico } from 'src/types/apps/templateConfigTypes'
 
 interface DocumentPreviewCardProps {
   data: DocumentType
@@ -47,7 +48,7 @@ const DocumentPreviewCard = ({ data }: DocumentPreviewCardProps) => {
           `/api/portal/PlantillaReporte/documento/${data.noPedidoStr}/html`,
           {
             params: {
-              tipoDocumento: data.tipoDocumento,
+              tipoDocumento: mapDocumentTypeToNumerico(data.tipoDocumento)
             },
             responseType: 'text',
             headers: {
