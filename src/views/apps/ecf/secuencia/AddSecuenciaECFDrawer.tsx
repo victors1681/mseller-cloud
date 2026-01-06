@@ -146,7 +146,7 @@ const AddSecuenciaECFDrawer = (props: SidebarAddSecuenciaType) => {
       ...data,
       vencimiento: data.vencimiento
         ? new Date(data.vencimiento).toISOString()
-        : null,
+        : undefined,
       businessId: store.secuenciaEditData?.businessId || '',
       vendedor: store.secuenciaEditData?.vendedor || 'MSELLER', // Default vendedor value
     }
