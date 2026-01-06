@@ -71,6 +71,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
         // Access request body using req.body
         res.status(200).json(putResponse.data)
         break
+      case 'PATCH':
+        const patchResponse = await axios.patch(fullPath, req.body, {
+          params: params,
+          headers: {
+            Authorization: req.headers.authorization,
+          },
+        })
+        // Access request body using req.body
+        res.status(200).json(patchResponse.data)
+        break
       case 'DELETE':
         const deleteResponse = await axios.request({
           url: fullPath,

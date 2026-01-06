@@ -6,6 +6,7 @@ import Link from 'next/link'
 
 // ** MUI Imports
 import {
+  Alert,
   Box,
   Button,
   Chip,
@@ -72,9 +73,9 @@ const LinkStyled = styled(Link)(({ theme }) => ({
 
 const defaultColumns: GridColDef[] = [
   {
-    flex: 0.1,
+    flex: 0.2,
     field: 'tipoCliente',
-    minWidth: 100,
+
     headerName: 'Tipo Cliente',
     renderCell: ({ row }: CellType) => (
       <Typography
@@ -89,23 +90,23 @@ const defaultColumns: GridColDef[] = [
       </Typography>
     ),
   },
-  {
-    flex: 0.15,
-    minWidth: 180,
-    field: 'descripcion',
-    headerName: 'Descripción',
-    renderCell: ({ row }: CellType) => (
-      <Typography
-        noWrap
-        variant="body2"
-        sx={{
-          color: 'text.primary',
-        }}
-      >
-        {row.descripcion}
-      </Typography>
-    ),
-  },
+  // {
+  //   flex: 0.15,
+  //   minWidth: 180,
+  //   field: 'descripcion',
+  //   headerName: 'Descripción',
+  //   renderCell: ({ row }: CellType) => (
+  //     <Typography
+  //       noWrap
+  //       variant="body2"
+  //       sx={{
+  //         color: 'text.primary',
+  //       }}
+  //     >
+  //       {row.descripcion}
+  //     </Typography>
+  //   ),
+  // },
   {
     flex: 0.08,
     minWidth: 100,
@@ -475,6 +476,19 @@ const SecuenciaECFList = () => {
                 />
               }
             />
+            {store.secuenciaData.some(
+              (seq) => seq.esElectronico && seq.habilitado,
+            ) && (
+              <Box sx={{ px: 5, pb: 4 }}>
+                <Alert severity="warning" icon={<Icon icon="mdi:alert" />}>
+                  <Typography variant="body2">
+                    <strong>Importante:</strong> Si al menos una secuencia
+                    electrónica está habilitada, el sistema utilizará siempre
+                    facturación electrónica.
+                  </Typography>
+                </Alert>
+              </Box>
+            )}
           </Card>
         </Grid>
         <Grid item xs={12}>

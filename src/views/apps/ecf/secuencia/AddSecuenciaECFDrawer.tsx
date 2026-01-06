@@ -65,7 +65,37 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 const schema = yup.object().shape({
   tipoCliente: yup.string().required('Tipo de cliente es requerido'),
   descripcion: yup.string().required('Descripción es requerida'),
-  encabezado: yup.string().required('Encabezado es requerido'),
+  encabezado: yup
+    .string()
+    .required('Encabezado es requerido')
+    .test(
+      'match-tipo-cliente',
+      'El encabezado debe coincidir con el tipo de cliente seleccionado',
+      function (value) {
+        const { tipoCliente } = this.parent
+        if (!value || !tipoCliente) return true
+
+        // Find the selected option
+        const selectedOption = tipoClienteOptions.find(
+          (opt) => opt.value === tipoCliente,
+        )
+        if (!selectedOption) return true // Skip validation if custom value
+
+        // Determine expected prefix based on tipoCliente value
+        const isElectronic = parseInt(tipoCliente) >= 31 // 31-47 are electronic (E)
+        const expectedPrefix = isElectronic ? 'E' : 'B'
+        const expectedCode = tipoCliente
+
+        // Validate format: prefix + code (e.g., E31, B02)
+        const encabezadoUpper = value.toUpperCase()
+        const expectedEncabezado = `${expectedPrefix}${expectedCode}`
+
+        return (
+          encabezadoUpper === expectedEncabezado ||
+          encabezadoUpper.startsWith(expectedEncabezado)
+        )
+      },
+    ),
   secuenciaIni: yup
     .number()
     .required('Secuencia inicial es requerida')
@@ -110,6 +140,7 @@ const AddSecuenciaECFDrawer = (props: SidebarAddSecuenciaType) => {
     reset,
     control,
     setValue,
+    watch,
     handleSubmit,
     formState: { errors },
   } = useForm({
@@ -117,6 +148,13 @@ const AddSecuenciaECFDrawer = (props: SidebarAddSecuenciaType) => {
     mode: 'onChange',
     resolver: yupResolver(schema),
   })
+
+  // ** Watch fields for validation
+  const encabezadoValue = watch('encabezado')
+  const esElectronicoValue = watch('esElectronico')
+
+  // ** Only enable esElectronico if encabezado starts with E
+  const canBeElectronic = encabezadoValue?.charAt(0)?.toUpperCase() === 'E'
 
   useEffect(() => {
     if (store.secuenciaEditData) {
@@ -138,6 +176,13 @@ const AddSecuenciaECFDrawer = (props: SidebarAddSecuenciaType) => {
       reset(defaultValues)
     }
   }, [store.secuenciaEditData, setValue, reset])
+
+  // ** Clear entorno when esElectronico is disabled
+  useEffect(() => {
+    if (!esElectronicoValue) {
+      setValue('entorno', '')
+    }
+  }, [esElectronicoValue, setValue])
 
   const onSubmit = async (data: SecuenciaFormData) => {
     setIsSubmitting(true)
@@ -210,25 +255,30 @@ const AddSecuenciaECFDrawer = (props: SidebarAddSecuenciaType) => {
                   }
                   value={
                     tipoClienteOptions.find((opt) => opt.value === value) ||
-                    value
+                    null
                   }
                   onChange={(_, newValue) => {
+                    let selectedValue = ''
                     if (typeof newValue === 'string') {
+                      selectedValue = newValue
                       onChange(newValue)
                     } else if (newValue && typeof newValue === 'object') {
+                      selectedValue = newValue.value
                       onChange(newValue.value)
                     } else {
                       onChange('')
+                      return
                     }
-                  }}
-                  onInputChange={(_, newInputValue) => {
-                    // Only update the value when freeSolo mode is used (typing custom values)
-                    if (
-                      !tipoClienteOptions.find(
-                        (opt) => opt.label === newInputValue,
-                      )
-                    ) {
-                      onChange(newInputValue)
+
+                    // Auto-populate encabezado based on tipoCliente
+                    if (selectedValue) {
+                      const isElectronic = parseInt(selectedValue) >= 31
+                      const prefix = isElectronic ? 'E' : 'B'
+                      const encabezado = `${prefix}${selectedValue}`
+                      setValue('encabezado', encabezado)
+
+                      // Auto-set esElectronico based on prefix
+                      setValue('esElectronico', isElectronic)
                     }
                   }}
                   renderInput={(params) => (
@@ -273,17 +323,26 @@ const AddSecuenciaECFDrawer = (props: SidebarAddSecuenciaType) => {
                 <TextField
                   value={value}
                   label="Encabezado"
-                  onChange={onChange}
-                  placeholder="Ej: B02"
+                  onChange={(e) => {
+                    const newValue = e.target.value
+                    onChange(newValue)
+                    // Only allow esElectronico if starts with E
+                    const firstChar = newValue?.charAt(0)?.toUpperCase()
+                    if (firstChar === 'E') {
+                      setValue('esElectronico', true)
+                    } else {
+                      setValue('esElectronico', false)
+                    }
+                  }}
+                  placeholder="Ej: E31, B02"
                   error={Boolean(errors.encabezado)}
+                  helperText={
+                    errors.encabezado?.message ||
+                    'Solo encabezados con "E" permiten facturación electrónica'
+                  }
                 />
               )}
             />
-            {errors.encabezado && (
-              <FormHelperText sx={{ color: 'error.main' }}>
-                {errors.encabezado.message}
-              </FormHelperText>
-            )}
           </FormControl>
 
           <FormControl fullWidth sx={{ mb: 4 }}>
@@ -372,7 +431,12 @@ const AddSecuenciaECFDrawer = (props: SidebarAddSecuenciaType) => {
           </FormControl>
 
           <FormControl fullWidth sx={{ mb: 4 }}>
-            <InputLabel error={Boolean(errors.entorno)}>Entorno</InputLabel>
+            <InputLabel
+              error={Boolean(errors.entorno)}
+              disabled={!esElectronicoValue}
+            >
+              Entorno
+            </InputLabel>
             <Controller
               name="entorno"
               control={control}
@@ -382,6 +446,7 @@ const AddSecuenciaECFDrawer = (props: SidebarAddSecuenciaType) => {
                   onChange={onChange}
                   error={Boolean(errors.entorno)}
                   label="Entorno"
+                  disabled={!esElectronicoValue}
                 >
                   <MenuItem value="eCF">Producción</MenuItem>
                   <MenuItem value="CerteCF">Certificación</MenuItem>
@@ -394,6 +459,11 @@ const AddSecuenciaECFDrawer = (props: SidebarAddSecuenciaType) => {
                 {errors.entorno.message}
               </FormHelperText>
             )}
+            {!esElectronicoValue && (
+              <FormHelperText>
+                Solo disponible para secuencias electrónicas
+              </FormHelperText>
+            )}
           </FormControl>
 
           <FormControl fullWidth sx={{ mb: 4 }}>
@@ -401,10 +471,27 @@ const AddSecuenciaECFDrawer = (props: SidebarAddSecuenciaType) => {
               name="esElectronico"
               control={control}
               render={({ field: { value, onChange } }) => (
-                <FormControlLabel
-                  control={<Switch checked={value} onChange={onChange} />}
-                  label="Es Electrónico"
-                />
+                <Box>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={value && canBeElectronic}
+                        onChange={(e) => {
+                          if (canBeElectronic) {
+                            onChange(e.target.checked)
+                          }
+                        }}
+                        disabled={!canBeElectronic}
+                      />
+                    }
+                    label="Es Electrónico"
+                  />
+                  <FormHelperText>
+                    {!canBeElectronic
+                      ? 'Solo disponible para encabezados que inician con "E"'
+                      : 'Facturación electrónica habilitada'}
+                  </FormHelperText>
+                </Box>
               )}
             />
           </FormControl>
