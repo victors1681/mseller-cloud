@@ -131,9 +131,9 @@ const OverviewDashboard = () => {
     loadDashboardData()
   }, [dateRange])
 
-  const loadDashboardData = async () => {
+  const loadDashboardData = async (invalidateCache = false) => {
     const dateFilters = getDateRangeFilters(dateRange)
-    const combinedFilters = { ...filters, ...dateFilters }
+    const combinedFilters = { ...filters, ...dateFilters, invalidateCache }
 
     await Promise.all([
       dispatch(fetchDashboardStats(combinedFilters)),
@@ -147,7 +147,7 @@ const OverviewDashboard = () => {
   }
 
   const handleRefresh = () => {
-    loadDashboardData()
+    loadDashboardData(true)
   }
 
   const handleDateRangeChange = (event: SelectChangeEvent) => {
@@ -259,6 +259,16 @@ const OverviewDashboard = () => {
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
           <DashboardStatsCard
+            title="Facturas Emitidas"
+            value={stats?.totalInvoices || 0}
+            subtitle="Total procesadas"
+            icon="mdi:cart"
+            color="success"
+            trend={stats?.ordersGrowth}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} lg={3}>
+          <DashboardStatsCard
             title="Órdenes"
             value={stats?.totalOrders || 0}
             subtitle="Total procesadas"
@@ -279,6 +289,10 @@ const OverviewDashboard = () => {
             trend={stats?.collectionsGrowth}
           />
         </Grid>
+      </Grid>
+
+      {/* Secondary Stats */}
+      <Grid container spacing={{ xs: 2, sm: 3 }} sx={{ mb: { xs: 2, sm: 3 } }}>
         <Grid item xs={12} sm={6} lg={3}>
           <DashboardStatsCard
             title="Productos"
@@ -288,10 +302,6 @@ const OverviewDashboard = () => {
             color="info"
           />
         </Grid>
-      </Grid>
-
-      {/* Secondary Stats */}
-      <Grid container spacing={{ xs: 2, sm: 3 }} sx={{ mb: { xs: 2, sm: 3 } }}>
         <Grid item xs={12} sm={6} lg={3}>
           <DashboardStatsCard
             title="Vendedores Activos"
@@ -302,7 +312,7 @@ const OverviewDashboard = () => {
             trend={stats?.sellersGrowth}
           />
         </Grid>
-        <Grid item xs={12} sm={6} lg={3}>
+        {/* <Grid item xs={12} sm={6} lg={3}>
           <DashboardStatsCard
             title="Distribuidores"
             value={stats?.activeDrivers || 0}
@@ -311,7 +321,7 @@ const OverviewDashboard = () => {
             color="success"
             trend={stats?.driversGrowth}
           />
-        </Grid>
+        </Grid> */}
         <Grid item xs={12} sm={6} lg={3}>
           <DashboardStatsCard
             title="Transportes Activos"

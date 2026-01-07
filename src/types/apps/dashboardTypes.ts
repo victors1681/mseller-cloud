@@ -4,6 +4,7 @@
 
 export interface DashboardStats {
   totalOrders: number
+  totalInvoices: number
   ordersGrowth: number
   totalRevenue: number
   revenueGrowth: number
@@ -127,6 +128,7 @@ export interface DashboardFilters {
   vendedorId?: string
   localidadId?: number
   distribuidorId?: string
+  invalidateCache?: boolean
 }
 
 export interface DashboardState {

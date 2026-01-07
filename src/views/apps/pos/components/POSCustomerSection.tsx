@@ -199,7 +199,7 @@ const POSCustomerSection: React.FC<POSCustomerSectionProps> = ({
                       display="block"
                       sx={{ fontSize: '0.7rem', lineHeight: 1.1 }}
                     >
-                      Cliente temporal
+                      Nuevo Cliente
                     </Typography>
                   </>
                 ) : (
@@ -307,7 +307,7 @@ const POSCustomerSection: React.FC<POSCustomerSectionProps> = ({
         <DialogTitle>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Icon icon="mdi:account-plus" />
-            Cliente Temporal
+            Nuevo Cliente
           </Box>
         </DialogTitle>
 
