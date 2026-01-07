@@ -7,7 +7,11 @@ import Head from 'next/head'
 import { Router } from 'next/router'
 
 // ** Datadog RUM
-import { initializeDatadog } from 'src/configs/datadogConfig'
+import {
+  datadogLogger,
+  initializeDatadog,
+  trackPageView,
+} from 'src/configs/datadogConfig'
 
 // ** Store Imports
 import { Provider } from 'react-redux'
@@ -99,14 +103,46 @@ const Guard = ({ children, authGuard, guestGuard }: GuardProps) => {
 }
 configureRestClient()
 
-// Initialize Datadog RUM
-if (typeof window !== 'undefined') {
-  initializeDatadog()
-}
-
 // ** Configure JSS & ClassName
 const App = (props: ExtendedAppProps) => {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
+
+  // Initialize Datadog RUM
+  useEffect(() => {
+    initializeDatadog()
+  }, [])
+
+  // Track route changes with Next.js context
+  useEffect(() => {
+    const handleRouteChangeStart = (url: string) => {
+      datadogLogger.debug('route_change_start', { url })
+    }
+
+    const handleRouteChangeComplete = (url: string) => {
+      trackPageView(url, {
+        previous_url: window.location.href,
+        page_type: url.includes('/apps/') ? 'app' : 'page',
+        is_authenticated: !!window.localStorage.getItem('userData'),
+      })
+    }
+
+    const handleRouteChangeError = (err: Error, url: string) => {
+      datadogLogger.error('route_change_error', err, {
+        target_url: url,
+        from_url: window.location.href,
+      })
+    }
+
+    Router.events.on('routeChangeStart', handleRouteChangeStart)
+    Router.events.on('routeChangeComplete', handleRouteChangeComplete)
+    Router.events.on('routeChangeError', handleRouteChangeError)
+
+    return () => {
+      Router.events.off('routeChangeStart', handleRouteChangeStart)
+      Router.events.off('routeChangeComplete', handleRouteChangeComplete)
+      Router.events.off('routeChangeError', handleRouteChangeError)
+    }
+  }, [])
 
   // Handle chunk loading errors
   useEffect(() => {
@@ -118,14 +154,23 @@ const App = (props: ExtendedAppProps) => {
         event.message.includes('Failed to fetch')
       ) {
         console.warn('Chunk loading error detected, reloading page...')
+        datadogLogger.warn('chunk_loading_error', {
+          message: event.message,
+        })
         window.location.reload()
       }
     }
 
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      datadogLogger.error('unhandled_promise_rejection', event.reason)
+    }
+
     window.addEventListener('error', handleError)
+    window.addEventListener('unhandledrejection', handleUnhandledRejection)
 
     return () => {
       window.removeEventListener('error', handleError)
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection)
     }
   }, [])
 

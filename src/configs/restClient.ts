@@ -2,6 +2,7 @@ import axios, { AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios'
 import Router from 'next/router'
 import toast from 'react-hot-toast'
 import authConfig from 'src/configs/auth'
+import { trackApiCall } from 'src/configs/datadogConfig'
 import { refreshAccessToken } from 'src/firebase'
 import { IConfig } from 'src/types/apps/userTypes'
 
@@ -50,6 +51,9 @@ export const configureRestClient = (baseURL?: string): void => {
   restClient.interceptors.request.use((config) => {
     const newConfig = { ...getExceptions(config, baseURL) } as any
 
+    // Add request start time for tracking
+    newConfig.metadata = { startTime: new Date().getTime() }
+
     const storedToken = window.localStorage.getItem(
       authConfig.storageTokenKeyName,
     )
@@ -63,9 +67,31 @@ export const configureRestClient = (baseURL?: string): void => {
 
 restClient.interceptors.response.use(
   (response) => {
+    // Track successful API calls
+    const config = response.config as any
+    if (config.metadata?.startTime) {
+      const duration = new Date().getTime() - config.metadata.startTime
+      const endpoint = config.url || 'unknown'
+      const method = (config.method || 'get').toUpperCase()
+
+      trackApiCall(endpoint, method, response.status, duration)
+    }
+
     return response
   },
   async (error) => {
+    // Track failed API calls
+    const config = error.config as any
+    if (config?.metadata?.startTime) {
+      const duration = new Date().getTime() - config.metadata.startTime
+      const endpoint = config.url || 'unknown'
+      const method = (config.method || 'get').toUpperCase()
+      const status = error.response?.status || 0
+      const errorMessage = error.response?.data?.message || error.message
+
+      trackApiCall(endpoint, method, status, duration, errorMessage)
+    }
+
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean
     }

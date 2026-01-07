@@ -10,6 +10,9 @@ import { styled } from '@mui/material/styles'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
+// ** Datadog
+import { trackReactError } from 'src/configs/datadogConfig'
+
 interface Props {
   children: ReactNode
 }
@@ -37,6 +40,9 @@ class ErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo)
+
+    // Track error in Datadog
+    trackReactError(error, errorInfo, errorInfo.componentStack || undefined)
   }
 
   private handleReset = () => {

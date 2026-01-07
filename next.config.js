@@ -39,6 +39,15 @@ const config = {
       ),
     }
 
+    // Optimize Datadog bundle - exclude from server-side
+    if (isServer) {
+      config.externals = [
+        ...(config.externals || []),
+        '@datadog/browser-rum',
+        '@datadog/browser-rum-react',
+      ]
+    }
+
     // Optimize for production - only apply to production builds
     if (!isServer && process.env.NODE_ENV === 'production') {
       config.optimization = {
