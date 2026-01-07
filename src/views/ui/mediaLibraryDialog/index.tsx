@@ -510,7 +510,10 @@ const MediaLibraryDialog = ({
           </Box>
         </DialogTitle>
         <DialogContent sx={{ p: { xs: 2, sm: 3 } }}>
-          <MediaUploadZone onUploadComplete={handleUploadComplete} />
+          <MediaUploadZone
+            onUploadComplete={handleUploadComplete}
+            {...(filterType && { filterType })}
+          />
         </DialogContent>
       </Dialog>
     </>
