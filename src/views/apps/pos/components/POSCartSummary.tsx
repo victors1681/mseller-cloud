@@ -1,26 +1,26 @@
-import React, { useState } from 'react'
 import {
   Box,
+  Button,
   Card,
   CardContent,
   CardHeader,
-  Typography,
-  Button,
+  Chip,
+  Divider,
+  IconButton,
   List,
   ListItem,
-  ListItemText,
   ListItemSecondaryAction,
-  IconButton,
-  Divider,
+  ListItemText,
   TextField,
-  Chip,
+  Typography,
   useTheme,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
+import React, { useState } from 'react'
 import Icon from 'src/@core/components/icon'
+import { usePermissions } from 'src/hooks/usePermissions'
 import { POSCartItem } from 'src/types/apps/posTypes'
 import formatCurrency from 'src/utils/formatCurrency'
-import { usePermissions } from 'src/hooks/usePermissions'
 
 const StyledCartCard = styled(Card)(({ theme }) => ({
   margin: theme.spacing(1),

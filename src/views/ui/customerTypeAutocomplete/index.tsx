@@ -16,6 +16,7 @@ interface CustomerTypeAutocompleteProps {
   callBack: (values: string) => void
   sx?: SxProps<Theme>
   size?: 'small' | 'medium'
+  label?: string
 }
 
 interface CustomerTypeOptions {
@@ -118,8 +119,8 @@ export const CustomerTypeAutocomplete = (
       renderInput={(params) => (
         <TextField
           {...params}
-          label="Tipo de Cliente *"
-          placeholder="Tipo de Cliente"
+          label={props.label || 'Tipo de Cliente *'}
+          placeholder={props.label || 'Tipo de Cliente'}
         />
       )}
     />

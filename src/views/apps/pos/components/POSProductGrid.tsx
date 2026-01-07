@@ -1,18 +1,18 @@
-import React from 'react'
 import {
-  Grid,
+  Box,
   Card,
   CardContent,
   CardMedia,
-  Typography,
-  Box,
-  Skeleton,
+  Grid,
   IconButton,
-  useTheme,
+  Skeleton,
+  Typography,
   useMediaQuery,
+  useTheme,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import Image from 'next/image'
+import React from 'react'
 import Icon from 'src/@core/components/icon'
 import { ProductType } from 'src/types/apps/productTypes'
 import formatCurrency from 'src/utils/formatCurrency'
@@ -211,9 +211,11 @@ const POSProductGrid: React.FC<POSProductGridProps> = ({
                   />
                 )}
 
-                <StyledStockChip inStock={inStock}>
-                  {totalStock}
-                </StyledStockChip>
+                {!product.esServicio && (
+                  <StyledStockChip inStock={inStock}>
+                    {totalStock}
+                  </StyledStockChip>
+                )}
               </StyledProductImage>
 
               <StyledProductInfo>

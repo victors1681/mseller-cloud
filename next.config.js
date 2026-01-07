@@ -12,7 +12,12 @@ const config = {
   trailingSlash: true,
   reactStrictMode: false, //fix issue with the wysiwyg editor
   images: {
-    domains: ['cloud.mseller.app', 'storage.googleapis.com'],
+    domains: [
+      'cloud.mseller.app',
+      'storage.googleapis.com',
+      'fastly.picsum.photos',
+      '127.0.0.1',
+    ],
   },
   // Production optimizations
   swcMinify: true,
@@ -34,31 +39,21 @@ const config = {
       ),
     }
 
-    // Better error handling for chunk loading
-    if (!isServer) {
-      config.output = {
-        ...config.output,
-        // Ensure proper chunk loading
-        chunkLoadingGlobal: 'webpackChunk',
-      }
-    }
-
-    // Optimize for production
-    if (!isServer) {
+    // Optimize for production - only apply to production builds
+    if (!isServer && process.env.NODE_ENV === 'production') {
       config.optimization = {
         ...config.optimization,
         splitChunks: {
           chunks: 'all',
           cacheGroups: {
-            default: false,
-            vendors: false,
             // Framework chunk (React, Next, etc.)
             framework: {
               name: 'framework',
               chunks: 'all',
-              test: /[\\/]node_modules[\\/](react|react-dom|next)[\\/]/,
+              test: /[\\/]node_modules[\\/](react|react-dom|scheduler|next)[\\/]/,
               priority: 40,
-              enforce: true,
+              // Don't enforce - let Next.js handle it
+              enforce: false,
             },
             // MUI and Emotion
             mui: {
@@ -66,13 +61,20 @@ const config = {
               test: /[\\/]node_modules[\\/](@mui|@emotion)[\\/]/,
               chunks: 'all',
               priority: 30,
-              enforce: true,
+              enforce: false,
             },
-            // Other vendors
-            vendors: {
+            // Large libraries
+            lib: {
               test: /[\\/]node_modules[\\/]/,
-              name: 'vendors',
+              name(module) {
+                const packageName = module.context.match(
+                  /[\\/]node_modules[\\/](.*?)([\\/]|$)/,
+                )?.[1]
+                return `npm.${packageName?.replace('@', '')}`
+              },
               priority: 20,
+              minChunks: 1,
+              reuseExistingChunk: true,
             },
           },
         },

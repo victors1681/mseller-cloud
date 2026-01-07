@@ -1,26 +1,67 @@
-import React, { useState } from 'react'
+import { yupResolver } from '@hookform/resolvers/yup'
 import {
+  Avatar,
   Box,
+  Button,
   Card,
   CardContent,
   CardHeader,
-  Typography,
-  Button,
-  IconButton,
-  Avatar,
-  Divider,
   Dialog,
-  DialogTitle,
-  DialogContent,
   DialogActions,
-  TextField,
+  DialogContent,
+  DialogTitle,
   Grid,
+  IconButton,
+  TextField,
+  Typography,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
+import React, { useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
 import Icon from 'src/@core/components/icon'
 import { CustomerType } from 'src/types/apps/customerType'
-import { POSCustomer } from 'src/types/apps/posTypes'
+import { NewCustomerFormData, POSCustomer } from 'src/types/apps/posTypes'
 import CustomerSearchDialog from 'src/views/ui/customerSearchDialog'
+import { CustomerTypeAutocomplete } from 'src/views/ui/customerTypeAutocomplete'
+import * as yup from 'yup'
+
+// ** Validation Schema
+const newCustomerSchema = yup.object({
+  nombre: yup.string().required('Nombre es requerido'),
+  telefono: yup
+    .string()
+    .test(
+      'phone-format',
+      'Formato de teléfono inválido (10 dígitos)',
+      (value) => {
+        if (!value) return true // Optional
+        const phoneRegex = /^(1)?[2-9]\d{2}[2-9]\d{6}$|^(809|829|849)\d{7}$/
+        return phoneRegex.test(value.replace(/[\s-()]/g, ''))
+      },
+    ),
+  tipoCliente: yup.string(),
+  rnc: yup
+    .string()
+    .test('rnc-format', 'RNC debe tener 9 u 11 dígitos', (value) => {
+      if (!value) return true // Will be checked by required test
+      const cleanRnc = value.replace(/[^0-9]/g, '')
+      return cleanRnc.length === 9 || cleanRnc.length === 11
+    })
+    .test(
+      'rnc-required',
+      'RNC es requerido para este tipo de comprobante',
+      function (value) {
+        const { tipoCliente } = this.parent
+        // RNC is mandatory if tipoCliente is NOT '02' or '32'
+        if (tipoCliente && tipoCliente !== '02' && tipoCliente !== '32') {
+          return !!value
+        }
+        return true
+      },
+    ),
+  email: yup.string().email('Formato de email inválido').optional(),
+  direccion: yup.string(),
+})
 
 const StyledCustomerCard = styled(Card)(({ theme }) => ({
   margin: theme.spacing(0.5),
@@ -44,7 +85,7 @@ const StyledCustomerDetails = styled(Box)({
 interface POSCustomerSectionProps {
   customer: POSCustomer | null
   onCustomerSelect: (customer: CustomerType) => void
-  onNewCustomer: (customerData: any) => void
+  onNewCustomer: (customerData: NewCustomerFormData) => void
   onClearCustomer: () => void
 }
 
@@ -56,26 +97,34 @@ const POSCustomerSection: React.FC<POSCustomerSectionProps> = ({
 }) => {
   const [searchDialogOpen, setSearchDialogOpen] = useState(false)
   const [newCustomerDialogOpen, setNewCustomerDialogOpen] = useState(false)
-  const [newCustomerData, setNewCustomerData] = useState({
-    nombre: '',
-    telefono: '',
-    email: '',
-    direccion: '',
-    rnc: '',
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isValid },
+    reset,
+  } = useForm<NewCustomerFormData>({
+    resolver: yupResolver(newCustomerSchema),
+    mode: 'onChange',
+    defaultValues: {
+      nombre: '',
+      telefono: '',
+      email: '',
+      direccion: '',
+      rnc: '',
+      tipoCliente: '',
+    },
   })
 
-  const handleNewCustomerSave = () => {
-    if (newCustomerData.nombre.trim()) {
-      onNewCustomer(newCustomerData)
-      setNewCustomerDialogOpen(false)
-      setNewCustomerData({
-        nombre: '',
-        telefono: '',
-        email: '',
-        direccion: '',
-        rnc: '',
-      })
-    }
+  const onSubmit = (data: NewCustomerFormData) => {
+    onNewCustomer(data)
+    setNewCustomerDialogOpen(false)
+    reset()
+  }
+
+  const handleDialogClose = () => {
+    setNewCustomerDialogOpen(false)
+    reset()
   }
 
   const getCustomerInitials = (name: string): string => {
@@ -228,7 +277,7 @@ const POSCustomerSection: React.FC<POSCustomerSectionProps> = ({
                   fullWidth
                   sx={{ fontSize: '0.75rem', py: 0.5 }}
                 >
-                  Temporal
+                  Nuevo Cliente
                 </Button>
               </Box>
             </Box>
@@ -251,7 +300,7 @@ const POSCustomerSection: React.FC<POSCustomerSectionProps> = ({
       {/* New Customer Dialog */}
       <Dialog
         open={newCustomerDialogOpen}
-        onClose={() => setNewCustomerDialogOpen(false)}
+        onClose={handleDialogClose}
         maxWidth="sm"
         fullWidth
       >
@@ -262,96 +311,135 @@ const POSCustomerSection: React.FC<POSCustomerSectionProps> = ({
           </Box>
         </DialogTitle>
 
-        <DialogContent>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Nombre *"
-                value={newCustomerData.nombre}
-                onChange={(e) =>
-                  setNewCustomerData((prev) => ({
-                    ...prev,
-                    nombre: e.target.value,
-                  }))
-                }
-                required
-              />
-            </Grid>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <DialogContent>
+            <Grid container spacing={3} sx={{ mt: 0.5 }}>
+              <Grid item xs={12}>
+                <Controller
+                  name="nombre"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Nombre *"
+                      error={!!errors.nombre}
+                      helperText={errors.nombre?.message}
+                    />
+                  )}
+                />
+              </Grid>
 
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Teléfono"
-                value={newCustomerData.telefono}
-                onChange={(e) =>
-                  setNewCustomerData((prev) => ({
-                    ...prev,
-                    telefono: e.target.value,
-                  }))
-                }
-              />
-            </Grid>
+              <Grid item xs={12} sm={6}>
+                <Controller
+                  name="telefono"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Teléfono"
+                      error={!!errors.telefono}
+                      helperText={
+                        errors.telefono?.message ||
+                        '10 dígitos (ej: 8091234567)'
+                      }
+                      inputProps={{
+                        maxLength: 10,
+                        inputMode: 'numeric',
+                        pattern: '[0-9]*',
+                      }}
+                    />
+                  )}
+                />
+              </Grid>
 
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="RNC"
-                value={newCustomerData.rnc}
-                onChange={(e) =>
-                  setNewCustomerData((prev) => ({
-                    ...prev,
-                    rnc: e.target.value,
-                  }))
-                }
-              />
-            </Grid>
+              <Grid item xs={12} sm={6}>
+                <Controller
+                  name="tipoCliente"
+                  control={control}
+                  render={({ field }) => (
+                    <CustomerTypeAutocomplete
+                      selectedCustomerType={field.value}
+                      callBack={(value: string) => field.onChange(value)}
+                      label="Tipo Comprobante"
+                    />
+                  )}
+                />
+              </Grid>
 
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Email"
-                type="email"
-                value={newCustomerData.email}
-                onChange={(e) =>
-                  setNewCustomerData((prev) => ({
-                    ...prev,
-                    email: e.target.value,
-                  }))
-                }
-              />
-            </Grid>
+              <Grid item xs={12}>
+                <Controller
+                  name="rnc"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="RNC"
+                      error={!!errors.rnc}
+                      helperText={
+                        errors.rnc?.message || 'cédula o RNC - 9 u 11 dígitos'
+                      }
+                      inputProps={{
+                        maxLength: 11,
+                        inputMode: 'numeric',
+                        pattern: '[0-9]*',
+                      }}
+                    />
+                  )}
+                />
+              </Grid>
 
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Dirección"
-                multiline
-                rows={2}
-                value={newCustomerData.direccion}
-                onChange={(e) =>
-                  setNewCustomerData((prev) => ({
-                    ...prev,
-                    direccion: e.target.value,
-                  }))
-                }
-              />
-            </Grid>
-          </Grid>
-        </DialogContent>
+              <Grid item xs={12}>
+                <Controller
+                  name="email"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Email"
+                      type="email"
+                      error={!!errors.email}
+                      helperText={errors.email?.message || 'Opcional'}
+                    />
+                  )}
+                />
+              </Grid>
 
-        <DialogActions>
-          <Button onClick={() => setNewCustomerDialogOpen(false)}>
-            Cancelar
-          </Button>
-          <Button
-            variant="contained"
-            onClick={handleNewCustomerSave}
-            disabled={!newCustomerData.nombre.trim()}
-          >
-            Crear Cliente
-          </Button>
-        </DialogActions>
+              <Grid item xs={12}>
+                <Controller
+                  name="direccion"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Dirección"
+                      multiline
+                      rows={2}
+                    />
+                  )}
+                />
+              </Grid>
+            </Grid>
+          </DialogContent>
+
+          <DialogActions sx={{ px: 3, pb: 2 }}>
+            <Button onClick={handleDialogClose} size="large">
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={!isValid}
+              size="large"
+            >
+              Crear Cliente
+            </Button>
+          </DialogActions>
+        </form>
       </Dialog>
     </>
   )

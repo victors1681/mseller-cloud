@@ -418,8 +418,8 @@ const DocumentRendererModal: FC<DocumentRendererProps> = ({
               </>
             )}
           </Box>
-          {/* Hidden iframe for printing */}
-          {renderContent()}
+          {/* Hidden iframe for printing - only render when content is ready */}
+          {!loading && renderContent()}
         </DialogContent>
       </Dialog>
     )

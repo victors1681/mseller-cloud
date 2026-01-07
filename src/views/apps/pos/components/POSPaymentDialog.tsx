@@ -20,13 +20,17 @@ import {
   useTheme,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import Icon from 'src/@core/components/icon'
 import { AppDispatch, RootState } from 'src/store'
 import { fetchPaymentType } from 'src/store/apps/paymentType'
 import { EstadoPago, TipoPago } from 'src/types/apps/documentTypes'
-import { POSCartItem, POSCustomer } from 'src/types/apps/posTypes'
+import {
+  POSCartItem,
+  POSCustomer,
+  POSPaymentData,
+} from 'src/types/apps/posTypes'
 import formatCurrency from 'src/utils/formatCurrency'
 
 const StyledPaymentCard = styled(Card)(({ theme }) => ({
@@ -61,7 +65,7 @@ interface POSPaymentDialogProps {
     total: number
   }
   onClose: () => void
-  onProcessPayment: (paymentData: any) => void
+  onProcessPayment: (paymentData: POSPaymentData) => void
   isProcessing: boolean
 }
 
@@ -92,6 +96,8 @@ const POSPaymentDialog: React.FC<POSPaymentDialogProps> = ({
   )
   const [notes, setNotes] = useState('')
   const [paymentReference, setPaymentReference] = useState('')
+  const [customerName, setCustomerName] = useState('')
+  const customerNameInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (open) {
@@ -100,8 +106,13 @@ const POSPaymentDialog: React.FC<POSPaymentDialogProps> = ({
         dispatch(fetchPaymentType({ query: '', pageNumber: 1 }))
       }
       setAmountReceived(totals.total.toString())
+      // Set customer name
+      const defaultName = customer?.isNew
+        ? customer.tempData?.nombre || ''
+        : customer?.customer?.nombre || 'Cliente Mostrador'
+      setCustomerName(defaultName)
     }
-  }, [open, totals.total, paymentTypesFromStore, dispatch])
+  }, [open, totals.total, paymentTypesFromStore, dispatch, customer])
 
   // Auto-select first payment type when data loads
   useEffect(() => {
@@ -195,8 +206,8 @@ const POSPaymentDialog: React.FC<POSPaymentDialogProps> = ({
     const amountReceivedNum = parseFloat(amountReceived)
     const changeAmount = calculateChange()
 
-    const paymentData = {
-      customer,
+    const paymentData: POSPaymentData = {
+      customer: customer,
       cart,
       totals,
       paymentType: selectedType,
@@ -206,6 +217,7 @@ const POSPaymentDialog: React.FC<POSPaymentDialogProps> = ({
       notes,
       paymentReference,
       timestamp: new Date().toISOString(),
+      nombreClienteMostrador: customerName,
       // POS specific fields
       tipoPago: mapCondicionPagoToTipoPago(selectedPaymentType),
       estadoPago: EstadoPago.Paid,
@@ -243,26 +255,64 @@ const POSPaymentDialog: React.FC<POSPaymentDialogProps> = ({
       </DialogTitle>
 
       <DialogContent>
-        <Grid container spacing={3}>
-          {/* Customer Info */}
+        <Grid container spacing={3} sx={{ pt: 2 }}>
+          {/* Customer Name Input */}
           <Grid item xs={12}>
-            <Card variant="outlined">
-              <CardContent sx={{ py: 2 }}>
-                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                  Cliente:
-                </Typography>
-                <Typography variant="body2">
-                  {customer?.isNew
-                    ? customer.tempData?.nombre
-                    : customer?.customer?.nombre || 'Cliente Mostrador'}
-                </Typography>
-                {customer?.customer?.codigo && (
-                  <Typography variant="caption" color="text.secondary">
-                    Código: {customer.customer.codigo}
-                  </Typography>
-                )}
-              </CardContent>
-            </Card>
+            <TextField
+              fullWidth
+              label="Nombre del Cliente"
+              value={customerName}
+              onChange={(e) => setCustomerName(e.target.value)}
+              disabled={
+                isProcessing ||
+                Boolean(customer && customer?.isNew) ||
+                Boolean(customer && customer?.customer) ||
+                Boolean(customer && customer?.tempData)
+              }
+              sx={{
+                '& .MuiInputBase-root': {
+                  fontSize: '1.25rem',
+                  fontWeight: 600,
+                },
+              }}
+              InputProps={{
+                startAdornment: (
+                  <Icon
+                    icon="mdi:account"
+                    fontSize={24}
+                    style={{ marginRight: 8 }}
+                  />
+                ),
+                endAdornment: customerName && (
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      setCustomerName('')
+                      setTimeout(() => customerNameInputRef.current?.focus(), 0)
+                    }}
+                    disabled={
+                      isProcessing ||
+                      Boolean(customer && customer?.isNew) ||
+                      Boolean(customer && customer?.customer) ||
+                      Boolean(customer && customer?.tempData)
+                    }
+                    edge="end"
+                  >
+                    <Icon icon="mdi:close-circle" fontSize={20} />
+                  </IconButton>
+                ),
+              }}
+              inputRef={customerNameInputRef}
+            />
+            {customer?.customer?.codigo && (
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ mt: 0.5, display: 'block' }}
+              >
+                Código: {customer.customer.codigo}
+              </Typography>
+            )}
           </Grid>
 
           {/* Order Summary */}

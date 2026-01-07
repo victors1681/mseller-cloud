@@ -1,6 +1,30 @@
 import { CustomerType } from './customerType'
-import { ProductType } from './productTypes'
+import { EstadoPago } from './documentTypes'
 import { CondicionPagoType } from './paymentTypeTypes'
+import { ProductType } from './productTypes'
+
+export interface POSPaymentData {
+  customer: POSCustomer | null
+  cart: POSCartItem[]
+  totals: {
+    subtotal: number
+    descuentoTotal: number
+    impuestoTotal: number
+    total: number
+  }
+  paymentType: CondicionPagoType | undefined
+  paymentTypes: CondicionPagoType[] | undefined
+  amountReceived: number
+  change: number
+  notes: string
+  paymentReference: string
+  timestamp: string
+  tipoPago: number
+  estadoPago: EstadoPago
+  montoRecibido: number
+  montoDevuelto: number
+  nombreClienteMostrador: string
+}
 
 export interface POSCartItem {
   id: string
@@ -21,16 +45,19 @@ export interface POSCartItem {
   promocion?: boolean
   // ...other fields as needed
 }
+
+export interface NewCustomerFormData {
+  nombre: string
+  telefono: string
+  email: string
+  direccion: string
+  rnc: string
+  tipoCliente: string
+}
 export interface POSCustomer {
   customer?: CustomerType
   isNew?: boolean
-  tempData?: {
-    nombre: string
-    telefono?: string
-    email?: string
-    direccion?: string
-    rnc?: string
-  }
+  tempData?: NewCustomerFormData
 }
 
 export interface POSPaymentMethod {

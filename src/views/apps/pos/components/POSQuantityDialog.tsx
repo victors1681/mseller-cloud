@@ -1,20 +1,20 @@
-import React, { useState, useEffect } from 'react'
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Box,
-  Typography,
-  TextField,
   Button,
-  IconButton,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Grid,
+  IconButton,
   InputAdornment,
-  useTheme,
+  TextField,
+  Typography,
   useMediaQuery,
+  useTheme,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
+import React, { useEffect, useState } from 'react'
 import Icon from 'src/@core/components/icon'
 import { ProductType } from 'src/types/apps/productTypes'
 import formatCurrency from 'src/utils/formatCurrency'
@@ -102,8 +102,15 @@ const POSQuantityDialog: React.FC<POSQuantityDialogProps> = ({
 
   const handleQuantityChange = (newQuantity: number) => {
     const totalStock = getTotalStock()
-    if (newQuantity >= 1 && newQuantity <= totalStock) {
-      setQuantity(newQuantity)
+    // For services, allow any quantity >= 1. For products, limit by stock
+    if (product.esServicio) {
+      if (newQuantity >= 1) {
+        setQuantity(newQuantity)
+      }
+    } else {
+      if (newQuantity >= 1 && newQuantity <= totalStock) {
+        setQuantity(newQuantity)
+      }
     }
   }
 
@@ -190,27 +197,67 @@ const POSQuantityDialog: React.FC<POSQuantityDialogProps> = ({
               </Typography>
             )}
 
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-              <Typography variant="body2">
-                Stock disponible:
-                <Typography
-                  component="span"
-                  color={totalStock > 0 ? 'success.main' : 'error.main'}
-                  sx={{ fontWeight: 600, ml: 1 }}
-                >
-                  {totalStock} {product.unidad}
+            {/* Only show stock for non-service products */}
+            {product.esServicio && (
+              <Box
+                sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}
+              >
+                <Typography variant="body2">
+                  Stock disponible:
+                  <Typography
+                    component="span"
+                    color={totalStock > 0 ? 'success.main' : 'error.main'}
+                    sx={{ fontWeight: 600, ml: 1 }}
+                  >
+                    {totalStock} {product.unidad}
+                  </Typography>
                 </Typography>
-              </Typography>
-            </Box>
+              </Box>
+            )}
 
-            {/* Price Selection - only show Precio 1 */}
-            <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Typography variant="h5" sx={{ fontWeight: 700 }}>
-              Precio:
+            {/* Price Selection - editable for non-service products */}
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+                Precio:
               </Typography>
-              <Typography variant="h6" color="primary" sx={{ fontWeight: 700 }}>
-              {formatCurrency(product.precio1)}
-              </Typography>
+              {product.esServicio ? (
+                <TextField
+                  type="number"
+                  value={selectedPrice}
+                  onChange={(e) => {
+                    const newPrice = parseFloat(e.target.value) || 0
+                    if (newPrice >= 0) {
+                      setSelectedPrice(newPrice)
+                    }
+                  }}
+                  fullWidth
+                  inputProps={{
+                    min: 0,
+                    step: 0.01,
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Typography variant="body2">RD$</Typography>
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{
+                    '& input': {
+                      fontSize: '1.1rem',
+                      fontWeight: 600,
+                    },
+                  }}
+                />
+              ) : (
+                <Typography
+                  variant="h6"
+                  color="primary"
+                  sx={{ fontWeight: 700 }}
+                >
+                  {formatCurrency(product.precio1)}
+                </Typography>
+              )}
             </Box>
           </Grid>
 
@@ -245,7 +292,7 @@ const POSQuantityDialog: React.FC<POSQuantityDialogProps> = ({
                     fontWeight: 600,
                   },
                   min: 1,
-                  max: totalStock,
+                  ...(product.esServicio ? {} : { max: totalStock }),
                 }}
                 sx={{ width: 100 }}
                 InputProps={{
@@ -261,7 +308,7 @@ const POSQuantityDialog: React.FC<POSQuantityDialogProps> = ({
 
               <IconButton
                 onClick={() => handleQuantityChange(quantity + 1)}
-                disabled={quantity >= totalStock}
+                disabled={!product.esServicio && quantity >= totalStock}
                 size="large"
               >
                 <Icon icon="mdi:plus" />
@@ -290,7 +337,7 @@ const POSQuantityDialog: React.FC<POSQuantityDialogProps> = ({
         <Button
           variant="contained"
           onClick={handleAddToCart}
-          disabled={totalStock === 0}
+          disabled={!product.esServicio && totalStock === 0}
           size="large"
           startIcon={<Icon icon="mdi:cart-plus" />}
         >

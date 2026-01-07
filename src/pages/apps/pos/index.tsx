@@ -50,7 +50,10 @@ import { DocumentRendererModal } from 'src/views/ui/documentRenderer'
 // Types
 import { CustomerType } from 'src/types/apps/customerType'
 import { TurnoType } from 'src/types/apps/posType'
-import { POSAreaFilter as AreaFilterType } from 'src/types/apps/posTypes'
+import {
+  POSAreaFilter as AreaFilterType,
+  POSPaymentData,
+} from 'src/types/apps/posTypes'
 import { ProductType } from 'src/types/apps/productTypes'
 
 // Component Props Interface
@@ -64,8 +67,8 @@ interface POSPageProps {
 import { addNewDocument } from '@/store/apps/documents'
 import { transformPOSDataToDocument } from '@/utils/transformPaymentData'
 import toast from 'react-hot-toast'
+import { generate as generateShortUuid } from 'short-uuid'
 import { usePermissions } from 'src/hooks/usePermissions'
-import { v4 as uuidV4 } from 'uuid'
 import { AuthContext } from '../../../context/AuthContext'
 import { useBarcodeScan } from '../../../hooks/useBarcodeScan'
 import { TipoDocumentoNumerico } from '../../../types/apps/reportsTypes'
@@ -377,7 +380,7 @@ const POSPage: NextPage<POSPageProps> = ({
   }
 
   // Save order locally if offline, or process and sync online
-  const handleProcessPayment = async (paymentData: any) => {
+  const handleProcessPayment = async (paymentData: POSPaymentData) => {
     setIsProcessing(true)
     try {
       if (navigator.onLine) {
@@ -391,16 +394,13 @@ const POSPage: NextPage<POSPageProps> = ({
         if (paymentData.customer?.isNew) {
           // New customer - add clienteNuevo object
           if (payload.clienteNuevo) {
-            payload.clienteNuevo.codigo = uuidV4()
+            // Generate short unique ID for customer code using short-uuid
+            payload.clienteNuevo.codigo = generateShortUuid()
             payload.clienteNuevo.localidadId = parseInt(user?.warehouse || '1')
             payload.clienteNuevo.vendedor = user?.sellerCode || ''
-            payload.clienteNuevo.tipoComprobante = '02'
+            payload.clienteNuevo.tipoComprobante =
+              paymentData.customer.tempData?.tipoCliente || '02' // Default to '02' if not provided
 
-            // Set condicionPago to first payment type with dias = 0
-            console.log(
-              'POS: Looking for payment type with dias = 0 from:',
-              paymentData.paymentTypes,
-            )
             const defaultPaymentType = paymentData.paymentTypes?.find(
               (pt: any) => pt.dias === 0,
             )
@@ -413,6 +413,8 @@ const POSPage: NextPage<POSPageProps> = ({
           payload.nombreCliente = paymentData.customer.customer.nombre
           delete payload.clienteNuevo
         } else {
+          //Set the name of Mostrador customer
+          payload.nombreCliente = paymentData.nombreClienteMostrador
           // Cliente Mostrador - remove clienteNuevo
           delete payload.clienteNuevo
         }
