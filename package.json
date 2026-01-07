@@ -23,6 +23,8 @@
   "dependencies": {
     "@casl/ability": "6.5.0",
     "@casl/react": "3.1.0",
+    "@datadog/browser-rum": "^6.25.2",
+    "@datadog/browser-rum-react": "^6.25.2",
     "@emotion/cache": "11.10.8",
     "@emotion/react": "11.10.8",
     "@emotion/server": "11.10.0",

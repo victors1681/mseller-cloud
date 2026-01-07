@@ -6,6 +6,9 @@ import type { AppProps } from 'next/app'
 import Head from 'next/head'
 import { Router } from 'next/router'
 
+// ** Datadog RUM
+import { initializeDatadog } from 'src/configs/datadogConfig'
+
 // ** Store Imports
 import { Provider } from 'react-redux'
 import { store } from 'src/store'
@@ -95,6 +98,11 @@ const Guard = ({ children, authGuard, guestGuard }: GuardProps) => {
   }
 }
 configureRestClient()
+
+// Initialize Datadog RUM
+if (typeof window !== 'undefined') {
+  initializeDatadog()
+}
 
 // ** Configure JSS & ClassName
 const App = (props: ExtendedAppProps) => {

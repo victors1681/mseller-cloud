@@ -25,6 +25,7 @@ export const AVAILABLE_AGENTS = [
   'Analytics Agent',
 ]
 export interface UserTypes {
+  businessId: string
   userId: string
   password: string
   email: string
@@ -55,6 +56,7 @@ export interface UserTypes {
   cloudAccess: ICloudModules
   // ** Verification Fields
   isEmailVerified?: boolean
+  tier?: Tiers
 }
 
 export interface ICloudModules {

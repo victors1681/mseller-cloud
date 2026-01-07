@@ -8,6 +8,7 @@ import { useRouter } from 'next/router'
 
 // ** Config
 import authConfig from 'src/configs/auth'
+import { setDatadogUser } from 'src/configs/datadogConfig'
 
 // ** Types
 import { FirebaseError } from 'firebase/app'
@@ -86,6 +87,9 @@ const AuthProvider = ({ children }: Props) => {
             //userData.role = 'admin' //TODO: Temporary forcing user role
             setUser(userData)
 
+            // Set Datadog user context
+            setDatadogUser(userData)
+
             const updateAccessToken = await user.getIdToken()
             if (!updateAccessToken) {
               throw new Error('Failed to get access token')
@@ -134,6 +138,9 @@ const AuthProvider = ({ children }: Props) => {
             // User is not authenticated
             setUser(null)
 
+            // Clear Datadog user context
+            setDatadogUser(null)
+
             // Check if we're already handling this in restClient interceptor
             // by checking if localStorage is already cleared
             const hasToken = window.localStorage.getItem(
@@ -179,6 +186,9 @@ const AuthProvider = ({ children }: Props) => {
 
           // Clear auth state on error
           setUser(null)
+
+          // Clear Datadog user context on error
+          setDatadogUser(null)
 
           // Check if we're already handling this in restClient interceptor
           const hasToken = window.localStorage.getItem(
@@ -234,6 +244,10 @@ const AuthProvider = ({ children }: Props) => {
       )
       if (userData) {
         setUser(userData)
+        
+        // Set Datadog user context on login
+        setDatadogUser(userData)
+        
         const redirectURL = (router.query.returnUrl as string) || '/'
         router.replace(redirectURL)
       }
@@ -260,6 +274,10 @@ const AuthProvider = ({ children }: Props) => {
     try {
       await handleSignOut()
       setUser(null)
+      
+      // Clear Datadog user context on logout
+      setDatadogUser(null)
+      
       window.localStorage.removeItem('userData')
       window.localStorage.removeItem(authConfig.storageTokenKeyName)
 

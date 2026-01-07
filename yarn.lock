@@ -385,6 +385,34 @@
   resolved "https://registry.npmjs.org/@csstools/css-tokenizer/-/css-tokenizer-3.0.4.tgz"
   integrity sha512-Vd/9EVDiu6PPJt9yAh6roZP6El1xHrdvIVGjyBsHR0RYwNHgL7FJPyIIW4fANJNG6FtyZfvlRPpFI4ZM/lubvw==
 
+"@datadog/browser-core@6.25.2":
+  version "6.25.2"
+  resolved "https://registry.yarnpkg.com/@datadog/browser-core/-/browser-core-6.25.2.tgz#8efa5f0f2cefd05011de4cad4df8f1cfe859271a"
+  integrity sha512-onYhcpZN1buplG3H4ZGr2FhMo71OVSHQRkKfTK7tu63TNO1AXR+rJt/nx/0oWvpSiohWyMSmvxHfYWf19GQgnQ==
+
+"@datadog/browser-rum-core@6.25.2":
+  version "6.25.2"
+  resolved "https://registry.yarnpkg.com/@datadog/browser-rum-core/-/browser-rum-core-6.25.2.tgz#9922035d6425da69a3d83c85f6c28719e7716a0c"
+  integrity sha512-v0fHbsrnXhQpyKWN+png0Y7aHroMwRVGTjZoszNw9XSnJe8vprUyYG45PJFjEoR7u1BciQC9mxWa29ucfS64nw==
+  dependencies:
+    "@datadog/browser-core" "6.25.2"
+
+"@datadog/browser-rum-react@^6.25.2":
+  version "6.25.2"
+  resolved "https://registry.yarnpkg.com/@datadog/browser-rum-react/-/browser-rum-react-6.25.2.tgz#2ce89c182edbc8fa77f207c49a31ca75c53b13d7"
+  integrity sha512-kpF9QzGx+GzvTmfwsg54zdStn09816gOtSAgb5eSXUpZubNjz1kjO0LsG18lMvmyFTrCTjMC7MXi3aHMr2na3g==
+  dependencies:
+    "@datadog/browser-core" "6.25.2"
+    "@datadog/browser-rum-core" "6.25.2"
+
+"@datadog/browser-rum@^6.25.2":
+  version "6.25.2"
+  resolved "https://registry.yarnpkg.com/@datadog/browser-rum/-/browser-rum-6.25.2.tgz#f3c1ae5cb4c963146dc08b1a19863252f9336a70"
+  integrity sha512-HnKrX5+RbuQ39WzO5DfBZG/bxU72R9jvxCL/Uw95W/4j07FrVGBX9wftTLd+WFPaGfEFQiirQwEUgXExi4Hosw==
+  dependencies:
+    "@datadog/browser-core" "6.25.2"
+    "@datadog/browser-rum-core" "6.25.2"
+
 "@discoveryjs/json-ext@0.5.7":
   version "0.5.7"
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz#1d572bfbbe14b7704e0ba0f39b74815b84870d70"
