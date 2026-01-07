@@ -244,10 +244,10 @@ const AuthProvider = ({ children }: Props) => {
       )
       if (userData) {
         setUser(userData)
-        
+
         // Set Datadog user context on login
         setDatadogUser(userData)
-        
+
         const redirectURL = (router.query.returnUrl as string) || '/'
         router.replace(redirectURL)
       }
@@ -274,10 +274,10 @@ const AuthProvider = ({ children }: Props) => {
     try {
       await handleSignOut()
       setUser(null)
-      
+
       // Clear Datadog user context on logout
       setDatadogUser(null)
-      
+
       window.localStorage.removeItem('userData')
       window.localStorage.removeItem(authConfig.storageTokenKeyName)
 
