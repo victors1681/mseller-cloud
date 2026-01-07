@@ -27,11 +27,13 @@ export const CustomerTypeAutocomplete = (
   props: CustomerTypeAutocompleteProps,
 ) => {
   const dispatch = useDispatch<AppDispatch>()
-  const ecfStore = useSelector((state: RootState) => state.ecf)
+  const ecfStore = useSelector(
+    (state: RootState) => state.ecf,
+  ).secuenciaData.filter((v) => v.habilitado)
 
   const findCustomerTypeLabel = (tipoCliente: string) => {
     return (
-      ecfStore?.secuenciaData
+      ecfStore
         .find((v) => v.tipoCliente === tipoCliente)
         ?.descripcion?.trim() || ''
     )
@@ -55,10 +57,10 @@ export const CustomerTypeAutocomplete = (
           ][0]
         : []
     }
-  }, [props.selectedCustomerType, props.multiple, ecfStore.secuenciaData])
+  }, [props.selectedCustomerType, props.multiple, ecfStore])
 
   useEffect(() => {
-    if (!ecfStore?.secuenciaData?.length) {
+    if (!ecfStore?.length) {
       dispatch(
         fetchSecuenciaECF({
           pageSize: 100,
@@ -67,7 +69,7 @@ export const CustomerTypeAutocomplete = (
         }),
       )
     }
-  }, [ecfStore.secuenciaData?.length, dispatch])
+  }, [ecfStore?.length, dispatch])
 
   const handleSelection = (
     _: SyntheticEvent<Element, Event>,
@@ -83,7 +85,7 @@ export const CustomerTypeAutocomplete = (
   // Get unique customer types to avoid duplicates
   const uniqueCustomerTypes = useMemo(() => {
     const seen = new Set()
-    return ecfStore.secuenciaData
+    return ecfStore
       .filter((v) => {
         if (seen.has(v.tipoCliente)) {
           return false
@@ -95,7 +97,7 @@ export const CustomerTypeAutocomplete = (
         label: v.descripcion,
         tipoCliente: v.tipoCliente,
       }))
-  }, [ecfStore.secuenciaData])
+  }, [ecfStore])
 
   return (
     <Autocomplete
