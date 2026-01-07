@@ -1,6 +1,5 @@
 // ** Datadog RUM Imports
 import { datadogRum } from '@datadog/browser-rum'
-import { reactPlugin } from '@datadog/browser-rum-react'
 
 // ** Types
 import { UserTypes } from 'src/types/apps/userTypes'
@@ -9,18 +8,39 @@ let isInitialized = false
 
 export const initializeDatadog = () => {
   // Only initialize once and only in browser (Next.js SSR check)
-  if (isInitialized || typeof window === 'undefined') {
+  if (isInitialized) {
+    console.log('⚠️ Datadog already initialized, skipping')
+    return
+  }
+
+  if (typeof window === 'undefined') {
+    console.log(
+      '⚠️ Not in browser environment, skipping Datadog initialization',
+    )
     return
   }
 
   // Skip initialization during build time
   if (process.env.NEXT_PHASE === 'phase-production-build') {
+    console.log('⚠️ Build phase detected, skipping Datadog initialization')
+    return
+  }
+
+  // Verify required env vars
+  const appId = process.env.NEXT_PUBLIC_DATADOG_APPLICATION_ID
+  const clientToken = process.env.NEXT_PUBLIC_DATADOG_CLIENT_TOKEN
+
+  if (!appId || !clientToken) {
+    console.error('❌ Datadog credentials missing!', {
+      hasAppId: !!appId,
+      hasClientToken: !!clientToken,
+    })
     return
   }
 
   const config = {
-    applicationId: process.env.NEXT_PUBLIC_DATADOG_APPLICATION_ID || '',
-    clientToken: process.env.NEXT_PUBLIC_DATADOG_CLIENT_TOKEN || '',
+    applicationId: appId,
+    clientToken: clientToken,
     site: process.env.NEXT_PUBLIC_DATADOG_SITE || 'datadoghq.com',
     service: process.env.NEXT_PUBLIC_DATADOG_SERVICE || 'mseller-cloud',
     env: process.env.NEXT_PUBLIC_DATADOG_ENV || 'prod',
@@ -31,23 +51,21 @@ export const initializeDatadog = () => {
     trackResources: true,
     trackLongTasks: true,
     trackFrustrations: true,
-    enableExperimentalFeatures: ['clickmap'],
+    trackViewsManually: false, // Let Datadog auto-track views
+    enableExperimentalFeatures: ['clickmap'] as any,
     defaultPrivacyLevel: 'mask-user-input' as const,
     allowedTracingUrls: [
       /https:\/\/.*\.firebaseapp\.com/,
       /https:\/\/.*\.cloudfunctions\.net/,
       window.location.origin,
-      // Include Next.js API routes
       `${window.location.origin}/api`,
     ],
-    // Exclude Next.js internal resources
     excludedActivityUrls: [
       /_next\/static/,
       /_next\/webpack/,
       /webpack-hmr/,
       /__nextjs_original-stack-frame/,
     ],
-    plugins: [reactPlugin({ router: true })],
   }
 
   console.log('🐶 Initializing Datadog RUM...', {
@@ -55,27 +73,35 @@ export const initializeDatadog = () => {
     service: config.service,
     env: config.env,
     version: config.version,
+    origin: window.location.origin,
   })
 
-  datadogRum.init(config)
-  datadogRum.startSessionReplayRecording()
+  try {
+    datadogRum.init(config)
 
-  // Add Next.js specific context
-  datadogRum.setGlobalContextProperty('app_platform', 'web')
-  datadogRum.setGlobalContextProperty('app_framework', 'nextjs')
-  datadogRum.setGlobalContextProperty('deployment_type', 'cloud')
-  datadogRum.setGlobalContextProperty('nextjs_version', '14')
+    // Start session replay
+    datadogRum.startSessionReplayRecording()
 
-  // Send a test action to confirm RUM is working
-  datadogRum.addAction('datadog_rum_initialized', {
-    timestamp: new Date().toISOString(),
-    userAgent: navigator.userAgent,
-    viewport: `${window.innerWidth}x${window.innerHeight}`,
-    referrer: document.referrer,
-  })
+    // Add Next.js specific context
+    datadogRum.setGlobalContextProperty('app_platform', 'web')
+    datadogRum.setGlobalContextProperty('app_framework', 'nextjs')
+    datadogRum.setGlobalContextProperty('deployment_type', 'cloud')
+    datadogRum.setGlobalContextProperty('nextjs_version', '14')
 
-  console.log('✅ Datadog RUM initialized successfully')
-  isInitialized = true
+    // Send a test action to confirm RUM is working
+    datadogRum.addAction('datadog_rum_initialized', {
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      viewport: `${window.innerWidth}x${window.innerHeight}`,
+      referrer: document.referrer,
+      origin: window.location.origin,
+    })
+
+    console.log('✅ Datadog RUM initialized successfully')
+    isInitialized = true
+  } catch (error) {
+    console.error('❌ Failed to initialize Datadog RUM:', error)
+  }
 }
 
 export const setDatadogUser = (user: UserTypes | null) => {
@@ -136,13 +162,30 @@ export const trackPageView = (
   pageName: string,
   properties?: Record<string, any>,
 ) => {
-  if (!isInitialized) return
+  if (!isInitialized) {
+    console.warn('Datadog not initialized, skipping page view tracking')
+    return
+  }
 
-  datadogRum.addAction('page_view', {
-    page_name: pageName,
-    timestamp: new Date().toISOString(),
-    ...properties,
-  })
+  try {
+    // Use startView for proper page tracking
+    datadogRum.startView({
+      name: pageName,
+    })
+
+    // Add additional context as action
+    if (properties && Object.keys(properties).length > 0) {
+      datadogRum.addAction('page_view_context', {
+        page_name: pageName,
+        timestamp: new Date().toISOString(),
+        ...properties,
+      })
+    }
+
+    console.log('📄 Page view tracked:', pageName)
+  } catch (error) {
+    console.error('Failed to track page view:', error)
+  }
 }
 
 // Track business events
