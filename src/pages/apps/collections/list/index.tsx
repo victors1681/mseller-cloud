@@ -38,6 +38,7 @@ import { CollectionType } from 'src/types/apps/collectionType'
 // ** Custom Components Imports
 import CustomChip from 'src/@core/components/mui/chip'
 import TableHeader from 'src/views/apps/transports/list/TableHeader'
+import MSellerIOSAppLink from 'src/views/ui/MSellerIOSAppLink'
 
 // ** Styled Components
 import { debounce } from '@mui/material'
@@ -482,7 +483,15 @@ const CollectionList = () => {
       <Grid container spacing={6}>
         <Grid item xs={12}>
           <Card>
-            <CardHeader title="Cobranza" />
+            <CardHeader
+              title="Cobranzas Remotas"
+              subheader={
+                <>
+                  Listado de cobranzas remotas realizadas por los vendedores
+                  desde <MSellerIOSAppLink />
+                </>
+              }
+            />
             <CardContent>
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={4}>
@@ -501,7 +510,7 @@ const CollectionList = () => {
                   />
                 </Grid>
 
-                <Grid xs={12} sm={4}>
+                <Grid item xs={12} sm={4}>
                   <SellerAutocomplete
                     selectedSellers={selectedSellersParams}
                     multiple

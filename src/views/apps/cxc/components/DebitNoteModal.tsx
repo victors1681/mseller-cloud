@@ -30,15 +30,13 @@ import * as yup from 'yup'
 import Icon from 'src/@core/components/icon'
 
 // ** Store Imports
-import { AppDispatch, useAppSelector } from 'src/store'
-import { fetchConfiguracion } from 'src/store/apps/configuracionEmpresa'
-import { createCreditNote, fetchCxcDetail } from 'src/store/apps/cxc'
+import { AppDispatch } from 'src/store'
+import { createDebitNote, fetchCxcDetail } from 'src/store/apps/cxc'
 
 // ** Types
-import { TAX_LABEL_BY_COUNTRY } from 'src/types/apps/configuracionEmpresaTypes'
 import {
   CuentaCxc,
-  NotaCreditoRequest,
+  NotaDebitoRequest,
   TipoDocumento,
 } from 'src/types/apps/cxcTypes'
 
@@ -46,13 +44,13 @@ import {
 import { extractResourceErrorMessage } from 'src/utils/errorUtils'
 import formatCurrency from 'src/utils/formatCurrency'
 
-interface CreditNoteModalProps {
+interface DebitNoteModalProps {
   open: boolean
   onClose: () => void
   cxc: CuentaCxc | null
 }
 
-const CreditNoteModal: React.FC<CreditNoteModalProps> = ({
+const DebitNoteModal: React.FC<DebitNoteModalProps> = ({
   open,
   onClose,
   cxc,
@@ -62,56 +60,18 @@ const CreditNoteModal: React.FC<CreditNoteModalProps> = ({
   const dispatch = useDispatch<AppDispatch>()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
-  // ** Store
-  const { data: businessConfig } = useAppSelector(
-    (state) => state.configuracionEmpresa,
-  )
-
   // ** State
   const [isProcessing, setIsProcessing] = useState(false)
 
-  // ** Check if document is an invoice (credit notes can only be applied to invoices)
-  const isInvoice =
-    cxc?.tipoDocumento === TipoDocumento.Invoice ||
-    cxc?.tipoDocumento === 'invoice'
+  // ** Check if document is an invoice (debit notes can only be applied to invoices)
+  const isInvoice = cxc?.tipoDocumento === TipoDocumento.Invoice
 
-  // ** Load business configuration on mount
-  React.useEffect(() => {
-    dispatch(fetchConfiguracion())
-  }, [dispatch])
-
-  // ** Calculate ITBIS eligibility
-  const calculateITBISEligibility = () => {
-    if (!cxc || !businessConfig?.diasMaximosDevolucionITBIS) {
-      return { canRefundITBIS: true, diasTranscurridos: 0 }
-    }
-
-    const invoiceDate = new Date(cxc.fechaEmision)
-    const today = new Date()
-    const diasTranscurridos = Math.floor(
-      (today.getTime() - invoiceDate.getTime()) / (1000 * 60 * 60 * 24),
-    )
-
-    const canRefundITBIS =
-      diasTranscurridos <= businessConfig.diasMaximosDevolucionITBIS
-
-    return { canRefundITBIS, diasTranscurridos }
-  }
-
-  const { canRefundITBIS, diasTranscurridos } = calculateITBISEligibility()
-  const taxLabel =
-    TAX_LABEL_BY_COUNTRY[businessConfig?.codigoPais || 'DO'] || 'ITBIS'
-
-  // ** Credit note form validation schema
-  const creditNoteSchema = yup.object().shape({
+  // ** Debit note form validation schema
+  const debitNoteSchema = yup.object().shape({
     monto: yup
       .number()
       .required('El monto es requerido')
-      .positive('El monto debe ser mayor a 0')
-      .max(
-        cxc?.saldoPendiente || 0,
-        `El monto no puede exceder ${formatCurrency(cxc?.saldoPendiente || 0)}`,
-      ),
+      .positive('El monto debe ser mayor a 0'),
     motivo: yup.string().required('El motivo es requerido'),
     observaciones: yup.string().optional(),
   })
@@ -122,8 +82,8 @@ const CreditNoteModal: React.FC<CreditNoteModalProps> = ({
     formState: { errors },
     watch,
     reset,
-  } = useForm<NotaCreditoRequest>({
-    resolver: yupResolver(creditNoteSchema),
+  } = useForm<NotaDebitoRequest>({
+    resolver: yupResolver(debitNoteSchema),
     defaultValues: {
       monto: 0,
       motivo: '',
@@ -133,7 +93,7 @@ const CreditNoteModal: React.FC<CreditNoteModalProps> = ({
 
   // ** Watch form values
   const watchedAmount = watch('monto')
-  const remainingBalance = (cxc?.saldoPendiente || 0) - (watchedAmount || 0)
+  const newBalance = (cxc?.saldoPendiente || 0) + (watchedAmount || 0)
 
   // ** Handlers
   const handleClose = () => {
@@ -141,27 +101,27 @@ const CreditNoteModal: React.FC<CreditNoteModalProps> = ({
     reset()
   }
 
-  const onSubmitCreditNote = async (data: NotaCreditoRequest) => {
+  const onSubmitDebitNote = async (data: NotaDebitoRequest) => {
     if (!cxc) return
 
-    console.log('Processing credit note:', {
+    console.log('Processing debit note:', {
       cxcId: cxc.id,
       cxcNumero: cxc.numeroCxc,
-      creditNoteData: data,
+      debitNoteData: data,
     })
 
     setIsProcessing(true)
     try {
-      // Create credit note using Redux action
+      // Create debit note using Redux action
       const result = await dispatch(
-        createCreditNote({
+        createDebitNote({
           cxcId: cxc.id,
           request: data,
         }),
       ).unwrap()
 
       toast.success(
-        `Nota de crédito de ${formatCurrency(
+        `Nota de débito de ${formatCurrency(
           data.monto,
         )} procesada exitosamente`,
       )
@@ -170,10 +130,10 @@ const CreditNoteModal: React.FC<CreditNoteModalProps> = ({
       // Refresh CXC data to show updated balance
       dispatch(fetchCxcDetail(cxc.numeroCxc))
     } catch (error: any) {
-      console.error('Credit note processing error:', error)
+      console.error('Debit note processing error:', error)
       const errorMessage = extractResourceErrorMessage(
         error,
-        'la nota de crédito',
+        'la nota de débito',
         'create',
       )
       toast.error(errorMessage)
@@ -204,13 +164,13 @@ const CreditNoteModal: React.FC<CreditNoteModalProps> = ({
       >
         <Stack direction="row" alignItems="center" spacing={2}>
           <Icon
-            icon="mdi:note-edit-outline"
+            icon="mdi:note-plus-outline"
             fontSize="1.5rem"
-            color="info.main"
+            style={{ color: theme.palette.warning.main }}
           />
           <Box>
             <Typography variant={isMobile ? 'h6' : 'h5'} fontWeight={600}>
-              Crear Nota de Crédito
+              Crear Nota de Débito
             </Typography>
             <Typography variant="body2" color="text.secondary">
               CXC: {cxc?.numeroCxc}
@@ -227,7 +187,7 @@ const CreditNoteModal: React.FC<CreditNoteModalProps> = ({
         </Stack>
       </DialogTitle>
 
-      <form onSubmit={handleSubmit(onSubmitCreditNote)}>
+      <form onSubmit={handleSubmit(onSubmitDebitNote)}>
         <DialogContent
           sx={{
             p: isMobile ? 2 : 3,
@@ -241,17 +201,17 @@ const CreditNoteModal: React.FC<CreditNoteModalProps> = ({
                 p: 2.5,
                 bgcolor: (theme) =>
                   theme.palette.mode === 'dark'
-                    ? 'rgba(33, 150, 243, 0.08)'
-                    : 'rgba(33, 150, 243, 0.04)',
+                    ? 'rgba(255, 152, 0, 0.08)'
+                    : 'rgba(255, 152, 0, 0.04)',
                 borderRadius: 2,
                 border: `1px solid`,
-                borderColor: 'info.main',
+                borderColor: 'warning.main',
                 boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
               }}
             >
               <Typography
                 variant="caption"
-                color="info.main"
+                color="warning.main"
                 fontWeight={600}
                 sx={{
                   letterSpacing: '0.5px',
@@ -262,7 +222,7 @@ const CreditNoteModal: React.FC<CreditNoteModalProps> = ({
               </Typography>
               <Stack spacing={1} mt={1}>
                 <Stack direction="row" justifyContent="space-between">
-                  <Typography variant="body2">Saldo Pendiente:</Typography>
+                  <Typography variant="body2">Saldo Actual:</Typography>
                   <Typography
                     variant="body2"
                     fontWeight={600}
@@ -277,25 +237,23 @@ const CreditNoteModal: React.FC<CreditNoteModalProps> = ({
                     <Typography
                       variant="body2"
                       fontWeight={600}
-                      color={
-                        remainingBalance <= 0 ? 'success.main' : 'warning.main'
-                      }
+                      color="error.main"
                     >
-                      {formatCurrency(remainingBalance)}
+                      {formatCurrency(newBalance)}
                     </Typography>
                   </Stack>
                 )}
               </Stack>
             </Box>
 
-            {/* Credit Note Amount */}
+            {/* Debit Note Amount */}
             <Controller
               name="monto"
               control={control}
               render={({ field }) => (
                 <TextField
                   {...field}
-                  label="Monto de la Nota de Crédito"
+                  label="Monto de la Nota de Débito"
                   type="number"
                   fullWidth
                   error={!!errors.monto}
@@ -309,7 +267,7 @@ const CreditNoteModal: React.FC<CreditNoteModalProps> = ({
               )}
             />
 
-            {/* Credit Note Reason */}
+            {/* Debit Note Reason */}
             <Controller
               name="motivo"
               control={control}
@@ -320,7 +278,7 @@ const CreditNoteModal: React.FC<CreditNoteModalProps> = ({
                   fullWidth
                   error={!!errors.motivo}
                   helperText={errors.motivo?.message}
-                  placeholder="Ej: Error de facturación, Descuento por cliente frecuente"
+                  placeholder="Ej: Cargos adicionales, Intereses por mora, Ajuste de precio"
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -343,46 +301,27 @@ const CreditNoteModal: React.FC<CreditNoteModalProps> = ({
                   multiline
                   rows={isMobile ? 2 : 3}
                   fullWidth
-                  placeholder="Comentarios adicionales sobre la nota de crédito..."
+                  placeholder="Comentarios adicionales sobre la nota de débito..."
                 />
               )}
             />
-
-            {/* ITBIS Refund Warning */}
-            {isInvoice && !canRefundITBIS && businessConfig && (
-              <Alert severity="warning" sx={{ borderRadius: 2 }}>
-                <Typography variant="body2">
-                  <strong>Advertencia:</strong> Esta factura fue emitida hace{' '}
-                  <strong>{diasTranscurridos} días</strong>. Su política de
-                  negocio permite reembolsos de {taxLabel} solo dentro de{' '}
-                  <strong>
-                    {businessConfig.diasMaximosDevolucionITBIS} días
-                  </strong>
-                  .
-                </Typography>
-                <Typography variant="body2" sx={{ mt: 1 }}>
-                  La nota de crédito se procesará{' '}
-                  <strong>sin reembolso de {taxLabel}</strong>.
-                </Typography>
-              </Alert>
-            )}
 
             {/* Document Type Validation Warning */}
             {!isInvoice && (
               <Alert severity="error" sx={{ borderRadius: 2 }}>
                 <Typography variant="body2">
-                  <strong>Error:</strong> Las notas de crédito solo pueden
+                  <strong>Error:</strong> Las notas de débito solo pueden
                   aplicarse a facturas (invoices). Este documento es de tipo:{' '}
                   <strong>{cxc?.tipoDocumento}</strong>
                 </Typography>
               </Alert>
             )}
 
-            {/* Warning for Credit Notes */}
+            {/* Warning for Debit Notes */}
             {isInvoice && (
               <Alert severity="warning" sx={{ borderRadius: 2 }}>
                 <Typography variant="body2">
-                  <strong>Importante:</strong> La nota de crédito reducirá
+                  <strong>Importante:</strong> La nota de débito aumentará
                   automáticamente el saldo pendiente de esta cuenta por cobrar y
                   no podrá ser revertida una vez procesada.
                 </Typography>
@@ -400,34 +339,30 @@ const CreditNoteModal: React.FC<CreditNoteModalProps> = ({
           }}
         >
           <Button
-            type="submit"
-            variant="contained"
-            color="info"
-            disabled={isProcessing || !isInvoice}
-            startIcon={
-              isProcessing ? (
-                <Icon icon="mdi:loading" className="spin" />
-              ) : (
-                <Icon icon="mdi:note-edit-outline" />
-              )
-            }
-            size="large"
-            fullWidth={isMobile}
-          >
-            {isProcessing
-              ? 'Procesando...'
-              : !isInvoice
-              ? 'No Disponible para Este Tipo de Documento'
-              : 'Crear Nota de Crédito'}
-          </Button>
-          <Button
-            onClick={handleClose}
             variant="outlined"
-            size="large"
+            onClick={handleClose}
+            disabled={isProcessing}
             fullWidth={isMobile}
-            sx={isMobile ? { mr: 2, mt: 1 } : undefined}
+            sx={{
+              height: isMobile ? 44 : 'auto',
+            }}
           >
             Cancelar
+          </Button>
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={isProcessing || !isInvoice}
+            fullWidth={isMobile}
+            color="warning"
+            startIcon={
+              isProcessing ? null : <Icon icon="mdi:note-plus-outline" />
+            }
+            sx={{
+              height: isMobile ? 44 : 'auto',
+            }}
+          >
+            {isProcessing ? 'Procesando...' : 'Crear Nota de Débito'}
           </Button>
         </DialogActions>
       </form>
@@ -435,4 +370,4 @@ const CreditNoteModal: React.FC<CreditNoteModalProps> = ({
   )
 }
 
-export default CreditNoteModal
+export default DebitNoteModal

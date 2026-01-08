@@ -43,6 +43,7 @@ interface CxcCardProps {
   cxc: CuentaCxc
   onPayment?: (cxc: CuentaCxc) => void
   onCreditNote?: (cxc: CuentaCxc) => void
+  onDebitNote?: (cxc: CuentaCxc) => void
   onReturn?: (cxc: CuentaCxc) => void
   onViewDetail?: (cxc: CuentaCxc) => void
   onViewClient?: (cxc: CuentaCxc) => void
@@ -102,6 +103,7 @@ const CxcCard: React.FC<CxcCardProps> = ({
   cxc,
   onPayment,
   onCreditNote,
+  onDebitNote,
   onReturn,
   onViewDetail,
   onViewClient,
@@ -458,6 +460,20 @@ const CxcCard: React.FC<CxcCardProps> = ({
               <Icon icon="mdi:note-edit-outline" />
             </ListItemIcon>
             <ListItemText>Nota de Crédito</ListItemText>
+          </MenuItem>
+        )}
+
+        {onDebitNote && (
+          <MenuItem
+            onClick={() => {
+              handleMenuClose()
+              onDebitNote(cxc)
+            }}
+          >
+            <ListItemIcon>
+              <Icon icon="mdi:note-plus-outline" />
+            </ListItemIcon>
+            <ListItemText>Nota de Débito</ListItemText>
           </MenuItem>
         )}
 

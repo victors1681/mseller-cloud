@@ -61,6 +61,7 @@ import ConfirmTransportStatus from '../confirmStatus'
 import TransportStatusSelect from '../transportStatusSelect'
 
 import { useRouter } from 'next/router'
+import MSellerIOSAppLink from '../../../../views/ui/MSellerIOSAppLink'
 
 interface InvoiceStatusObj {
   [key: string]: {
@@ -628,7 +629,16 @@ const TransportList = () => {
       <Grid container spacing={6}>
         <Grid item xs={12}>
           <Card>
-            <CardHeader title="Transportes" />
+            <CardHeader
+              title="Transportes"
+              subheader={
+                <>
+                  Listado de transportes para distribuidores entregar desde{' '}
+                  <MSellerIOSAppLink />
+                </>
+              }
+            />
+
             <CardContent>
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={4}>

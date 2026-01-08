@@ -15,6 +15,7 @@ export enum EstadoCxc {
 export enum TipoMovimientoCxc {
   Pago = 'Pago',
   NotaCredito = 'NotaCredito',
+  NotaDebito = 'NotaDebito',
   Devolucion = 'Devolucion',
   AjustePositivo = 'AjustePositivo',
   AjusteNegativo = 'AjusteNegativo',
@@ -264,6 +265,12 @@ export interface PagoRequest {
 }
 
 export interface NotaCreditoRequest {
+  monto: number
+  motivo?: string
+  observaciones?: string
+}
+
+export interface NotaDebitoRequest {
   monto: number
   motivo?: string
   observaciones?: string

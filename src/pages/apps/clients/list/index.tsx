@@ -64,37 +64,69 @@ const defaultColumns: GridColDef[] = [
   {
     flex: 0.1,
     field: 'id',
-    minWidth: 80,
+    minWidth: 100,
     headerName: 'Código',
     renderCell: ({ row }: CellType) => (
-      <Typography variant="body2">{row.codigo}</Typography>
+      <Link
+        href={`/apps/clients/detail/${row.codigo}`}
+        passHref
+        style={{ textDecoration: 'none' }}
+      >
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'primary.main',
+            cursor: 'pointer',
+            '&:hover': {
+              textDecoration: 'underline',
+            },
+          }}
+        >
+          {row.codigo}
+        </Typography>
+      </Link>
     ),
   },
   {
     flex: 0.35,
     field: 'client',
-    minWidth: 300,
+    minWidth: 200,
     headerName: 'Nombre/Dir',
     renderCell: ({ row }: CellType) => {
       return (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography
-              noWrap
-              variant="body2"
-              sx={{
-                color: 'text.primary',
-                fontWeight: 600,
-                textTransform: 'capitalize',
-              }}
-            >
-              {row.nombre}
-            </Typography>
-            <Typography noWrap variant="caption">
-              {row.direccion} - {row.ciudad}
-            </Typography>
+        <Link
+          href={`/apps/clients/detail/${row.codigo}`}
+          passHref
+          style={{ textDecoration: 'none', width: '100%' }}
+        >
+          <Box
+            sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+          >
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Typography
+                noWrap
+                variant="body2"
+                sx={{
+                  color: 'primary.main',
+                  fontWeight: 600,
+                  textTransform: 'capitalize',
+                  '&:hover': {
+                    textDecoration: 'underline',
+                  },
+                }}
+              >
+                {row.nombre}
+              </Typography>
+              <Typography
+                noWrap
+                variant="caption"
+                sx={{ color: 'text.secondary' }}
+              >
+                {row.direccion} - {row.ciudad}
+              </Typography>
+            </Box>
           </Box>
-        </Box>
+        </Link>
       )
     },
   },
@@ -160,7 +192,7 @@ const defaultColumns: GridColDef[] = [
     ),
   },
   {
-    flex: 0.05,
+    width: 60,
     field: 'active',
     headerName: '',
     renderCell: ({ row }: CellType) =>
@@ -355,7 +387,7 @@ const InvoiceList = () => {
     ...defaultColumns,
     {
       flex: 0.1,
-      minWidth: 130,
+      minWidth: 140,
       sortable: false,
       field: 'actions',
       headerName: 'Actions',
@@ -387,7 +419,7 @@ const InvoiceList = () => {
               <Icon icon="ph:map-pin" fontSize={20} />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Aprobar">
+          <Tooltip title="Editar">
             <IconButton
               size="small"
               component={Link}
@@ -396,12 +428,11 @@ const InvoiceList = () => {
               <Icon icon="tabler:edit" fontSize={20} />
             </IconButton>
           </Tooltip>
-          <Tooltip title="View">
+          <Tooltip title="Ver detalle">
             <IconButton
               size="small"
               component={Link}
-              disabled
-              href={`/apps/invoice/preview/${row.codigo}`}
+              href={`/apps/clients/detail/${row.codigo}`}
             >
               <Icon icon="mdi:eye-outline" fontSize={20} />
             </IconButton>

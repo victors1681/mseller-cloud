@@ -25,6 +25,7 @@ interface DataParams {
   localidad?: string
   condicionPago?: string
   tipoDocumento?: string
+  codigoCliente?: string
 }
 
 interface Redux {

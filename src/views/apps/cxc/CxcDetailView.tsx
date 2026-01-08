@@ -55,6 +55,7 @@ import formatCurrency from 'src/utils/formatCurrency'
 // ** Components
 import CreditNoteModal from './components/CreditNoteModal'
 import CxcStatusBadge from './components/CxcStatusBadge'
+import DebitNoteModal from './components/DebitNoteModal'
 import PaymentModal from './components/PaymentModal'
 
 interface CxcDetailViewProps {
@@ -103,6 +104,7 @@ const CxcDetailView: React.FC<CxcDetailViewProps> = ({ numeroCxc }) => {
   const [actionMenuOpen, setActionMenuOpen] = useState(false)
   const [paymentModalOpen, setPaymentModalOpen] = useState(false)
   const [creditNoteModalOpen, setCreditNoteModalOpen] = useState(false)
+  const [debitNoteModalOpen, setDebitNoteModalOpen] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
 
   // ** Effects
@@ -135,6 +137,10 @@ const CxcDetailView: React.FC<CxcDetailViewProps> = ({ numeroCxc }) => {
     setCreditNoteModalOpen(true)
   }
 
+  const handleCreateDebitNote = () => {
+    setDebitNoteModalOpen(true)
+  }
+
   const handleProcessReturn = () => {
     // TODO: Open return dialog
     toast.success('Abrir formulario de devolución')
@@ -163,6 +169,8 @@ const CxcDetailView: React.FC<CxcDetailViewProps> = ({ numeroCxc }) => {
         return 'mdi:cash'
       case TipoMovimientoCxc.NotaCredito:
         return 'mdi:note-edit-outline'
+      case TipoMovimientoCxc.NotaDebito:
+        return 'mdi:note-plus-outline'
       case TipoMovimientoCxc.Devolucion:
         return 'mdi:keyboard-return'
       case TipoMovimientoCxc.AjustePositivo:
@@ -180,6 +188,8 @@ const CxcDetailView: React.FC<CxcDetailViewProps> = ({ numeroCxc }) => {
         return 'success'
       case TipoMovimientoCxc.NotaCredito:
         return 'info'
+      case TipoMovimientoCxc.NotaDebito:
+        return 'warning'
       case TipoMovimientoCxc.Devolucion:
         return 'warning'
       case TipoMovimientoCxc.AjustePositivo:
@@ -327,6 +337,10 @@ const CxcDetailView: React.FC<CxcDetailViewProps> = ({ numeroCxc }) => {
     setCreditNoteModalOpen(false)
   }
 
+  const handleCloseDebitNoteModal = () => {
+    setDebitNoteModalOpen(false)
+  }
+
   return (
     <Box
       sx={{
@@ -424,6 +438,20 @@ const CxcDetailView: React.FC<CxcDetailViewProps> = ({ numeroCxc }) => {
                   }}
                 >
                   {isMobile ? 'Nota Crédito' : 'N. Crédito'}
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="warning"
+                  startIcon={<Icon icon="mdi:note-plus-outline" />}
+                  onClick={handleCreateDebitNote}
+                  size={isMobile ? 'medium' : 'medium'}
+                  fullWidth={isMobile}
+                  sx={{
+                    minHeight: isMobile ? 44 : 36,
+                    fontSize: isMobile ? '0.875rem' : '0.75rem',
+                  }}
+                >
+                  {isMobile ? 'Nota Débito' : 'N. Débito'}
                 </Button>
                 <Button
                   variant="outlined"
@@ -1063,6 +1091,11 @@ const CxcDetailView: React.FC<CxcDetailViewProps> = ({ numeroCxc }) => {
       <CreditNoteModal
         open={creditNoteModalOpen}
         onClose={handleCloseCreditNoteModal}
+        cxc={cxc}
+      />
+      <DebitNoteModal
+        open={debitNoteModalOpen}
+        onClose={handleCloseDebitNoteModal}
         cxc={cxc}
       />
     </Box>

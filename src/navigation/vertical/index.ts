@@ -66,15 +66,20 @@ const navigation = (): VerticalNavItemsType => {
           path: '/apps/clients/list',
         },
         {
+          title: 'Condiciones de Pago',
+          icon: 'mdi:account-payment',
+          path: '/apps/paymentTypes/list',
+        },
+        {
           title: 'Facturas CxC',
           icon: 'lets-icons:order',
           path: '/apps/invoices/list',
         },
-        {
-          title: 'Visitas',
-          icon: 'material-symbols:map-outline',
-          path: '/apps/visits/list',
-        },
+        // {
+        //   title: 'Visitas',
+        //   icon: 'material-symbols:map-outline',
+        //   path: '/apps/visits/list',
+        // },
         {
           title: 'Mensajería',
           icon: 'mdi:message-text',
@@ -86,12 +91,17 @@ const navigation = (): VerticalNavItemsType => {
           path: '/apps/cxc',
         },
         {
+          title: 'Notas Crédito/Débito',
+          icon: 'mdi:note-multiple-outline',
+          path: '/apps/cxc/notes',
+        },
+        {
           title: 'Reportes CXC',
           icon: 'mdi:chart-line',
           path: '/apps/cxc/reports',
         },
         {
-          title: 'Cobranza',
+          title: 'Cobranzas Remotas',
           icon: 'ph:money-fill',
           path: '/apps/collections/list',
         },
@@ -114,15 +124,22 @@ const navigation = (): VerticalNavItemsType => {
           path: '/apps/products/list',
         },
         {
-          title: 'Conteos de Inventario',
+          title: 'Conteos',
           icon: 'mdi:clipboard-list-outline',
-          path: '/apps/inventory-management/counts',
+          children: [
+            {
+              title: 'Conteos de Inventario',
+              icon: 'mdi:clipboard-list-outline',
+              path: '/apps/inventory-management/counts',
+            },
+            {
+              title: 'Reconciliaciones',
+              icon: 'mdi:compare-horizontal',
+              path: '/apps/inventory-management/reconciliations',
+            },
+          ],
         },
-        {
-          title: 'Reconciliaciones',
-          icon: 'mdi:compare-horizontal',
-          path: '/apps/inventory-management/reconciliations',
-        },
+
         {
           title: 'Movimientos',
           icon: 'mdi:swap-horizontal',
@@ -190,11 +207,6 @@ const navigation = (): VerticalNavItemsType => {
           icon: 'hugeicons-sale-tag-02',
           path: '/apps/offers/list',
         },
-        {
-          title: 'Condiciones de Pago',
-          icon: 'mdi:account-payment',
-          path: '/apps/paymentTypes/list',
-        },
       ],
     },
 
@@ -225,6 +237,11 @@ const navigation = (): VerticalNavItemsType => {
           title: 'Empresa',
           icon: 'mdi:office-building',
           path: '/apps/business',
+        },
+        {
+          title: 'Configuración de Empresa',
+          icon: 'mdi:cog-outline',
+          path: '/apps/settings/business-configuration',
         },
         {
           title: 'Sucursales',

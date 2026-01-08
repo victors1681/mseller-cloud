@@ -1,5 +1,5 @@
 // ** React Imports
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 // ** Next Imports
 import { useRouter } from 'next/router'
@@ -38,7 +38,12 @@ import { fetchCxcByClient } from 'src/store/apps/cxc'
 import formatCurrency from 'src/utils/formatCurrency'
 
 // ** Components
+import CreditNoteModal from './components/CreditNoteModal'
 import CxcCard from './components/CxcCard'
+import DebitNoteModal from './components/DebitNoteModal'
+
+// ** Types
+import { CuentaCxc } from 'src/types/apps/cxcTypes'
 
 interface CxcClientViewProps {
   codigoCliente: string
@@ -51,6 +56,11 @@ const CxcClientView: React.FC<CxcClientViewProps> = ({ codigoCliente }) => {
   const dispatch = useDispatch<AppDispatch>()
   const store = useSelector((state: RootState) => state.cxc)
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+
+  // ** State
+  const [creditNoteModalOpen, setCreditNoteModalOpen] = useState(false)
+  const [debitNoteModalOpen, setDebitNoteModalOpen] = useState(false)
+  const [selectedCxc, setSelectedCxc] = useState<CuentaCxc | null>(null)
 
   // ** Effects
   useEffect(() => {
@@ -66,6 +76,34 @@ const CxcClientView: React.FC<CxcClientViewProps> = ({ codigoCliente }) => {
 
   const handleViewDetail = (cxc: any) => {
     router.push(`/apps/cxc/detail/${cxc.numeroCxc}`)
+  }
+
+  const handleCreditNote = (cxc: CuentaCxc) => {
+    setSelectedCxc(cxc)
+    setCreditNoteModalOpen(true)
+  }
+
+  const handleDebitNote = (cxc: CuentaCxc) => {
+    setSelectedCxc(cxc)
+    setDebitNoteModalOpen(true)
+  }
+
+  const handleCloseCreditNoteModal = () => {
+    setCreditNoteModalOpen(false)
+    setSelectedCxc(null)
+    // Refresh data
+    if (codigoCliente) {
+      dispatch(fetchCxcByClient({ codigoCliente }))
+    }
+  }
+
+  const handleCloseDebitNoteModal = () => {
+    setDebitNoteModalOpen(false)
+    setSelectedCxc(null)
+    // Refresh data
+    if (codigoCliente) {
+      dispatch(fetchCxcByClient({ codigoCliente }))
+    }
   }
 
   // ** Computed values
@@ -209,6 +247,8 @@ const CxcClientView: React.FC<CxcClientViewProps> = ({ codigoCliente }) => {
                   key={cxc.id}
                   cxc={cxc}
                   onViewDetail={handleViewDetail}
+                  onCreditNote={handleCreditNote}
+                  onDebitNote={handleDebitNote}
                   compact={isMobile}
                 />
               ))}
@@ -216,6 +256,18 @@ const CxcClientView: React.FC<CxcClientViewProps> = ({ codigoCliente }) => {
           )}
         </CardContent>
       </Card>
+
+      {/* Modal Components */}
+      <CreditNoteModal
+        open={creditNoteModalOpen}
+        onClose={handleCloseCreditNoteModal}
+        cxc={selectedCxc}
+      />
+      <DebitNoteModal
+        open={debitNoteModalOpen}
+        onClose={handleCloseDebitNoteModal}
+        cxc={selectedCxc}
+      />
     </Box>
   )
 }

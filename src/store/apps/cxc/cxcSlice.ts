@@ -15,6 +15,7 @@ import {
   EstadoCxc,
   MovimientoCxc,
   NotaCreditoRequest,
+  NotaDebitoRequest,
   PaginatedResponse,
   PagoRequest,
   ReporteCxc,
@@ -322,6 +323,27 @@ export const createCreditNote = createAsyncThunk(
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || 'Error creating credit note',
+      )
+    }
+  },
+)
+
+// Create debit note
+export const createDebitNote = createAsyncThunk(
+  'cxc/createDebitNote',
+  async (
+    params: { cxcId: number; request: NotaDebitoRequest },
+    { rejectWithValue },
+  ) => {
+    try {
+      const response = await restClient.post<MovimientoCxc>(
+        `/api/portal/Cxc/${params.cxcId}/nota-debito`,
+        params.request,
+      )
+      return { cxcId: params.cxcId, movimiento: response.data }
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Error creating debit note',
       )
     }
   },
@@ -682,6 +704,73 @@ export const cxcSlice = createSlice({
         }
       })
       .addCase(createCreditNote.rejected, (state, action) => {
+        state.isProcessing = false
+        state.error = action.payload as string
+      })
+
+    // ============================================
+    // Create Debit Note
+    // ============================================
+    builder
+      .addCase(createDebitNote.pending, (state) => {
+        state.isProcessing = true
+        state.error = null
+      })
+      .addCase(createDebitNote.fulfilled, (state, action) => {
+        state.isProcessing = false
+
+        // Debit notes increase the outstanding balance
+        if (
+          state.selectedCxc &&
+          state.selectedCxc.id === action.payload.cxcId
+        ) {
+          if (!state.selectedCxc.movimientos) {
+            state.selectedCxc.movimientos = []
+          }
+          state.selectedCxc.movimientos.unshift(action.payload.movimiento)
+
+          // Debit notes increase the outstanding balance
+          state.selectedCxc.saldoPendiente += action.payload.movimiento.monto
+          state.selectedCxc.montoTotal += action.payload.movimiento.monto
+
+          // Update state based on new balance
+          if (state.selectedCxc.saldoPendiente > 0) {
+            if (state.selectedCxc.estado === EstadoCxc.Pagado) {
+              state.selectedCxc.estado = EstadoCxc.PagoParcial
+            }
+          }
+
+          // Recalculate percentage
+          state.selectedCxc.porcentajePagado =
+            ((state.selectedCxc.montoTotal - state.selectedCxc.saldoPendiente) /
+              state.selectedCxc.montoTotal) *
+            100
+        }
+
+        // Update the CXC in the main list if present
+        const cxcIndex = state.data.findIndex(
+          (cxc) => cxc.id === action.payload.cxcId,
+        )
+        if (cxcIndex !== -1) {
+          state.data[cxcIndex].saldoPendiente += action.payload.movimiento.monto
+          state.data[cxcIndex].montoTotal += action.payload.movimiento.monto
+
+          // Update state based on new balance
+          if (state.data[cxcIndex].saldoPendiente > 0) {
+            if (state.data[cxcIndex].estado === EstadoCxc.Pagado) {
+              state.data[cxcIndex].estado = EstadoCxc.PagoParcial
+            }
+          }
+
+          // Recalculate percentage
+          state.data[cxcIndex].porcentajePagado =
+            ((state.data[cxcIndex].montoTotal -
+              state.data[cxcIndex].saldoPendiente) /
+              state.data[cxcIndex].montoTotal) *
+            100
+        }
+      })
+      .addCase(createDebitNote.rejected, (state, action) => {
         state.isProcessing = false
         state.error = action.payload as string
       })
