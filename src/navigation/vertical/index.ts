@@ -51,7 +51,7 @@ const navigation = (): VerticalNavItemsType => {
       ],
     },
     {
-      title: 'Biblioteca de Medios',
+      title: 'Multimedia',
       icon: 'mdi:folder-multiple-image',
       path: '/apps/media',
     },
@@ -237,21 +237,21 @@ const navigation = (): VerticalNavItemsType => {
           path: '/apps/communication/config',
         },
         {
-          title: 'eCF',
+          title: 'NCFs',
           icon: 'mdi:file-document-edit',
           children: [
             {
-              title: 'Integración',
+              title: 'Integración eCF',
               icon: 'mdi:cog',
               path: '/apps/ecf/integration/list',
             },
             {
-              title: 'Secuencias eCF',
+              title: 'Secuencias Fiscales',
               icon: 'mdi:counter',
               path: '/apps/ecf/secuencia/list',
             },
             {
-              title: 'Auditoría',
+              title: 'Auditoría eCF',
               icon: 'mdi:file-search',
               path: '/apps/ecf/audit',
             },
