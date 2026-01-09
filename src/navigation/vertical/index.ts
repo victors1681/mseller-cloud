@@ -23,15 +23,23 @@ const navigation = (): VerticalNavItemsType => {
       icon: 'mdi:point-of-sale',
       children: [
         {
-          title: 'Terminal POS',
+          title: 'POS',
           icon: 'mdi:cash-register',
           path: '/apps/pos',
           permission: 'pos.allowCashierAccess',
-        },
-        {
-          title: 'Gestión de Turnos',
-          icon: 'mdi:clock-outline',
-          path: '/apps/pos/manager',
+          children: [
+            {
+              title: 'Terminal POS',
+              icon: 'mdi:cash-register',
+              path: '/apps/pos',
+              permission: 'pos.allowCashierAccess',
+            },
+            {
+              title: 'Gestión de Turnos',
+              icon: 'mdi:clock-outline',
+              path: '/apps/pos/manager',
+            },
+          ],
         },
         {
           title: 'Cotizaciones',
