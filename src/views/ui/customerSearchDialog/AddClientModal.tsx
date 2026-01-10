@@ -44,16 +44,25 @@ const quickAddSchema = yup.object().shape({
     .string()
     .required('El nombre es requerido')
     .max(100, 'El nombre no debe exceder 100 caracteres'),
-  rnc: yup.string().nullable().max(50, 'El RNC no debe exceder 50 caracteres'),
+  rnc: yup
+    .string()
+    .nullable()
+    .transform((value) => (value === '' ? null : value))
+    .test('rnc-numeric', 'El RNC debe contener solo números', (value) => {
+      if (!value) return true // Allow empty values
+      return /^\d+$/.test(value)
+    })
+    .test('rnc-length', 'El RNC debe tener 9 u 11 caracteres', (value) => {
+      if (!value) return true // Allow empty values
+      const length = value.length
+      return length === 9 || length === 11
+    }),
   telefono1: yup.string().nullable(),
   email: yup
     .string()
     .nullable()
     .transform((value) => (value === '' ? null : value))
-    .test('email-validation', 'Correo electrónico inválido', (value) => {
-      if (!value) return true // Allow empty values
-      return yup.string().email().isValidSync(value)
-    }),
+    .email('Correo electrónico inválido'),
   direccion: yup.string().nullable().max(200),
   ciudad: yup.string().nullable(),
   tipoCliente: yup.string().required('El tipo de cliente es requerido'),
@@ -458,7 +467,7 @@ const AddClientModal: React.FC<AddClientModalProps> = ({
               />
             </Grid>
 
-            <Grid item xs={12} sm={6} sx={{ mt: 2 }}>
+            <Grid item xs={12} sm={6}>
               <CustomAutocomplete
                 name="localidadId"
                 control={control}
@@ -520,12 +529,14 @@ const AddClientModal: React.FC<AddClientModalProps> = ({
 
         <DialogActions
           sx={{
-            p: 3,
+            px: 3,
+            my: 4,
             flexDirection: { xs: 'column', sm: 'row' },
-            gap: { xs: 1, sm: 0 },
+            gap: { xs: 1, sm: 1 },
             '& .MuiButton-root': {
-              minHeight: { xs: 48, sm: 36 }, // Larger touch targets on mobile
+              minHeight: { xs: 48, sm: 36 },
               fontSize: { xs: '0.875rem', sm: '0.875rem' },
+              px: { xs: 0, sm: 3 },
             },
           }}
         >

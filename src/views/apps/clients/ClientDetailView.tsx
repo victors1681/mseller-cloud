@@ -97,7 +97,7 @@ const ClientDetailView: React.FC<ClientDetailViewProps> = ({
   const [debitNoteModalOpen, setDebitNoteModalOpen] = useState(false)
   const [selectedCxc, setSelectedCxc] = useState<CuentaCxc | null>(null)
   const [customerInfo, setCustomerInfo] = useState<CustomerType | null>(null)
-
+  console.log('selectedCxc', selectedCxc)
   // ** Effects
   useEffect(() => {
     if (codigoCliente) {

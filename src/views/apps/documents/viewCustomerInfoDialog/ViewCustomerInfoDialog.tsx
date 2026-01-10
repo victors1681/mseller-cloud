@@ -107,10 +107,6 @@ const ViewCustomerInfoDialog: React.FC<ViewCustomerInfoDialogProps> = ({
               sx={{
                 minWidth: 44,
                 minHeight: 44,
-                bgcolor: 'action.hover',
-                '&:hover': {
-                  bgcolor: 'action.selected',
-                },
               }}
             >
               <Icon icon="mdi:close" />

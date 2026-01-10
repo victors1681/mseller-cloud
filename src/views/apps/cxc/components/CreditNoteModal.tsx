@@ -71,9 +71,7 @@ const CreditNoteModal: React.FC<CreditNoteModalProps> = ({
   const [isProcessing, setIsProcessing] = useState(false)
 
   // ** Check if document is an invoice (credit notes can only be applied to invoices)
-  const isInvoice =
-    cxc?.tipoDocumento === TipoDocumento.Invoice ||
-    cxc?.tipoDocumento === 'invoice'
+  const isInvoice = cxc?.tipoDocumento === TipoDocumento.Invoice
 
   // ** Load business configuration on mount
   React.useEffect(() => {
@@ -191,7 +189,6 @@ const CreditNoteModal: React.FC<CreditNoteModalProps> = ({
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: isMobile ? 0 : 3,
           margin: isMobile ? 0 : 2,
         },
       }}

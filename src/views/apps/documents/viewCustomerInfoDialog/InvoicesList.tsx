@@ -188,7 +188,7 @@ const InvoicesList: React.FC<InvoicesListProps> = ({ invoices, isLoading }) => {
             <Icon icon="mdi:file-table" />
           </Avatar>
         }
-        title="Facturas"
+        title="Facturas Pendientes por cobrar"
         titleTypographyProps={{
           variant: 'h6',
           sx: {
