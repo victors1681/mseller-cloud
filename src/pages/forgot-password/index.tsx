@@ -7,30 +7,28 @@ import Link from 'next/link'
 // ** MUI Components
 import LoadingButton from '@mui/lab/LoadingButton'
 import Alert from '@mui/material/Alert'
-import Box, { BoxProps } from '@mui/material/Box'
+import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import MuiCard, { CardProps } from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { styled, useTheme } from '@mui/material/styles'
-import useMediaQuery from '@mui/material/useMediaQuery'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
 // ** Configs
-import themeConfig from 'src/configs/themeConfig'
 
 // ** Layout Import
 import BlankLayout from 'src/@core/layouts/BlankLayout'
 
 // ** Hooks
-import { useSettings } from 'src/@core/hooks/useSettings'
-import { useAuth } from 'src/hooks/useAuth'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import { useSettings } from 'src/@core/hooks/useSettings'
 import { isValidResponse } from 'src/firebase'
+import { useAuth } from 'src/hooks/useAuth'
 
 // ** Demo Imports
 import FooterIllustrationsV2 from 'src/views/pages/auth/FooterIllustrationsV2'
