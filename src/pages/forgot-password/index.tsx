@@ -1,16 +1,20 @@
 // ** React Imports
-import { ReactNode } from 'react'
+import { ReactNode, useState } from 'react'
 
 // ** Next Import
 import Link from 'next/link'
 
 // ** MUI Components
-import Button from '@mui/material/Button'
-import TextField from '@mui/material/TextField'
+import LoadingButton from '@mui/lab/LoadingButton'
+import Alert from '@mui/material/Alert'
 import Box, { BoxProps } from '@mui/material/Box'
-import useMediaQuery from '@mui/material/useMediaQuery'
+import Button from '@mui/material/Button'
+import MuiCard, { CardProps } from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
 import { styled, useTheme } from '@mui/material/styles'
-import Typography, { TypographyProps } from '@mui/material/Typography'
+import useMediaQuery from '@mui/material/useMediaQuery'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -23,56 +27,21 @@ import BlankLayout from 'src/@core/layouts/BlankLayout'
 
 // ** Hooks
 import { useSettings } from 'src/@core/hooks/useSettings'
-
-// ** Demo Imports
-import FooterIllustrationsV2 from 'src/views/pages/auth/FooterIllustrationsV2'
-import Image from 'next/image'
 import { useAuth } from 'src/hooks/useAuth'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { isValidResponse } from 'src/firebase'
+
+// ** Demo Imports
+import FooterIllustrationsV2 from 'src/views/pages/auth/FooterIllustrationsV2'
+
 interface FormValues {
   email: string
 }
 
-// Styled Components
-const ForgotPasswordIllustrationWrapper = styled(Box)<BoxProps>(
-  ({ theme }) => ({
-    padding: theme.spacing(20),
-    paddingRight: '0 !important',
-    [theme.breakpoints.down('lg')]: {
-      padding: theme.spacing(10),
-    },
-  }),
-)
-
-const ForgotPasswordIllustration = styled('img')(({ theme }) => ({
-  maxWidth: '53.125rem',
-  [theme.breakpoints.down('lg')]: {
-    maxWidth: '35rem',
-  },
-}))
-
-const RightWrapper = styled(Box)<BoxProps>(({ theme }) => ({
-  width: '100%',
-  [theme.breakpoints.up('md')]: {
-    maxWidth: 450,
-  },
-}))
-
-const BoxWrapper = styled(Box)<BoxProps>(({ theme }) => ({
-  [theme.breakpoints.down('xl')]: {
-    width: '100%',
-  },
-  [theme.breakpoints.down('md')]: {
-    maxWidth: 400,
-  },
-}))
-
-const TypographyStyled = styled(Typography)<TypographyProps>(({ theme }) => ({
-  fontWeight: 600,
-  marginBottom: theme.spacing(1.5),
-  [theme.breakpoints.down('md')]: { mt: theme.spacing(8) },
+// ** Styled Components
+const Card = styled(MuiCard)<CardProps>(({ theme }) => ({
+  [theme.breakpoints.up('sm')]: { width: '28rem' },
 }))
 
 const LinkStyled = styled(Link)(({ theme }) => ({
@@ -85,6 +54,10 @@ const LinkStyled = styled(Link)(({ theme }) => ({
 }))
 
 const ForgotPassword = () => {
+  // ** State
+  const [isLoading, setIsLoading] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
+
   const {
     register,
     handleSubmit,
@@ -98,14 +71,14 @@ const ForgotPassword = () => {
 
   // ** Vars
   const { skin } = settings
-  const hidden = useMediaQuery(theme.breakpoints.down('md'))
 
   const onSubmit = async (data: FormValues) => {
-    console.log('Form submitted:', data)
+    setIsLoading(true)
 
     try {
       const response = await triggerForgotPassword({ email: data.email })
       if (isValidResponse(response)) {
+        setIsSuccess(true)
         toast.success(
           'Se ha enviado un correo electrónico para actualizar su contraseña',
         )
@@ -113,130 +86,186 @@ const ForgotPassword = () => {
         toast.error('Error inesperado al recuperar la contraseña')
       }
     } catch (err: any) {
-      toast.error(err?.message)
+      toast.error(err?.message || 'Error al enviar el correo')
+    } finally {
+      setIsLoading(false)
     }
-    // Add your restore password logic here
   }
 
-  const imageSource =
-    skin === 'bordered'
-      ? 'auth-v2-forgot-password-illustration-bordered'
-      : 'auth-v2-forgot-password-illustration'
-
   return (
-    <Box className="content-right">
-      {!hidden ? (
-        <Box
-          sx={{
-            flex: 1,
-            display: 'flex',
-            position: 'relative',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
+    <Box className="content-center">
+      <Card sx={{ zIndex: 1 }}>
+        <CardContent
+          sx={{ p: (theme) => `${theme.spacing(12, 9, 7)} !important` }}
         >
-          <ForgotPasswordIllustrationWrapper>
-            <ForgotPasswordIllustration
-              alt="forgot-password-illustration"
-              src={`/images/pages/${imageSource}-${theme.palette.mode}.png`}
-            />
-          </ForgotPasswordIllustrationWrapper>
-          <FooterIllustrationsV2 />
-        </Box>
-      ) : null}
-      <RightWrapper
-        sx={
-          skin === 'bordered' && !hidden
-            ? { borderLeft: `1px solid ${theme.palette.divider}` }
-            : {}
-        }
-      >
-        <Box
-          sx={{
-            p: 12,
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'background.paper',
-          }}
-        >
-          <BoxWrapper>
+          <Box
+            sx={{
+              mb: 8,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
             <Box
+              component="a"
+              href="https://mseller.app"
+              target="_blank"
+              rel="noopener noreferrer"
               sx={{
-                top: 30,
-                left: 40,
-                display: 'flex',
-                position: 'absolute',
-                alignItems: 'center',
-                justifyContent: 'center',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                transition: 'transform 0.2s',
+                '&:hover': {
+                  transform: 'scale(1.05)',
+                },
               }}
             >
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Image
-                  src="/images/logos/mseller-logo-dark.png"
-                  alt="logo"
-                  height="50"
-                  width="200"
-                  style={{ paddingLeft: '10px' }}
-                />
-              </Box>
-            </Box>
-            <Box sx={{ mb: 6 }}>
-              <TypographyStyled variant="h5">
-                Olvidó su contraseña? 🔒
-              </TypographyStyled>
-              <Typography variant="body2">
-                Digíte su correo electónico y recibirá intrucciones para
-                restaurar su contraseña
-              </Typography>
-            </Box>
-            <form
-              noValidate
-              autoComplete="off"
-              onSubmit={handleSubmit(onSubmit)}
-            >
-              <TextField
-                autoFocus
-                type="email"
-                label="Email"
-                sx={{ display: 'flex', mb: 4 }}
-                {...register('email', {
-                  required: 'Email is required',
-                  pattern: {
-                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                    message: 'Invalid email address',
-                  },
-                })}
-                error={!!errors.email}
-                helperText={errors.email?.message}
+              <img
+                src="/images/logos/mseller-logo.svg"
+                alt="MSeller Logo"
+                style={{ height: '36px', width: 'auto' }}
               />
+            </Box>
+          </Box>
+
+          {!isSuccess ? (
+            <>
+              <Box sx={{ mb: 6 }}>
+                <Typography variant="h5" sx={{ fontWeight: 600, mb: 1.5 }}>
+                  Olvidó su contraseña? 🔒
+                </Typography>
+                <Typography variant="body2">
+                  Ingrese su correo electrónico y recibirá instrucciones para
+                  restaurar su contraseña
+                </Typography>
+              </Box>
+              <form
+                noValidate
+                autoComplete="off"
+                onSubmit={handleSubmit(onSubmit)}
+              >
+                <TextField
+                  autoFocus
+                  fullWidth
+                  type="email"
+                  label="Email"
+                  placeholder="correo electrónico"
+                  sx={{ mb: 4 }}
+                  {...register('email', {
+                    required: 'Email es requerido',
+                    pattern: {
+                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                      message: 'Dirección de correo inválida',
+                    },
+                  })}
+                  error={!!errors.email}
+                  helperText={errors.email?.message}
+                  disabled={isLoading}
+                />
+                <LoadingButton
+                  fullWidth
+                  size="large"
+                  type="submit"
+                  variant="contained"
+                  sx={{ mb: 5.25 }}
+                  loading={isLoading}
+                >
+                  Restaurar Contraseña
+                </LoadingButton>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <LinkStyled href="/login">
+                    <Icon icon="mdi:chevron-left" />
+                    <span>Regresar al inicio de sesión</span>
+                  </LinkStyled>
+                </Typography>
+              </form>
+            </>
+          ) : (
+            <>
+              <Box sx={{ mb: 6, textAlign: 'center' }}>
+                <Icon
+                  icon="mdi:email-check-outline"
+                  fontSize={64}
+                  color="success"
+                />
+                <Typography
+                  variant="h5"
+                  sx={{ fontWeight: 600, mb: 1.5, mt: 4 }}
+                >
+                  ¡Correo Enviado!
+                </Typography>
+                <Alert severity="success" sx={{ mb: 4, textAlign: 'left' }}>
+                  Se ha enviado un correo electrónico con las instrucciones para
+                  restaurar su contraseña.
+                </Alert>
+                <Typography variant="body2" sx={{ mb: 2 }}>
+                  Por favor, revise su bandeja de entrada y su carpeta de spam.
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 4 }}>
+                  Si no recibe el correo en unos minutos, contacte a soporte en{' '}
+                  <Box
+                    component="a"
+                    href="mailto:soporte@mseller.app"
+                    sx={{
+                      color: 'primary.main',
+                      textDecoration: 'none',
+                      fontWeight: 600,
+                      '&:hover': {
+                        textDecoration: 'underline',
+                      },
+                    }}
+                  >
+                    soporte@mseller.app
+                  </Box>
+                </Typography>
+              </Box>
               <Button
                 fullWidth
                 size="large"
-                type="submit"
                 variant="contained"
-                sx={{ mb: 5.25 }}
+                href="/login"
+                sx={{ mb: 4 }}
               >
-                Restaurar contraseña
+                Volver al inicio de sesión
               </Button>
-              <Typography
-                variant="body2"
+            </>
+          )}
+
+          <Box sx={{ mt: 4, textAlign: 'center' }}>
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'text.secondary',
+              }}
+            >
+              ¿Necesitas ayuda?{' '}
+              <Box
+                component="a"
+                href="https://mseller.app"
+                target="_blank"
+                rel="noopener noreferrer"
                 sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  color: 'primary.main',
+                  textDecoration: 'none',
+                  '&:hover': {
+                    textDecoration: 'underline',
+                  },
                 }}
               >
-                <LinkStyled href="/login">
-                  <Icon icon="mdi:chevron-left" />
-                  <span>Regresar al inicio de sesión</span>
-                </LinkStyled>
-              </Typography>
-            </form>
-          </BoxWrapper>
-        </Box>
-      </RightWrapper>
+                Visita mseller.app
+              </Box>
+            </Typography>
+          </Box>
+        </CardContent>
+      </Card>
+      <FooterIllustrationsV2 />
     </Box>
   )
 }
