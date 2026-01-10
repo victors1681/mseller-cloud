@@ -52,6 +52,7 @@
     "@reduxjs/toolkit": "1.9.5",
     "@stripe/react-stripe-js": "^3.0.0",
     "@stripe/stripe-js": "^5.2.0",
+    "@tawk.to/tawk-messenger-react": "^2.0.2",
     "@testing-library/dom": "^10.4.0",
     "@types/http-proxy": "^1.17.17",
     "@types/puppeteer": "^7.0.4",

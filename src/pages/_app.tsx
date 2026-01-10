@@ -6,6 +6,9 @@ import type { AppProps } from 'next/app'
 import Head from 'next/head'
 import { Router } from 'next/router'
 
+// ** Tawk.to Chat Widget
+import TawkMessengerReact from '@tawk.to/tawk-messenger-react'
+
 // ** Datadog RUM
 import {
   datadogLogger,
@@ -244,6 +247,12 @@ const App = (props: ExtendedAppProps) => {
             </FirebaseProvider>
           </AuthProvider>
         </ErrorBoundary>
+        
+        {/* Tawk.to Chat Widget */}
+        <TawkMessengerReact
+          propertyId="696247b67c8bd319796ac4dc"
+          widgetId="1jejug80h"
+        />
       </CacheProvider>
     </Provider>
   )
