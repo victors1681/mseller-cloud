@@ -8,13 +8,16 @@ import Link from 'next/link'
 import Alert from '@mui/material/Alert'
 import Grid from '@mui/material/Grid'
 
-// ** Third Party Components
+// ** Redux
+import { useSelector } from 'react-redux'
+import { RootState } from 'src/store'
 
 // ** Types
 import { DocumentType } from 'src/types/apps/documentTypes'
 
 // ** Demo Components Imports
 import restClient from 'src/configs/restClient'
+import AddEditDocumentDialog from 'src/views/apps/documents/add-edit-document'
 import DocumentPreviewCard from 'src/views/apps/documents/preview/DocumentPreviewCard'
 import PreviewActions from 'src/views/apps/documents/preview/PreviewActions'
 
@@ -28,6 +31,9 @@ const InvoicePreview = ({ id }: DocumentPreviewProps) => {
   const [data, setData] = useState<null | DocumentType>(null)
   const [addPaymentOpen, setAddPaymentOpen] = useState<boolean>(false)
   const [sendInvoiceOpen, setSendInvoiceOpen] = useState<boolean>(false)
+
+  // ** Redux
+  const store = useSelector((state: RootState) => state.documents)
 
   useEffect(() => {
     restClient
@@ -55,6 +61,7 @@ const InvoicePreview = ({ id }: DocumentPreviewProps) => {
             <PreviewActions data={data} />
           </Grid>
         </Grid>
+        <AddEditDocumentDialog open={store.isEditDialogOpen} />
         {/* <SendInvoiceDrawer
           open={sendInvoiceOpen}
           toggle={toggleSendInvoiceDrawer}

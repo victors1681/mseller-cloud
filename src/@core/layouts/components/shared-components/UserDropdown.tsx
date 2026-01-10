@@ -1,15 +1,15 @@
 // ** React Imports
-import { useState, SyntheticEvent, Fragment } from 'react'
+import { Fragment, SyntheticEvent, useState } from 'react'
 
 // ** Next Import
 import { useRouter } from 'next/router'
 
 // ** MUI Imports
-import Box from '@mui/material/Box'
-import Menu from '@mui/material/Menu'
-import Badge from '@mui/material/Badge'
 import Avatar from '@mui/material/Avatar'
+import Badge from '@mui/material/Badge'
+import Box from '@mui/material/Box'
 import Divider from '@mui/material/Divider'
+import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import { styled } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
@@ -151,32 +151,35 @@ const UserDropdown = (props: Props) => {
           </Box>
         </Box>
         <Divider sx={{ mt: '0 !important' }} />
-        <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose()}>
+        <MenuItem
+          sx={{ p: 0 }}
+          onClick={() => handleDropdownClose('/account-settings/account/')}
+        >
           <Box sx={styles}>
             <Icon icon="mdi:account-outline" />
-            Profile
+            Mi Cuenta
           </Box>
         </MenuItem>
-        <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose()}>
-          <Box sx={styles}>
-            <Icon icon="mdi:email-outline" />
-            Inbox
-          </Box>
-        </MenuItem>
-        <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose()}>
+        <MenuItem
+          sx={{ p: 0 }}
+          onClick={() => handleDropdownClose('/apps/communication/')}
+        >
           <Box sx={styles}>
             <Icon icon="mdi:message-outline" />
-            Chat
+            Mensajería
           </Box>
         </MenuItem>
         <Divider />
-        <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose()}>
+        <MenuItem
+          sx={{ p: 0 }}
+          onClick={() => handleDropdownClose('/apps/business/')}
+        >
           <Box sx={styles}>
             <Icon icon="mdi:cog-outline" />
-            Settings
+            Configuración Empresa
           </Box>
         </MenuItem>
-        <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose()}>
+        {/* <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose()}>
           <Box sx={styles}>
             <Icon icon="mdi:currency-usd" />
             Pricing
@@ -187,7 +190,7 @@ const UserDropdown = (props: Props) => {
             <Icon icon="mdi:help-circle-outline" />
             FAQ
           </Box>
-        </MenuItem>
+        </MenuItem> */}
         <Divider />
         <MenuItem
           onClick={handleLogout}
@@ -197,7 +200,7 @@ const UserDropdown = (props: Props) => {
           }}
         >
           <Icon icon="mdi:logout-variant" />
-          Logout
+          Cerrar Sesión
         </MenuItem>
       </Menu>
     </Fragment>

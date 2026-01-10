@@ -109,7 +109,11 @@ const schema = yup.object().shape({
     .required('Secuencia actual es requerida')
     .min(1, 'Debe ser mayor a 0'),
   vencimiento: yup.string(),
-  entorno: yup.string().required('Entorno es requerido'),
+  entorno: yup.string().when('esElectronico', {
+    is: true,
+    then: (schema) => schema.required('Entorno es requerido'),
+    otherwise: (schema) => schema.notRequired(),
+  }),
 })
 
 const defaultValues: SecuenciaFormData = {

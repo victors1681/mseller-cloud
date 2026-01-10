@@ -2,7 +2,6 @@
 import { useState } from 'react'
 
 // ** Next Import
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 // ** MUI Imports
@@ -16,7 +15,10 @@ import { useDispatch } from 'react-redux'
 import Icon from 'src/@core/components/icon'
 import { useGoBack } from 'src/hooks/useGoBack'
 import { AppDispatch } from 'src/store'
-import { changeDocumentStatus } from 'src/store/apps/documents'
+import {
+  changeDocumentStatus,
+  toggleEditDocument,
+} from 'src/store/apps/documents'
 import {
   DocumentStatus,
   DocumentType,
@@ -75,6 +77,10 @@ const PreviewActions = ({ data }: Props) => {
     )
   }
 
+  const handleEdit = () => {
+    dispatch(toggleEditDocument(data))
+  }
+
   return (
     <Card>
       <CardContent>
@@ -100,11 +106,11 @@ const PreviewActions = ({ data }: Props) => {
         <Button
           fullWidth
           sx={{ mb: 3.5 }}
-          component={Link}
           color="secondary"
           variant="outlined"
-          href={`#`}
-          disabled={true}
+          onClick={handleEdit}
+          disabled={data.procesado !== DocumentStatus.Pending}
+          startIcon={<Icon icon="mdi:pencil-outline" />}
         >
           Editar
         </Button>

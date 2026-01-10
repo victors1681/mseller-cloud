@@ -181,6 +181,55 @@ interface AddCustomerProps {
   id: string
 }
 
+const defaultCustomerValues: Partial<CustomerType> = {
+  // Basic Information
+  codigo: '',
+  nombre: '',
+  direccion: '',
+  telefono1: '',
+  ciudad: '',
+  email: '',
+  contactos: [],
+  rnc: '',
+
+  // Financial Information
+  balance: 0,
+  limiteFacturas: 0,
+  limiteCredito: 0,
+  descuento: 0,
+  descuentoProntoPago: 0,
+
+  // Sales Information
+  codigoVendedor: '',
+  rutaVenta: 0,
+  clasificacion: '',
+  condicionPrecio: 1,
+
+  // Status and Controls
+  status: 'A',
+  confirmado: false,
+  actualizar: false,
+  impuesto: false,
+  bloqueoPorVencimiento: false,
+
+  // Scheduling
+  condicion: '',
+  dia: 0,
+  frecuencia: 0,
+  secuencia: 0,
+
+  // Other Details
+  tipoCliente: '',
+  localidadId: 0,
+
+  estado: '',
+  codigoPostal: '',
+  preferenciasDeContacto: '',
+  idiomaPreferido: '',
+  notas: '',
+  pais: '',
+}
+
 const AddCustomer = ({ id }: AddCustomerProps) => {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -188,54 +237,7 @@ const AddCustomer = ({ id }: AddCustomerProps) => {
 
   // Initialize form
   const methods = useForm<CustomerType>({
-    defaultValues: {
-      // Basic Information
-      codigo: '',
-      nombre: '',
-      direccion: '',
-      telefono1: '',
-      ciudad: '',
-      email: '',
-      contactos: [],
-      rnc: '',
-
-      // Financial Information
-      balance: 0,
-      limiteFacturas: 0,
-      limiteCredito: 0,
-      descuento: 0,
-      descuentoProntoPago: 0,
-
-      // Sales Information
-      codigoVendedor: '',
-      rutaVenta: 0,
-      clasificacion: '',
-      condicionPrecio: 1,
-
-      // Status and Controls
-      status: 'A',
-      confirmado: false,
-      actualizar: false,
-      impuesto: false,
-      bloqueoPorVencimiento: false,
-
-      // Scheduling
-      condicion: '',
-      dia: 0,
-      frecuencia: 0,
-      secuencia: 0,
-
-      // Other Details
-      tipoCliente: '',
-      localidadId: 0,
-
-      estado: '',
-      codigoPostal: '',
-      preferenciasDeContacto: '',
-      idiomaPreferido: '',
-      notas: '',
-      pais: '',
-    },
+    defaultValues: defaultCustomerValues,
     resolver: yupResolver(clientSchema),
     mode: 'onChange',
   })
@@ -278,14 +280,17 @@ const AddCustomer = ({ id }: AddCustomerProps) => {
   useEffect(() => {
     if (id && id !== 'new') {
       dispatch(fetchCustomer(id))
+    } else if (id === 'new') {
+      // Reset form when creating a new client
+      methods.reset(defaultCustomerValues)
     }
-  }, [id, dispatch])
+  }, [id, dispatch, methods])
 
   useEffect(() => {
-    if (store.customerDetail) {
+    if (store.customerDetail && id !== 'new') {
       methods.reset(store.customerDetail.client)
     }
-  }, [methods, store.customerDetail])
+  }, [methods, store.customerDetail, id])
 
   // Set default values for new customer
   useEffect(() => {
