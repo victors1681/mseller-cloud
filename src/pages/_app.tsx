@@ -7,7 +7,7 @@ import Head from 'next/head'
 import { Router } from 'next/router'
 
 // ** Tawk.to Chat Widget
-import TawkMessengerReact from '@tawk.to/tawk-messenger-react'
+import TawkMessenger from 'src/components/TawkMessenger'
 
 // ** Datadog RUM
 import {
@@ -239,6 +239,9 @@ const App = (props: ExtendedAppProps) => {
                             toastOptions={{ className: 'react-hot-toast' }}
                           />
                         </ReactHotToast>
+
+                        {/* Tawk.to Chat Widget - Client Side Only */}
+                        <TawkMessenger />
                       </ThemeComponent>
                     )
                   }}
@@ -247,12 +250,9 @@ const App = (props: ExtendedAppProps) => {
             </FirebaseProvider>
           </AuthProvider>
         </ErrorBoundary>
-        
+
         {/* Tawk.to Chat Widget */}
-        <TawkMessengerReact
-          propertyId="696247b67c8bd319796ac4dc"
-          widgetId="1jejug80h"
-        />
+        <TawkMessenger />
       </CacheProvider>
     </Provider>
   )
