@@ -28,6 +28,7 @@ interface TawkUserInfo {
   fromPortal: boolean
   warehouse: string
   sellerCode: string
+  phoneUser: string
 }
 
 // Store user info outside component to persist across remounts
@@ -46,6 +47,7 @@ const buildUserInfo = (user: any): TawkUserInfo => ({
   country: user.business?.address?.country || '',
   street: user.business?.address?.street || '',
   phone: user.business?.phone || '',
+  phoneUser: user.phone,
   rnc: user.business?.rnc || '',
   tier: user.business?.tier || '',
   fromPortal: user.business?.fromPortal || false,
