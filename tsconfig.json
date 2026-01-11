@@ -26,6 +26,6 @@
       "apexcharts/*": ["./node_modules/apexcharts-clevision/*"]
     }
   },
-  "include": ["src", "declaration.d.ts"],
+  "include": ["src", "declaration.d.ts", "tawk-messenger-react.d.ts"],
   "exclude": ["node_modules"]
 }
